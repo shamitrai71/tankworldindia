@@ -5,6 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>TankWorld India — Engineering &amp; Equipment Directory</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<!-- Firebase compat SDK, classic script tags (not ES modules) so load order is
+     predictable in a single-file app. AUTH ONLY — Firestore stays on the REST
+     layer, mirroring TankBazaar, because the streaming SDK's WebChannel
+     transport hangs on some corporate networks. -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -244,6 +250,98 @@ main{ flex:1; min-width:0; padding:20px 24px 60px; }
   font-family:var(--font-mono); font-size:10px; font-weight:700; color:var(--paper-raised);
   background:var(--blue); padding:2px 6px; border-radius:2px; width:fit-content; letter-spacing:0.5px;
 }
+/* ── Auth / profile / admin ─────────────────────────────────────────── */
+.auth-area{ display:flex; align-items:center; gap:8px; }
+.btn-auth{
+  font-family:var(--font-mono); font-size:10.5px; letter-spacing:0.5px; cursor:pointer;
+  padding:7px 12px; border-radius:var(--radius); border:1px solid var(--blue);
+  background:var(--blue); color:var(--paper-raised); transition:opacity .15s;
+}
+.btn-auth:hover{ opacity:.88; }
+.btn-auth.ghost{ background:transparent; color:var(--blue); }
+.user-chip{
+  display:flex; align-items:center; gap:8px; cursor:pointer;
+  padding:4px 10px 4px 4px; border:1px solid var(--line); border-radius:20px; background:var(--paper-raised);
+}
+.user-chip img, .user-chip .avatar-fallback{ width:26px; height:26px; border-radius:50%; object-fit:cover; }
+.user-chip .avatar-fallback{
+  background:var(--blue); color:var(--paper-raised); display:flex; align-items:center;
+  justify-content:center; font-family:var(--font-mono); font-size:11px; font-weight:700;
+}
+.user-chip .u-name{ font-size:12px; font-weight:600; max-width:120px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.badge-admin{
+  font-family:var(--font-mono); font-size:8.5px; font-weight:700; letter-spacing:0.5px;
+  background:var(--rust); color:var(--paper-raised); padding:2px 5px; border-radius:2px;
+}
+
+/* Modal */
+.modal-backdrop{
+  display:none; position:fixed; inset:0; background:rgba(27,31,35,.55);
+  z-index:2000; align-items:center; justify-content:center; padding:20px;
+}
+.modal-backdrop.open{ display:flex; }
+.modal{
+  background:var(--paper-raised); border:1px solid var(--line); border-radius:var(--radius);
+  padding:22px; width:100%; max-width:400px; box-shadow:0 18px 50px rgba(0,0,0,.22);
+}
+.modal-head{ display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px; }
+.modal-code{ font-family:var(--font-mono); font-size:9.5px; color:var(--ink-faint); letter-spacing:1px; }
+.modal h3{ font-family:var(--font-display); font-size:19px; }
+.modal-x{ background:none; border:none; font-size:22px; cursor:pointer; color:var(--ink-muted); line-height:1; }
+.modal-note{ font-size:12.5px; color:var(--ink-muted); margin:8px 0 16px; line-height:1.5; }
+.btn-google{
+  width:100%; display:flex; align-items:center; justify-content:center; gap:9px; cursor:pointer;
+  padding:11px; border:1px solid var(--line); border-radius:var(--radius);
+  background:#fff; font-family:var(--font-body); font-size:13.5px; font-weight:500; transition:background .15s;
+}
+.btn-google:hover{ background:#F5F5F5; }
+.auth-error{ color:#B23B3B; font-size:12px; margin-top:10px; min-height:16px; }
+
+/* Profile + admin panels */
+#profile-view, #admin-view{ display:none; }
+#profile-view.active, #admin-view.active{ display:block; }
+.panel-head{ margin-bottom:18px; padding-bottom:14px; border-bottom:1px solid var(--line); }
+.panel-head .p-code{ font-family:var(--font-mono); font-size:10px; color:var(--ink-faint); letter-spacing:1.5px; }
+.panel-head h2{ font-family:var(--font-display); font-size:26px; margin-top:4px; }
+.panel-head p{ font-size:13px; color:var(--ink-muted); margin-top:5px; }
+.profile-card{
+  display:flex; gap:16px; align-items:center; background:var(--paper-raised);
+  border:1px solid var(--line); border-radius:var(--radius); padding:18px; margin-bottom:16px;
+}
+.profile-card img, .profile-card .avatar-fallback{ width:60px; height:60px; border-radius:50%; object-fit:cover; }
+.profile-card .avatar-fallback{
+  background:var(--blue); color:var(--paper-raised); display:flex; align-items:center;
+  justify-content:center; font-family:var(--font-mono); font-size:20px; font-weight:700;
+}
+.profile-card h3{ font-family:var(--font-display); font-size:19px; }
+.profile-card .p-mail{ font-family:var(--font-mono); font-size:11.5px; color:var(--ink-muted); margin-top:2px; }
+.admin-actions{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:18px; }
+.btn-action{
+  font-family:var(--font-mono); font-size:11px; letter-spacing:.5px; cursor:pointer;
+  padding:10px 15px; border-radius:var(--radius); border:1px solid var(--blue);
+  background:var(--blue); color:var(--paper-raised);
+}
+.btn-action.rust{ background:var(--rust); border-color:var(--rust); }
+.btn-action.ghost{ background:transparent; color:var(--blue); }
+.btn-action:disabled{ opacity:.5; cursor:not-allowed; }
+.admin-log{
+  font-family:var(--font-mono); font-size:11px; background:var(--paper); border:1px solid var(--line);
+  border-radius:var(--radius); padding:12px; max-height:240px; overflow-y:auto; white-space:pre-wrap;
+  line-height:1.6; margin-bottom:18px;
+}
+.admin-log:empty{ display:none; }
+.admin-note{
+  font-size:12.5px; color:var(--ink-muted); background:var(--blue-soft); border:1px solid var(--line-blue);
+  border-left:3px solid var(--blue); border-radius:var(--radius); padding:12px 14px; margin-bottom:18px; line-height:1.55;
+}
+.gate{
+  text-align:center; padding:60px 20px; border:1px dashed var(--line);
+  border-radius:var(--radius); background:var(--paper-raised);
+}
+.gate .g-mark{ font-family:var(--font-mono); font-size:11px; color:var(--ink-faint); letter-spacing:2px; }
+.gate h3{ font-family:var(--font-display); font-size:22px; margin:10px 0 6px; }
+.gate p{ font-size:13px; color:var(--ink-muted); margin-bottom:16px; }
+
 .product-tile .tile-name{ font-family:var(--font-display); font-weight:600; font-size:13px; line-height:1.3; }
 .product-tile .tile-sheet{ font-family:var(--font-mono); font-size:9.5px; color:var(--ink-faint); }
 .product-tile .tile-code-row{ display:flex; align-items:center; gap:5px; flex-wrap:wrap; }
@@ -305,7 +403,28 @@ footer{
     <button id="btnListView" class="active" onclick="setView('list')">List</button>
     <button id="btnMapView" onclick="setView('map')">Map</button>
   </div>
+  <div class="auth-area" id="authArea"></div>
 </header>
+
+<!-- ── Sign-in modal ─────────────────────────────────────────────────── -->
+<div class="modal-backdrop" id="authModal" onclick="if(event.target===this) closeAuthModal()">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <div class="modal-code">AUTH-01</div>
+        <h3>Sign in</h3>
+      </div>
+      <button class="modal-x" onclick="closeAuthModal()">&times;</button>
+    </div>
+    <p class="modal-note">Sign in to manage your company listing. Browsing the
+      directory doesn't require an account.</p>
+    <button class="btn-google" onclick="signInWithGoogle()">
+      <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.65l-3.57-2.77c-.99.66-2.26 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.84 14.11a6.6 6.6 0 0 1 0-4.22V7.05H2.18a11 11 0 0 0 0 9.9l3.66-2.84z"/><path fill="#EA4335" d="M12 4.75c1.61 0 3.06.55 4.2 1.64l3.15-3.15C17.45 1.46 14.97.5 12 .5A11 11 0 0 0 2.18 7.05l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Continue with Google
+    </button>
+    <div id="authError" class="auth-error"></div>
+  </div>
+</div>
 
 <div class="app-body">
   <aside class="sidebar">
@@ -335,6 +454,8 @@ footer{
       <div id="twi-map"></div>
     </div>
     <div id="company-view"></div>
+    <div id="profile-view"></div>
+    <div id="admin-view"></div>
   </main>
 </div>
 
@@ -761,10 +882,73 @@ const FIRESTORE_DB_ID = "(default)";
 // `companies` is public-read per firestore.rules, so no auth token is
 // needed for the directory to load.
 // ══════════════════════════════════════════════════════════════════════
+// Auth uses the Firebase SDK (plain HTTPS, no WebChannel), data uses REST.
+let firebaseReady = false, fbAuth = null;
+(function initFirebase() {
+  if (typeof firebase === 'undefined') {
+    console.warn('[TANKWORLDINDIA] Firebase SDK not loaded — sign-in disabled, directory still works.');
+    return;
+  }
+  try {
+    firebase.initializeApp(firebaseConfig);
+    fbAuth = firebase.auth();
+    firebaseReady = true;
+    console.log('%c[TANKWORLDINDIA] Firebase ready · project=' + firebaseConfig.projectId +
+                ' · db=' + FIRESTORE_DB_ID, 'color:#1B4B7A;font-weight:bold');
+  } catch (e) {
+    console.error('[TANKWORLDINDIA] Firebase init failed:', e);
+  }
+})();
+
+// Admin emails — must match the isAdmin() list in firestore.rules. This
+// controls UI visibility only; the rules are what actually enforce writes.
+const ADMIN_EMAILS = ['esraigroup@gmail.com', 'petrodeksystems@gmail.com'];
+function isAdminUser(u) {
+  return !!u && ADMIN_EMAILS.includes((u.email || '').toLowerCase());
+}
+
 const FS_REST = {
   base() {
     return `https://firestore.googleapis.com/v1/projects/${firebaseConfig.projectId}` +
            `/databases/${FIRESTORE_DB_ID}/documents`;
+  },
+  async token() {
+    return fbAuth && fbAuth.currentUser ? await fbAuth.currentUser.getIdToken() : null;
+  },
+  toFields(obj) {
+    const fields = {};
+    for (const [k, v] of Object.entries(obj)) fields[k] = FS_REST.toValue(v);
+    return fields;
+  },
+  toValue(v) {
+    if (v === null || v === undefined) return { nullValue: null };
+    if (typeof v === 'boolean') return { booleanValue: v };
+    if (typeof v === 'number') return Number.isInteger(v) ? { integerValue: String(v) } : { doubleValue: v };
+    if (typeof v === 'string') return { stringValue: v };
+    if (v instanceof Date) return { timestampValue: v.toISOString() };
+    if (Array.isArray(v)) return { arrayValue: { values: v.map(FS_REST.toValue) } };
+    if (typeof v === 'object') return { mapValue: { fields: FS_REST.toFields(v) } };
+    return { stringValue: String(v) };
+  },
+  // PATCH with an updateMask = merge semantics: only the listed fields are
+  // written, anything else on the document is preserved.
+  async setMerge(collection, docId, data) {
+    const token = await FS_REST.token();
+    const mask = Object.keys(data).map(k => `updateMask.fieldPaths=${encodeURIComponent(k)}`).join('&');
+    const res = await fetch(`${FS_REST.base()}/${collection}/${docId}?${mask}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ fields: FS_REST.toFields(data) }),
+    });
+    if (!res.ok) throw new Error('REST ' + res.status + ': ' + (await res.text()).slice(0, 200));
+    return res.json();
+  },
+  async deleteDoc(collection, docId) {
+    const token = await FS_REST.token();
+    const res = await fetch(`${FS_REST.base()}/${collection}/${docId}`, {
+      method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token },
+    });
+    if (!res.ok && res.status !== 404) throw new Error('REST ' + res.status);
   },
   fromFields(fields) {
     const obj = {};
@@ -1064,8 +1248,28 @@ function handleRoute() {
   const listPanel = document.getElementById('list-view');
   const mapPanel = document.getElementById('map-view');
   const companyPanel = document.getElementById('company-view');
+  const profilePanel = document.getElementById('profile-view');
+  const adminPanel = document.getElementById('admin-view');
   const header = document.querySelector('header');
   const sidebar = document.querySelector('.sidebar');
+
+  // Reset the two account panels on every route change; whichever branch
+  // below matches turns its own panel back on.
+  profilePanel.classList.remove('active');
+  adminPanel.classList.remove('active');
+
+  if (hash === '#/profile' || hash === '#/admin') {
+    const isAdminRoute = hash === '#/admin';
+    if (isAdminRoute) { renderAdminPage(); adminPanel.classList.add('active'); }
+    else { renderProfilePage(); profilePanel.classList.add('active'); }
+    document.title = (isAdminRoute ? 'Admin' : 'Profile') + ' — TankWorld India';
+    listPanel.style.display = 'none';
+    mapPanel.classList.remove('active');
+    companyPanel.classList.remove('active');
+    sidebar.style.display = 'none';
+    header.querySelector('.view-toggle').style.display = 'none';
+    return;
+  }
 
   if (m) {
     renderCompanyPage(m[1]);
@@ -1083,6 +1287,207 @@ function handleRoute() {
   }
 }
 
+// ══════════════════════════════════════════════════════════════════════
+// AUTH · PROFILE · ADMIN
+// ══════════════════════════════════════════════════════════════════════
+let currentUser = null;
+
+function openAuthModal() {
+  document.getElementById('authError').textContent = '';
+  document.getElementById('authModal').classList.add('open');
+}
+function closeAuthModal() {
+  document.getElementById('authModal').classList.remove('open');
+}
+
+function signInWithGoogle() {
+  if (!firebaseReady) {
+    document.getElementById('authError').textContent = 'Sign-in unavailable — Firebase failed to load.';
+    return;
+  }
+  const p = new firebase.auth.GoogleAuthProvider();
+  // Popup first (better desktop UX); fall back to full-page redirect when it's
+  // blocked — popup blockers, COOP policies and mobile browsers all trip this.
+  fbAuth.signInWithPopup(p).catch(err => {
+    const code = err.code || '';
+    if (['auth/popup-blocked','auth/popup-closed-by-user','auth/cancelled-popup-request',
+         'auth/operation-not-supported-in-this-environment','auth/web-storage-unsupported'].includes(code)) {
+      fbAuth.signInWithRedirect(p);
+    } else if (code === 'auth/unauthorized-domain') {
+      document.getElementById('authError').textContent =
+        'This domain is not authorised in Firebase Auth. Add it under Authentication → Settings → Authorized domains.';
+    } else {
+      document.getElementById('authError').textContent = err.message;
+      console.error(err);
+    }
+  });
+}
+
+function signOutUser() {
+  if (fbAuth) fbAuth.signOut();
+  location.hash = '#/';
+}
+
+function initials(nameOrEmail) {
+  const s = (nameOrEmail || '?').trim();
+  const parts = s.split(/[\s@.]+/).filter(Boolean);
+  return ((parts[0] || '?')[0] + (parts[1] ? parts[1][0] : '')).toUpperCase();
+}
+
+function avatarHtml(u, cls) {
+  return u.photoURL
+    ? `<img src="${u.photoURL}" alt="" referrerpolicy="no-referrer">`
+    : `<div class="avatar-fallback ${cls || ''}">${initials(u.displayName || u.email)}</div>`;
+}
+
+function renderAuthArea() {
+  const el = document.getElementById('authArea');
+  if (!el) return;
+  if (!currentUser) {
+    el.innerHTML = `<button class="btn-auth" onclick="openAuthModal()">Sign in</button>`;
+    return;
+  }
+  el.innerHTML = `
+    <div class="user-chip" onclick="location.hash='#/profile'" title="Your profile">
+      ${avatarHtml(currentUser)}
+      <span class="u-name">${currentUser.displayName || currentUser.email}</span>
+      ${isAdminUser(currentUser) ? '<span class="badge-admin">ADMIN</span>' : ''}
+    </div>`;
+}
+
+function renderProfilePage() {
+  const el = document.getElementById('profile-view');
+  if (!currentUser) {
+    el.innerHTML = `
+      <div class="gate">
+        <div class="g-mark">NOT SIGNED IN</div>
+        <h3>Sign in to view your profile</h3>
+        <p>Browsing the directory doesn't need an account — managing a listing does.</p>
+        <button class="btn-action" onclick="openAuthModal()">Sign in</button>
+      </div>`;
+    return;
+  }
+  const admin = isAdminUser(currentUser);
+  el.innerHTML = `
+    <div class="panel-head">
+      <div class="p-code">PROFILE · USR-01</div>
+      <h2>Your account</h2>
+    </div>
+    <div class="profile-card">
+      ${avatarHtml(currentUser)}
+      <div>
+        <h3>${currentUser.displayName || 'Unnamed user'}</h3>
+        <div class="p-mail">${currentUser.email}</div>
+        ${admin ? '<span class="badge-admin" style="margin-top:6px;display:inline-block;">ADMINISTRATOR</span>' : ''}
+      </div>
+    </div>
+    ${admin ? `<div class="admin-note"><b>Administrator access.</b> You can seed and manage
+      the company roster from the admin panel.</div>` : `<div class="admin-note">Company
+      claiming isn't built yet — once it is, you'll be able to request control of your
+      company's listing from its page.</div>`}
+    <div class="admin-actions">
+      ${admin ? `<button class="btn-action" onclick="location.hash='#/admin'">Open admin panel</button>` : ''}
+      <button class="btn-action ghost" onclick="location.hash='#/'">Back to directory</button>
+      <button class="btn-action rust" onclick="signOutUser()">Sign out</button>
+    </div>`;
+}
+
+function adminLog(msg) {
+  const el = document.getElementById('adminLog');
+  if (el) { el.textContent += msg + '\n'; el.scrollTop = el.scrollHeight; }
+}
+
+// Writes the in-page COMPANIES roster into Firestore, doc id = slug.
+// Idempotent: setMerge only touches the listed fields, so re-running updates
+// records in place rather than duplicating them. Slug-as-doc-id is what keeps
+// this safe to re-run and what ties a company to the same identity across apps.
+async function seedCompanies() {
+  if (!isAdminUser(currentUser)) { alert('Admin only.'); return; }
+  if (!confirm(`Write ${COMPANIES.length} companies to Firestore?\n\n` +
+               `Document id = slug. Safe to re-run: existing records are updated ` +
+               `in place, not duplicated.`)) return;
+  const btn = document.getElementById('btnSeed');
+  btn.disabled = true;
+  const log = document.getElementById('adminLog');
+  log.textContent = '';
+  let ok = 0; const failures = [];
+  for (const c of COMPANIES) {
+    try {
+      await FS_REST.setMerge('companies', c.slug, {
+        id: c.id, slug: c.slug, name: c.name, desc: c.desc || '',
+        site: c.site || '', country: c.country || '', logo: c.logo || null,
+        cats: c.cats || [], locations: c.locations || [],
+        updatedAt: new Date(),
+      });
+      ok++;
+      adminLog(`✓ ${c.slug}`);
+    } catch (err) {
+      failures.push(c.slug);
+      adminLog(`✗ ${c.slug} — ${err.message}`);
+      if (failures.length >= 3) { adminLog('\nStopped after 3 failures.'); break; }
+    }
+  }
+  adminLog(`\nDone — ${ok} written, ${failures.length} failed.`);
+  btn.disabled = false;
+  if (ok > 0) { await CompanyStore.load(); renderAll(); }
+}
+
+function renderAdminPage() {
+  const el = document.getElementById('admin-view');
+  if (!currentUser) {
+    el.innerHTML = `
+      <div class="gate">
+        <div class="g-mark">RESTRICTED · ADM-00</div>
+        <h3>Admin panel</h3>
+        <p>Sign in with an administrator account to continue.</p>
+        <button class="btn-action" onclick="openAuthModal()">Sign in</button>
+      </div>`;
+    return;
+  }
+  if (!isAdminUser(currentUser)) {
+    el.innerHTML = `
+      <div class="gate">
+        <div class="g-mark">RESTRICTED · ADM-00</div>
+        <h3>Not an administrator</h3>
+        <p>${currentUser.email} doesn't have admin access.</p>
+        <button class="btn-action ghost" onclick="location.hash='#/'">Back to directory</button>
+      </div>`;
+    return;
+  }
+  el.innerHTML = `
+    <div class="panel-head">
+      <div class="p-code">ADMIN · ADM-01</div>
+      <h2>Admin panel</h2>
+      <p>Roster management for the TankWorld India directory.</p>
+    </div>
+    <div class="admin-note">
+      <b>Data source:</b> ${CompanyStore.isLive
+        ? `Firestore — ${COMPANIES.length} companies loaded live.`
+        : `built-in seed roster (${COMPANIES.length} companies). Firestore is empty
+           or unreachable, so the directory is running on the in-page array.`}
+    </div>
+    <div class="admin-actions">
+      <button class="btn-action" id="btnSeed" onclick="seedCompanies()">
+        Seed ${COMPANIES.length} companies → Firestore
+      </button>
+      <button class="btn-action ghost" onclick="reloadFromFirestore()">Reload from Firestore</button>
+      <button class="btn-action ghost" onclick="location.hash='#/'">Back to directory</button>
+    </div>
+    <div class="admin-log" id="adminLog"></div>
+    <div class="admin-note">
+      Writes go through the Firestore REST API with your ID token. If a write is
+      rejected, check that your email is in the <code>isAdmin()</code> list in
+      <code>firestore.rules</code> — the rules are what actually enforce this,
+      not this page.
+    </div>`;
+}
+
+async function reloadFromFirestore() {
+  await CompanyStore.load();
+  renderAll();
+  renderAdminPage();
+}
+
 async function startApp() {
   await CompanyStore.load();
   buildSidebar();
@@ -1092,6 +1497,24 @@ async function startApp() {
   renderAll();
   window.addEventListener('hashchange', handleRoute);
   handleRoute();
+
+  // onAuthStateChanged is the single source of truth for who's signed in — it
+  // fires on load, after popup sign-in, and after a redirect returns, so all
+  // three paths converge here rather than each updating the UI themselves.
+  renderAuthArea();
+  if (firebaseReady) {
+    fbAuth.onAuthStateChanged(user => {
+      currentUser = user;
+      renderAuthArea();
+      closeAuthModal();
+      const h = location.hash;
+      if (h === '#/profile') renderProfilePage();
+      if (h === '#/admin') renderAdminPage();
+    });
+  }
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeAuthModal();
+  });
 }
 document.addEventListener('DOMContentLoaded', startApp);
 </script>
