@@ -1,0 +1,19 @@
+# Firebase
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+
+# Service account keys — never commit these
+*serviceAccount*.json
+*-firebase-adminsdk-*.json
+
+# OS / editor
+Thumbs.db
+desktop.ini
+.DS_Store
+.vscode/
+.idea/
+
+# Node (only if you add a seed script later)
+node_modules/

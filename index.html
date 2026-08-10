@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>TankWorld India — Engineering &amp; Equipment Directory</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════════════════════════════════
+   DESIGN TOKENS — "engineering drawing / cyanotype" system.
+   Deliberately distinct from TankBazaar's dark green dashboard look:
+   warm drafting-paper background, blueprint-blue signature accent,
+   rust-orange for action/alert, condensed technical display type,
+   monospace "drawing sheet" numbering for the category taxonomy.
+   ══════════════════════════════════════════════════════════════════════ */
+:root{
+  --paper: #F1ECDF;
+  --paper-raised: #FAF7EE;
+  --ink: #1B1F23;
+  --ink-muted: #5B6570;
+  --ink-faint: #8B93A0;
+  --blue: #1B4B7A;
+  --blue-soft: #E4ECF3;
+  --rust: #C0602A;
+  --rust-soft: #F4E3D6;
+  --line: #D8CFB8;
+  --line-blue: #C3D2DE;
+  --ok: #3E7A4F;
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+  --radius: 3px;
+}
+*{ box-sizing:border-box; margin:0; padding:0; }
+body{
+  background:var(--paper); color:var(--ink); font-family:var(--font-body);
+  font-size:14px; line-height:1.5;
+  background-image:
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: 28px 28px;
+  background-attachment: fixed;
+  min-height:100vh;
+}
+a{ color:var(--blue); }
+button{ font-family:inherit; cursor:pointer; }
+
+/* ── NATIONAL-COLORS ACCENT STRIP ──
+   A thin tricolor band, purely decorative — not a reproduction of any
+   official emblem, just a quiet nod to the national colors. */
+.tricolor-strip{ height:4px; display:flex; }
+.tricolor-strip div{ flex:1; }
+.tricolor-strip .saffron{ background:#FF9933; }
+.tricolor-strip .white{ background:#FFFFFF; border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
+.tricolor-strip .green{ background:#138808; }
+
+.app-body, header, footer{ position:relative; z-index:1; }
+::-webkit-scrollbar{ width:8px; height:8px; }
+::-webkit-scrollbar-thumb{ background:var(--line); border-radius:4px; }
+
+/* ── HEADER ── */
+header{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:14px 24px; background:var(--paper-raised);
+  border-bottom:2px solid var(--ink); position:sticky; top:0; z-index:50;
+  flex-wrap:wrap; gap:12px;
+}
+.brand{ display:flex; align-items:baseline; gap:10px; }
+.brand-mark{
+  font-family:var(--font-display); font-weight:700; font-size:22px;
+  letter-spacing:-0.3px; text-transform:uppercase;
+}
+.brand-mark span{ color:var(--blue); }
+.brand-sub{
+  font-family:var(--font-mono); font-size:10px; color:var(--ink-muted);
+  letter-spacing:1.5px; text-transform:uppercase; border-left:2px solid var(--line);
+  padding-left:10px;
+}
+.header-stats{ display:flex; gap:18px; font-family:var(--font-mono); font-size:11px; color:var(--ink-muted); }
+.header-stats b{ color:var(--ink); font-weight:600; }
+.view-toggle{ display:flex; gap:2px; background:var(--paper); border:1.5px solid var(--ink); border-radius:var(--radius); padding:2px; }
+.view-toggle button{
+  border:0; background:none; padding:6px 14px; font-family:var(--font-mono);
+  font-size:11px; font-weight:600; letter-spacing:0.5px; text-transform:uppercase;
+  color:var(--ink-muted); border-radius:2px;
+}
+.view-toggle button.active{ background:var(--ink); color:var(--paper-raised); }
+
+/* ── LAYOUT ── */
+.app-body{ display:flex; align-items:flex-start; max-width:1440px; margin:0 auto; }
+.sidebar{
+  width:280px; flex:0 0 280px; padding:20px 16px; position:sticky; top:64px;
+  max-height:calc(100vh - 64px); overflow-y:auto;
+}
+.sidebar-title{
+  font-family:var(--font-mono); font-size:10px; letter-spacing:1.5px; text-transform:uppercase;
+  color:var(--ink-faint); margin-bottom:10px; display:flex; justify-content:space-between;
+}
+.search-box{
+  width:100%; padding:9px 10px; border:1.5px solid var(--ink); border-radius:var(--radius);
+  background:var(--paper-raised); font-family:var(--font-body); font-size:13px; margin-bottom:18px;
+}
+.sheet-group{ margin-bottom:4px; border:1px solid var(--line); border-radius:var(--radius); background:var(--paper-raised); overflow:hidden; }
+.sheet-head{
+  display:flex; align-items:center; gap:8px; padding:9px 10px; cursor:pointer;
+  font-family:var(--font-display); font-weight:600; font-size:12.5px;
+}
+.sheet-head:hover{ background:var(--blue-soft); }
+.sheet-code{
+  font-family:var(--font-mono); font-size:10px; font-weight:600; color:var(--paper-raised);
+  background:var(--blue); padding:2px 6px; border-radius:2px; letter-spacing:0.5px; flex:0 0 auto;
+}
+.sheet-caret{ margin-left:auto; font-size:10px; color:var(--ink-faint); transition:transform 0.15s; }
+.sheet-group.open .sheet-caret{ transform:rotate(90deg); }
+.sheet-items{ display:none; padding:2px 0 6px; }
+.sheet-group.open .sheet-items{ display:block; }
+.sheet-item{
+  display:flex; align-items:center; gap:8px; padding:5px 10px 5px 14px;
+  font-size:12px; color:var(--ink-muted); cursor:pointer;
+}
+.sheet-item:hover{ color:var(--ink); background:var(--paper); }
+.sheet-item.active{ color:var(--blue); font-weight:600; background:var(--blue-soft); }
+.sheet-item .item-code{ font-family:var(--font-mono); font-size:9px; color:var(--ink-faint); flex:0 0 32px; }
+.clear-filters{
+  margin-top:12px; width:100%; padding:8px; border:1.5px dashed var(--ink-faint); background:none;
+  border-radius:var(--radius); font-family:var(--font-mono); font-size:10px; letter-spacing:0.5px;
+  text-transform:uppercase; color:var(--ink-muted);
+}
+.clear-filters:hover{ border-color:var(--rust); color:var(--rust); }
+
+/* ── MAIN ── */
+main{ flex:1; min-width:0; padding:20px 24px 60px; }
+.results-bar{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:16px; flex-wrap:wrap; gap:8px; }
+.results-count{ font-family:var(--font-display); font-weight:600; font-size:15px; }
+.results-count b{ color:var(--blue); }
+.active-filters{ display:flex; gap:6px; flex-wrap:wrap; }
+.filter-chip{
+  display:inline-flex; align-items:center; gap:5px; padding:3px 8px 3px 10px;
+  background:var(--rust-soft); border:1px solid var(--rust); border-radius:12px;
+  font-family:var(--font-mono); font-size:10px; color:var(--rust); font-weight:600;
+}
+.filter-chip button{ background:none; border:0; color:var(--rust); font-size:12px; line-height:1; padding:0; }
+
+.company-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(300px,1fr)); gap:14px; }
+.company-card{
+  display:block; text-decoration:none; color:inherit;
+  background:var(--paper-raised); border:1.5px solid var(--ink); border-radius:var(--radius);
+  padding:16px; cursor:pointer; transition:transform 0.12s, box-shadow 0.12s; position:relative;
+}
+.company-card:hover{ transform:translate(-2px,-2px); box-shadow:4px 4px 0 var(--line-blue); }
+.company-card::before{
+  content:""; position:absolute; top:10px; right:10px; width:8px; height:8px;
+  border-radius:50%; background:var(--ok);
+}
+.card-header{ display:flex; align-items:flex-start; gap:10px; margin-bottom:10px; padding-right:20px; }
+.card-logo{
+  width:38px; height:38px; flex:0 0 auto; border:1.5px solid var(--ink); border-radius:var(--radius);
+  background:var(--paper); display:flex; align-items:center; justify-content:center; overflow:hidden;
+}
+.card-logo img{ width:100%; height:100%; object-fit:contain; }
+.card-logo .cp-logo-fallback{ font-family:var(--font-display); font-weight:700; font-size:14px; color:var(--blue); }
+.card-title-block{ flex:1; min-width:0; }
+.card-name{ font-family:var(--font-display); font-weight:600; font-size:15.5px; margin-bottom:2px; }
+.card-loc{ font-family:var(--font-mono); font-size:10.5px; color:var(--ink-faint); display:flex; align-items:center; gap:4px; }
+.card-desc{ font-size:12px; color:var(--ink-muted); line-height:1.45; margin-bottom:12px; }
+.card-tags{ display:flex; flex-wrap:wrap; gap:5px; }
+.tag{
+  font-family:var(--font-mono); font-size:9.5px; padding:2px 6px; border-radius:2px;
+  background:var(--blue-soft); color:var(--blue); font-weight:600; letter-spacing:0.2px;
+}
+.tag.more{ background:var(--paper); color:var(--ink-faint); border:1px dashed var(--line); }
+
+.empty-state{ text-align:center; padding:60px 20px; color:var(--ink-muted); }
+.empty-state .em-mark{ font-family:var(--font-mono); font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--ink-faint); margin-bottom:8px; }
+.empty-state h3{ font-family:var(--font-display); font-size:18px; margin-bottom:6px; }
+
+/* ── MAP VIEW ── */
+#map-view{ display:none; }
+#map-view.active{ display:block; }
+#twi-map{ height:calc(100vh - 130px); min-height:420px; border:1.5px solid var(--ink); border-radius:var(--radius); }
+.leaflet-popup-content-wrapper{ border-radius:var(--radius); font-family:var(--font-body); }
+.map-pin-label{ font-family:var(--font-mono); font-size:9px; }
+
+/* ── COMPANY PAGE ── */
+#company-view{ display:none; max-width:840px; }
+#company-view.active{ display:block; }
+.back-link{
+  display:inline-flex; align-items:center; gap:6px; font-family:var(--font-mono);
+  font-size:11px; font-weight:600; letter-spacing:0.5px; text-transform:uppercase;
+  color:var(--ink-muted); text-decoration:none; margin-bottom:18px;
+}
+.back-link:hover{ color:var(--blue); }
+.cp-header{ display:flex; gap:18px; align-items:flex-start; margin-bottom:6px; }
+.cp-logo{
+  width:72px; height:72px; flex:0 0 auto; border:1.5px solid var(--ink); border-radius:var(--radius);
+  background:var(--paper-raised); display:flex; align-items:center; justify-content:center;
+  overflow:hidden;
+}
+.cp-logo img{ width:100%; height:100%; object-fit:contain; }
+.cp-logo .cp-logo-fallback{
+  font-family:var(--font-display); font-weight:700; font-size:24px; color:var(--blue);
+}
+.cp-title-block{ flex:1; min-width:0; }
+.cp-name{ font-family:var(--font-display); font-weight:700; font-size:26px; line-height:1.2; margin-bottom:6px; }
+.cp-slug{ font-family:var(--font-mono); font-size:10.5px; color:var(--ink-faint); word-break:break-all; }
+.cp-desc{ font-size:14px; line-height:1.65; color:var(--ink); margin:20px 0; max-width:640px; }
+.cp-site{
+  display:inline-block; padding:9px 16px; background:var(--blue); color:var(--paper-raised);
+  border-radius:var(--radius); font-family:var(--font-mono); font-size:12px; font-weight:600;
+  text-decoration:none; letter-spacing:0.3px; margin-bottom:28px;
+}
+.cp-site:hover{ background:var(--ink); }
+.cp-section-label{
+  font-family:var(--font-mono); font-size:10px; letter-spacing:1.5px; text-transform:uppercase;
+  color:var(--ink-faint); margin:28px 0 12px; padding-bottom:8px; border-bottom:1px solid var(--line);
+}
+.cp-locations{ display:grid; gap:10px; }
+.location-card{
+  border:1.5px solid var(--ink); border-radius:var(--radius); background:var(--paper-raised);
+  padding:12px 14px; display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;
+}
+.loc-type{
+  font-family:var(--font-mono); font-size:9px; font-weight:600; letter-spacing:0.5px; text-transform:uppercase;
+  color:var(--blue); background:var(--blue-soft); padding:2px 7px; border-radius:2px; display:inline-block; margin-bottom:4px;
+}
+.loc-name{ font-family:var(--font-display); font-weight:600; font-size:13.5px; }
+.loc-city{ font-family:var(--font-mono); font-size:11px; color:var(--ink-faint); margin-top:2px; }
+.loc-map-link{
+  font-family:var(--font-mono); font-size:10.5px; font-weight:600; color:var(--blue);
+  text-decoration:none; white-space:nowrap; padding:6px 10px; border:1px solid var(--blue); border-radius:2px;
+}
+.loc-map-link:hover{ background:var(--blue); color:var(--paper-raised); }
+.loc-map-pending{
+  font-family:var(--font-mono); font-size:10px; color:var(--ink-faint); font-style:italic; white-space:nowrap;
+}
+.cp-tiles{ display:grid; grid-template-columns:repeat(auto-fill, minmax(180px,1fr)); gap:10px; }
+.product-tile{
+  border:1.5px solid var(--ink); border-radius:var(--radius); background:var(--paper-raised);
+  padding:14px; display:flex; flex-direction:column; gap:6px;
+}
+.product-tile .tile-code{
+  font-family:var(--font-mono); font-size:10px; font-weight:700; color:var(--paper-raised);
+  background:var(--blue); padding:2px 6px; border-radius:2px; width:fit-content; letter-spacing:0.5px;
+}
+.product-tile .tile-name{ font-family:var(--font-display); font-weight:600; font-size:13px; line-height:1.3; }
+.product-tile .tile-sheet{ font-family:var(--font-mono); font-size:9.5px; color:var(--ink-faint); }
+.product-tile .tile-code-row{ display:flex; align-items:center; gap:5px; flex-wrap:wrap; }
+/* AST-xx badge — rust, to read as "parts/commerce" vs the blue taxonomy code */
+.product-tile .tile-ast-code{
+  font-family:var(--font-mono); font-size:10px; font-weight:700; color:var(--paper-raised);
+  background:var(--rust); padding:2px 6px; border-radius:2px; letter-spacing:0.5px;
+}
+.product-tile .tile-links{
+  display:flex; flex-direction:column; gap:4px; margin-top:2px;
+  padding-top:8px; border-top:1px dashed var(--line);
+}
+.xlink{
+  font-family:var(--font-mono); font-size:9.5px; letter-spacing:0.3px;
+  text-decoration:none; padding:3px 6px; border-radius:2px; border:1px solid transparent;
+  transition:background .15s, border-color .15s;
+}
+.xlink-hub{ color:var(--blue); background:var(--blue-soft); border-color:var(--line-blue); }
+.xlink-hub:hover{ background:#D6E4F0; }
+.xlink-ast{ color:var(--rust); background:var(--rust-soft); border-color:#E4C9B3; }
+.xlink-ast:hover{ background:#EFD8C6; }
+/* sidebar "parts available" dot */
+.sheet-items .ast-dot{
+  display:inline-block; width:5px; height:5px; border-radius:50%;
+  background:var(--rust); margin-left:5px; vertical-align:middle;
+}
+footer{
+  text-align:center; padding:20px; font-family:var(--font-mono); font-size:10px;
+  color:var(--ink-faint); letter-spacing:0.5px; border-top:1px solid var(--line);
+}
+
+/* ── MOBILE ── */
+@media (max-width: 860px){
+  .app-body{ flex-direction:column; }
+  .sidebar{ width:100%; flex:1 1 auto; position:static; max-height:none; padding:14px 16px; border-bottom:2px solid var(--ink); }
+  .sheet-items{ }
+  main{ padding:16px; }
+  header{ padding:12px 16px; }
+  .header-stats{ display:none; }
+  .company-grid{ grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="tricolor-strip"><div class="saffron"></div><div class="white"></div><div class="green"></div></div>
+
+<header>
+  <div class="brand">
+    <div class="brand-mark">TANKWORLD <span>INDIA</span></div>
+    <div class="brand-sub">Engineering &amp; Equipment Directory</div>
+  </div>
+  <div class="header-stats">
+    <div>COMPANIES: <b id="statCompanies">0</b></div>
+    <div>CATEGORIES: <b id="statCategories">0</b></div>
+    <div>SHEETS: <b id="statSheets">0</b></div>
+  </div>
+  <div class="view-toggle">
+    <button id="btnListView" class="active" onclick="setView('list')">List</button>
+    <button id="btnMapView" onclick="setView('map')">Map</button>
+  </div>
+</header>
+
+<div class="app-body">
+  <aside class="sidebar">
+    <div class="sidebar-title">
+      <span>Category Index</span>
+      <span id="filterCount"></span>
+    </div>
+    <input type="text" class="search-box" id="searchBox" placeholder="Search company or category…" oninput="renderAll()">
+    <div id="sheetList"></div>
+    <button class="clear-filters" onclick="clearFilters()">Clear all filters</button>
+  </aside>
+
+  <main>
+    <div id="list-view">
+      <div class="results-bar">
+        <div class="results-count"><b id="resultCount">0</b> companies</div>
+        <div class="active-filters" id="activeFilters"></div>
+      </div>
+      <div class="company-grid" id="companyGrid"></div>
+      <div class="empty-state" id="emptyState" style="display:none;">
+        <div class="em-mark">No Matches — Sheet Blank</div>
+        <h3>No companies found</h3>
+        <p>Try clearing a filter or searching a different term.</p>
+      </div>
+    </div>
+    <div id="map-view">
+      <div id="twi-map"></div>
+    </div>
+    <div id="company-view"></div>
+  </main>
+</div>
+
+<footer>
+  TANKWORLD INDIA — A DIRECTORY OF ENGINEERING &amp; EQUIPMENT COMPANIES SERVING THE TANK TERMINAL &amp; PROCESS INDUSTRIES SUPPLY CHAIN · DATA SCOPE: INDIA + INTERNATIONAL
+  <div style="margin-top:6px; opacity:0.75;">BUILT IN SUPPORT OF INDIA'S VIKSIT BHARAT @2047 VISION — A DEVELOPED INDIA BY 2047</div>
+</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+// ══════════════════════════════════════════════════════════════════════
+// CATEGORY TAXONOMY — sourced directly from the Tankonomics category-slug
+// tree (confirmed real L1/L2 names + slugs, not invented). Sheet codes
+// (EC-01, TS-02, etc.) mirror real engineering drawing/document-control
+// numbering conventions — the org scheme for this directory's taxonomy.
+// ══════════════════════════════════════════════════════════════════════
+</script>
+<script>
+// ══════════════════════════════════════════════════════════════════════
+// CROSS-APP LINKAGE
+// Every L2 category slug here IS the Tankonomics master category slug, so
+// it can be used directly as the hub's deep-link key — no mapping table
+// needed, nothing re-derived. That shared-slug-as-identity rule is what
+// makes these links safe.
+//
+// ASTSPARES is different: only a handful of master categories currently
+// exist as *parts* categories in the catalogue, so that mapping IS
+// explicit — master slug -> {AST code, catalogue path}. Note flame
+// arres/stors: the master tree spells it "flame-arresters", ASTSPARES
+// uses "flame-arrestors" in its own path. Both are correct in their own
+// app; the mapping is what reconciles them.
+// ══════════════════════════════════════════════════════════════════════
+const TANKONOMICS_BASE = 'https://tankonomics.web.app';
+const ASTSPARES_BASE   = 'https://astspares.com';
+
+const AST_LINKS = {
+  'rim-seals':             { code:'RS', path:'rim-seals',       label:'Rim Seals' },
+  'flame-arresters':       { code:'FA', path:'flame-arrestors', label:'Flame Arrestors' },
+  'pressure-vacuum-vents': { code:'PV', path:'pv-valves',       label:'Pressure / Vacuum Valves' },
+  'flexible-hoses':        { code:'HS', path:'hoses',           label:'Hoses & Assemblies' },
+  // 'gaskets' (AST-GK) exists in ASTSPARES but has no L2 in this directory's
+  // 92-category scope — left out deliberately rather than inventing a category.
+};
+
+/** Hub directory, filtered to this category. */
+function tankonomicsUrl(slug) {
+  return `${TANKONOMICS_BASE}/directory?category=${encodeURIComponent(slug)}`;
+}
+/** ASTSPARES parts catalogue for this master category, or null if no parts exist yet. */
+function astLink(slug) {
+  const a = AST_LINKS[slug];
+  return a ? { ...a, url: `${ASTSPARES_BASE}/products/${a.path}/` } : null;
+}
+
+const CATEGORY_TREE = [
+  { code:"EC", name:"Engineering & Construction", slug:"engineering-and-construction", items:[
+    { code:"EC-01", name:"EPC Contractors", slug:"epc-contractors" },
+    { code:"EC-02", name:"Tank Construction", slug:"tank-construction" },
+    { code:"EC-03", name:"Tank Engineering", slug:"tank-engineering" },
+    { code:"EC-04", name:"Civil & Structural Engineering", slug:"civil-and-structural-engineering" },
+    { code:"EC-05", name:"Foundation Contractors", slug:"foundation-contractors" },
+    { code:"EC-06", name:"Piping Contractors", slug:"piping-contractors" },
+    { code:"EC-07", name:"Mechanical Contractors", slug:"mechanical-contractors" },
+    { code:"EC-08", name:"Electrical Contractors", slug:"electrical-contractors" },
+    { code:"EC-09", name:"Instrumentation Contractors", slug:"instrumentation-contractors" },
+    { code:"EC-10", name:"Insulation Contractors", slug:"insulation-contractors" },
+    { code:"EC-11", name:"Painting & Coating Contractors", slug:"painting-and-coating-contractors" },
+    { code:"EC-12", name:"Scaffolding Services", slug:"scaffolding-services" },
+    { code:"EC-13", name:"Industrial Flooring", slug:"industrial-flooring" },
+    { code:"EC-14", name:"Roofing Systems", slug:"roofing-systems" },
+    { code:"EC-15", name:"Demolition & Decommissioning", slug:"demolition-and-decommissioning" },
+    { code:"EC-16", name:"Heavy Engineering & Fabrication", slug:"heavy-engineering-and-fabrication" },
+  ]},
+  { code:"TS", name:"Tank Systems & Equipment", slug:"tank-systems-and-equipment", items:[
+    { code:"TS-01", name:"Tank Gauging", slug:"tank-gauging" },
+    { code:"TS-02", name:"Rim Seals", slug:"rim-seals" },
+    { code:"TS-03", name:"Seal Fittings", slug:"seal-fittings" },
+    { code:"TS-04", name:"Floating Roof Systems", slug:"floating-roof-systems" },
+    { code:"TS-05", name:"Internal Floating Roofs", slug:"internal-floating-roofs" },
+    { code:"TS-06", name:"Aluminium Dome Roofs", slug:"aluminium-dome-roofs" },
+    { code:"TS-07", name:"Gauge Hatches", slug:"gauge-hatches" },
+    { code:"TS-08", name:"Roof Drains", slug:"roof-drains" },
+    { code:"TS-09", name:"Foam Chambers", slug:"foam-chambers" },
+    { code:"TS-10", name:"Foam Dams", slug:"foam-dams" },
+    { code:"TS-11", name:"Nozzles & Manways", slug:"nozzles-and-manways" },
+    { code:"TS-12", name:"Mixers & Agitators", slug:"mixers-and-agitators" },
+    { code:"TS-13", name:"Heating Systems", slug:"heating-systems" },
+    { code:"TS-14", name:"Tank Blanketing", slug:"tank-blanketing" },
+    { code:"TS-15", name:"Vapour Recovery Units (VRU)", slug:"vapour-recovery-units-vru" },
+    { code:"TS-16", name:"Pressure/Vacuum Vents", slug:"pressure-vacuum-vents" },
+    { code:"TS-17", name:"Emergency Vents", slug:"emergency-vents" },
+    { code:"TS-18", name:"Flame Arresters", slug:"flame-arresters" },
+    { code:"TS-19", name:"Breather Valves", slug:"breather-valves" },
+    { code:"TS-20", name:"Conservation Vents", slug:"conservation-vents" },
+    { code:"TS-21", name:"Floating Suction Systems", slug:"floating-suction-systems" },
+    { code:"TS-22", name:"Water Draw-Off Systems", slug:"water-draw-off-systems" },
+  ]},
+  { code:"FT", name:"Flow & Transfer Equipment", slug:"flow-and-transfer-equipment", items:[
+    { code:"FT-01", name:"Pumps", slug:"pumps" },
+    { code:"FT-02", name:"Compressors", slug:"compressors" },
+    { code:"FT-03", name:"Blowers", slug:"blowers" },
+    { code:"FT-04", name:"Loading Pumps", slug:"loading-pumps" },
+    { code:"FT-05", name:"Transfer Pumps", slug:"transfer-pumps" },
+    { code:"FT-06", name:"Metering Pumps", slug:"metering-pumps" },
+    { code:"FT-07", name:"Valves", slug:"valves" },
+    { code:"FT-08", name:"Actuators", slug:"actuators" },
+    { code:"FT-09", name:"Flow Meters", slug:"flow-meters" },
+    { code:"FT-10", name:"Custody Transfer Metering", slug:"custody-transfer-metering" },
+    { code:"FT-11", name:"Pigging Systems", slug:"pigging-systems" },
+    { code:"FT-12", name:"Strainers", slug:"strainers" },
+    { code:"FT-13", name:"Expansion Joints", slug:"expansion-joints" },
+    { code:"FT-14", name:"Flexible Hoses", slug:"flexible-hoses" },
+    { code:"FT-15", name:"Loading Arms", slug:"loading-arms" },
+    { code:"FT-16", name:"Marine Loading Arms", slug:"marine-loading-arms" },
+    { code:"FT-17", name:"Truck Loading Systems", slug:"truck-loading-systems" },
+    { code:"FT-18", name:"Rail Loading Systems", slug:"rail-loading-systems" },
+  ]},
+  { code:"IA", name:"Instrumentation & Automation", slug:"instrumentation-and-automation", items:[
+    { code:"IA-01", name:"Terminal Automation", slug:"terminal-automation" },
+    { code:"IA-02", name:"SCADA Systems", slug:"scada-systems" },
+    { code:"IA-03", name:"PLC & DCS", slug:"plc-and-dcs" },
+    { code:"IA-04", name:"Tank Inventory Systems", slug:"tank-inventory-systems" },
+    { code:"IA-05", name:"Remote Monitoring", slug:"remote-monitoring" },
+    { code:"IA-06", name:"Industrial Networking", slug:"industrial-networking" },
+    { code:"IA-07", name:"Electrical & Instrumentation", slug:"electrical-and-instrumentation" },
+  ]},
+  { code:"DR", name:"Digital, AI & Robotics", slug:"digital-ai-and-robotics", items:[
+    { code:"DR-01", name:"Drone & Robotic Inspection", slug:"drone-and-robotic-inspection" },
+    { code:"DR-02", name:"Autonomous Inspection Robots", slug:"autonomous-inspection-robots" },
+  ]},
+  { code:"AX", name:"Asset Integrity & Inspection", slug:"asset-integrity-and-inspection", items:[
+    { code:"AX-01", name:"Tank Inspection", slug:"tank-inspection" },
+    { code:"AX-02", name:"Non-Destructive Testing (NDT)", slug:"non-destructive-testing-ndt" },
+    { code:"AX-03", name:"Corrosion Monitoring", slug:"corrosion-monitoring" },
+    { code:"AX-04", name:"Corrosion Protection", slug:"corrosion-protection" },
+    { code:"AX-05", name:"Cathodic Protection", slug:"cathodic-protection" },
+    { code:"AX-06", name:"Protective Coatings", slug:"protective-coatings" },
+    { code:"AX-07", name:"Coatings & Linings", slug:"coatings-and-linings" },
+    { code:"AX-08", name:"Refractory Services", slug:"refractory-services" },
+    { code:"AX-09", name:"Integrity Management", slug:"integrity-management" },
+    { code:"AX-10", name:"Risk-Based Inspection (RBI)", slug:"risk-based-inspection-rbi" },
+    { code:"AX-11", name:"Fitness-for-Service", slug:"fitness-for-service" },
+    { code:"AX-12", name:"Life Extension", slug:"life-extension" },
+    { code:"AX-13", name:"Tank Cleaning", slug:"tank-cleaning" },
+    { code:"AX-14", name:"Hydrotesting", slug:"hydrotesting" },
+    { code:"AX-15", name:"Calibration Services", slug:"calibration-services" },
+    { code:"AX-16", name:"Rope Access Services", slug:"rope-access-services" },
+    { code:"AX-17", name:"Leak Detection", slug:"leak-detection" },
+  ]},
+  { code:"FS", name:"Fire, Safety & Environment", slug:"fire-safety-and-environment", items:[
+    { code:"FS-01", name:"Hazardous Area Equipment", slug:"hazardous-area-equipment" },
+    { code:"FS-02", name:"Inspection & Certification", slug:"inspection-and-certification" },
+  ]},
+  { code:"MR", name:"Industrial Supplies (MRO)", slug:"industrial-supplies-mro", items:[
+    { code:"MR-01", name:"Industrial Safety Equipment", slug:"industrial-safety-equipment" },
+  ]},
+  { code:"LT", name:"Logistics & Transportation", slug:"logistics-and-transportation", items:[
+    { code:"LT-01", name:"Marine & Port Equipment", slug:"marine-and-port-equipment" },
+  ]},
+  { code:"ES", name:"Sustainability & Energy Transition", slug:"sustainability-and-energy-transition", items:[
+    { code:"ES-01", name:"ESG Consulting", slug:"esg-consulting" },
+  ]},
+  { code:"PS", name:"Professional Services", slug:"professional-services", items:[
+    { code:"PS-01", name:"Project Consultants", slug:"project-consultants" },
+    { code:"PS-02", name:"Engineering Consultants", slug:"engineering-consultants" },
+    { code:"PS-03", name:"Consultancy Services", slug:"consultancy-services" },
+    { code:"PS-04", name:"Owner's Engineers", slug:"owner-s-engineers" },
+    { code:"PS-05", name:"Environmental Consultants", slug:"environmental-consultants" },
+  ]},
+];
+</script>
+<script>
+// ══════════════════════════════════════════════════════════════════════
+// SEED COMPANIES — first batch, real companies operating in India across
+// these categories. Structured for later Firestore sync (see
+// FIREBASE SCAFFOLD below) the same way TankBazaar's TerminalStore works.
+// ══════════════════════════════════════════════════════════════════════
+</script>
+<script>
+const COMPANIES = [
+  { id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toubro Limited", logo:null, country:"India",
+    cats:["epc-contractors","tank-construction","heavy-engineering-and-fabrication","valves","actuators"], desc:"Major Indian engineering and construction conglomerate — EPC for oil & gas and tankage through its Hydrocarbon Engineering business, and industrial valves/actuators through its Valves business.", site:"https://www.larsentoubro.com",
+    locations:[
+      { type:"registered-office", name:"Registered Office", city:"Mumbai, Maharashtra", lat:19.07, lng:72.88, placeId:null },
+      { type:"plant", name:"Hydrocarbon Engineering — Manufacturing Complex", city:"Chennai, Tamil Nadu", lat:13.08, lng:80.27, placeId:null },
+      { type:"plant", name:"L&T Valves — Manufacturing Plant", city:"Coimbatore, Tamil Nadu", lat:11.02, lng:76.97, placeId:null }
+    ] },
+  { id:2, slug:"toyo-engineering-india-limited", name:"Toyo Engineering India Limited", logo:null, country:"India",
+    cats:["epc-contractors","piping-contractors"], desc:"Indian arm of Japan's Toyo Engineering Corporation, delivering EPC projects across refining and petrochemicals.", site:"https://www.toyo-eng.com",
+    locations:[
+      { type:"registered-office", name:"Registered Office", city:"Mumbai, Maharashtra", lat:19.08, lng:72.88, placeId:null }
+    ] },
+  { id:3, slug:"bharat-heavy-electricals-limited", name:"Bharat Heavy Electricals Limited", logo:null, country:"India",
+    cats:["heavy-engineering-and-fabrication","mechanical-contractors"], desc:"Major Indian PSU engineering and manufacturing company, with heavy fabrication capability for industrial equipment.", site:"https://www.bhel.com",
+    locations:[
+      { type:"registered-office", name:"Registered Office", city:"New Delhi", lat:28.61, lng:77.21, placeId:null },
+      { type:"plant", name:"Tiruchirappalli Manufacturing Plant", city:"Tiruchirappalli, Tamil Nadu", lat:10.79, lng:78.7, placeId:null },
+      { type:"plant", name:"Haridwar Manufacturing Plant", city:"Haridwar, Uttarakhand", lat:29.95, lng:78.15, placeId:null }
+    ] },
+  { id:4, slug:"kirloskar-brothers-limited", name:"Kirloskar Brothers Limited", logo:null, country:"India",
+    cats:["pumps","transfer-pumps","loading-pumps"], desc:"India's largest pump manufacturer, supplying transfer and process pumps across the industrial and energy sectors.", site:"https://www.kirloskarpumps.com",
+    locations:[
+      { type:"registered-office", name:"Registered Office", city:"Pune, Maharashtra", lat:18.52, lng:73.86, placeId:null },
+      { type:"plant", name:"Kirloskarvadi Manufacturing Plant", city:"Kirloskarvadi, Maharashtra", lat:17.05, lng:74.34, placeId:null }
+    ] },
+  { id:5, slug:"ksb-limited", name:"KSB Limited", logo:null, country:"India",
+    cats:["pumps","valves"], desc:"Indian subsidiary of Germany's KSB SE, manufacturing pumps and valves for industrial and process applications.", site:"https://www.ksbindia.co.in",
+    locations:[
+      { type:"registered-office", name:"Registered Office", city:"Pimpri-Chinchwad, Maharashtra", lat:18.62, lng:73.8, placeId:null }
+    ] },
+  { id:6, slug:"forbes-marshall-pvt-ltd", name:"Forbes Marshall Pvt. Ltd.", logo:null, country:"India",
+    cats:["valves","electrical-and-instrumentation"], desc:"Well-established Indian manufacturer of control valves, steam engineering equipment, and process instrumentation.", site:"https://www.forbesmarshall.com",
+    locations:[
+      { type:"registered-office", name:"Registered Office", city:"Pune, Maharashtra", lat:18.53, lng:73.85, placeId:null }
+    ] },
+  { id:7, slug:"emerson-electric-co", name:"Emerson Electric Co.", logo:null, country:"India",
+    cats:["scada-systems","tank-inventory-systems","terminal-automation"], desc:"Indian operations of Emerson, supplying terminal automation, SCADA, and tank inventory management systems.", site:"https://www.emerson.com",
+    locations:[
+      { type:"registered-office", name:"India Office", city:"Mumbai, Maharashtra", lat:19.06, lng:72.87, placeId:null }
+    ] },
+  { id:8, slug:"honeywell-international-inc", name:"Honeywell International Inc.", logo:null, country:"India",
+    cats:["terminal-automation","scada-systems","plc-and-dcs"], desc:"Indian arm of Honeywell's process automation business, deploying DCS and terminal automation systems.", site:"https://www.honeywell.com",
+    locations:[
+      { type:"registered-office", name:"India Office", city:"Gurugram, Haryana", lat:28.46, lng:77.03, placeId:null }
+    ] },
+  { id:9, slug:"endress-hauser-group", name:"Endress+Hauser Group", logo:null, country:"India",
+    cats:["flow-meters","custody-transfer-metering","tank-gauging"], desc:"Indian subsidiary of the Swiss instrumentation group, specializing in flow measurement and level/tank gauging.", site:"https://www.in.endress.com",
+    locations:[
+      { type:"registered-office", name:"India Office", city:"Mumbai, Maharashtra", lat:19.11, lng:72.87, placeId:null }
+    ] },
+  { id:10, slug:"godrej-and-boyce-mfg-co-ltd", name:"Godrej & Boyce Mfg. Co. Ltd.", logo:null, country:"India",
+    cats:["heavy-engineering-and-fabrication","tank-construction"], desc:"Godrej's heavy engineering division, fabricating process equipment and storage tanks for industrial clients.", site:"https://www.godrejprocessequipment.com",
+    locations:[
+      { type:"registered-office", name:"Registered Office", city:"Mumbai, Maharashtra", lat:19.13, lng:72.91, placeId:null }
+    ] },
+  { id:11, slug:"bureau-veritas-sa", name:"Bureau Veritas S.A.", logo:null, country:"India",
+    cats:["inspection-and-certification","non-destructive-testing-ndt","tank-inspection"], desc:"Indian operations of the global inspection and certification group, covering NDT and tank/asset inspection.", site:"https://www.bureauveritas.co.in",
+    locations:[
+      { type:"registered-office", name:"India Office", city:"Mumbai, Maharashtra", lat:19.02, lng:72.85, placeId:null }
+    ] },
+  { id:12, slug:"tuv-sud-ag", name:"TÜV SÜD AG", logo:null, country:"India",
+    cats:["inspection-and-certification","risk-based-inspection-rbi","integrity-management"], desc:"South Asian arm of TÜV SÜD, providing inspection, certification, and asset integrity services.", site:"https://www.tuvsud.com",
+    locations:[
+      { type:"registered-office", name:"India Office", city:"Mumbai, Maharashtra", lat:19.06, lng:72.83, placeId:null }
+    ] },
+  { id:13, slug:"sgs-sa", name:"SGS S.A.", logo:null, country:"India",
+    cats:["non-destructive-testing-ndt","inspection-and-certification","calibration-services"], desc:"Indian arm of the global inspection, verification, testing, and certification company SGS.", site:"https://www.sgsgroup.in",
+    locations:[
+      { type:"registered-office", name:"India Office", city:"Gurugram, Haryana", lat:28.47, lng:77.04, placeId:null }
+    ] },
+  { id:14, slug:"elgi-equipments-limited", name:"ELGi Equipments Limited", logo:null, country:"India",
+    cats:["compressors","blowers"], desc:"Major Indian manufacturer of air compressors, serving industrial and process applications.", site:"https://www.elgi.com",
+    locations:[
+      { type:"registered-office", name:"Registered Office", city:"Coimbatore, Tamil Nadu", lat:11.0, lng:76.96, placeId:null }
+    ] },
+  { id:15, slug:"ador-welding-limited", name:"Ador Welding Limited", logo:null, country:"India",
+    cats:["heavy-engineering-and-fabrication"], desc:"Established Indian welding and fabrication technology company, serving heavy industrial manufacturing.", site:"https://www.adorwelding.com",
+    locations:[
+      { type:"registered-office", name:"Registered Office", city:"Mumbai, Maharashtra", lat:19.12, lng:72.84, placeId:null }
+    ] },
+  { id:16, slug:"petrofac-limited", name:"Petrofac Limited", logo:null, country:"India",
+    cats:["epc-contractors","piping-contractors"], desc:"Indian operations of Petrofac, delivering EPC and engineering services to the oil, gas, and energy sectors.", site:"https://www.petrofac.com",
+    locations:[
+      { type:"registered-office", name:"India Office", city:"Mumbai, Maharashtra", lat:19.1, lng:72.9, placeId:null }
+    ] },
+  { id:17, slug:"john-wood-group-plc", name:"John Wood Group PLC", logo:null, country:"India",
+    cats:["engineering-consultants","owner-s-engineers","consultancy-services"], desc:"Indian presence of the Wood Group, providing engineering consultancy and owner's engineer services.", site:"https://www.woodplc.com",
+    locations:[
+      { type:"registered-office", name:"India Office", city:"Mumbai, Maharashtra", lat:19.05, lng:72.86, placeId:null }
+    ] },
+  { id:18, slug:"ramboll-group-a-s", name:"Ramboll Group A/S", logo:null, country:"India",
+    cats:["engineering-consultants","environmental-consultants"], desc:"Indian arm of the Danish engineering consultancy Ramboll, covering engineering and environmental consulting.", site:"https://www.ramboll.com",
+    locations:[
+      { type:"registered-office", name:"India Office", city:"Gurugram, Haryana", lat:28.45, lng:77.05, placeId:null }
+    ] },
+  { id:19, slug:"cholamandalam-ms-general-insurance", name:"Cholamandalam MS General Insurance", logo:null, country:"India",
+    cats:["risk-based-inspection-rbi","integrity-management"], desc:"Indian risk engineering and inspection services provider working with industrial and process facility operators.", site:"https://www.cholainsurance.com",
+    locations:[
+      { type:"registered-office", name:"Registered Office", city:"Chennai, Tamil Nadu", lat:13.06, lng:80.25, placeId:null }
+    ] },
+  { id:20, slug:"hmt-llc", name:"HMT LLC", logo:null, country:"USA",
+    cats:["rim-seals","seal-fittings","floating-roof-systems","internal-floating-roofs","aluminium-dome-roofs","roof-drains"], desc:"Global leader in aboveground storage tank solutions since 1978 — floating roofs, floating roof seals, roof drains, and aluminum dome roofs used by tank operators worldwide, including in India.", site:"https://www.hmttank.com",
+    locations:[
+      { type:"registered-office", name:"Corporate Headquarters", city:"The Woodlands, TX", lat:30.16, lng:-95.46, placeId:null }
+    ] },
+  { id:21, slug:"mesa-industries-inc", name:"Mesa Industries, Inc.", logo:null, country:"USA",
+    cats:["rim-seals","seal-fittings","floating-roof-systems","internal-floating-roofs","roof-drains"], desc:"U.S. manufacturer of custom-engineered floating roof tank seals, drain systems, and emission control products for aboveground storage tanks, through its Mesa Engineered Tank Products (Mesa ETP) division — over 4,000 seals installed worldwide.", site:"https://www.mesaetp.com",
+    locations:[
+      { type:"registered-office", name:"Registered Office", city:"Cincinnati, OH", lat:39.10, lng:-84.51, placeId:null }
+    ] },
+  { id:22, slug:"fluidyne-instruments-private-limited", name:"Fluidyne Instruments Private Limited", logo:null, country:"India",
+    cats:["breather-valves","emergency-vents","conservation-vents","pressure-vacuum-vents"], desc:"Mumbai-based manufacturer of tank breather valves, emergency and conservation vents, and level gauging instruments for bulk storage tank protection.", site:"https://www.fluidyneindia.com",
+    locations:[
+      { type:"registered-office", name:"Registered Office", city:"Mumbai, Maharashtra", lat:19.07, lng:72.87, placeId:null }
+    ] },
+  { id:23, slug:"baliga-lighting-equipments-private-limited", name:"Baliga Lighting Equipments Private Limited", logo:null, country:"India",
+    cats:["hazardous-area-equipment"], desc:"Pioneer Indian manufacturer of explosion-proof lighting, switches, and control equipment for hazardous industrial areas, founded 1960 and ATEX/IECEx certified.", site:"https://www.baliga.com",
+    locations:[
+      { type:"registered-office", name:"Registered Office", city:"Chennai, Tamil Nadu", lat:13.03, lng:80.25, placeId:null }
+    ] },
+  { id:24, slug:"engineers-india-limited", name:"Engineers India Limited", logo:null, country:"India",
+    cats:["project-consultants","engineering-consultants"], desc:"Major Indian PSU engineering consultancy and EPC company, one of the country's leading providers of project consultancy services to the oil, gas, and petrochemical sectors.", site:"https://www.engineersindia.com",
+    locations:[
+      { type:"registered-office", name:"Registered Office", city:"New Delhi", lat:28.63, lng:77.22, placeId:null }
+    ] },
+  { id:25, slug:"kec-international-limited", name:"KEC International Limited", logo:null, country:"India",
+    cats:["electrical-contractors"], desc:"Major Indian power and infrastructure EPC company (RPG Group), with a significant electrical contracting business serving industrial clients.", site:"https://www.kecrpg.com",
+    locations:[
+      { type:"registered-office", name:"Registered Office", city:"Mumbai, Maharashtra", lat:19.02, lng:72.83, placeId:null }
+    ] },
+  { id:26, slug:"balmer-lawrie-and-co-limited", name:"Balmer Lawrie & Co. Limited", logo:null, country:"India",
+    cats:["tank-cleaning"], desc:"Major Indian PSU diversified industrial services company, with a dedicated industrial and tank cleaning services business.", site:"https://www.balmerlawrie.com",
+    locations:[
+      { type:"registered-office", name:"Registered Office", city:"Kolkata, West Bengal", lat:22.57, lng:88.35, placeId:null }
+    ] },
+  { id:27, slug:"vesuvius-india-limited", name:"Vesuvius India Limited", logo:null, country:"India",
+    cats:["refractory-services"], desc:"Indian arm of the global Vesuvius group, providing refractory materials and services to heavy industrial and process facilities.", site:"https://www.vesuvius.com",
+    locations:[
+      { type:"registered-office", name:"Registered Office", city:"Kolkata, West Bengal", lat:22.55, lng:88.34, placeId:null }
+    ] },
+  { id:28, slug:"lloyd-insulations-india-limited", name:"Lloyd Insulations (India) Limited", logo:null, country:"India",
+    cats:["insulation-contractors"], desc:"Established Indian industrial insulation contracting company, serving process plants and storage facilities across the country.", site:"https://www.lloydinsulations.com",
+    locations:[
+      { type:"registered-office", name:"Registered Office", city:"New Delhi", lat:28.55, lng:77.25, placeId:null }
+    ] },
+  { id:29, slug:"afcons-infrastructure-limited", name:"Afcons Infrastructure Limited", logo:null, country:"India",
+    cats:["civil-and-structural-engineering","foundation-contractors"], desc:"Major Indian infrastructure construction company (Shapoorji Pallonji Group), with substantial civil, structural, and foundation engineering capability.", site:"https://www.afcons.com",
+    locations:[
+      { type:"registered-office", name:"Registered Office", city:"Mumbai, Maharashtra", lat:19.05, lng:72.88, placeId:null }
+    ] },
+  { id:30, slug:"erm-india-private-limited", name:"ERM India Private Limited", logo:null, country:"India",
+    cats:["esg-consulting"], desc:"Indian arm of Environmental Resources Management (ERM), a global sustainability and ESG consultancy serving industrial and energy clients.", site:"https://www.erm.com",
+    locations:[
+      { type:"registered-office", name:"India Office", city:"Gurugram, Haryana", lat:28.47, lng:77.05, placeId:null }
+    ] },
+  { id:31, slug:"sharp-tanks-and-structurals-private-limited", name:"Sharp Tanks And Structurals Private Limited", logo:null, country:"India",
+    cats:["tank-construction","heavy-engineering-and-fabrication"], desc:"Mumbai EPC contractor with nearly four decades of experience constructing storage tanks — floating roof, cone roof, dome roof, Horton spheres, and cryogenic tanks — for the hydrocarbon, oil and gas, and petrochemical sectors.", site:"https://www.sharptanks.com",
+    locations:[
+      { type:"registered-office", name:"Registered Office", city:"Andheri East, Mumbai, Maharashtra", lat:19.12, lng:72.87, placeId:null }
+    ] },
+  { id:32, slug:"bridge-and-roof-company-india-limited", name:"Bridge And Roof Company (India) Limited", logo:null, country:"India",
+    cats:["epc-contractors","tank-construction","civil-and-structural-engineering"], desc:"Miniratna Category-I Public Sector Enterprise (Ministry of Heavy Industries) established 1920, providing EPC and turnkey construction across industrial infrastructure, including cryogenic LPG storage tanks built for BPCL at Uran.", site:"https://www.bridgeroof.co.in",
+    locations:[
+      { type:"registered-office", name:"Corporate Office", city:"Kolkata, West Bengal", lat:22.56, lng:88.35, placeId:null }
+    ] },
+  { id:33, slug:"offshore-infrastructures-limited", name:"Offshore Infrastructures Limited", logo:null, country:"India",
+    cats:["tank-construction","piping-contractors","electrical-contractors"], desc:"Mumbai-based multi-discipline industrial construction company undertaking tankage (fixed, floating, and dome roof), piping and equipment erection, and electrical & instrumentation works for refineries and petrochemical plants.", site:"https://www.offshoreinfrastructures.com",
+    locations:[
+      { type:"registered-office", name:"Registered Office", city:"Mulund, Mumbai, Maharashtra", lat:19.17, lng:72.96, placeId:null }
+    ] },
+  { id:34, slug:"prashanth-projects-limited", name:"Prashanth Projects Limited", logo:null, country:"India",
+    cats:["epc-contractors","tank-construction"], desc:"Indian international turnkey EPC contractor, established 1978, for the design and construction of petroleum oil and gas storage terminals, cryogenic tanks, Horton spheres, and mounded bullets.", site:"https://www.prashanthprojects.com",
+    locations:[
+      { type:"registered-office", name:"Registered Office", city:"Navi Mumbai, Maharashtra", lat:19.03, lng:73.02, placeId:null }
+    ] },
+  { id:35, slug:"vijay-tanks-and-vessels-private-limited", name:"Vijay Tanks And Vessels Private Limited", logo:null, country:"India",
+    cats:["tank-construction","heavy-engineering-and-fabrication"], desc:"Leading Indian EPC contractor for storage terminals since 1956 — designed and built roughly 70% of India's crude oil storage capacity, including one of the world's largest storage terminals at RIL Jamnagar, and India's first LNG storage tanks.", site:"https://www.vjtanks.com",
+    locations:[
+      { type:"registered-office", name:"Registered Office", city:"Ranoli, Vadodara, Gujarat", lat:22.34, lng:73.19, placeId:null }
+    ] },
+  { id:36, slug:"artson-limited", name:"Artson Limited", logo:null, country:"India",
+    cats:["epc-contractors","tank-construction","heavy-engineering-and-fabrication"], desc:"Tata Enterprise (subsidiary of Tata Projects Limited since 2007), established 1978, providing EPC contracting, tank construction, and ASME-stamped pressure vessel and process equipment manufacturing for the oil, gas, and petrochemical sectors.", site:"https://artson.net",
+    locations:[
+      { type:"registered-office", name:"Corporate Office", city:"Hyderabad, Telangana", lat:17.39, lng:78.49, placeId:null }
+    ] },
+  { id:37, slug:"thermosystems-private-limited", name:"Thermosystems Private Limited", logo:null, country:"India",
+    cats:["heating-systems","piping-contractors"], desc:"Hyderabad-based turnkey solutions provider for hydrocarbon and fuel gas handling systems, tank farm heat tracing, and low-pressure piping, serving clients including ONGC, IOCL, GAIL, HPCL, NTPC, and NALCO.", site:"https://thermosystems.co.in",
+    locations:[
+      { type:"registered-office", name:"Registered Office", city:"Hyderabad, Telangana", lat:17.43, lng:78.45, placeId:null }
+    ] },
+  { id:38, slug:"fidicon-devices-india-private-limited", name:"Fidicon Devices India Private Limited", logo:null, country:"India",
+    cats:["flame-arresters","gauge-hatches","strainers","breather-valves"], desc:"Gujarat manufacturer of process control and tank safety equipment — flame arresters, breather valves, gauge hatches, and pipeline strainers — serving chemical, pharmaceutical, and petrochemical industries.", site:"https://www.fidicondevicesindia.com",
+    locations:[
+      { type:"registered-office", name:"Registered Office", city:"Ankleshwar, Gujarat", lat:21.63, lng:73.02, placeId:null }
+    ] },
+  { id:39, slug:"aeroflex-industries-limited", name:"Aeroflex Industries Limited", logo:null, country:"India",
+    cats:["flexible-hoses","expansion-joints"], desc:"NSE-listed Indian manufacturer of stainless steel flexible metal hoses, hose assemblies, and expansion joints, holding roughly 40% share of India's organized flexible hose market and exporting to 90+ countries.", site:"https://www.aeroflexindia.com",
+    locations:[
+      { type:"registered-office", name:"Registered Office", city:"Taloja, Navi Mumbai, Maharashtra", lat:19.08, lng:73.1, placeId:null }
+    ] },
+];
+</script>
+<script>
+// ══════════════════════════════════════════════════════════════════════
+// FIREBASE — live config for project `tankworldindia-t5`.
+//
+// The apiKey is PUBLIC BY DESIGN: it identifies the project and is meant
+// to ship in client code. Security comes from firestore.rules /
+// storage.rules and the Authentication → Authorized domains list, not
+// from hiding this value.
+//
+// Reads go through the REST layer below; the app falls back to the
+// COMPANIES seed array if Firestore is empty or unreachable, so the
+// directory always renders.
+//
+// Still to add when admin editing is built: Firebase Auth (Google) for
+// sign-in, and authenticated PATCH/DELETE writes (see TankBazaar's
+// FS_REST.setMerge / delete for the pattern).
+// ══════════════════════════════════════════════════════════════════════
+const firebaseConfig = {
+  apiKey: "AIzaSyANNEPtOo9aQIp9v5J978Xd0RrZf56MS24",
+  authDomain: "tankworldindia-t5.firebaseapp.com",
+  projectId: "tankworldindia-t5",
+  storageBucket: "tankworldindia-t5.firebasestorage.app",
+  messagingSenderId: "539894263955",
+  appId: "1:539894263955:web:c2835de786d86a3b35dd66"
+};
+
+// Firestore database id. "(default)" is the standard single database.
+// If you named the database when creating it (TankBazaar, for instance,
+// uses a named DB "tankbazaar"), put that name here instead — reading the
+// wrong database returns an empty result rather than an error, which is a
+// quiet failure worth knowing about.
+const FIRESTORE_DB_ID = "(default)";
+
+// ══════════════════════════════════════════════════════════════════════
+// FIRESTORE REST LAYER
+// Deliberately REST rather than the Firebase JS SDK, mirroring TankBazaar:
+// the SDK's streaming/WebChannel transport is blocked on some corporate
+// networks (requests hang rather than fail), whereas plain HTTPS GET works
+// wherever HTTPS works. It also keeps this a true single-file app with no
+// SDK bundle or module-loading order to manage.
+//
+// `companies` is public-read per firestore.rules, so no auth token is
+// needed for the directory to load.
+// ══════════════════════════════════════════════════════════════════════
+const FS_REST = {
+  base() {
+    return `https://firestore.googleapis.com/v1/projects/${firebaseConfig.projectId}` +
+           `/databases/${FIRESTORE_DB_ID}/documents`;
+  },
+  fromFields(fields) {
+    const obj = {};
+    if (!fields) return obj;
+    for (const [k, v] of Object.entries(fields)) obj[k] = FS_REST.fromValue(v);
+    return obj;
+  },
+  fromValue(v) {
+    if ('nullValue' in v) return null;
+    if ('booleanValue' in v) return v.booleanValue;
+    if ('integerValue' in v) return parseInt(v.integerValue, 10);
+    if ('doubleValue' in v) return v.doubleValue;
+    if ('stringValue' in v) return v.stringValue;
+    if ('timestampValue' in v) return v.timestampValue;
+    if ('arrayValue' in v) return (v.arrayValue.values || []).map(FS_REST.fromValue);
+    if ('mapValue' in v) return FS_REST.fromFields(v.mapValue.fields);
+    return null;
+  },
+  // Public read — no auth token. Paginates so a roster larger than one
+  // page still loads completely.
+  async listPublic(collection) {
+    const out = [];
+    let pageToken = '';
+    do {
+      const url = `${FS_REST.base()}/${collection}?pageSize=300` +
+                  (pageToken ? `&pageToken=${encodeURIComponent(pageToken)}` : '');
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('REST ' + res.status + ': ' + (await res.text()).slice(0, 160));
+      const data = await res.json();
+      (data.documents || []).forEach(d => {
+        const obj = FS_REST.fromFields(d.fields);
+        obj.slug = obj.slug || d.name.split('/').pop();
+        out.push(obj);
+      });
+      pageToken = data.nextPageToken || '';
+    } while (pageToken);
+    return out;
+  },
+};
+
+// Live-if-available, seed-array-if-not. Same philosophy as TankBazaar's
+// TerminalStore: the directory must still render if Firestore is empty,
+// unreachable, or blocked — the site degrades to the built-in roster
+// rather than showing an empty page.
+const CompanyStore = {
+  isLive: false,
+  async load() {
+    try {
+      const docs = await FS_REST.listPublic('companies');
+      if (docs && docs.length) {
+        COMPANIES.length = 0;
+        COMPANIES.push(...docs);
+        this.isLive = true;
+        console.log('%c[TANKWORLDINDIA] Firestore · ' + docs.length + ' companies · project=' +
+                    firebaseConfig.projectId + ' · db=' + FIRESTORE_DB_ID,
+                    'color:#1B4B7A;font-weight:bold');
+      } else {
+        console.log('%c[TANKWORLDINDIA] Firestore reachable but empty — using seed roster (' +
+                    COMPANIES.length + ')', 'color:#C0602A');
+      }
+    } catch (err) {
+      console.warn('[TANKWORLDINDIA] Firestore unavailable, using seed roster:', err.message);
+    }
+    return COMPANIES;
+  }
+};
+</script>
+<script>
+// ══════════════════════════════════════════════════════════════════════
+// APP LOGIC
+// ══════════════════════════════════════════════════════════════════════
+let activeCategory = null;   // single L2 slug filter, or null
+let currentView = 'list';
+let map = null, mapMarkers = [];
+
+function allL2Count() {
+  return CATEGORY_TREE.reduce((s, l1) => s + l1.items.length, 0);
+}
+
+function categoryLabel(slug) {
+  for (const l1 of CATEGORY_TREE) {
+    for (const it of l1.items) if (it.slug === slug) return { code: it.code, name: it.name };
+  }
+  return null;
+}
+
+function buildSidebar() {
+  const wrap = document.getElementById('sheetList');
+  wrap.innerHTML = CATEGORY_TREE.map((l1, i) => `
+    <div class="sheet-group" data-l1="${l1.slug}">
+      <div class="sheet-head" onclick="toggleSheet('${l1.slug}')">
+        <span class="sheet-code">${l1.code}</span>
+        <span>${l1.name}</span>
+        <span class="sheet-caret">▶</span>
+      </div>
+      <div class="sheet-items">
+        ${l1.items.map(it => `
+          <div class="sheet-item" data-slug="${it.slug}" onclick="selectCategory('${it.slug}')">
+            <span class="item-code">${it.code}</span><span>${it.name}</span>${astLink(it.slug) ? `<span class="ast-dot" title="Parts available in ASTSPARES"></span>` : ''}
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleSheet(slug) {
+  const el = document.querySelector('.sheet-group[data-l1="' + slug + '"]');
+  if (el) el.classList.toggle('open');
+}
+
+function selectCategory(slug) {
+  activeCategory = (activeCategory === slug) ? null : slug;
+  document.querySelectorAll('.sheet-item').forEach(el => {
+    el.classList.toggle('active', el.dataset.slug === activeCategory);
+  });
+  renderAll();
+}
+
+function clearFilters() {
+  activeCategory = null;
+  document.getElementById('searchBox').value = '';
+  document.querySelectorAll('.sheet-item.active').forEach(el => el.classList.remove('active'));
+  renderAll();
+}
+
+// Registered office is always locations[0] by construction — used anywhere
+// a single "the company's location" is needed (search, card, map pin).
+function primaryLocation(c) { return c.locations[0]; }
+
+function locTypeLabel(t) {
+  return { 'registered-office': 'Registered Office', 'plant': 'Plant', 'facility': 'Facility', 'branch': 'Branch Office' }[t] || t;
+}
+
+function logoHtml(c) {
+  if (c.logo) return `<img src="${c.logo}" alt="${c.name} logo">`;
+  const initials = c.name.split(/\s+/).filter(w => /^[A-Z]/.test(w)).slice(0, 2).map(w => w[0]).join('') || c.name[0];
+  return `<span class="cp-logo-fallback">${initials}</span>`;
+}
+
+function filteredCompanies() {
+  const q = document.getElementById('searchBox').value.trim().toLowerCase();
+  return COMPANIES.filter(c => {
+    if (activeCategory && !c.cats.includes(activeCategory)) return false;
+    if (q) {
+      const loc = primaryLocation(c);
+      const hay = (c.name + ' ' + loc.city + ' ' + c.desc + ' ' +
+        c.cats.map(s => (categoryLabel(s)||{}).name || '').join(' ')).toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+}
+
+function renderActiveFilters() {
+  const wrap = document.getElementById('activeFilters');
+  if (!activeCategory) { wrap.innerHTML = ''; return; }
+  const lbl = categoryLabel(activeCategory);
+  wrap.innerHTML = `<span class="filter-chip">${lbl.code} · ${lbl.name} <button onclick="selectCategory('${activeCategory}')">×</button></span>`;
+}
+
+function renderCards() {
+  const list = filteredCompanies();
+  const grid = document.getElementById('companyGrid');
+  const empty = document.getElementById('emptyState');
+  document.getElementById('resultCount').textContent = list.length;
+  renderActiveFilters();
+  if (!list.length) { grid.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+  grid.innerHTML = list.map(c => {
+    const tags = c.cats.slice(0, 3).map(s => {
+      const l = categoryLabel(s);
+      return l ? `<span class="tag">${l.code}</span>` : '';
+    }).join('');
+    const more = c.cats.length > 3 ? `<span class="tag more">+${c.cats.length - 3}</span>` : '';
+    return `
+      <a class="company-card" href="#/company/${c.slug}">
+        <div class="card-header">
+          <div class="card-logo">${logoHtml(c)}</div>
+          <div class="card-title-block">
+            <div class="card-name">${c.name}</div>
+            <div class="card-loc">📍 ${primaryLocation(c).city}</div>
+          </div>
+        </div>
+        <div class="card-desc">${c.desc}</div>
+        <div class="card-tags">${tags}${more}</div>
+      </a>`;
+  }).join('');
+}
+
+function renderMap() {
+  if (!map) return;
+  mapMarkers.forEach(m => map.removeLayer(m));
+  mapMarkers = [];
+  const list = filteredCompanies();
+  list.forEach(c => {
+    const loc = primaryLocation(c);
+    const marker = L.circleMarker([loc.lat, loc.lng], {
+      radius: 7, color: '#1B4B7A', weight: 2, fillColor: '#1B4B7A', fillOpacity: 0.55
+    }).addTo(map);
+    marker.bindPopup(`<b>${c.name}</b><br><span class="map-pin-label">${loc.city}</span>`);
+    marker.on('click', () => { location.hash = '#/company/' + c.slug; });
+    mapMarkers.push(marker);
+  });
+}
+
+function renderAll() {
+  renderCards();
+  if (currentView === 'map') renderMap();
+}
+
+function setView(v) {
+  currentView = v;
+  document.getElementById('list-view').style.display = v === 'list' ? 'block' : 'none';
+  document.getElementById('map-view').classList.toggle('active', v === 'map');
+  document.getElementById('btnListView').classList.toggle('active', v === 'list');
+  document.getElementById('btnMapView').classList.toggle('active', v === 'map');
+  if (v === 'map') {
+    if (!map) initMap();
+    setTimeout(() => { map.invalidateSize(); renderMap(); }, 50);
+  }
+}
+
+function initMap() {
+  map = L.map('twi-map').setView([22.5, 79.0], 5); // India-centered
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors', maxZoom: 18
+  }).addTo(map);
+}
+
+// ── ROUTING ──
+// Hash-based so each company gets a real, addressable, bookmarkable URL —
+// e.g. tankworldindia.html#/company/larsen-and-toubro-limited — ready for
+// Tankonomics to link to directly once the two apps are wired together.
+function renderCompanyPage(slug) {
+  const c = COMPANIES.find(x => x.slug === slug);
+  const wrap = document.getElementById('company-view');
+  if (!c) {
+    wrap.innerHTML = `<a class="back-link" href="#/">← Back to directory</a><div class="empty-state"><div class="em-mark">Sheet Not Found</div><h3>No company at this URL</h3></div>`;
+    return;
+  }
+  document.title = c.name + ' — TankWorld India';
+
+  const locationsHtml = c.locations.map(l => `
+    <div class="location-card">
+      <div>
+        <span class="loc-type">${locTypeLabel(l.type)}</span>
+        <div class="loc-name">${l.name}</div>
+        <div class="loc-city">📍 ${l.city}</div>
+      </div>
+      ${l.placeId
+        ? `<a class="loc-map-link" href="https://www.google.com/maps/place/?q=place_id:${l.placeId}" target="_blank" rel="noopener">View on Google Maps ↗</a>`
+        : `<span class="loc-map-pending">Place ID not yet added</span>`}
+    </div>`).join('');
+
+  const tilesHtml = c.cats.map(s => {
+    const l = categoryLabel(s);
+    if (!l) return '';
+    const l1 = CATEGORY_TREE.find(l1 => l1.items.some(it => it.slug === s));
+    const ast = astLink(s);
+    return `
+      <div class="product-tile">
+        <div class="tile-code-row">
+          <span class="tile-code">${l.code}</span>
+          ${ast ? `<span class="tile-ast-code" title="Parts available in ASTSPARES">AST-${ast.code}</span>` : ''}
+        </div>
+        <div class="tile-name">${l.name}</div>
+        <div class="tile-sheet">${l1 ? l1.name : ''}</div>
+        <div class="tile-links">
+          <a class="xlink xlink-hub" href="${tankonomicsUrl(s)}" target="_blank" rel="noopener">Companies on Tankonomics ↗</a>
+          ${ast ? `<a class="xlink xlink-ast" href="${ast.url}" target="_blank" rel="noopener">Buy parts — ASTSPARES ↗</a>` : ''}
+        </div>
+      </div>`;
+  }).join('');
+
+  wrap.innerHTML = `
+    <a class="back-link" href="#/">← Back to directory</a>
+    <div class="cp-header">
+      <div class="cp-logo">${logoHtml(c)}</div>
+      <div class="cp-title-block">
+        <div class="cp-name">${c.name}</div>
+        <div class="cp-slug">/company/${c.slug}</div>
+      </div>
+    </div>
+    <div class="cp-desc">${c.desc}</div>
+    <a class="cp-site" href="${c.site}" target="_blank" rel="noopener">Visit Website ↗</a>
+    <div class="cp-section-label">Locations (${c.locations.length})</div>
+    <div class="cp-locations">${locationsHtml}</div>
+    <div class="cp-section-label">Products &amp; Services</div>
+    <div class="cp-tiles">${tilesHtml}</div>
+  `;
+}
+
+function handleRoute() {
+  const hash = location.hash || '#/';
+  const m = hash.match(/^#\/company\/([a-z0-9-]+)$/);
+  const listPanel = document.getElementById('list-view');
+  const mapPanel = document.getElementById('map-view');
+  const companyPanel = document.getElementById('company-view');
+  const header = document.querySelector('header');
+  const sidebar = document.querySelector('.sidebar');
+
+  if (m) {
+    renderCompanyPage(m[1]);
+    listPanel.style.display = 'none';
+    mapPanel.classList.remove('active');
+    companyPanel.classList.add('active');
+    sidebar.style.display = 'none';
+    header.querySelector('.view-toggle').style.display = 'none';
+  } else {
+    document.title = 'TankWorld India — Engineering & Equipment Directory';
+    companyPanel.classList.remove('active');
+    sidebar.style.display = '';
+    header.querySelector('.view-toggle').style.display = '';
+    setView(currentView);
+  }
+}
+
+async function startApp() {
+  await CompanyStore.load();
+  buildSidebar();
+  document.getElementById('statCompanies').textContent = COMPANIES.length;
+  document.getElementById('statCategories').textContent = allL2Count();
+  document.getElementById('statSheets').textContent = CATEGORY_TREE.length;
+  renderAll();
+  window.addEventListener('hashchange', handleRoute);
+  handleRoute();
+}
+document.addEventListener('DOMContentLoaded', startApp);
+</script>
+</body>
+</html>

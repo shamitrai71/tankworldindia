@@ -1,0 +1,56 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() { return request.auth != null; }
+    function isOwner(uid) { return isSignedIn() && request.auth.uid == uid; }
+
+    // Admin identified by email claim, matching TankBazaar's approach.
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == 'esraigroup@gmail.com' ||
+        request.auth.token.email == 'petrodeksystems@gmail.com'
+      );
+    }
+
+    // ── Companies ──────────────────────────────────────────────────────
+    // TankWorldIndia is a PUBLIC directory — unlike TankBazaar's terminals,
+    // which are sign-in + approval gated. Anyone (signed out included) can
+    // read; only admin writes. Once claims exist, a listing's owner may
+    // update their own record.
+    match /companies/{doc} {
+      allow read:   if true;
+      allow create: if isAdmin();
+      allow delete: if isAdmin();
+      allow update: if isAdmin()
+                    || (isSignedIn() && resource.data.ownerUid == request.auth.uid);
+    }
+
+    // ── Categories ─────────────────────────────────────────────────────
+    // Only needed if the 92-category taxonomy ever moves out of the HTML
+    // and into Firestore. Harmless to keep either way.
+    match /categories/{doc} {
+      allow read:  if true;
+      allow write: if isAdmin();
+    }
+
+    // ── User profiles ──────────────────────────────────────────────────
+    match /users/{uid} {
+      allow read:   if isOwner(uid) || isAdmin();
+      allow create: if isOwner(uid);
+      allow update: if isOwner(uid) || isAdmin();
+      allow delete: if isOwner(uid) || isAdmin();
+    }
+
+    // ── Company ownership claims ───────────────────────────────────────
+    // A signed-in user files a claim on a listing and can read their own;
+    // admin reads all and approves/rejects.
+    match /companyClaims/{doc} {
+      allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;
+      allow read:   if isAdmin() || (isSignedIn() && resource.data.uid == request.auth.uid);
+      allow update, delete: if isAdmin();
+    }
+
+    // Anything not matched above is denied by default.
+  }
+}

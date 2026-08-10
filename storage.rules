@@ -1,0 +1,29 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isAdmin() {
+      return request.auth != null && (
+        request.auth.token.email == 'esraigroup@gmail.com' ||
+        request.auth.token.email == 'petrodeksystems@gmail.com'
+      );
+    }
+
+    // ── Company logos ──────────────────────────────────────────────────
+    // World-readable: logos render on the public directory, so visitors who
+    // are not signed in must be able to load them. Admin-only writes, with
+    // a size cap and an image-only content-type check — without those, a
+    // publicly-readable path becomes a place to park arbitrary files.
+    match /logos/{fileName} {
+      allow read: if true;
+      allow write: if isAdmin()
+                   && request.resource.size < 2 * 1024 * 1024
+                   && request.resource.contentType.matches('image/.*');
+    }
+
+    // Everything else denied by default.
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
