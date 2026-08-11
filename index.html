@@ -956,7 +956,7 @@ const COMPANIES = [
     cats:["flexible-hoses","expansion-joints"], desc:"NSE-listed Indian manufacturer of stainless steel flexible metal hoses, hose assemblies, and expansion joints, holding roughly 40% share of India's organized flexible hose market and exporting to 90+ countries.", site:"https://www.aeroflexindia.com",
     locations:[
       { type:"registered-office", name:"Registered Office", city:"Taloja, Navi Mumbai, Maharashtra", lat:19.08, lng:73.1, placeId:null }
-    ] },,
+    ] },
   { id:40, slug:"vinci-energies-sa-actemium", name:"VINCI ENERGIES S.A. (ACTEMIUM)", logo:null, country:"Belgium",
     desc:"",
     site:"",
@@ -1222,7 +1222,10 @@ const COMPANIES = [
 // would be silently discarded on load, and the seed button — which iterates
 // COMPANIES — would only ever re-write what Firestore already had. New
 // companies could never reach the database. Seeding reads from here instead.
-const SEED_COMPANIES = JSON.parse(JSON.stringify(COMPANIES));
+// .filter(Boolean) guards against array elisions — a stray double comma in
+// the literal above creates a hole, which JSON.stringify turns into null,
+// and any consumer reading .slug then throws mid-run. Cheap insurance.
+const SEED_COMPANIES = JSON.parse(JSON.stringify(COMPANIES)).filter(Boolean);
 
 </script>
 <script>
@@ -1388,7 +1391,7 @@ const CompanyStore = {
       const docs = await FS_REST.listPublic('companies');
       if (docs && docs.length) {
         COMPANIES.length = 0;
-        COMPANIES.push(...docs);
+        COMPANIES.push(...docs.filter(Boolean));
         this.isLive = true;
         console.log('%c[TANKWORLDINDIA] Firestore · ' + docs.length + ' companies · project=' +
                     firebaseConfig.projectId + ' · db=' + FIRESTORE_DB_ID,
