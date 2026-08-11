@@ -803,7 +803,7 @@ const COMPANIES = [
       { type:"registered-office", name:"India Office", city:"Gurugram, Haryana", lat:28.46, lng:77.03, placeId:null }
     ] },
   { id:9, slug:"endress-hauser-group", name:"Endress+Hauser Group", logo:null, country:"India",
-    cats:["flow-meters","custody-transfer-metering","tank-gauging"], desc:"Indian subsidiary of the Swiss instrumentation group, specializing in flow measurement and level/tank gauging.", site:"https://www.in.endress.com",
+    cats:["flow-meters","custody-transfer-metering","tank-gauging","overfill-protection"], desc:"Indian subsidiary of the Swiss instrumentation group, specializing in flow measurement and level/tank gauging.", site:"https://www.in.endress.com",
     locations:[
       { type:"registered-office", name:"India Office", city:"Mumbai, Maharashtra", lat:19.11, lng:72.87, placeId:null }
     ] },
@@ -888,7 +888,7 @@ const COMPANIES = [
       { type:"registered-office", name:"Registered Office", city:"Mumbai, Maharashtra", lat:19.02, lng:72.83, placeId:null }
     ] },
   { id:26, slug:"balmer-lawrie-and-co-limited", name:"Balmer Lawrie & Co. Limited", logo:null, country:"India",
-    cats:["tank-cleaning"], desc:"Major Indian PSU diversified industrial services company, with a dedicated industrial and tank cleaning services business.", site:"https://www.balmerlawrie.com",
+    cats:["tank-cleaning","sludge-removal"], desc:"Major Indian PSU diversified industrial services company, with a dedicated industrial and tank cleaning services business.", site:"https://www.balmerlawrie.com",
     locations:[
       { type:"registered-office", name:"Registered Office", city:"Kolkata, West Bengal", lat:22.57, lng:88.35, placeId:null }
     ] },
@@ -1052,10 +1052,10 @@ const COMPANIES = [
     site:"",
     cats:["terminal-automation", "scada-systems", "plc-and-dcs", "electrical-and-instrumentation"],
     locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
-  { id:59, slug:"rotork-bv", name:"Rotork B.V.", logo:null, country:"Netherlands",
-    desc:"",
+  { id:59, slug:"rotork-plc", name:"Rotork plc", logo:null, country:"United Kingdom",
+    desc:"UK manufacturer of valve actuators and flow control equipment, with operations worldwide including India.",
     site:"",
-    cats:["actuators", "valves"],
+    cats:["actuators", "valves", "overfill-protection"],
     locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
   { id:60, slug:"sofis-bv", name:"Sofis B.V.", logo:null, country:"Netherlands",
     desc:"",
@@ -1171,7 +1171,47 @@ const COMPANIES = [
     desc:"UK originator of glass-fused-to-steel bolted storage tanks, based in Eye, Suffolk.",
     site:"https://www.permastore.com",
     cats:["bolted-steel-tanks"],
-    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] }
+    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
+  { id:83, slug:"pune-techtrol-private-limited", name:"Pune Techtrol Private Limited", logo:null, country:"India",
+    desc:"Indian manufacturer of level gauges, switches, transmitters and controllers for liquids and solids under the Techtrol brand, established 1984.",
+    site:"https://www.punetechtrol.com",
+    cats:["overfill-protection", "tank-gauging", "electrical-and-instrumentation"],
+    locations:[{ type:"registered-office", name:"Registered Office", city:"Pune, Maharashtra", lat:null, lng:null, placeId:null }] },
+  { id:84, slug:"scully-signal-company", name:"Scully Signal Company", logo:null, country:"United States",
+    desc:"US manufacturer of overfill prevention and static grounding systems, optical and thermistor probes and rack monitors for fuel storage and transfer.",
+    site:"https://scully.com",
+    cats:["overfill-protection", "electrical-and-instrumentation"],
+    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
+  { id:85, slug:"hima-paul-hildebrandt-gmbh", name:"HIMA Paul Hildebrandt GmbH", logo:null, country:"Germany",
+    desc:"German supplier of safety-instrumented systems, including SIL-certified tank farm overfill protection and emergency shutdown solutions.",
+    site:"https://www.hima.com",
+    cats:["overfill-protection", "plc-and-dcs", "electrical-and-instrumentation"],
+    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
+  { id:86, slug:"sureflo-techcon-limited", name:"Sureflo Techcon Limited", logo:null, country:"India",
+    desc:"Indian specialist in automated no-man-entry crude oil tank cleaning and hydrocarbon recovery.",
+    site:"https://sureflo.in",
+    cats:["tank-cleaning", "sludge-removal", "tank-maintenance"],
+    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
+  { id:87, slug:"epiq-india", name:"Epiq India", logo:null, country:"India",
+    desc:"Indian provider of mechanised oily sludge processing for refineries, pits, lagoons and crude tanks, with bioremediation services.",
+    site:"https://epiqindia.in",
+    cats:["sludge-removal", "tank-cleaning"],
+    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
+  { id:88, slug:"tristar-engineering-and-chemical-co", name:"Tristar Engineering & Chemical Co.", logo:null, country:"India",
+    desc:"Indian provider of fuel, diesel, petrol and chemical tank sludge management services.",
+    site:"https://tristarengg.co.in",
+    cats:["sludge-removal", "tank-cleaning"],
+    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
+  { id:89, slug:"arham-oil", name:"Arham Oil", logo:null, country:"India",
+    desc:"Indian provider of mechanised non-man-entry tank and lagoon cleaning with oil and hydrocarbon recovery.",
+    site:"https://www.arhamoil.com",
+    cats:["sludge-removal", "tank-cleaning"],
+    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
+  { id:90, slug:"ram-engineering", name:"Ram Engineering", logo:null, country:"India",
+    desc:"Industrial and lube oil storage tank cleaning across the Taloja, Thane-Belapur and Navi Mumbai industrial belts.",
+    site:"https://oilfiltration.in",
+    cats:["tank-cleaning", "tank-maintenance"],
+    locations:[{ type:"registered-office", name:"Registered Office", city:"Navi Mumbai, Maharashtra", lat:null, lng:null, placeId:null }] }
 ];
 
 // Immutable copy of the in-page roster, taken BEFORE CompanyStore.load()
@@ -1799,25 +1839,38 @@ async function seedCompanies() {
   const log = document.getElementById('adminLog');
   log.textContent = '';
   let ok = 0; const failures = [];
-  for (const c of SEED_COMPANIES) {
-    try {
-      await FS_REST.setMerge('companies', c.slug, {
-        id: c.id, slug: c.slug, name: c.name, desc: c.desc || '',
-        site: c.site || '', country: c.country || '', logo: c.logo || null,
-        cats: c.cats || [], locations: c.locations || [],
-        updatedAt: new Date(),
-      });
-      ok++;
-      adminLog(`✓ ${c.slug}`);
-    } catch (err) {
-      failures.push(c.slug);
-      adminLog(`✗ ${c.slug} — ${err.message}`);
-      if (failures.length >= 3) { adminLog('\nStopped after 3 failures.'); break; }
+  // try/finally so the button is always re-enabled and the panel always
+  // refreshes, even if something throws outside the per-company catch.
+  try {
+    for (let i = 0; i < SEED_COMPANIES.length; i++) {
+      const c = SEED_COMPANIES[i];
+      try {
+        await FS_REST.setMerge('companies', c.slug, {
+          id: c.id, slug: c.slug, name: c.name, desc: c.desc || '',
+          site: c.site || '', country: c.country || '', logo: c.logo || null,
+          cats: c.cats || [], locations: c.locations || [],
+          updatedAt: new Date(),
+        });
+        ok++;
+        adminLog(`✓ ${i + 1}/${SEED_COMPANIES.length} ${c.slug}`);
+      } catch (err) {
+        // Record and CONTINUE. An earlier version stopped after 3 failures,
+        // which silently truncated the run and hid which records were missing.
+        failures.push({ slug: c.slug, msg: err.message });
+        adminLog(`✗ ${i + 1}/${SEED_COMPANIES.length} ${c.slug} — ${err.message}`);
+      }
     }
+  } finally {
+    adminLog(`\nDone — ${ok} written, ${failures.length} failed.`);
+    if (failures.length) {
+      adminLog(`\nFailed records:`);
+      failures.forEach(f => adminLog(`   ${f.slug}: ${f.msg}`));
+    }
+    btn.disabled = false;
+    await CompanyStore.load();
+    renderAll();
+    renderAdminPage();   // refresh the counts so "Data source" isn't stale
   }
-  adminLog(`\nDone — ${ok} written, ${failures.length} failed.`);
-  btn.disabled = false;
-  if (ok > 0) { await CompanyStore.load(); renderAll(); }
 }
 
 function renderAdminPage() {
