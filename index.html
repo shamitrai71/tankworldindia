@@ -54,14 +54,6 @@ body{
 a{ color:var(--blue); }
 button{ font-family:inherit; cursor:pointer; }
 
-/* ── NATIONAL-COLORS ACCENT STRIP ──
-   A thin tricolor band, purely decorative — not a reproduction of any
-   official emblem, just a quiet nod to the national colors. */
-.tricolor-strip{ height:4px; display:flex; }
-.tricolor-strip div{ flex:1; }
-.tricolor-strip .saffron{ background:#FF9933; }
-.tricolor-strip .white{ background:#FFFFFF; border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
-.tricolor-strip .green{ background:#138808; }
 
 .app-body, header, footer{ position:relative; z-index:1; }
 ::-webkit-scrollbar{ width:8px; height:8px; }
@@ -321,6 +313,27 @@ main{ flex:1; min-width:0; padding:20px 24px 60px; }
   border-top:1px solid var(--line);
 }
 
+/* ── Region (India / International) filter ──────────────────────────── */
+.region-filter{ margin-bottom:14px; }
+.rf-label{
+  font-family:var(--font-mono); font-size:9.5px; letter-spacing:1.5px;
+  color:var(--ink-faint); margin-bottom:6px;
+}
+.rf-buttons{ display:flex; border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; }
+.rf-btn{
+  flex:1; display:flex; align-items:center; justify-content:center; gap:5px; cursor:pointer;
+  padding:7px 4px; border:none; border-right:1px solid var(--line); background:var(--paper-raised);
+  font-family:var(--font-body); font-size:11.5px; color:var(--ink-muted); transition:background .15s, color .15s;
+}
+.rf-btn:last-child{ border-right:none; }
+.rf-btn:hover{ background:var(--blue-soft); }
+.rf-btn.active{ background:var(--blue); color:var(--paper-raised); font-weight:600; }
+.rf-count{
+  font-family:var(--font-mono); font-size:9px; opacity:.75;
+  background:rgba(0,0,0,.08); padding:1px 4px; border-radius:2px;
+}
+.rf-btn.active .rf-count{ background:rgba(255,255,255,.22); }
+
 .auth-area{ display:flex; align-items:center; gap:8px; }
 .btn-auth{
   font-family:var(--font-mono); font-size:10.5px; letter-spacing:0.5px; cursor:pointer;
@@ -457,7 +470,6 @@ footer{
 </head>
 <body>
 
-<div class="tricolor-strip"><div class="saffron"></div><div class="white"></div><div class="green"></div></div>
 
 <header>
   <div class="brand">
@@ -521,6 +533,7 @@ footer{
       <span id="filterCount"></span>
     </div>
     <input type="text" class="search-box" id="searchBox" placeholder="Search company or category…" oninput="renderAll()">
+    <div class="region-filter" id="regionFilter"></div>
     <div id="sheetList"></div>
     <button class="clear-filters" onclick="clearFilters()">Clear all filters</button>
   </aside>
@@ -549,7 +562,6 @@ footer{
 
 <footer>
   TANKWORLD INDIA — A DIRECTORY OF ENGINEERING &amp; EQUIPMENT COMPANIES SERVING THE TANK TERMINAL &amp; PROCESS INDUSTRIES SUPPLY CHAIN · DATA SCOPE: INDIA + INTERNATIONAL
-  <div style="margin-top:6px; opacity:0.75;">BUILT IN SUPPORT OF INDIA'S VIKSIT BHARAT @2047 VISION — A DEVELOPED INDIA BY 2047</div>
 </footer>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -827,12 +839,12 @@ const COMPANIES = [
     locations:[
       { type:"registered-office", name:"Registered Office", city:"Chennai, Tamil Nadu", lat:13.06, lng:80.25, placeId:null }
     ] },
-  { id:20, slug:"hmt-llc", name:"HMT LLC", logo:null, country:"USA",
+  { id:20, slug:"hmt-llc", name:"HMT LLC", logo:null, country:"United States",
     cats:["rim-seals","seal-fittings","floating-roof-systems","internal-floating-roofs","aluminium-dome-roofs","roof-drains"], desc:"Global leader in aboveground storage tank solutions since 1978 — floating roofs, floating roof seals, roof drains, and aluminum dome roofs used by tank operators worldwide, including in India.", site:"https://www.hmttank.com",
     locations:[
       { type:"registered-office", name:"Corporate Headquarters", city:"The Woodlands, TX", lat:30.16, lng:-95.46, placeId:null }
     ] },
-  { id:21, slug:"mesa-industries-inc", name:"Mesa Industries, Inc.", logo:null, country:"USA",
+  { id:21, slug:"mesa-industries-inc", name:"Mesa Industries, Inc.", logo:null, country:"United States",
     cats:["rim-seals","seal-fittings","floating-roof-systems","internal-floating-roofs","roof-drains"], desc:"U.S. manufacturer of custom-engineered floating roof tank seals, drain systems, and emission control products for aboveground storage tanks, through its Mesa Engineered Tank Products (Mesa ETP) division — over 4,000 seals installed worldwide.", site:"https://www.mesaetp.com",
     locations:[
       { type:"registered-office", name:"Registered Office", city:"Cincinnati, OH", lat:39.10, lng:-84.51, placeId:null }
@@ -926,7 +938,137 @@ const COMPANIES = [
     cats:["flexible-hoses","expansion-joints"], desc:"NSE-listed Indian manufacturer of stainless steel flexible metal hoses, hose assemblies, and expansion joints, holding roughly 40% share of India's organized flexible hose market and exporting to 90+ countries.", site:"https://www.aeroflexindia.com",
     locations:[
       { type:"registered-office", name:"Registered Office", city:"Taloja, Navi Mumbai, Maharashtra", lat:19.08, lng:73.1, placeId:null }
-    ] },
+    ] },,
+  { id:40, slug:"vinci-energies-sa-actemium", name:"VINCI ENERGIES S.A. (ACTEMIUM)", logo:null, country:"Belgium",
+    desc:"",
+    site:"",
+    cats:["terminal-automation", "electrical-and-instrumentation"],
+    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
+  { id:41, slug:"agidens-process-automation-nv", name:"Agidens Process Automation NV", logo:null, country:"Belgium",
+    desc:"",
+    site:"",
+    cats:["terminal-automation", "scada-systems", "plc-and-dcs"],
+    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
+  { id:42, slug:"ari-armaturen-albert-richter-gmbh-and-co-kg", name:"ARI-Armaturen Albert Richter GmbH & Co. KG", logo:null, country:"Germany",
+    desc:"",
+    site:"",
+    cats:["valves", "actuators"],
+    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
+  { id:43, slug:"bray-controls-benelux-bv", name:"Bray Controls Benelux B.V.", logo:null, country:"Netherlands",
+    desc:"",
+    site:"",
+    cats:["valves", "actuators"],
+    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
+  { id:44, slug:"belven-nv", name:"Belven NV", logo:null, country:"Belgium",
+    desc:"",
+    site:"",
+    cats:["valves", "actuators"],
+    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
+  { id:45, slug:"control-seal-bv", name:"Control Seal B.V.", logo:null, country:"Netherlands",
+    desc:"",
+    site:"",
+    cats:["valves"],
+    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
+  { id:46, slug:"dtn-llc", name:"DTN, LLC", logo:null, country:"United States",
+    desc:"",
+    site:"",
+    cats:["remote-monitoring", "tank-inventory-systems"],
+    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
+  { id:47, slug:"eccos-inzenjering-doo", name:"ECCOS inzenjering d.o.o.", logo:null, country:"Croatia",
+    desc:"",
+    site:"",
+    cats:["terminal-automation", "scada-systems"],
+    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
+  { id:48, slug:"eriks-nv", name:"ERIKS N.V.", logo:null, country:"Netherlands",
+    desc:"",
+    site:"",
+    cats:["valves", "flexible-hoses"],
+    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
+  { id:49, slug:"emil-stelling-armaturen-kg", name:"Emil Stelling Armaturen KG", logo:null, country:"Germany",
+    desc:"",
+    site:"",
+    cats:["valves"],
+    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
+  { id:50, slug:"fma-systems-ltd", name:"FMA Systems Ltd", logo:null, country:"United Kingdom",
+    desc:"",
+    site:"",
+    cats:["terminal-automation", "tank-inventory-systems"],
+    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
+  { id:51, slug:"hafen-und-industrietechnik-gmbh", name:"Hafen- und Industrietechnik GmbH", logo:null, country:"Germany",
+    desc:"",
+    site:"",
+    cats:["loading-arms", "marine-loading-arms"],
+    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
+  { id:52, slug:"implico-bv", name:"Implico B.V.", logo:null, country:"Netherlands",
+    desc:"",
+    site:"",
+    cats:["terminal-automation", "tank-inventory-systems"],
+    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
+  { id:53, slug:"kimman-process-solutions-bv", name:"Kimman Process Solutions B.V.", logo:null, country:"Netherlands",
+    desc:"",
+    site:"",
+    cats:["terminal-automation", "plc-and-dcs"],
+    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
+  { id:54, slug:"kremsmuller-industrieanlagenbau-kg", name:"Kremsmüller Industrieanlagenbau KG", logo:null, country:"Austria",
+    desc:"",
+    site:"",
+    cats:["epc-contractors", "mechanical-contractors"],
+    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
+  { id:55, slug:"m-f-technologies-gmbh", name:"M+F Technologies GmbH", logo:null, country:"Germany",
+    desc:"",
+    site:"",
+    cats:["terminal-automation", "custody-transfer-metering"],
+    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
+  { id:56, slug:"nvent-thermal-management-nvent-electric-plc", name:"nVent Thermal Management (nVent Electric plc)", logo:null, country:"United Kingdom",
+    desc:"",
+    site:"",
+    cats:["heating-systems", "electrical-and-instrumentation"],
+    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
+  { id:57, slug:"phoenix-contact-deutschland-gmbh", name:"Phoenix Contact Deutschland GmbH", logo:null, country:"Germany",
+    desc:"",
+    site:"",
+    cats:["industrial-networking", "electrical-and-instrumentation"],
+    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
+  { id:58, slug:"plexus-integracao-de-sistemas-lda", name:"Plexus — Integração de Sistemas, Lda.", logo:null, country:"Portugal",
+    desc:"",
+    site:"",
+    cats:["terminal-automation", "scada-systems", "plc-and-dcs", "electrical-and-instrumentation"],
+    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
+  { id:59, slug:"rotork-bv", name:"Rotork B.V.", logo:null, country:"Netherlands",
+    desc:"",
+    site:"",
+    cats:["actuators", "valves"],
+    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
+  { id:60, slug:"sofis-bv", name:"Sofis B.V.", logo:null, country:"Netherlands",
+    desc:"",
+    site:"",
+    cats:["valves", "actuators"],
+    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
+  { id:61, slug:"sze-hagenuk-gmbh", name:"SZE Hagenuk GmbH", logo:null, country:"Germany",
+    desc:"",
+    site:"",
+    cats:["terminal-automation", "custody-transfer-metering"],
+    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
+  { id:62, slug:"toptech-systems-inc", name:"Toptech Systems, Inc.", logo:null, country:"United States",
+    desc:"",
+    site:"",
+    cats:["terminal-automation", "custody-transfer-metering"],
+    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
+  { id:63, slug:"verwater-group-bv", name:"Verwater Group B.V.", logo:null, country:"Netherlands",
+    desc:"",
+    site:"",
+    cats:["epc-contractors", "tank-construction", "mechanical-contractors"],
+    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
+  { id:64, slug:"voczero-ltd", name:"VOCZero Ltd", logo:null, country:"United Kingdom",
+    desc:"",
+    site:"",
+    cats:["vapour-recovery-units-vru", "tank-cleaning"],
+    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
+  { id:65, slug:"zwick-armaturen-gmbh", name:"Zwick Armaturen GmbH", logo:null, country:"Germany",
+    desc:"",
+    site:"",
+    cats:["valves"],
+    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] }
 ];
 </script>
 <script>
@@ -1113,6 +1255,11 @@ const CompanyStore = {
 // APP LOGIC
 // ══════════════════════════════════════════════════════════════════════
 let activeCategory = null;   // single L2 slug filter, or null
+// Region filter: 'all' | 'india' | 'international'. Derived from each
+// company's country field rather than stored separately, so there's one
+// source of truth and no risk of the two drifting apart.
+let activeRegion = 'all';
+function isIndian(c) { return (c.country || '').trim().toLowerCase() === 'india'; }
 let currentView = 'list';
 let map = null, mapMarkers = [];
 
@@ -1125,6 +1272,32 @@ function categoryLabel(slug) {
     for (const it of l1.items) if (it.slug === slug) return { code: it.code, name: it.name };
   }
   return null;
+}
+
+function setRegion(r) {
+  activeRegion = r;
+  renderRegionFilter();
+  renderAll();
+}
+
+function renderRegionFilter() {
+  const el = document.getElementById('regionFilter');
+  if (!el) return;
+  const nIndia = COMPANIES.filter(isIndian).length;
+  const nIntl  = COMPANIES.length - nIndia;
+  const opts = [
+    ['all',           'All',           COMPANIES.length],
+    ['india',         'India',         nIndia],
+    ['international', 'International', nIntl],
+  ];
+  el.innerHTML = `
+    <div class="rf-label">LOCATION</div>
+    <div class="rf-buttons">
+      ${opts.map(([k, label, n]) => `
+        <button class="rf-btn ${activeRegion === k ? 'active' : ''}" onclick="setRegion('${k}')">
+          ${label}<span class="rf-count">${n}</span>
+        </button>`).join('')}
+    </div>`;
 }
 
 function buildSidebar() {
@@ -1162,7 +1335,9 @@ function selectCategory(slug) {
 
 function clearFilters() {
   activeCategory = null;
+  activeRegion = 'all';
   document.getElementById('searchBox').value = '';
+  renderRegionFilter();
   document.querySelectorAll('.sheet-item.active').forEach(el => el.classList.remove('active'));
   renderAll();
 }
@@ -1185,6 +1360,8 @@ function filteredCompanies() {
   const q = document.getElementById('searchBox').value.trim().toLowerCase();
   return COMPANIES.filter(c => {
     if (activeCategory && !c.cats.includes(activeCategory)) return false;
+    if (activeRegion === 'india' && !isIndian(c)) return false;
+    if (activeRegion === 'international' && isIndian(c)) return false;
     if (q) {
       const loc = primaryLocation(c);
       const hay = (c.name + ' ' + loc.city + ' ' + c.desc + ' ' +
@@ -1238,6 +1415,10 @@ function renderMap() {
   const list = filteredCompanies();
   list.forEach(c => {
     const loc = primaryLocation(c);
+    // Skip companies whose registered office has no coordinates yet — real
+    // gaps rather than invented ones. They still appear in the list view and
+    // are flagged in the admin roster so the gap is visible, not hidden.
+    if (!loc || typeof loc.lat !== 'number' || typeof loc.lng !== 'number') return;
     const marker = L.circleMarker([loc.lat, loc.lng], {
       radius: 7, color: '#1B4B7A', weight: 2, fillColor: '#1B4B7A', fillOpacity: 0.55
     }).addTo(map);
@@ -1815,6 +1996,7 @@ async function reloadFromFirestore() {
 async function startApp() {
   await CompanyStore.load();
   buildSidebar();
+  renderRegionFilter();
   document.getElementById('statCompanies').textContent = COMPANIES.length;
   document.getElementById('statCategories').textContent = allL2Count();
   document.getElementById('statSheets').textContent = CATEGORY_TREE.length;
