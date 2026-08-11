@@ -1173,6 +1173,17 @@ const COMPANIES = [
     cats:["bolted-steel-tanks"],
     locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] }
 ];
+
+// Immutable copy of the in-page roster, taken BEFORE CompanyStore.load()
+// can replace COMPANIES with Firestore's contents.
+//
+// Why this exists: load() overwrites COMPANIES with whatever Firestore
+// returns. Without this snapshot, any company newly added to the array above
+// would be silently discarded on load, and the seed button — which iterates
+// COMPANIES — would only ever re-write what Firestore already had. New
+// companies could never reach the database. Seeding reads from here instead.
+const SEED_COMPANIES = JSON.parse(JSON.stringify(COMPANIES));
+
 </script>
 <script>
 // ══════════════════════════════════════════════════════════════════════
@@ -1779,15 +1790,16 @@ function adminLog(msg) {
 // this safe to re-run and what ties a company to the same identity across apps.
 async function seedCompanies() {
   if (!isAdminUser(currentUser)) { alert('Admin only.'); return; }
-  if (!confirm(`Write ${COMPANIES.length} companies to Firestore?\n\n` +
+  if (!confirm(`Write ${SEED_COMPANIES.length} companies to Firestore?\n\n` +
                `Document id = slug. Safe to re-run: existing records are updated ` +
-               `in place, not duplicated.`)) return;
+               `in place, not duplicated. Records already in Firestore but not in ` +
+               `the built-in roster are left untouched.`)) return;
   const btn = document.getElementById('btnSeed');
   btn.disabled = true;
   const log = document.getElementById('adminLog');
   log.textContent = '';
   let ok = 0; const failures = [];
-  for (const c of COMPANIES) {
+  for (const c of SEED_COMPANIES) {
     try {
       await FS_REST.setMerge('companies', c.slug, {
         id: c.id, slug: c.slug, name: c.name, desc: c.desc || '',
@@ -1841,10 +1853,16 @@ function renderAdminPage() {
         ? `Firestore — ${COMPANIES.length} companies loaded live.`
         : `built-in seed roster (${COMPANIES.length} companies). Firestore is empty
            or unreachable, so the directory is running on the in-page array.`}
+      <br><b>Built-in roster:</b> ${SEED_COMPANIES.length} companies in this build.
+      ${CompanyStore.isLive && SEED_COMPANIES.length > COMPANIES.length
+        ? `<br><span style="color:var(--rust);"><b>${SEED_COMPANIES.length - COMPANIES.length}
+           compan${SEED_COMPANIES.length - COMPANIES.length === 1 ? 'y is' : 'ies are'} in this
+           build but not yet in Firestore.</b> Run the seed below to write them.</span>`
+        : ``}
     </div>
     <div class="admin-actions">
       <button class="btn-action" id="btnSeed" onclick="seedCompanies()">
-        Seed ${COMPANIES.length} companies → Firestore
+        Seed ${SEED_COMPANIES.length} companies → Firestore
       </button>
       <button class="btn-action ghost" onclick="reloadFromFirestore()">Reload from Firestore</button>
       <button class="btn-action ghost" onclick="location.hash='#/'">Back to directory</button>
