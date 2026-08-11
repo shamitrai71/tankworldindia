@@ -245,6 +245,21 @@ main{ flex:1; min-width:0; padding:20px 24px 60px; }
 }
 /* ── Auth / profile / admin ─────────────────────────────────────────── */
 /* ── Admin roster table + company editor ────────────────────────────── */
+/* ── Bulk category tagging ──────────────────────────────────────────── */
+.bulk-select-row{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:10px; }
+.bulk-bar{ display:none; }
+.bulk-bar.active{
+  display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:12px;
+  padding:10px 12px; background:var(--blue-soft); border:1px solid var(--line-blue);
+  border-left:3px solid var(--blue); border-radius:var(--radius);
+}
+.bulk-count{ font-family:var(--font-mono); font-size:10.5px; font-weight:700; color:var(--blue); }
+.bulk-bar select{
+  padding:6px 8px; border:1px solid var(--line); border-radius:var(--radius);
+  background:var(--paper-raised); font-family:var(--font-body); font-size:12px; color:var(--ink); outline:none;
+}
+.ac-check{ cursor:pointer; }
+
 .admin-table-wrap{ border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; background:var(--paper-raised); }
 .admin-table{ width:100%; border-collapse:collapse; }
 .admin-table td{ padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:middle; }
@@ -628,6 +643,7 @@ const CATEGORY_TREE = [
     { code:"EC-14", name:"Roofing Systems", slug:"roofing-systems" },
     { code:"EC-15", name:"Demolition & Decommissioning", slug:"demolition-and-decommissioning" },
     { code:"EC-16", name:"Heavy Engineering & Fabrication", slug:"heavy-engineering-and-fabrication" },
+    { code:"EC-17", name:"Tank Maintenance", slug:"tank-maintenance" },
   ]},
   { code:"TS", name:"Tank Systems & Equipment", slug:"tank-systems-and-equipment", items:[
     { code:"TS-01", name:"Tank Gauging", slug:"tank-gauging" },
@@ -1070,6 +1086,91 @@ const COMPANIES = [
     desc:"",
     site:"",
     cats:["valves"],
+    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
+  { id:66, slug:"shijiazhuang-zhengzhong-technology-company-limited", name:"Shijiazhuang Zhengzhong Technology Company Limited", logo:null, country:"China",
+    desc:"Chinese manufacturer of glass-fused-to-steel bolted storage tanks, trading as Center Enamel.",
+    site:"https://www.cectank.com",
+    cats:["bolted-steel-tanks"],
+    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
+  { id:67, slug:"astha-infra-engg-india-private-limited", name:"Astha Infra Engg. (India) Private Limited", logo:null, country:"India",
+    desc:"Indian supplier of hydraulic tank jacking equipment and automatic welding systems for storage tank erection.",
+    site:"https://www.hydraulictankjackingequipmentsupplier.com",
+    cats:["hydraulic-jacking-and-automatic-welding-systems", "tank-construction"],
+    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
+  { id:68, slug:"petrotech-engineers", name:"Petrotech Engineers", logo:null, country:"India",
+    desc:"Vadodara-based manufacturer of level gauges and indicators, flow meters, sight flow indicators and tank gauging instruments.",
+    site:"https://www.petrotechengineers.in",
+    cats:["tank-gauging", "flow-meters", "electrical-and-instrumentation"],
+    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
+  { id:69, slug:"vermont-technologies-private-limited", name:"Vermont Technologies Private Limited", logo:null, country:"India",
+    desc:"Indian manufacturer of gauge hatches and associated storage tank fittings.",
+    site:"https://vermonttechnologies.co.in",
+    cats:["gauge-hatches"],
+    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
+  { id:70, slug:"rostfrei-steels-private-limited", name:"Rostfrei Steels Private Limited", logo:null, country:"India",
+    desc:"Manufacturer of bolted steel liquid storage tanks, grain silos and fusion-bond-epoxy tanks, with plants at Palwal, Haryana.",
+    site:"https://www.rostfreisteels.com",
+    cats:["bolted-steel-tanks", "tank-construction"],
+    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
+  { id:71, slug:"protego-india-private-limited", name:"Protego India Private Limited", logo:null, country:"India",
+    desc:"Indian arm of PROTEGO, supplying flame arresters, pressure/vacuum relief valves and tank blanketing equipment.",
+    site:"https://in.protego.com",
+    cats:["flame-arresters", "pressure-vacuum-vents", "emergency-vents", "tank-blanketing"],
+    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
+  { id:72, slug:"protectoseal-india-private-limited", name:"Protectoseal (India) Private Limited", logo:null, country:"India",
+    desc:"Indian arm of The Protectoseal Company, supplying flame arresters, conservation vents and emergency relief vents.",
+    site:"https://www.protectoseal.com",
+    cats:["flame-arresters", "pressure-vacuum-vents", "emergency-vents"],
+    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
+  { id:73, slug:"newton-engineering-and-chemicals-limited", name:"Newton Engineering & Chemicals Limited", logo:null, country:"India",
+    desc:"Indian storage tank construction and maintenance contractor.",
+    site:"https://newtonengg.com",
+    cats:["tank-construction", "mechanical-contractors"],
+    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
+  { id:74, slug:"velankanni-engineers", name:"Velankanni Engineers", logo:null, country:"India",
+    desc:"Indian storage tank construction and maintenance contractor.",
+    site:"https://www.velankanniengineers.com",
+    cats:["tank-construction", "mechanical-contractors"],
+    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
+  { id:75, slug:"aarkay-erectors-private-limited", name:"Aarkay Erectors Private Limited", logo:null, country:"India",
+    desc:"Indian storage tank erection contractor.",
+    site:"https://aarkayerectors.com",
+    cats:["tank-construction", "mechanical-contractors"],
+    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
+  { id:76, slug:"kesari-engineering-and-construction", name:"Kesari Engineering & Construction", logo:null, country:"India",
+    desc:"Indian storage tank construction and fabrication contractor.",
+    site:"https://www.kesariengineering.com",
+    cats:["tank-construction", "heavy-engineering-and-fabrication"],
+    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
+  { id:77, slug:"nuberg-engineering-limited", name:"Nuberg Engineering Limited", logo:null, country:"India",
+    desc:"Indian EPC contractor for chemical, fertiliser and industrial process plants.",
+    site:"http://www.nuberghfd.com",
+    cats:["epc-contractors", "tank-engineering"],
+    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
+  { id:78, slug:"united-fabritech-and-erectors-private-limited", name:"United Fabritech & Erectors Private Limited", logo:null, country:"India",
+    desc:"Indian storage tank fabrication and erection contractor.",
+    site:"https://www.unitedfabritech.com",
+    cats:["tank-construction", "heavy-engineering-and-fabrication"],
+    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
+  { id:79, slug:"consite-engineering-company-limited", name:"Consite Engineering Company Limited", logo:null, country:"India",
+    desc:"Indian storage tank construction contractor.",
+    site:"https://www.consite.in",
+    cats:["tank-construction"],
+    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
+  { id:80, slug:"deha-tech-makina-sanayi-ve-ticaret-as", name:"Deha Tech Makina Sanayi ve Ticaret A.Ş.", logo:null, country:"Turkey",
+    desc:"Turkish storage tank construction and maintenance company.",
+    site:"https://dehatech.com",
+    cats:["tank-construction", "mechanical-contractors"],
+    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
+  { id:81, slug:"tank-connection-llc", name:"Tank Connection, LLC", logo:null, country:"United States",
+    desc:"US manufacturer of bolted and RTP storage tanks, based in Parsons, Kansas.",
+    site:"https://www.tankconnection.com",
+    cats:["bolted-steel-tanks", "tank-construction"],
+    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
+  { id:82, slug:"permastore-limited", name:"Permastore Limited", logo:null, country:"United Kingdom",
+    desc:"UK originator of glass-fused-to-steel bolted storage tanks, based in Eye, Suffolk.",
+    site:"https://www.permastore.com",
+    cats:["bolted-steel-tanks"],
     locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] }
 ];
 </script>
@@ -1763,6 +1864,12 @@ function renderAdminPage() {
     </div>
     <input type="text" class="search-box" id="adminSearch" placeholder="Filter by name or slug…"
            oninput="renderAdminList()" style="margin-bottom:12px;">
+    <div class="bulk-select-row">
+      <button class="btn-mini" onclick="bulkSelectVisible(true)">Select all shown</button>
+      <button class="btn-mini" onclick="bulkSelectVisible(false)">Deselect all shown</button>
+      <span class="ed-hint">Tick companies to tag several at once.</span>
+    </div>
+    <div class="bulk-bar" id="bulkBar"></div>
     <div class="admin-table-wrap">
       <table class="admin-table">
         <tbody id="adminList">${adminCompanyRows()}</tbody>
@@ -1957,6 +2064,13 @@ async function saveCompany() {
   }
 }
 
+// ── Bulk category tagging ────────────────────────────────────────────
+// Adding one category to many companies one-at-a-time through the editor is
+// the tedious case; this applies a single category across a selection in one
+// pass. Writes only the `cats` field, so nothing else on those documents is
+// touched.
+const bulkSelected = new Set();
+
 function adminCompanyRows() {
   const q = (document.getElementById('adminSearch')?.value || '').toLowerCase();
   return COMPANIES
@@ -1967,6 +2081,8 @@ function adminCompanyRows() {
       const noPid = (c.locations || []).filter(l => !l.placeId).length;
       return `
       <tr>
+        <td><input type="checkbox" class="ac-check" ${bulkSelected.has(c.slug) ? 'checked' : ''}
+                   onchange="toggleBulk('${c.slug}', this.checked)"></td>
         <td>
           <div class="ac-logo">${c.logo ? `<img src="${c.logo}" alt="">` : `<span>${initials(c.name)}</span>`}</div>
         </td>
@@ -1978,10 +2094,86 @@ function adminCompanyRows() {
           ${noLogo ? '<span class="flag warn">no logo</span>' : '<span class="flag ok">logo</span>'}
           <span class="flag">${locs} loc</span>
           ${noPid ? `<span class="flag warn">${noPid} no place ID</span>` : '<span class="flag ok">place IDs</span>'}
+          <span class="flag">${(c.cats || []).length} cat</span>
         </td>
         <td><button class="btn-mini" onclick="openCompanyEditor('${c.slug}')">Edit</button></td>
       </tr>`;
     }).join('');
+}
+
+function toggleBulk(slug, on) {
+  if (on) bulkSelected.add(slug); else bulkSelected.delete(slug);
+  renderBulkBar();
+}
+
+function bulkSelectVisible(on) {
+  const q = (document.getElementById('adminSearch')?.value || '').toLowerCase();
+  COMPANIES
+    .filter(c => !q || c.name.toLowerCase().includes(q) || c.slug.includes(q))
+    .forEach(c => { if (on) bulkSelected.add(c.slug); else bulkSelected.delete(c.slug); });
+  renderAdminList();
+  renderBulkBar();
+}
+
+function bulkClear() {
+  bulkSelected.clear();
+  renderAdminList();
+  renderBulkBar();
+}
+
+function renderBulkBar() {
+  const el = document.getElementById('bulkBar');
+  if (!el) return;
+  const n = bulkSelected.size;
+  if (n === 0) { el.innerHTML = ''; el.classList.remove('active'); return; }
+  el.classList.add('active');
+  const catOptions = CATEGORY_TREE.map(l1 =>
+    `<optgroup label="${l1.code} · ${l1.name}">` +
+    l1.items.map(it => `<option value="${it.slug}">${it.code} — ${it.name}</option>`).join('') +
+    `</optgroup>`).join('');
+  el.innerHTML = `
+    <div class="bulk-count">${n} selected</div>
+    <select id="bulkCat"><option value="">Choose a category…</option>${catOptions}</select>
+    <button class="btn-mini" onclick="bulkApply('add')">Add to selected</button>
+    <button class="btn-mini rust" onclick="bulkApply('remove')">Remove from selected</button>
+    <button class="btn-mini" onclick="bulkClear()">Clear selection</button>
+    <span class="ed-hint" id="bulkStatus"></span>`;
+}
+
+async function bulkApply(mode) {
+  if (!isAdminUser(currentUser)) { alert('Admin only.'); return; }
+  const slug = document.getElementById('bulkCat').value;
+  const status = document.getElementById('bulkStatus');
+  if (!slug) { status.textContent = 'Pick a category first.'; return; }
+  const label = categoryLabel(slug);
+  const verb = mode === 'add' ? 'Add' : 'Remove';
+  if (!confirm(`${verb} "${label ? label.name : slug}" ${mode === 'add' ? 'to' : 'from'} ` +
+               `${bulkSelected.size} compan${bulkSelected.size === 1 ? 'y' : 'ies'}?`)) return;
+
+  let changed = 0, skipped = 0;
+  const failures = [];
+  for (const s of Array.from(bulkSelected)) {
+    const c = COMPANIES.find(x => x.slug === s);
+    if (!c) continue;
+    const cats = Array.isArray(c.cats) ? [...c.cats] : [];
+    const has = cats.includes(slug);
+    if (mode === 'add' && has) { skipped++; continue; }
+    if (mode === 'remove' && !has) { skipped++; continue; }
+    const next = mode === 'add' ? [...cats, slug] : cats.filter(x => x !== slug);
+    try {
+      await FS_REST.setMerge('companies', s, { cats: next, updatedAt: new Date() });
+      c.cats = next;
+      changed++;
+      status.textContent = `${changed} updated…`;
+    } catch (err) {
+      failures.push(s);
+      if (failures.length >= 3) break;
+    }
+  }
+  status.textContent = `${changed} updated, ${skipped} already ${mode === 'add' ? 'had it' : 'without it'}` +
+                       (failures.length ? `, ${failures.length} failed (${failures[0]})` : '');
+  renderAdminList();
+  renderAll();
 }
 
 function renderAdminList() {
