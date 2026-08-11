@@ -11,6 +11,7 @@
      transport hangs on some corporate networks. -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -251,6 +252,75 @@ main{ flex:1; min-width:0; padding:20px 24px 60px; }
   background:var(--blue); padding:2px 6px; border-radius:2px; width:fit-content; letter-spacing:0.5px;
 }
 /* ── Auth / profile / admin ─────────────────────────────────────────── */
+/* ── Admin roster table + company editor ────────────────────────────── */
+.admin-table-wrap{ border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; background:var(--paper-raised); }
+.admin-table{ width:100%; border-collapse:collapse; }
+.admin-table td{ padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:middle; }
+.admin-table tr:last-child td{ border-bottom:none; }
+.admin-table tr:hover{ background:var(--paper); }
+.ac-logo{
+  width:34px; height:34px; border:1px solid var(--line); border-radius:var(--radius);
+  display:flex; align-items:center; justify-content:center; overflow:hidden; background:#fff;
+}
+.ac-logo img{ width:100%; height:100%; object-fit:contain; }
+.ac-logo span{ font-family:var(--font-mono); font-size:11px; font-weight:700; color:var(--blue); }
+.ac-name{ font-weight:600; font-size:13px; }
+.ac-slug{ font-family:var(--font-mono); font-size:10px; color:var(--ink-faint); }
+.ac-flags{ display:flex; gap:5px; flex-wrap:wrap; }
+.flag{
+  font-family:var(--font-mono); font-size:9px; padding:2px 6px; border-radius:2px;
+  background:var(--surface, #ECE6D6); color:var(--ink-muted); white-space:nowrap;
+}
+.flag.ok{ background:#E4EFE6; color:#3E7A4F; }
+.flag.warn{ background:var(--rust-soft); color:var(--rust); }
+.btn-mini{
+  font-family:var(--font-mono); font-size:10px; cursor:pointer; padding:5px 10px;
+  border-radius:var(--radius); border:1px solid var(--blue); background:transparent; color:var(--blue);
+}
+.btn-mini.rust{ border-color:var(--rust); color:var(--rust); }
+.btn-mini:hover{ background:var(--blue-soft); }
+
+.modal-wide{ max-width:640px; max-height:88vh; display:flex; flex-direction:column; }
+.edit-body{ overflow-y:auto; padding-right:4px; margin-top:6px; }
+.ed-row{ margin-bottom:14px; }
+.ed-row-2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
+.ed-row-3{ display:grid; grid-template-columns:1fr 1fr 2fr; gap:6px; margin-top:6px; }
+.edit-body label{
+  display:block; font-family:var(--font-mono); font-size:10px; letter-spacing:.5px;
+  color:var(--ink-muted); margin-bottom:5px; text-transform:uppercase;
+}
+.edit-body input[type=text], .edit-body textarea, .edit-body select{
+  width:100%; padding:8px 10px; border:1px solid var(--line); border-radius:var(--radius);
+  background:var(--paper); font-family:var(--font-body); font-size:13px; color:var(--ink); outline:none;
+}
+.edit-body input:focus, .edit-body textarea:focus, .edit-body select:focus{ border-color:var(--blue); }
+.edit-body input:disabled{ background:#E9E3D3; color:var(--ink-faint); }
+.ed-hint{ font-size:11px; color:var(--ink-faint); margin-top:4px; line-height:1.45; }
+.ed-hint code{ font-family:var(--font-mono); font-size:10.5px; }
+.ed-hint-link{ display:inline-block; font-size:11px; color:var(--blue); margin-top:5px; }
+.ed-count{ font-family:var(--font-mono); font-size:9px; background:var(--blue-soft); color:var(--blue); padding:1px 5px; border-radius:2px; }
+.ed-logo{ display:flex; gap:12px; align-items:flex-start; }
+.ed-logo-preview{
+  width:64px; height:64px; border:1px solid var(--line); border-radius:var(--radius);
+  display:flex; align-items:center; justify-content:center; background:#fff; flex-shrink:0; overflow:hidden;
+}
+.ed-logo-preview img{ width:100%; height:100%; object-fit:contain; }
+.ed-logo-preview span{ font-family:var(--font-mono); font-size:18px; font-weight:700; color:var(--blue); }
+.ed-chips{ display:flex; flex-wrap:wrap; gap:5px; margin-bottom:7px; }
+.ed-chip{
+  font-size:11px; background:var(--blue-soft); color:var(--blue); border:1px solid var(--line-blue);
+  padding:3px 6px; border-radius:2px; display:inline-flex; align-items:center; gap:5px;
+}
+.ed-chip button{ background:none; border:none; color:var(--blue); cursor:pointer; font-size:14px; line-height:1; padding:0; }
+.ed-loc{ border:1px solid var(--line); border-radius:var(--radius); padding:10px; margin-bottom:8px; background:var(--paper); }
+.ed-loc input{ margin-bottom:6px; }
+.ed-loc-head{ display:flex; gap:8px; align-items:center; margin-bottom:7px; }
+.ed-loc-head select{ flex:1; }
+.edit-actions{
+  display:flex; gap:10px; justify-content:flex-end; padding-top:14px; margin-top:10px;
+  border-top:1px solid var(--line);
+}
+
 .auth-area{ display:flex; align-items:center; gap:8px; }
 .btn-auth{
   font-family:var(--font-mono); font-size:10.5px; letter-spacing:0.5px; cursor:pointer;
@@ -423,6 +493,24 @@ footer{
       Continue with Google
     </button>
     <div id="authError" class="auth-error"></div>
+  </div>
+</div>
+
+<!-- ── Company editor modal ──────────────────────────────────────────── -->
+<div class="modal-backdrop" id="editModal" onclick="if(event.target===this) closeCompanyEditor()">
+  <div class="modal modal-wide">
+    <div class="modal-head">
+      <div>
+        <div class="modal-code">EDIT · CO-01</div>
+        <h3>Edit company</h3>
+      </div>
+      <button class="modal-x" onclick="closeCompanyEditor()">&times;</button>
+    </div>
+    <div id="editBody" class="edit-body"></div>
+    <div class="edit-actions">
+      <button class="btn-action ghost" onclick="closeCompanyEditor()">Cancel</button>
+      <button class="btn-action" onclick="saveCompany()">Save to Firestore</button>
+    </div>
   </div>
 </div>
 
@@ -883,7 +971,7 @@ const FIRESTORE_DB_ID = "(default)";
 // needed for the directory to load.
 // ══════════════════════════════════════════════════════════════════════
 // Auth uses the Firebase SDK (plain HTTPS, no WebChannel), data uses REST.
-let firebaseReady = false, fbAuth = null;
+let firebaseReady = false, fbAuth = null, fbStorage = null;
 (function initFirebase() {
   if (typeof firebase === 'undefined') {
     console.warn('[TANKWORLDINDIA] Firebase SDK not loaded — sign-in disabled, directory still works.');
@@ -892,6 +980,7 @@ let firebaseReady = false, fbAuth = null;
   try {
     firebase.initializeApp(firebaseConfig);
     fbAuth = firebase.auth();
+    if (firebase.storage) fbStorage = firebase.storage();
     firebaseReady = true;
     console.log('%c[TANKWORLDINDIA] Firebase ready · project=' + firebaseConfig.projectId +
                 ' · db=' + FIRESTORE_DB_ID, 'color:#1B4B7A;font-weight:bold');
@@ -1479,7 +1568,239 @@ function renderAdminPage() {
       rejected, check that your email is in the <code>isAdmin()</code> list in
       <code>firestore.rules</code> — the rules are what actually enforce this,
       not this page.
+    </div>
+
+    <div class="panel-head" style="margin-top:26px;">
+      <div class="p-code">ROSTER · ADM-02</div>
+      <h2 style="font-size:20px;">Companies</h2>
+      <p>Edit details, upload logos, and add Google Place IDs per location.</p>
+    </div>
+    <input type="text" class="search-box" id="adminSearch" placeholder="Filter by name or slug…"
+           oninput="renderAdminList()" style="margin-bottom:12px;">
+    <div class="admin-table-wrap">
+      <table class="admin-table">
+        <tbody id="adminList">${adminCompanyRows()}</tbody>
+      </table>
     </div>`;
+}
+
+// ── Company editor ───────────────────────────────────────────────────
+let editingSlug = null;
+let editDraft = null;
+
+function openCompanyEditor(slug) {
+  const c = COMPANIES.find(x => x.slug === slug);
+  if (!c) return;
+  editingSlug = slug;
+  // Deep copy so Cancel genuinely discards — editing the live object would
+  // leave half-applied changes in the directory even on cancel.
+  editDraft = JSON.parse(JSON.stringify(c));
+  editDraft.locations = editDraft.locations || [];
+  renderCompanyEditor();
+  document.getElementById('editModal').classList.add('open');
+}
+
+function closeCompanyEditor() {
+  document.getElementById('editModal').classList.remove('open');
+  editingSlug = null; editDraft = null;
+}
+
+function editField(field, value) { editDraft[field] = value; }
+function editLocField(i, field, value) {
+  if (field === 'lat' || field === 'lng') {
+    const n = parseFloat(value);
+    editDraft.locations[i][field] = isNaN(n) ? null : n;
+  } else {
+    editDraft.locations[i][field] = value === '' ? null : value;
+  }
+}
+function addEditLocation() {
+  editDraft.locations.push({ type:'registered-office', name:'', city:'', lat:null, lng:null, placeId:null });
+  renderCompanyEditor();
+}
+function removeEditLocation(i) {
+  editDraft.locations.splice(i, 1);
+  renderCompanyEditor();
+}
+
+function renderCompanyEditor() {
+  const c = editDraft;
+  const catOptions = CATEGORY_TREE.map(l1 =>
+    `<optgroup label="${l1.code} · ${l1.name}">` +
+    l1.items.map(it => `<option value="${it.slug}">${it.code} — ${it.name}</option>`).join('') +
+    `</optgroup>`).join('');
+
+  document.getElementById('editBody').innerHTML = `
+    <div class="ed-row">
+      <label>Logo</label>
+      <div class="ed-logo">
+        <div class="ed-logo-preview" id="logoPreview">
+          ${c.logo ? `<img src="${c.logo}" alt="">` : `<span>${initials(c.name)}</span>`}
+        </div>
+        <div>
+          <input type="file" id="logoFile" accept="image/*" onchange="uploadLogo()">
+          <div class="ed-hint">Square PNG/SVG works best · max 2 MB · stored in
+            <code>logos/${c.slug}</code></div>
+          <div class="ed-hint" id="logoStatus"></div>
+          ${c.logo ? `<button class="btn-mini rust" onclick="clearLogo()">Remove logo</button>` : ''}
+        </div>
+      </div>
+    </div>
+
+    <div class="ed-row"><label>Name</label>
+      <input type="text" value="${(c.name||'').replace(/"/g,'&quot;')}" oninput="editField('name', this.value)"></div>
+
+    <div class="ed-row"><label>Slug</label>
+      <input type="text" value="${c.slug}" disabled>
+      <div class="ed-hint">Immutable — it's the shared identity key across Tankonomics,
+        TankBazaar and ASTSPARES. Changing it would break those joins.</div></div>
+
+    <div class="ed-row"><label>Description</label>
+      <textarea rows="3" oninput="editField('desc', this.value)">${c.desc||''}</textarea></div>
+
+    <div class="ed-row-2">
+      <div><label>Website</label>
+        <input type="text" value="${(c.site||'').replace(/"/g,'&quot;')}" oninput="editField('site', this.value)"></div>
+      <div><label>Country</label>
+        <input type="text" value="${(c.country||'').replace(/"/g,'&quot;')}" oninput="editField('country', this.value)"></div>
+    </div>
+
+    <div class="ed-row">
+      <label>Categories <span class="ed-count">${(c.cats||[]).length}</span></label>
+      <div class="ed-chips" id="catChips">
+        ${(c.cats||[]).map(s => {
+          const l = categoryLabel(s);
+          return `<span class="ed-chip">${l ? l.code + ' ' + l.name : s}
+            <button onclick="removeCat('${s}')">&times;</button></span>`;
+        }).join('') || '<span class="ed-hint">None yet</span>'}
+      </div>
+      <select onchange="addCat(this.value); this.value='';">
+        <option value="">+ Add category…</option>${catOptions}
+      </select>
+    </div>
+
+    <div class="ed-row">
+      <label>Locations <span class="ed-count">${c.locations.length}</span></label>
+      ${c.locations.map((l, i) => `
+        <div class="ed-loc">
+          <div class="ed-loc-head">
+            <select onchange="editLocField(${i},'type',this.value)">
+              ${['registered-office','plant','facility','branch'].map(t =>
+                `<option value="${t}" ${l.type===t?'selected':''}>${t}</option>`).join('')}
+            </select>
+            <button class="btn-mini rust" onclick="removeEditLocation(${i})">Remove</button>
+          </div>
+          <input type="text" placeholder="Location name" value="${(l.name||'').replace(/"/g,'&quot;')}"
+                 oninput="editLocField(${i},'name',this.value)">
+          <input type="text" placeholder="City, State" value="${(l.city||'').replace(/"/g,'&quot;')}"
+                 oninput="editLocField(${i},'city',this.value)">
+          <div class="ed-row-3">
+            <input type="text" placeholder="lat" value="${l.lat ?? ''}" oninput="editLocField(${i},'lat',this.value)">
+            <input type="text" placeholder="lng" value="${l.lng ?? ''}" oninput="editLocField(${i},'lng',this.value)">
+            <input type="text" placeholder="Google Place ID (ChIJ…)" value="${l.placeId ?? ''}"
+                   oninput="editLocField(${i},'placeId',this.value)">
+          </div>
+          ${l.placeId ? `<a class="ed-hint-link" href="https://www.google.com/maps/place/?q=place_id:${l.placeId}"
+                target="_blank" rel="noopener">Test this Place ID on Google Maps ↗</a>`
+              : `<div class="ed-hint">No Place ID — the public page falls back to a maps search by name + city.</div>`}
+        </div>`).join('')}
+      <button class="btn-mini" onclick="addEditLocation()">+ Add location</button>
+    </div>
+
+    <div class="ed-hint" id="saveStatus"></div>`;
+}
+
+function addCat(slug) {
+  if (!slug) return;
+  editDraft.cats = editDraft.cats || [];
+  if (!editDraft.cats.includes(slug)) editDraft.cats.push(slug);
+  renderCompanyEditor();
+}
+function removeCat(slug) {
+  editDraft.cats = (editDraft.cats || []).filter(s => s !== slug);
+  renderCompanyEditor();
+}
+function clearLogo() { editDraft.logo = null; renderCompanyEditor(); }
+
+// Upload to Storage under logos/<slug>, then keep the download URL on the
+// company. Path and constraints match storage.rules (admin-only, image/*, 2 MB).
+async function uploadLogo() {
+  const input = document.getElementById('logoFile');
+  const status = document.getElementById('logoStatus');
+  const file = input.files && input.files[0];
+  if (!file) return;
+  if (!fbStorage) { status.textContent = 'Storage SDK not loaded.'; return; }
+  if (file.size > 2 * 1024 * 1024) { status.textContent = 'Too large — 2 MB maximum.'; return; }
+  if (!file.type.startsWith('image/')) { status.textContent = 'Images only.'; return; }
+  try {
+    status.textContent = 'Uploading…';
+    const ext = (file.name.split('.').pop() || 'png').toLowerCase();
+    const ref = fbStorage.ref().child(`logos/${editDraft.slug}.${ext}`);
+    const snap = await ref.put(file, { contentType: file.type });
+    editDraft.logo = await snap.ref.getDownloadURL();
+    renderCompanyEditor();
+    document.getElementById('logoStatus').textContent = 'Uploaded — remember to Save.';
+  } catch (err) {
+    status.textContent = 'Upload failed: ' + err.message;
+    console.error(err);
+  }
+}
+
+async function saveCompany() {
+  if (!isAdminUser(currentUser)) { alert('Admin only.'); return; }
+  const status = document.getElementById('saveStatus');
+  status.textContent = 'Saving…';
+  try {
+    await FS_REST.setMerge('companies', editDraft.slug, {
+      id: editDraft.id, slug: editDraft.slug, name: editDraft.name,
+      desc: editDraft.desc || '', site: editDraft.site || '',
+      country: editDraft.country || '', logo: editDraft.logo || null,
+      cats: editDraft.cats || [], locations: editDraft.locations || [],
+      updatedAt: new Date(),
+    });
+    // Reflect immediately in the in-memory roster so the directory updates
+    // without a full refetch.
+    const idx = COMPANIES.findIndex(x => x.slug === editDraft.slug);
+    if (idx >= 0) COMPANIES[idx] = JSON.parse(JSON.stringify(editDraft));
+    closeCompanyEditor();
+    renderAll();
+    renderAdminPage();
+  } catch (err) {
+    status.textContent = 'Save failed: ' + err.message;
+    console.error(err);
+  }
+}
+
+function adminCompanyRows() {
+  const q = (document.getElementById('adminSearch')?.value || '').toLowerCase();
+  return COMPANIES
+    .filter(c => !q || c.name.toLowerCase().includes(q) || c.slug.includes(q))
+    .map(c => {
+      const noLogo = !c.logo;
+      const locs = (c.locations || []).length;
+      const noPid = (c.locations || []).filter(l => !l.placeId).length;
+      return `
+      <tr>
+        <td>
+          <div class="ac-logo">${c.logo ? `<img src="${c.logo}" alt="">` : `<span>${initials(c.name)}</span>`}</div>
+        </td>
+        <td>
+          <div class="ac-name">${c.name}</div>
+          <div class="ac-slug">${c.slug}</div>
+        </td>
+        <td class="ac-flags">
+          ${noLogo ? '<span class="flag warn">no logo</span>' : '<span class="flag ok">logo</span>'}
+          <span class="flag">${locs} loc</span>
+          ${noPid ? `<span class="flag warn">${noPid} no place ID</span>` : '<span class="flag ok">place IDs</span>'}
+        </td>
+        <td><button class="btn-mini" onclick="openCompanyEditor('${c.slug}')">Edit</button></td>
+      </tr>`;
+    }).join('');
+}
+
+function renderAdminList() {
+  const el = document.getElementById('adminList');
+  if (el) el.innerHTML = adminCompanyRows();
 }
 
 async function reloadFromFirestore() {
