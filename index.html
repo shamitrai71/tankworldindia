@@ -349,6 +349,24 @@ main{ flex:1; min-width:0; padding:20px 24px 60px; }
 }
 .rf-btn.active .rf-count{ background:rgba(255,255,255,.22); }
 
+/* ── Corporate relationships ────────────────────────────────────────── */
+.cp-rel{ font-size:12.5px; color:var(--ink-muted); margin-top:5px; }
+.cp-rel a{ color:var(--blue); text-decoration:none; border-bottom:1px solid var(--line-blue); }
+.cp-rel a:hover{ border-bottom-color:var(--blue); }
+.rel-unlisted{ color:var(--ink-muted); border-bottom:1px dotted var(--ink-faint); }
+.cp-subs{ display:flex; flex-wrap:wrap; gap:8px; }
+.sub-card{
+  display:flex; flex-direction:column; gap:2px; text-decoration:none;
+  border:1px solid var(--line); border-left:3px solid var(--blue); border-radius:var(--radius);
+  padding:9px 12px; background:var(--paper-raised); min-width:220px; transition:border-color .15s;
+}
+.sub-card:hover{ border-color:var(--blue); }
+.sub-name{ font-family:var(--font-display); font-weight:600; font-size:13px; color:var(--ink); }
+.sub-meta{ font-family:var(--font-mono); font-size:9.5px; color:var(--ink-faint); }
+.ed-rel{ display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+.ed-rel input{ grid-column:1 / -1; }
+.flag.rel{ background:var(--blue-soft); color:var(--blue); }
+
 .auth-area{ display:flex; align-items:center; gap:8px; }
 .btn-auth{
   font-family:var(--font-mono); font-size:10.5px; letter-spacing:0.5px; cursor:pointer;
@@ -766,6 +784,7 @@ const COMPANIES = [
     ] },
   { id:2, slug:"toyo-engineering-india-limited", name:"Toyo Engineering India Limited", logo:null, country:"India",
     cats:["epc-contractors","piping-contractors"], desc:"Indian arm of Japan's Toyo Engineering Corporation, delivering EPC projects across refining and petrochemicals.", site:"https://www.toyo-eng.com",
+    parent:{ name:"Toyo Engineering Corporation", slug:"", relationship:"subsidiary" },
     locations:[
       { type:"registered-office", name:"Registered Office", city:"Mumbai, Maharashtra", lat:19.08, lng:72.88, placeId:null }
     ] },
@@ -784,6 +803,7 @@ const COMPANIES = [
     ] },
   { id:5, slug:"ksb-limited", name:"KSB Limited", logo:null, country:"India",
     cats:["pumps","valves"], desc:"Indian subsidiary of Germany's KSB SE, manufacturing pumps and valves for industrial and process applications.", site:"https://www.ksbindia.co.in",
+    parent:{ name:"KSB SE & Co. KGaA", slug:"", relationship:"subsidiary" },
     locations:[
       { type:"registered-office", name:"Registered Office", city:"Pimpri-Chinchwad, Maharashtra", lat:18.62, lng:73.8, placeId:null }
     ] },
@@ -909,6 +929,7 @@ const COMPANIES = [
     ] },
   { id:30, slug:"erm-india-private-limited", name:"ERM India Private Limited", logo:null, country:"India",
     cats:["esg-consulting"], desc:"Indian arm of Environmental Resources Management (ERM), a global sustainability and ESG consultancy serving industrial and energy clients.", site:"https://www.erm.com",
+    parent:{ name:"Environmental Resources Management Limited", slug:"", relationship:"subsidiary" },
     locations:[
       { type:"registered-office", name:"India Office", city:"Gurugram, Haryana", lat:28.47, lng:77.05, placeId:null }
     ] },
@@ -939,6 +960,7 @@ const COMPANIES = [
     ] },
   { id:36, slug:"artson-limited", name:"Artson Limited", logo:null, country:"India",
     cats:["epc-contractors","tank-construction","heavy-engineering-and-fabrication"], desc:"Tata Enterprise (subsidiary of Tata Projects Limited since 2007), established 1978, providing EPC contracting, tank construction, and ASME-stamped pressure vessel and process equipment manufacturing for the oil, gas, and petrochemical sectors.", site:"https://artson.net",
+    parent:{ name:"Tata Projects Limited", slug:"", relationship:"subsidiary" },
     locations:[
       { type:"registered-office", name:"Corporate Office", city:"Hyderabad, Telangana", lat:17.39, lng:78.49, placeId:null }
     ] },
@@ -1071,6 +1093,7 @@ const COMPANIES = [
     desc:"",
     site:"",
     cats:["terminal-automation", "custody-transfer-metering"],
+    parent:{ name:"IDEX Corporation", slug:"", relationship:"subsidiary" },
     locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
   { id:63, slug:"verwater-group-bv", name:"Verwater Group B.V.", logo:null, country:"Netherlands",
     desc:"",
@@ -1116,11 +1139,13 @@ const COMPANIES = [
     desc:"Indian arm of PROTEGO, supplying flame arresters, pressure/vacuum relief valves and tank blanketing equipment.",
     site:"https://in.protego.com",
     cats:["flame-arresters", "pressure-vacuum-vents", "emergency-vents", "tank-blanketing"],
+    parent:{ name:"PROTEGO Braunschweiger Flammenfilter GmbH", slug:"", relationship:"subsidiary" },
     locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
   { id:72, slug:"protectoseal-india-private-limited", name:"Protectoseal (India) Private Limited", logo:null, country:"India",
     desc:"Indian arm of The Protectoseal Company, supplying flame arresters, conservation vents and emergency relief vents.",
     site:"https://www.protectoseal.com",
     cats:["flame-arresters", "pressure-vacuum-vents", "emergency-vents"],
+    parent:{ name:"The Protectoseal Company", slug:"", relationship:"subsidiary" },
     locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
   { id:73, slug:"newton-engineering-and-chemicals-limited", name:"Newton Engineering & Chemicals Limited", logo:null, country:"India",
     desc:"Indian storage tank construction and maintenance contractor.",
@@ -1613,6 +1638,53 @@ function initMap() {
 // Hash-based so each company gets a real, addressable, bookmarkable URL —
 // e.g. tankworldindia.html#/company/larsen-and-toubro-limited — ready for
 // Tankonomics to link to directly once the two apps are wired together.
+// ── Corporate relationships ──────────────────────────────────────────
+// A subsidiary is a SEPARATE LEGAL ENTITY, not a location of its parent:
+// Protego India Private Limited has its own CIN, accounts and contracts;
+// it is not a site belonging to the German GmbH. So each entity keeps its
+// own card and the relationship is expressed here instead.
+//
+// Ownership is likewise not identity — Rosneft's stake in Nayara doesn't
+// make Nayara a Rosneft location.
+//
+// company.parent = { name, slug, relationship } — slug may be "" when the
+// parent isn't itself listed. relationship: subsidiary | division |
+// joint-venture | affiliate | associate.
+const REL_LABEL = {
+  'subsidiary':    'Subsidiary of',
+  'division':      'Division of',
+  'joint-venture': 'Joint venture of',
+  'affiliate':     'Affiliate of',
+  'associate':     'Associate of',
+  'owned-by':      'Owned by',
+};
+
+function parentLineHtml(c) {
+  const p = c.parent;
+  if (!p || !p.name) return '';
+  const label = REL_LABEL[p.relationship] || 'Part of';
+  const listed = p.slug && COMPANIES.some(x => x.slug === p.slug);
+  const target = listed
+    ? `<a href="#/company/${p.slug}">${p.name}</a>`
+    : `<span class="rel-unlisted" title="Not listed in this directory">${p.name}</span>`;
+  return `<div class="cp-rel">${label} ${target}</div>`;
+}
+
+// Reverse view: entities in the directory that name THIS company as parent.
+function subsidiariesHtml(c) {
+  const kids = COMPANIES.filter(x => x.parent && x.parent.slug === c.slug);
+  if (!kids.length) return '';
+  return `
+    <div class="cp-section-label">Group companies (${kids.length})</div>
+    <div class="cp-subs">
+      ${kids.map(k => `
+        <a class="sub-card" href="#/company/${k.slug}">
+          <span class="sub-name">${k.name}</span>
+          <span class="sub-meta">${k.country || ''} · ${REL_LABEL[k.parent.relationship] || 'Part of'} this company</span>
+        </a>`).join('')}
+    </div>`;
+}
+
 function renderCompanyPage(slug) {
   const c = COMPANIES.find(x => x.slug === slug);
   const wrap = document.getElementById('company-view');
@@ -1661,6 +1733,7 @@ function renderCompanyPage(slug) {
       <div class="cp-title-block">
         <div class="cp-name">${c.name}</div>
         <div class="cp-slug">/company/${c.slug}</div>
+        ${parentLineHtml(c)}
       </div>
     </div>
     <div class="cp-desc">${c.desc}</div>
@@ -1669,6 +1742,7 @@ function renderCompanyPage(slug) {
     <div class="cp-locations">${locationsHtml}</div>
     <div class="cp-section-label">Products &amp; Services</div>
     <div class="cp-tiles">${tilesHtml}</div>
+    ${subsidiariesHtml(c)}
   `;
 }
 
@@ -1852,6 +1926,7 @@ async function seedCompanies() {
           id: c.id, slug: c.slug, name: c.name, desc: c.desc || '',
           site: c.site || '', country: c.country || '', logo: c.logo || null,
           cats: c.cats || [], locations: c.locations || [],
+          parent: (c.parent && c.parent.name) ? c.parent : null,
           updatedAt: new Date(),
         });
         ok++;
@@ -2047,6 +2122,30 @@ function renderCompanyEditor() {
     </div>
 
     <div class="ed-row">
+      <label>Corporate relationship</label>
+      <div class="ed-rel">
+        <select onchange="editParentRel(this.value)">
+          <option value="">— independent / no parent —</option>
+          ${Object.entries(REL_LABEL).map(([k, v]) =>
+            `<option value="${k}" ${c.parent && c.parent.relationship === k ? 'selected' : ''}>${v}…</option>`).join('')}
+        </select>
+        <select onchange="editParentSlug(this.value)" ${c.parent && c.parent.relationship ? '' : 'disabled'}>
+          <option value="">— pick a listed company —</option>
+          ${COMPANIES.filter(x => x.slug !== c.slug).sort((a,b)=>a.name.localeCompare(b.name))
+            .map(x => `<option value="${x.slug}" ${c.parent && c.parent.slug === x.slug ? 'selected' : ''}>${x.name}</option>`).join('')}
+        </select>
+        <input type="text" placeholder="…or type a parent not in the directory"
+               value="${c.parent && !c.parent.slug ? (c.parent.name || '').replace(/"/g,'&quot;') : ''}"
+               oninput="editParentName(this.value)"
+               ${c.parent && c.parent.relationship ? '' : 'disabled'}>
+      </div>
+      <div class="ed-hint">A subsidiary is a <b>separate legal entity</b>, not a location — it keeps its own
+        card and links here. Leave blank for independent companies. Use <i>Division of</i> only for a business
+        unit that is <b>not</b> separately incorporated (e.g. Emerson Automation Solutions), and in that case
+        don't give it a card at all.</div>
+    </div>
+
+    <div class="ed-row">
       <label>Locations <span class="ed-count">${c.locations.length}</span></label>
       ${c.locations.map((l, i) => `
         <div class="ed-loc">
@@ -2075,6 +2174,32 @@ function renderCompanyEditor() {
     </div>
 
     <div class="ed-hint" id="saveStatus"></div>`;
+}
+
+function editParentRel(rel) {
+  if (!rel) { editDraft.parent = null; }
+  else {
+    editDraft.parent = editDraft.parent || { name: '', slug: '', relationship: '' };
+    editDraft.parent.relationship = rel;
+  }
+  renderCompanyEditor();
+}
+function editParentSlug(slug) {
+  if (!editDraft.parent) return;
+  if (slug) {
+    const p = COMPANIES.find(x => x.slug === slug);
+    editDraft.parent.slug = slug;
+    editDraft.parent.name = p ? p.name : slug;
+  } else {
+    editDraft.parent.slug = '';
+  }
+  renderCompanyEditor();
+}
+function editParentName(name) {
+  if (!editDraft.parent) return;
+  // A free-typed parent isn't in the directory, so it has no slug to link to.
+  editDraft.parent.name = name;
+  editDraft.parent.slug = '';
 }
 
 function addCat(slug) {
@@ -2123,6 +2248,7 @@ async function saveCompany() {
       desc: editDraft.desc || '', site: editDraft.site || '',
       country: editDraft.country || '', logo: editDraft.logo || null,
       cats: editDraft.cats || [], locations: editDraft.locations || [],
+      parent: (editDraft.parent && editDraft.parent.name) ? editDraft.parent : null,
       updatedAt: new Date(),
     });
     // Reflect immediately in the in-memory roster so the directory updates
@@ -2169,6 +2295,7 @@ function adminCompanyRows() {
           <span class="flag">${locs} loc</span>
           ${noPid ? `<span class="flag warn">${noPid} no place ID</span>` : '<span class="flag ok">place IDs</span>'}
           <span class="flag">${(c.cats || []).length} cat</span>
+          ${c.parent && c.parent.name ? `<span class="flag rel">${REL_LABEL[c.parent.relationship] || 'part of'} ${c.parent.name}</span>` : ''}
         </td>
         <td><button class="btn-mini" onclick="openCompanyEditor('${c.slug}')">Edit</button></td>
       </tr>`;
