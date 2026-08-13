@@ -288,6 +288,31 @@ main{ flex:1; min-width:0; padding:20px 24px 60px; }
 .btn-mini:hover{ background:var(--blue-soft); }
 
 .modal-wide{ max-width:640px; max-height:88vh; display:flex; flex-direction:column; }
+
+/* ── Batch logo upload ──────────────────────────────────────────────── */
+.bl-summary{
+  font-family:var(--font-mono); font-size:11px; color:var(--ink-muted);
+  margin:10px 0 8px; padding-bottom:8px; border-bottom:1px dashed var(--line);
+}
+.bl-rows{ display:flex; flex-direction:column; gap:6px; max-height:38vh; overflow-y:auto; }
+.bl-row{
+  display:flex; align-items:center; gap:10px; padding:8px; border:1px solid var(--line);
+  border-radius:var(--radius); background:var(--paper);
+}
+.bl-row.done{ border-color:#3E7A4F; background:#EEF5EF; }
+.bl-row.failed{ border-color:var(--rust); background:var(--rust-soft); }
+.bl-row.skipped{ opacity:.5; }
+.bl-thumb{
+  width:38px; height:38px; object-fit:contain; border:1px solid var(--line);
+  border-radius:2px; background:#fff; flex-shrink:0;
+}
+.bl-file{ flex:1; min-width:0; }
+.bl-filename{ font-size:12px; font-weight:600; color:var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.bl-status{ font-family:var(--font-mono); font-size:10px; color:var(--ink-faint); }
+.bl-status.ok{ color:#3E7A4F; }
+.bl-status.warn{ color:var(--rust); }
+.bl-status.err{ color:var(--rust); font-weight:700; }
+.bl-row select{ max-width:180px; padding:5px 6px; font-size:11px; border:1px solid var(--line); border-radius:var(--radius); background:var(--paper-raised); }
 .edit-body{ overflow-y:auto; padding-right:4px; margin-top:6px; }
 .ed-row{ margin-bottom:14px; }
 .ed-row-2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
@@ -555,6 +580,24 @@ footer{
     <div class="edit-actions">
       <button class="btn-action ghost" onclick="closeCompanyEditor()">Cancel</button>
       <button class="btn-action" onclick="saveCompany()">Save to Firestore</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Batch logo upload modal ───────────────────────────────────────── -->
+<div class="modal-backdrop" id="batchLogoModal" onclick="if(event.target===this) closeBatchLogoModal()">
+  <div class="modal modal-wide">
+    <div class="modal-head">
+      <div>
+        <div class="modal-code">BATCH · CO-02</div>
+        <h3>Batch upload logos</h3>
+      </div>
+      <button class="modal-x" onclick="closeBatchLogoModal()">&times;</button>
+    </div>
+    <div id="batchLogoBody" class="edit-body"></div>
+    <div class="edit-actions">
+      <button class="btn-action ghost" onclick="closeBatchLogoModal()">Close</button>
+      <button class="btn-action" onclick="runBatchLogoUpload()">Upload assigned logos</button>
     </div>
   </div>
 </div>
@@ -1996,6 +2039,7 @@ function renderAdminPage() {
         Seed ${SEED_COMPANIES.length} companies → Firestore
       </button>
       <button class="btn-action ghost" onclick="reloadFromFirestore()">Reload from Firestore</button>
+      <button class="btn-action ghost" onclick="openBatchLogoModal()">Batch upload logos</button>
       <button class="btn-action ghost" onclick="location.hash='#/'">Back to directory</button>
     </div>
     <div class="admin-log" id="adminLog"></div>
@@ -2024,6 +2068,158 @@ function renderAdminPage() {
         <tbody id="adminList">${adminCompanyRows()}</tbody>
       </table>
     </div>`;
+}
+
+// ── Batch logo upload ────────────────────────────────────────────────
+// Filename -> slug, mirroring the Python slug() rule used everywhere else in
+// this project (lowercase, & -> and, strip accents/punctuation, collapse to
+// hyphens) so a file named after a company's slug or its full name both have
+// a real chance of auto-matching.
+function filenameSlug(filename) {
+  let s = filename.replace(/\.[a-zA-Z0-9]+$/, '');
+  s = s.replace(/&/g, 'and').replace(/\+/g, '-');
+  s = s.normalize('NFKD').replace(/[\u0300-\u036f]/g, '');
+  s = s.toLowerCase();
+  s = s.replace(/[().,\/']/g, '');
+  s = s.replace(/[^a-z0-9]+/g, '-');
+  s = s.replace(/^-+|-+$/g, '').replace(/-+/g, '-');
+  return s;
+}
+
+let batchLogoRows = []; // [{ file, objectUrl, matchedSlug, status }]
+
+function openBatchLogoModal() {
+  batchLogoRows = [];
+  document.getElementById('batchLogoBody').innerHTML =
+    `<p class="ed-hint">Choose several logo files at once. Each is matched to a company by
+     filename — name files after the company's slug or its full name for the best match rate
+     (e.g. <code>larsen-and-toubro-limited.png</code> or <code>Larsen and Toubro Limited.png</code>).
+     Anything that doesn't auto-match gets a dropdown to assign by hand — nothing uploads to
+     the wrong company silently.</p>
+     <input type="file" id="batchLogoFiles" accept="image/*" multiple onchange="handleBatchLogoFiles()">`;
+  document.getElementById('batchLogoModal').classList.add('open');
+}
+function closeBatchLogoModal() {
+  document.getElementById('batchLogoModal').classList.remove('open');
+  batchLogoRows.forEach(r => r.objectUrl && URL.revokeObjectURL(r.objectUrl));
+  batchLogoRows = [];
+}
+
+function matchCompanyForFile(filename) {
+  const fSlug = filenameSlug(filename);
+  let hit = COMPANIES.find(c => c.slug === fSlug);
+  if (hit) return hit.slug;
+  hit = COMPANIES.find(c => filenameSlug(c.name) === fSlug);
+  return hit ? hit.slug : '';
+}
+
+function handleBatchLogoFiles() {
+  const input = document.getElementById('batchLogoFiles');
+  const files = Array.from(input.files || []);
+  batchLogoRows = files.map(file => ({
+    file,
+    objectUrl: URL.createObjectURL(file),
+    matchedSlug: matchCompanyForFile(file.name),
+    status: 'pending', // pending | done | failed | skipped
+  }));
+  renderBatchLogoRows();
+}
+
+function renderBatchLogoRows() {
+  const matched = batchLogoRows.filter(r => r.matchedSlug && r.status === 'pending').length;
+  const unmatched = batchLogoRows.filter(r => !r.matchedSlug && r.status === 'pending').length;
+  const companyOptions = COMPANIES.slice().sort((a, b) => a.name.localeCompare(b.name))
+    .map(c => `<option value="${c.slug}">${c.name}</option>`).join('');
+
+  const rowsHtml = batchLogoRows.map((r, i) => {
+    const c = r.matchedSlug ? COMPANIES.find(x => x.slug === r.matchedSlug) : null;
+    return `
+      <div class="bl-row ${r.status}">
+        <img src="${r.objectUrl}" class="bl-thumb" alt="">
+        <div class="bl-file">
+          <div class="bl-filename">${r.file.name}</div>
+          ${r.status === 'done' ? `<div class="bl-status ok">Uploaded to ${c ? c.name : r.matchedSlug}</div>`
+            : r.status === 'failed' ? `<div class="bl-status err">Failed — see log below</div>`
+            : r.status === 'skipped' ? `<div class="bl-status">Skipped</div>`
+            : c ? `<div class="bl-status ok">Matched: ${c.name}</div>`
+            : `<div class="bl-status warn">No automatic match</div>`}
+        </div>
+        ${r.status === 'pending' ? `
+          <select onchange="reassignBatchRow(${i}, this.value)">
+            <option value="">— assign a company —</option>
+            ${companyOptions.replace(`value="${r.matchedSlug}"`, `value="${r.matchedSlug}" selected`)}
+          </select>
+          <button class="btn-mini rust" onclick="removeBatchLogoRow(${i})">Remove</button>
+        ` : ''}
+      </div>`;
+  }).join('');
+
+  document.getElementById('batchLogoBody').innerHTML = `
+    <p class="ed-hint">Choose several logo files at once. Each is matched to a company by
+     filename — name files after the company's slug or its full name for the best match rate.
+     Anything that doesn't auto-match gets a dropdown to assign by hand.</p>
+    <input type="file" id="batchLogoFiles" accept="image/*" multiple onchange="handleBatchLogoFiles()">
+    ${batchLogoRows.length > 0 ? `
+      <div class="bl-summary">${matched} matched · ${unmatched} need assignment · ${batchLogoRows.length} total</div>
+      <div class="bl-rows">${rowsHtml}</div>
+      <div class="admin-log" id="batchLogoLog"></div>
+    ` : ''}`;
+}
+
+function reassignBatchRow(i, slug) {
+  batchLogoRows[i].matchedSlug = slug;
+  renderBatchLogoRows();
+}
+function removeBatchLogoRow(i) {
+  if (batchLogoRows[i].objectUrl) URL.revokeObjectURL(batchLogoRows[i].objectUrl);
+  batchLogoRows.splice(i, 1);
+  renderBatchLogoRows();
+}
+function batchLogoLog(msg) {
+  const el = document.getElementById('batchLogoLog');
+  if (el) { el.textContent += msg + '\n'; el.scrollTop = el.scrollHeight; }
+}
+
+async function runBatchLogoUpload() {
+  if (!isAdminUser(currentUser)) { alert('Admin only.'); return; }
+  const assignable = batchLogoRows.filter(r => r.status === 'pending' && r.matchedSlug);
+  if (assignable.length === 0) { alert('Nothing assigned to upload yet.'); return; }
+  if (!confirm(`Upload ${assignable.length} logo${assignable.length === 1 ? '' : 's'}? ` +
+               `Each replaces that company's current logo, if any.`)) return;
+  if (!fbStorage) { alert('Storage SDK not loaded.'); return; }
+
+  let ok = 0, failed = 0;
+  for (const r of assignable) {
+    const label = COMPANIES.find(c => c.slug === r.matchedSlug)?.name || r.matchedSlug;
+    if (r.file.size > 2 * 1024 * 1024) {
+      r.status = 'failed'; failed++;
+      batchLogoLog(`✗ ${r.file.name} → ${label} — too large (2 MB max)`);
+      continue;
+    }
+    if (!r.file.type.startsWith('image/')) {
+      r.status = 'failed'; failed++;
+      batchLogoLog(`✗ ${r.file.name} → ${label} — not an image`);
+      continue;
+    }
+    try {
+      const ext = (r.file.name.split('.').pop() || 'png').toLowerCase();
+      const ref = fbStorage.ref().child(`logos/${r.matchedSlug}.${ext}`);
+      const snap = await ref.put(r.file, { contentType: r.file.type });
+      const url = await snap.ref.getDownloadURL();
+      await FS_REST.setMerge('companies', r.matchedSlug, { logo: url, updatedAt: new Date() });
+      const c = COMPANIES.find(x => x.slug === r.matchedSlug);
+      if (c) c.logo = url;
+      r.status = 'done'; ok++;
+      batchLogoLog(`✓ ${r.file.name} → ${label}`);
+    } catch (err) {
+      r.status = 'failed'; failed++;
+      batchLogoLog(`✗ ${r.file.name} → ${label} — ${err.message}`);
+    }
+    renderBatchLogoRows();
+  }
+  batchLogoLog(`\nDone — ${ok} uploaded, ${failed} failed.`);
+  renderAll();
+  renderAdminList();
 }
 
 // ── Company editor ───────────────────────────────────────────────────
