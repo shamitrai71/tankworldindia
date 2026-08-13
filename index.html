@@ -2098,6 +2098,11 @@ function openBatchLogoModal() {
      the wrong company silently.</p>
      <input type="file" id="batchLogoFiles" accept="image/*" multiple onchange="handleBatchLogoFiles()">`;
   document.getElementById('batchLogoModal').classList.add('open');
+  // Same fix as the company editor: the modal persists in the DOM between
+  // opens, so without this its scroll position carries over from the last
+  // time it was open — which, after reviewing a long file list, could mean
+  // it reopens scrolled past the file picker entirely and looks empty.
+  document.getElementById('batchLogoBody').scrollTop = 0;
 }
 function closeBatchLogoModal() {
   document.getElementById('batchLogoModal').classList.remove('open');
@@ -2235,6 +2240,11 @@ function openCompanyEditor(slug) {
   editDraft = JSON.parse(JSON.stringify(c));
   editDraft.locations = editDraft.locations || [];
   renderCompanyEditor();
+  // The modal is hidden/shown via a CSS class, not recreated, so its inner
+  // scroll position otherwise carries over from whichever company was
+  // viewed last — reopening on a new company could land scrolled straight
+  // past Logo/Name/Slug to whatever was on screen when you closed it.
+  document.getElementById('editBody').scrollTop = 0;
   document.getElementById('editModal').classList.add('open');
 }
 
