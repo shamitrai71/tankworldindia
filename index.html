@@ -822,8 +822,8 @@ const COMPANIES = [
     cats:["epc-contractors","tank-construction","heavy-engineering-and-fabrication","valves","actuators"], desc:"Major Indian engineering and construction conglomerate — EPC for oil & gas and tankage through its Hydrocarbon Engineering business, and industrial valves/actuators through its Valves business.", site:"https://www.larsentoubro.com",
     locations:[
       { type:"registered-office", name:"Registered Office", address:"5th Floor, Tower B L&T Innovation Campus, Saki Vihar Rd, Krishna Nagar, Powai, Mumbai, Maharashtra 400072, India", city:"Mumbai, Maharashtra", lat:19.07, lng:72.88, placeId:"ChIJ7x7A4API5zsRU8F2HkzI6n0" },
-      { type:"plant", name:"Hydrocarbon Engineering — Manufacturing Complex", city:"Chennai, Tamil Nadu", lat:13.08, lng:80.27, placeId:null },
-      { type:"plant", name:"L&T Valves — Manufacturing Plant", city:"Coimbatore, Tamil Nadu", lat:11.02, lng:76.97, placeId:null }
+      { type:"plant", name:"Hydrocarbon Engineering — Manufacturing Complex", address:"L&T Energy Hydrocarbon, Kattupalli, Tamil Nadu 600120, India", city:"Chennai, Tamil Nadu", lat:13.08, lng:80.27, placeId:"ChIJqbYCtu52UjoRBeiAsXZgElU" },
+      { type:"plant", name:"L&T Valves — Manufacturing Plant", address:"L&T Valves, L&T Campus, L&T Bypass Road, Srinivasa Nagar, Malumichampatti, Tamil Nadu 641021, India", city:"Coimbatore, Tamil Nadu", lat:11.02, lng:76.97, placeId:"ChIJu1AAP2RaqDsRTnkpYF754Xs" }
     ] },
   { id:2, slug:"toyo-engineering-india-limited", name:"Toyo Engineering India Limited", logo:null, country:"India",
     cats:["epc-contractors","piping-contractors"], desc:"Indian arm of Japan's Toyo Engineering Corporation, delivering EPC projects across refining and petrochemicals.", site:"https://www.toyo-eng.com",
@@ -834,15 +834,15 @@ const COMPANIES = [
   { id:3, slug:"bharat-heavy-electricals-limited", name:"Bharat Heavy Electricals Limited", logo:null, country:"India",
     cats:["heavy-engineering-and-fabrication","mechanical-contractors"], desc:"Major Indian PSU engineering and manufacturing company, with heavy fabrication capability for industrial equipment.", site:"https://www.bhel.com",
     locations:[
-      { type:"registered-office", name:"Registered Office", city:"New Delhi", lat:28.61, lng:77.21, placeId:null },
+      { type:"registered-office", name:"Registered Office", address:"Siri Institutional Area, Siri Fort, New Delhi, Delhi 110049, India", city:"New Delhi", lat:28.61, lng:77.21, placeId:"ChIJ3xdMmhTiDDkRtbkIdIfYNWI" },
       { type:"plant", name:"Tiruchirappalli Manufacturing Plant", address:"QQ6P+VPJ, Main Office Rd, Bhel Tiruchy, BHEL Tiruchirappali Complex area, Thiruverumbur, Navalpatu, Tamil Nadu 620014, India", city:"Tiruchirappalli, Tamil Nadu", lat:10.79, lng:78.7, placeId:"ChIJsWEnLdqMqjsRUY0AtvB7gyU" },
-      { type:"plant", name:"Haridwar Manufacturing Plant", city:"Haridwar, Uttarakhand", lat:29.95, lng:78.15, placeId:null }
+      { type:"plant", name:"Haridwar Manufacturing Plant", address:"G M Colony, BHEL Township, Ranipur, Haridwar, Uttarakhand 249403, India", city:"Haridwar, Uttarakhand", lat:29.95, lng:78.15, placeId:"ChIJ4Swtz45ICTkRs6XN9Vu0-B0" }
     ] },
   { id:4, slug:"kirloskar-brothers-limited", name:"Kirloskar Brothers Limited", logo:null, country:"India",
     cats:["pumps","transfer-pumps","loading-pumps"], desc:"India's largest pump manufacturer, supplying transfer and process pumps across the industrial and energy sectors.", site:"https://www.kirloskarpumps.com",
     locations:[
       { type:"registered-office", name:"Registered Office", address:"Yamuna, Survey No. 98, 3-7, Kirloskar Rd, Baner, Pune, Maharashtra 411045, India", city:"Pune, Maharashtra", lat:18.52, lng:73.86, placeId:"ChIJWWWTyra-wjsR35U8aDEpxx8" },
-      { type:"plant", name:"Kirloskarvadi Manufacturing Plant", city:"Kirloskarvadi, Maharashtra", lat:17.05, lng:74.34, placeId:null }
+      { type:"plant", name:"Kirloskarvadi Manufacturing Plant", address:"Palus - Karad Rd, Kirloskarvadi, Kundal, Maharashtra 416308, India", city:"Kirloskarvadi, Maharashtra", lat:17.05, lng:74.34, placeId:"ChIJD906RGhtwTsR-eA6YX38cHQ" }
     ] },
   { id:5, slug:"ksb-limited", name:"KSB Limited", logo:null, country:"India",
     cats:["pumps","valves"], desc:"Indian subsidiary of Germany's KSB SE, manufacturing pumps and valves for industrial and process applications.", site:"https://www.ksbindia.co.in",
@@ -1159,12 +1159,12 @@ const COMPANIES = [
     site:"https://www.protectoseal.com",
     cats:["flame-arresters", "pressure-vacuum-vents", "emergency-vents"],
     parent:{ name:"The Protectoseal Company", slug:"", relationship:"subsidiary" },
-    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
+    locations:[{ type:"registered-office", name:"Registered Office", address:"A-73, Anand Nagar, Additional M.I.D.C, Ambernath, Maharashtra 421506, India", city:"", lat:null, lng:null, placeId:"ChIJLxBAcwCT5zsRUAmj2SGvaJE" }] },
   { id:73, slug:"newton-engineering-and-chemicals-limited", name:"Newton Engineering & Chemicals Limited", logo:null, country:"India",
     desc:"Indian storage tank construction and maintenance contractor.",
     site:"https://newtonengg.com",
     cats:["tank-construction", "mechanical-contractors"],
-    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
+    locations:[{ type:"registered-office", name:"Registered Office", address:"864/A, GIDC Industrial Estate, Makarpura GIDC, Makarpura, Vadodara, Gujarat 390010, India", city:"", lat:null, lng:null, placeId:"ChIJAQAAACvEXzkRPV2kHWTEOdM" }] },
   { id:74, slug:"velankanni-engineers", name:"Velankanni Engineers", logo:null, country:"India",
     desc:"Indian storage tank construction and maintenance contractor.",
     site:"https://www.velankanniengineers.com",
@@ -1249,7 +1249,7 @@ const COMPANIES = [
     desc:"Industrial and lube oil storage tank cleaning across the Taloja, Thane-Belapur and Navi Mumbai industrial belts.",
     site:"https://oilfiltration.in",
     cats:["tank-cleaning", "tank-maintenance"],
-    locations:[{ type:"registered-office", name:"Registered Office", city:"Navi Mumbai, Maharashtra", lat:null, lng:null, placeId:null }] },
+    locations:[{ type:"registered-office", name:"Registered Office", address:"number 3, Bharthi Chawl, Pandit Jawaharlal Nehru Rd, near KK Store, Indira Nagar, Mulund West, Mumbai, Maharashtra 400080, India", city:"Navi Mumbai, Maharashtra", lat:null, lng:null, placeId:"ChIJewMGD2C55zsRPuq0fKCDXQ4" }] },
   { id:91, slug:"phoenix-contact-india-private-limited", name:"Phoenix Contact India Private Limited", logo:null, country:"India",
     desc:"",
     site:"",
