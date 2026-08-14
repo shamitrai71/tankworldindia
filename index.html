@@ -1742,10 +1742,10 @@ function renderCompanyPage(slug) {
       <div>
         <span class="loc-type">${locTypeLabel(l.type)}</span>
         <div class="loc-name">${l.name}</div>
-        <div class="loc-city">📍 ${l.city}</div>
+        <div class="loc-city">📍 ${l.address || l.city}</div>
       </div>
       ${l.placeId
-        ? `<a class="loc-map-link" href="https://www.google.com/maps/place/?q=place_id:${l.placeId}" target="_blank" rel="noopener">View on Google Maps ↗</a>`
+        ? `<a class="loc-map-link" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(c.name + ' ' + l.name)}&query_place_id=${l.placeId}" target="_blank" rel="noopener">View on Google Maps ↗</a>`
         : `<span class="loc-map-pending">Place ID not yet added</span>`}
     </div>`).join('');
 
@@ -1967,7 +1967,14 @@ async function seedCompanies() {
       try {
         await FS_REST.setMerge('companies', c.slug, {
           id: c.id, slug: c.slug, name: c.name, desc: c.desc || '',
-          site: c.site || '', country: c.country || '', logo: c.logo || null,
+          site: c.site || '', country: c.country || '',
+          // logo and address-bearing locations are set INDEPENDENTLY via the
+          // admin editor / batch uploader, and Firestore is their source of
+          // truth — not the in-page array. Omitting logo entirely when the
+          // array has none means the update mask never touches that field,
+          // so a real uploaded logo survives every re-seed instead of being
+          // silently overwritten back to null.
+          ...(c.logo ? { logo: c.logo } : {}),
           cats: c.cats || [], locations: c.locations || [],
           parent: (c.parent && c.parent.name) ? c.parent : null,
           updatedAt: new Date(),
@@ -2040,6 +2047,7 @@ function renderAdminPage() {
       </button>
       <button class="btn-action ghost" onclick="reloadFromFirestore()">Reload from Firestore</button>
       <button class="btn-action ghost" onclick="openBatchLogoModal()">Batch upload logos</button>
+      <button class="btn-action ghost" onclick="relinkLogosFromStorage()" title="Repairs logos wiped by a re-seed — no re-upload needed">Relink logos from Storage</button>
       <button class="btn-action ghost" onclick="location.hash='#/'">Back to directory</button>
     </div>
     <div class="admin-log" id="adminLog"></div>
@@ -2263,7 +2271,7 @@ function editLocField(i, field, value) {
   }
 }
 function addEditLocation() {
-  editDraft.locations.push({ type:'registered-office', name:'', city:'', lat:null, lng:null, placeId:null });
+  editDraft.locations.push({ type:'registered-office', name:'', address:'', city:'', lat:null, lng:null, placeId:null });
   renderCompanyEditor();
 }
 function removeEditLocation(i) {
@@ -2364,6 +2372,8 @@ function renderCompanyEditor() {
           </div>
           <input type="text" placeholder="Location name" value="${(l.name||'').replace(/"/g,'&quot;')}"
                  oninput="editLocField(${i},'name',this.value)">
+          <input type="text" placeholder="Full address (street, city, state, postal code)" value="${(l.address||'').replace(/"/g,'&quot;')}"
+                 oninput="editLocField(${i},'address',this.value)">
           <input type="text" placeholder="City, State" value="${(l.city||'').replace(/"/g,'&quot;')}"
                  oninput="editLocField(${i},'city',this.value)">
           <div class="ed-row-3">
@@ -2372,7 +2382,7 @@ function renderCompanyEditor() {
             <input type="text" placeholder="Google Place ID (ChIJ…)" value="${l.placeId ?? ''}"
                    oninput="editLocField(${i},'placeId',this.value)">
           </div>
-          ${l.placeId ? `<a class="ed-hint-link" href="https://www.google.com/maps/place/?q=place_id:${l.placeId}"
+          ${l.placeId ? `<a class="ed-hint-link" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(c.name + ' ' + (l.name||''))}&query_place_id=${l.placeId}"
                 target="_blank" rel="noopener">Test this Place ID on Google Maps ↗</a>`
               : `<div class="ed-hint">No Place ID — the public page falls back to a maps search by name + city.</div>`}
         </div>`).join('')}
@@ -2586,6 +2596,56 @@ async function bulkApply(mode) {
 function renderAdminList() {
   const el = document.getElementById('adminList');
   if (el) el.innerHTML = adminCompanyRows();
+}
+
+// Recovery for the logo-wipe bug: re-seeding Firestore previously overwrote
+// every company's logo field with null, because the seed payload always
+// included `logo: c.logo || null` and the in-page array never carried real
+// logo URLs (those only ever lived in Firestore, written by the uploader).
+// The actual files were never touched — only the Firestore pointer to them.
+// This lists every file under logos/ in Storage and re-links each one back
+// to its company by filename (logos/<slug>.<ext>), with no re-upload needed.
+async function relinkLogosFromStorage() {
+  if (!isAdminUser(currentUser)) { alert('Admin only.'); return; }
+  if (!fbStorage) { alert('Storage SDK not loaded.'); return; }
+  if (!confirm('Scan Storage for existing logo files and re-link them to their companies in ' +
+               'Firestore? This does not upload anything new — it only repairs the logo field ' +
+               'for companies whose file already exists in Storage.')) return;
+
+  const log = document.getElementById('adminLog') || { textContent: '' };
+  const write = (msg) => { if (log.textContent !== undefined) { log.textContent += msg + '\n'; log.scrollTop = log.scrollHeight; } };
+  write('Scanning logos/ in Storage…');
+
+  let items;
+  try {
+    const listing = await fbStorage.ref('logos').listAll();
+    items = listing.items;
+  } catch (err) {
+    write('✗ Could not list Storage folder — ' + err.message);
+    return;
+  }
+  write(`Found ${items.length} file(s) in Storage.\n`);
+
+  let relinked = 0, noCompany = 0, failed = 0;
+  for (const item of items) {
+    const filename = item.name; // e.g. "larsen-and-toubro-limited.png"
+    const slug = filename.replace(/\.[a-zA-Z0-9]+$/, '');
+    const c = COMPANIES.find(x => x.slug === slug);
+    if (!c) { write(`⚠ ${filename} — no company matches slug "${slug}"`); noCompany++; continue; }
+    try {
+      const url = await item.getDownloadURL();
+      await FS_REST.setMerge('companies', slug, { logo: url, updatedAt: new Date() });
+      c.logo = url;
+      relinked++;
+      write(`✓ ${c.name}`);
+    } catch (err) {
+      failed++;
+      write(`✗ ${filename} — ${err.message}`);
+    }
+  }
+  write(`\nDone — ${relinked} re-linked, ${noCompany} had no matching company, ${failed} failed.`);
+  renderAll();
+  renderAdminList();
 }
 
 async function reloadFromFirestore() {
