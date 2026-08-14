@@ -905,11 +905,6 @@ const COMPANIES = [
     locations:[
       { type:"registered-office", name:"India Office", city:"Mumbai, Maharashtra", lat:19.1, lng:72.9, placeId:null }
     ] },
-  { id:17, slug:"john-wood-group-plc", name:"John Wood Group PLC", logo:null, country:"India",
-    cats:["engineering-consultants","owner-s-engineers","consultancy-services"], desc:"Indian presence of the Wood Group, providing engineering consultancy and owner's engineer services.", site:"https://www.woodplc.com",
-    locations:[
-      { type:"registered-office", name:"India Office", city:"Mumbai, Maharashtra", lat:19.05, lng:72.86, placeId:null }
-    ] },
   { id:18, slug:"ramboll-group-a-s", name:"Ramboll Group A/S", logo:null, country:"India",
     cats:["engineering-consultants","environmental-consultants"], desc:"Indian arm of the Danish engineering consultancy Ramboll, covering engineering and environmental consulting.", site:"https://www.ramboll.com",
     locations:[
@@ -1082,11 +1077,6 @@ const COMPANIES = [
     site:"",
     cats:["loading-arms", "marine-loading-arms"],
     locations:[{ type:"registered-office", name:"Registered Office", address:"Ostkamp 3, 26203 Wardenburg-Astrup, Germany", city:"", lat:null, lng:null, placeId:"ChIJ6aFCTz4ht0cR5aOLxflb_Lw" }] },
-  { id:52, slug:"implico-bv", name:"Implico B.V.", logo:null, country:"Netherlands",
-    desc:"",
-    site:"",
-    cats:["terminal-automation", "tank-inventory-systems"],
-    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
   { id:53, slug:"kimman-process-solutions-bv", name:"Kimman Process Solutions B.V.", logo:null, country:"Netherlands",
     desc:"",
     site:"",
@@ -1153,11 +1143,6 @@ const COMPANIES = [
     site:"",
     cats:["valves"],
     locations:[{ type:"registered-office", name:"Registered Office", address:"Egerstraße 25, 58256 Ennepetal-Oelkinghausen, Germany", city:"", lat:null, lng:null, placeId:"ChIJ4Qx9YfMluUcR_8h4_KyXmRM" }] },
-  { id:66, slug:"shijiazhuang-zhengzhong-technology-company-limited", name:"Shijiazhuang Zhengzhong Technology Company Limited", logo:null, country:"China",
-    desc:"Chinese manufacturer of glass-fused-to-steel bolted storage tanks, trading as Center Enamel.",
-    site:"https://www.cectank.com",
-    cats:["bolted-steel-tanks"],
-    locations:[{ type:"registered-office", name:"Registered Office", city:"", lat:null, lng:null, placeId:null }] },
   { id:67, slug:"astha-infra-engg-india-private-limited", name:"Astha Infra Engg. (India) Private Limited", logo:null, country:"India",
     desc:"Indian supplier of hydraulic tank jacking equipment and automatic welding systems for storage tank erection.",
     site:"https://www.hydraulictankjackingequipmentsupplier.com",
@@ -2454,6 +2439,35 @@ async function uploadLogo() {
   }
 }
 
+// Removing a company has two parts, and doing only the first is a trap this
+// project has hit before: editing the in-page COMPANIES array alone changes
+// nothing a visitor sees, because Seed only ever merges/adds — it never
+// deletes stale Firestore records. This actually removes the live document,
+// not just the source-file entry.
+async function deleteCompany(slug) {
+  if (!isAdminUser(currentUser)) { alert('Admin only.'); return; }
+  const c = COMPANIES.find(x => x.slug === slug);
+  if (!c) return;
+  const typed = prompt(
+    `This permanently deletes "${c.name}" from Firestore — not just this page.\n\n` +
+    `Type the company's name exactly to confirm:`
+  );
+  if (typed !== c.name) {
+    if (typed !== null) alert('Name did not match — nothing was deleted.');
+    return;
+  }
+  try {
+    await FS_REST.deleteDoc('companies', slug);
+    const idx = COMPANIES.findIndex(x => x.slug === slug);
+    if (idx >= 0) COMPANIES.splice(idx, 1);
+    renderAll();
+    renderAdminList();
+  } catch (err) {
+    alert('Delete failed: ' + err.message);
+    console.error(err);
+  }
+}
+
 async function saveCompany() {
   if (!isAdminUser(currentUser)) { alert('Admin only.'); return; }
   const status = document.getElementById('saveStatus');
@@ -2513,7 +2527,10 @@ function adminCompanyRows() {
           <span class="flag">${(c.cats || []).length} cat</span>
           ${c.parent && c.parent.name ? `<span class="flag rel">${REL_LABEL[c.parent.relationship] || 'part of'} ${c.parent.name}</span>` : ''}
         </td>
-        <td><button class="btn-mini" onclick="openCompanyEditor('${c.slug}')">Edit</button></td>
+        <td>
+          <button class="btn-mini" onclick="openCompanyEditor('${c.slug}')">Edit</button>
+          <button class="btn-mini rust" onclick="deleteCompany('${c.slug}')">Delete</button>
+        </td>
       </tr>`;
     }).join('');
 }
