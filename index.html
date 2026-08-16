@@ -122,6 +122,12 @@ header{
 .sheet-item:hover{ color:var(--ink); background:var(--paper); }
 .sheet-item.active{ color:var(--blue); font-weight:600; background:var(--blue-soft); }
 .sheet-item .item-code{ font-family:var(--font-mono); font-size:9px; color:var(--ink-faint); flex:0 0 32px; }
+/* L3 sub-categories (e.g. TS-01.1 under TS-01). Indented with a rule so the
+   hierarchy reads at a glance; the code column is wider to fit "TS-01.1". */
+.sheet-subitems{ border-left:1px solid var(--line); margin-left:22px; }
+.sheet-item.sheet-subitem{ padding-left:12px; font-size:11.5px; color:var(--ink-faint); }
+.sheet-item.sheet-subitem:hover{ color:var(--ink); }
+.sheet-item.sheet-subitem .item-code{ font-size:8.5px; flex:0 0 40px; }
 .clear-filters{
   margin-top:12px; width:100%; padding:8px; border:1.5px dashed var(--ink-faint); background:none;
   border-radius:var(--radius); font-family:var(--font-mono); font-size:10px; letter-spacing:0.5px;
@@ -708,7 +714,14 @@ const CATEGORY_TREE = [
     { code:"EC-18", name:"Surface Preparation & Blasting", slug:"surface-preparation-and-blasting" },
   ]},
   { code:"TS", name:"Tank Systems & Equipment", slug:"tank-systems-and-equipment", items:[
-    { code:"TS-01", name:"Tank Gauging", slug:"tank-gauging" },
+    { code:"TS-01", name:"Tank Gauging", slug:"tank-gauging", items:[
+      { code:"TS-01.1", name:"Radar Level Gauges", slug:"radar-level-gauges" },
+      { code:"TS-01.2", name:"Servo Gauges", slug:"servo-gauges" },
+      { code:"TS-01.3", name:"Temperature Measurement (MTT)", slug:"temperature-measurement-mtt" },
+      { code:"TS-01.4", name:"Water Interface Detection", slug:"water-interface-detection" },
+      { code:"TS-01.5", name:"Manual Gauging Equipment", slug:"manual-gauging-equipment" },
+      { code:"TS-01.6", name:"Tank Sampling Systems", slug:"tank-sampling-systems" },
+    ]},
     { code:"TS-02", name:"Rim Seals", slug:"rim-seals" },
     { code:"TS-03", name:"Seal Fittings", slug:"seal-fittings" },
     { code:"TS-04", name:"Floating Roof Systems", slug:"floating-roof-systems" },
@@ -812,6 +825,64 @@ const CATEGORY_TREE = [
     { code:"PS-03", name:"Consultancy Services", slug:"consultancy-services" },
     { code:"PS-04", name:"Owner's Engineers", slug:"owner-s-engineers" },
     { code:"PS-05", name:"Environmental Consultants", slug:"environmental-consultants" },
+  ]},
+  { code:"MM", name:"Materials & Metallurgy", slug:"materials-and-metallurgy", items:[
+    { code:"MM-01", name:"Steel Manufacturers", slug:"steel-manufacturers" },
+    { code:"MM-02", name:"Stainless Steel", slug:"stainless-steel" },
+    { code:"MM-03", name:"Alloy Steel", slug:"alloy-steel" },
+    { code:"MM-04", name:"Aluminium Products", slug:"aluminium-products" },
+    { code:"MM-05", name:"Pipes & Tubes", slug:"pipes-and-tubes" },
+    { code:"MM-06", name:"Plates & Sheets", slug:"plates-and-sheets" },
+    { code:"MM-07", name:"Structural Steel", slug:"structural-steel" },
+    { code:"MM-08", name:"Forgings", slug:"forgings" },
+    { code:"MM-09", name:"Castings", slug:"castings" },
+    { code:"MM-10", name:"Composite Materials", slug:"composite-materials" },
+    { code:"MM-11", name:"FRP Products", slug:"frp-products" },
+    { code:"MM-12", name:"HDPE Products", slug:"hdpe-products" },
+    { code:"MM-13", name:"Cable Manufacturers", slug:"cable-manufacturers" },
+    { code:"MM-14", name:"Ready Mix Concrete", slug:"ready-mix-concrete" },
+    { code:"MM-15", name:"Cement & Aggregates", slug:"cement-and-aggregates" },
+    { code:"MM-16", name:"Refractory Materials", slug:"refractory-materials" },
+    { code:"MM-17", name:"Insulation Materials", slug:"insulation-materials" },
+  ]},
+  { code:"UE", name:"Utilities & Energy", slug:"utilities-and-energy", items:[
+    { code:"UE-01", name:"Industrial Water Systems", slug:"industrial-water-systems" },
+    { code:"UE-02", name:"Wastewater Treatment", slug:"wastewater-treatment" },
+    { code:"UE-03", name:"Desalination", slug:"desalination" },
+    { code:"UE-04", name:"Steam Systems", slug:"steam-systems" },
+    { code:"UE-05", name:"Compressed Air", slug:"compressed-air" },
+    { code:"UE-06", name:"Power Generation", slug:"power-generation", items:[
+      { code:"UE-06.1", name:"Diesel Generators & Gensets", slug:"diesel-generators" },
+      { code:"UE-06.2", name:"UPS Systems", slug:"ups-systems" },
+      { code:"UE-06.3", name:"Power Distribution Equipment", slug:"power-distribution-equipment" },
+    ]},
+    { code:"UE-07", name:"Renewable Energy", slug:"renewable-energy" },
+    { code:"UE-08", name:"Battery Energy Storage", slug:"battery-energy-storage" },
+    { code:"UE-09", name:"Hydrogen Infrastructure", slug:"hydrogen-infrastructure" },
+    { code:"UE-10", name:"Utility Contractors", slug:"utility-contractors" },
+  ]},
+  { code:"RE", name:"Renewables & Energy Storage", slug:"renewables-and-energy-storage", items:[
+    { code:"RE-01", name:"Solar Power Systems", slug:"solar-power-systems" },
+    { code:"RE-02", name:"Battery Energy Storage (BESS)", slug:"bess-systems" },
+    { code:"RE-03", name:"Hydrogen Storage & Handling", slug:"hydrogen-storage-and-handling" },
+    { code:"RE-04", name:"Ammonia Storage & Handling", slug:"ammonia-storage-and-handling" },
+    { code:"RE-05", name:"Biofuel & Ethanol Storage Systems", slug:"biofuel-and-ethanol-storage-systems" },
+    { code:"RE-06", name:"CBG & Biogas Infrastructure", slug:"cbg-and-biogas-infrastructure" },
+    { code:"RE-07", name:"Carbon Capture Equipment", slug:"carbon-capture-equipment" },
+    { code:"RE-08", name:"Energy Efficiency Systems", slug:"energy-efficiency-systems" },
+  ]},
+  { code:"IE", name:"Inspection Equipment", slug:"inspection-equipment", items:[
+    { code:"IE-01", name:"NDT Equipment", slug:"ndt-equipment", items:[
+      { code:"IE-01.1", name:"Ultrasonic Flaw Detectors", slug:"ultrasonic-flaw-detectors" },
+      { code:"IE-01.2", name:"Thickness Gauges", slug:"thickness-gauges" },
+      { code:"IE-01.3", name:"Phased Array & TOFD", slug:"phased-array-and-tofd" },
+    ]},
+    { code:"IE-02", name:"Tank Floor Scanners (MFL)", slug:"tank-floor-scanners" },
+    { code:"IE-03", name:"Radiographic Equipment", slug:"radiographic-equipment" },
+    { code:"IE-04", name:"Weld Inspection Equipment", slug:"weld-inspection-equipment" },
+    { code:"IE-05", name:"Acoustic Emission Systems", slug:"acoustic-emission-systems" },
+    { code:"IE-06", name:"Borescopes & Visual Inspection", slug:"borescopes-and-visual-inspection" },
+    { code:"IE-07", name:"Inspection Drones & Crawlers", slug:"inspection-drones-and-crawlers" },
   ]},
 ];
 </script>
@@ -1479,15 +1550,37 @@ function isIndian(c) { return (c.country || '').trim().toLowerCase() === 'india'
 let currentView = 'list';
 let map = null, mapMarkers = [];
 
+// Category tree is now up to three levels: sheet (L1) → category (L2) →
+// sub-category (L3, e.g. TS-01.1 Radar Level Gauges under TS-01 Tank Gauging).
+// L3 is OPTIONAL — most L2 entries have no `items` array at all, so every
+// walker below has to tolerate its absence rather than assume it.
+
+/** Every category node below the sheet level, flattened (L2 + L3). */
+function allCategoryNodes() {
+  const out = [];
+  for (const l1 of CATEGORY_TREE) {
+    for (const it of (l1.items || [])) {
+      out.push({ ...it, l1 });
+      for (const sub of (it.items || [])) out.push({ ...sub, l1, parent: it });
+    }
+  }
+  return out;
+}
+
 function allL2Count() {
-  return CATEGORY_TREE.reduce((s, l1) => s + l1.items.length, 0);
+  return allCategoryNodes().length;
 }
 
 function categoryLabel(slug) {
-  for (const l1 of CATEGORY_TREE) {
-    for (const it of l1.items) if (it.slug === slug) return { code: it.code, name: it.name };
-  }
-  return null;
+  const hit = allCategoryNodes().find(n => n.slug === slug);
+  return hit ? { code: hit.code, name: hit.name } : null;
+}
+
+/** slug → [slug, ...all descendant slugs]. Used for inclusive filtering. */
+function categoryWithDescendants(slug) {
+  const hit = allCategoryNodes().find(n => n.slug === slug);
+  if (!hit) return [slug];
+  return [slug, ...(hit.items || []).map(s => s.slug)];
 }
 
 function setRegion(r) {
@@ -1530,6 +1623,14 @@ function buildSidebar() {
           <div class="sheet-item" data-slug="${it.slug}" onclick="selectCategory('${it.slug}')">
             <span class="item-code">${it.code}</span><span>${it.name}</span>${astLink(it.slug) ? `<span class="ast-dot" title="Parts available in ASTSPARES"></span>` : ''}
           </div>
+          ${(it.items && it.items.length) ? `
+            <div class="sheet-subitems" data-parent="${it.slug}">
+              ${it.items.map(sub => `
+                <div class="sheet-item sheet-subitem" data-slug="${sub.slug}" onclick="selectCategory('${sub.slug}')">
+                  <span class="item-code">${sub.code}</span><span>${sub.name}</span>${astLink(sub.slug) ? `<span class="ast-dot" title="Parts available in ASTSPARES"></span>` : ''}
+                </div>
+              `).join('')}
+            </div>` : ''}
         `).join('')}
       </div>
     </div>
@@ -1575,7 +1676,14 @@ function logoHtml(c) {
 function filteredCompanies() {
   const q = document.getElementById('searchBox').value.trim().toLowerCase();
   return COMPANIES.filter(c => {
-    if (activeCategory && !c.cats.includes(activeCategory)) return false;
+    // Inclusive of descendants: selecting an L2 like "Tank Gauging" must still
+    // match a company tagged only with its L3 child "Radar Level Gauges".
+    // Without this a company tagged at L3 would vanish from its own parent's
+    // filter — the same confusing empty-result class of bug as before.
+    if (activeCategory) {
+      const wanted = categoryWithDescendants(activeCategory);
+      if (!wanted.some(s => c.cats.includes(s))) return false;
+    }
     if (activeRegion === 'india' && !isIndian(c)) return false;
     if (activeRegion === 'international' && isIndian(c)) return false;
     if (q) {
@@ -1743,7 +1851,8 @@ function renderCompanyPage(slug) {
   const tilesHtml = c.cats.map(s => {
     const l = categoryLabel(s);
     if (!l) return '';
-    const l1 = CATEGORY_TREE.find(l1 => l1.items.some(it => it.slug === s));
+    const l1 = CATEGORY_TREE.find(l1 => (l1.items || []).some(it =>
+      it.slug === s || (it.items || []).some(sub => sub.slug === s)));
     const ast = astLink(s);
     return `
       <div class="product-tile">
@@ -2274,7 +2383,12 @@ function renderCompanyEditor() {
   const c = editDraft;
   const catOptions = CATEGORY_TREE.map(l1 =>
     `<optgroup label="${l1.code} · ${l1.name}">` +
-    l1.items.map(it => `<option value="${it.slug}">${it.code} — ${it.name}</option>`).join('') +
+    // L3 entries are indented with a non-breaking space so the hierarchy is
+    // visible in a flat <select>, which can't nest optgroups.
+    l1.items.map(it =>
+      `<option value="${it.slug}">${it.code} — ${it.name}</option>` +
+      (it.items || []).map(sub => `<option value="${sub.slug}">&nbsp;&nbsp;&nbsp;${sub.code} — ${sub.name}</option>`).join('')
+    ).join('') +
     `</optgroup>`).join('');
 
   document.getElementById('editBody').innerHTML = `
@@ -2569,7 +2683,12 @@ function renderBulkBar() {
   el.classList.add('active');
   const catOptions = CATEGORY_TREE.map(l1 =>
     `<optgroup label="${l1.code} · ${l1.name}">` +
-    l1.items.map(it => `<option value="${it.slug}">${it.code} — ${it.name}</option>`).join('') +
+    // L3 entries are indented with a non-breaking space so the hierarchy is
+    // visible in a flat <select>, which can't nest optgroups.
+    l1.items.map(it =>
+      `<option value="${it.slug}">${it.code} — ${it.name}</option>` +
+      (it.items || []).map(sub => `<option value="${sub.slug}">&nbsp;&nbsp;&nbsp;${sub.code} — ${sub.name}</option>`).join('')
+    ).join('') +
     `</optgroup>`).join('');
   el.innerHTML = `
     <div class="bulk-count">${n} selected</div>
