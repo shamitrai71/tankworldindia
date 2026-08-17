@@ -728,7 +728,11 @@ const CATEGORY_TREE = [
     { code:"TS-05", name:"Internal Floating Roofs", slug:"internal-floating-roofs" },
     { code:"TS-06", name:"Aluminium Dome Roofs", slug:"aluminium-dome-roofs" },
     { code:"TS-07", name:"Gauge Hatches", slug:"gauge-hatches" },
-    { code:"TS-08", name:"Roof Drains", slug:"roof-drains" },
+    { code:"TS-08", name:"Roof Drains", slug:"roof-drains", items:[
+      { code:"TS-08.1", name:"Swivel Joint Roof Drains", slug:"swivel-joint-roof-drains" },
+      { code:"TS-08.2", name:"Articulated Roof Drains", slug:"articulated-roof-drains" },
+      { code:"TS-08.3", name:"Hose-Type Roof Drains", slug:"hose-type-roof-drains" },
+    ]},
     { code:"TS-09", name:"Foam Chambers", slug:"foam-chambers" },
     { code:"TS-10", name:"Foam Dams", slug:"foam-dams" },
     { code:"TS-11", name:"Nozzles & Manways", slug:"nozzles-and-manways" },
@@ -751,6 +755,7 @@ const CATEGORY_TREE = [
     { code:"TS-28", name:"Industrial Platforms", slug:"industrial-platforms" },
     { code:"TS-29", name:"Cranes & Lifting Equipment", slug:"cranes-and-lifting-equipment" },
     { code:"TS-30", name:"Blasting & Painting Equipment", slug:"blasting-and-painting-equipment" },
+    { code:"TS-31", name:"Sludge Recovery Units", slug:"sludge-recovery-units" },
   ]},
   { code:"FT", name:"Flow & Transfer Equipment", slug:"flow-and-transfer-equipment", items:[
     { code:"FT-01", name:"Pumps", slug:"pumps" },
@@ -780,6 +785,7 @@ const CATEGORY_TREE = [
     { code:"IA-05", name:"Remote Monitoring", slug:"remote-monitoring" },
     { code:"IA-06", name:"Industrial Networking", slug:"industrial-networking" },
     { code:"IA-07", name:"Electrical & Instrumentation", slug:"electrical-and-instrumentation" },
+    { code:"IA-08", name:"Site Communication Systems", slug:"site-communication-systems" },
   ]},
   { code:"DR", name:"Digital, AI & Robotics", slug:"digital-ai-and-robotics", items:[
     { code:"DR-01", name:"Drone & Robotic Inspection", slug:"drone-and-robotic-inspection" },
@@ -799,12 +805,18 @@ const CATEGORY_TREE = [
     { code:"AX-10", name:"Risk-Based Inspection (RBI)", slug:"risk-based-inspection-rbi" },
     { code:"AX-11", name:"Fitness-for-Service", slug:"fitness-for-service" },
     { code:"AX-12", name:"Life Extension", slug:"life-extension" },
-    { code:"AX-13", name:"Tank Cleaning", slug:"tank-cleaning" },
+    { code:"AX-13", name:"Tank Cleaning", slug:"tank-cleaning", items:[
+      { code:"AX-13.1", name:"Robotic & No-Man-Entry Cleaning", slug:"robotic-no-man-entry-cleaning" },
+      { code:"AX-13.2", name:"Manual & Confined-Space Cleaning", slug:"manual-confined-space-cleaning" },
+      { code:"AX-13.3", name:"Degassing & Vapour Freeing", slug:"degassing-and-vapour-freeing" },
+    ]},
     { code:"AX-14", name:"Hydrotesting", slug:"hydrotesting" },
     { code:"AX-15", name:"Calibration Services", slug:"calibration-services" },
     { code:"AX-16", name:"Rope Access Services", slug:"rope-access-services" },
     { code:"AX-17", name:"Leak Detection", slug:"leak-detection" },
-    { code:"AX-18", name:"Sludge Removal", slug:"sludge-removal" },
+    { code:"AX-18", name:"Sludge Removal", slug:"sludge-removal", items:[
+      { code:"AX-18.1", name:"Hydrocarbon Recovery", slug:"hydrocarbon-recovery" },
+    ]},
   ]},
   { code:"FS", name:"Fire, Safety & Environment", slug:"fire-safety-and-environment", items:[
     { code:"FS-01", name:"Fire Protection", slug:"fire-protection", items:[
