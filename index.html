@@ -807,8 +807,40 @@ const CATEGORY_TREE = [
     { code:"AX-18", name:"Sludge Removal", slug:"sludge-removal" },
   ]},
   { code:"FS", name:"Fire, Safety & Environment", slug:"fire-safety-and-environment", items:[
-    { code:"FS-01", name:"Hazardous Area Equipment", slug:"hazardous-area-equipment" },
-    { code:"FS-02", name:"Inspection & Certification", slug:"inspection-and-certification" },
+    { code:"FS-01", name:"Fire Protection", slug:"fire-protection", items:[
+      { code:"FS-01.1", name:"Foam Systems & Equipment", slug:"foam-systems-and-equipment" },
+      { code:"FS-01.2", name:"Fire Water Systems", slug:"fire-water-systems" },
+      { code:"FS-01.3", name:"Portable Fire Equipment", slug:"portable-fire-equipment" },
+    ]},
+    { code:"FS-02", name:"Fire Detection", slug:"fire-detection" },
+    { code:"FS-03", name:"Fire Fighting Foam", slug:"fire-fighting-foam" },
+    { code:"FS-04", name:"Rim Seal Fire Protection", slug:"rim-seal-fire-protection", items:[
+      { code:"FS-04.1", name:"Rim Seal Foam Pourers", slug:"rim-seal-foam-pourers" },
+      { code:"FS-04.2", name:"Rim Seal Detection Systems", slug:"rim-seal-detection-systems" },
+      { code:"FS-04.3", name:"Rim Seal Dry Chemical Systems", slug:"rim-seal-dry-chemical-systems" },
+    ]},
+    { code:"FS-05", name:"Gas Detection", slug:"gas-detection" },
+    { code:"FS-06", name:"Emergency Shutdown Systems", slug:"emergency-shutdown-systems" },
+    { code:"FS-07", name:"Explosion Protection (ATEX)", slug:"explosion-protection-atex" },
+    { code:"FS-08", name:"Hazardous Area Equipment", slug:"hazardous-area-equipment", items:[
+      { code:"FS-08.1", name:"Hazardous Area Lighting", slug:"hazardous-area-lighting" },
+    ]},
+    { code:"FS-09", name:"Lightning Protection", slug:"lightning-protection", items:[
+      { code:"FS-09.1", name:"Bypass Conductors", slug:"bypass-conductors" },
+      { code:"FS-09.2", name:"Submerged Shunts", slug:"submerged-shunts" },
+      { code:"FS-09.3", name:"Surge Protection Devices", slug:"surge-protection-devices" },
+    ]},
+    { code:"FS-10", name:"Earthing & Bonding", slug:"earthing-and-bonding" },
+    { code:"FS-11", name:"Spill Containment", slug:"spill-containment", items:[
+      { code:"FS-11.1", name:"Containment Liners & Geomembranes", slug:"containment-liners-and-geomembranes" },
+      { code:"FS-11.2", name:"Spill Response Equipment", slug:"spill-response-equipment" },
+    ]},
+    { code:"FS-12", name:"Environmental Monitoring", slug:"environmental-monitoring" },
+    { code:"FS-13", name:"Occupational Safety", slug:"occupational-safety" },
+    { code:"FS-14", name:"HAZOP & Risk Assessment", slug:"hazop-and-risk-assessment" },
+    { code:"FS-15", name:"Functional Safety", slug:"functional-safety" },
+    { code:"FS-16", name:"Process Safety", slug:"process-safety" },
+    { code:"FS-17", name:"Regulatory Compliance", slug:"regulatory-compliance" },
   ]},
   { code:"MR", name:"Industrial Supplies (MRO)", slug:"industrial-supplies-mro", items:[
     { code:"MR-01", name:"Industrial Safety Equipment", slug:"industrial-safety-equipment" },
@@ -825,6 +857,7 @@ const CATEGORY_TREE = [
     { code:"PS-03", name:"Consultancy Services", slug:"consultancy-services" },
     { code:"PS-04", name:"Owner's Engineers", slug:"owner-s-engineers" },
     { code:"PS-05", name:"Environmental Consultants", slug:"environmental-consultants" },
+    { code:"PS-06", name:"Inspection & Certification", slug:"inspection-and-certification" },
   ]},
   { code:"MM", name:"Materials & Metallurgy", slug:"materials-and-metallurgy", items:[
     { code:"MM-01", name:"Steel Manufacturers", slug:"steel-manufacturers" },
@@ -1003,7 +1036,7 @@ const COMPANIES = [
       { type:"registered-office", name:"Registered Office", address:"Office No 3 , Plot No.70-D, Uday Building, Maharshi Dayanand, Dayanand Saraswati Rd, Mahadeo Wadi, Chembur Gaothan, Chembur, Mumbai, Maharashtra 400071, India", city:"Mumbai, Maharashtra", lat:19.07, lng:72.87, placeId:"ChIJV_aOZgDH5zsRoIX6FE6afPk" }
     ] },
   { id:23, slug:"baliga-lighting-equipments-private-limited", name:"Baliga Lighting Equipments Private Limited", logo:null, country:"India",
-    cats:["hazardous-area-equipment"], desc:"Pioneer Indian manufacturer of explosion-proof lighting, switches, and control equipment for hazardous industrial areas, founded 1960 and ATEX/IECEx certified.", site:"https://www.baliga.com",
+    cats:["hazardous-area-lighting"], desc:"Pioneer Indian manufacturer of explosion-proof lighting, switches, and control equipment for hazardous industrial areas, founded 1960 and ATEX/IECEx certified.", site:"https://www.baliga.com",
     locations:[
       { type:"registered-office", name:"Registered Office", address:"No.1/382, Baliga Rd, off Medavakkam Main Road, Veeramani Nagar, Kovilambakkam, Chennai, Nanmangalam, Tamil Nadu 600129, India", city:"Chennai, Tamil Nadu", lat:13.03, lng:80.25, placeId:"ChIJLXyfkn5eUjoRD3nWSQojXHg" }
     ] },
