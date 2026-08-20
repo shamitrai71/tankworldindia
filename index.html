@@ -492,11 +492,6 @@ main{ flex:1; min-width:0; padding:20px 24px 60px; }
 .product-tile .tile-name{ font-family:var(--font-display); font-weight:600; font-size:13px; line-height:1.3; }
 .product-tile .tile-sheet{ font-family:var(--font-mono); font-size:9.5px; color:var(--ink-faint); }
 .product-tile .tile-code-row{ display:flex; align-items:center; gap:5px; flex-wrap:wrap; }
-/* AST-xx badge — rust, to read as "parts/commerce" vs the blue taxonomy code */
-.product-tile .tile-ast-code{
-  font-family:var(--font-mono); font-size:10px; font-weight:700; color:var(--paper-raised);
-  background:var(--rust); padding:2px 6px; border-radius:2px; letter-spacing:0.5px;
-}
 .product-tile .tile-links{
   display:flex; flex-direction:column; gap:4px; margin-top:2px;
   padding-top:8px; border-top:1px dashed var(--line);
@@ -508,13 +503,6 @@ main{ flex:1; min-width:0; padding:20px 24px 60px; }
 }
 .xlink-hub{ color:var(--blue); background:var(--blue-soft); border-color:var(--line-blue); }
 .xlink-hub:hover{ background:#D6E4F0; }
-.xlink-ast{ color:var(--rust); background:var(--rust-soft); border-color:#E4C9B3; }
-.xlink-ast:hover{ background:#EFD8C6; }
-/* sidebar "parts available" dot */
-.sheet-items .ast-dot{
-  display:inline-block; width:5px; height:5px; border-radius:50%;
-  background:var(--rust); margin-left:5px; vertical-align:middle;
-}
 footer{
   text-align:center; padding:20px; font-family:var(--font-mono); font-size:10px;
   color:var(--ink-faint); letter-spacing:0.5px; border-top:1px solid var(--line);
@@ -662,34 +650,12 @@ footer{
 // it can be used directly as the hub's deep-link key — no mapping table
 // needed, nothing re-derived. That shared-slug-as-identity rule is what
 // makes these links safe.
-//
-// ASTSPARES is different: only a handful of master categories currently
-// exist as *parts* categories in the catalogue, so that mapping IS
-// explicit — master slug -> {AST code, catalogue path}. Note flame
-// arres/stors: the master tree spells it "flame-arresters", ASTSPARES
-// uses "flame-arrestors" in its own path. Both are correct in their own
-// app; the mapping is what reconciles them.
 // ══════════════════════════════════════════════════════════════════════
 const TANKONOMICS_BASE = 'https://tankonomics.web.app';
-const ASTSPARES_BASE   = 'https://astspares.com';
-
-const AST_LINKS = {
-  'rim-seals':             { code:'RS', path:'rim-seals',       label:'Rim Seals' },
-  'flame-arresters':       { code:'FA', path:'flame-arrestors', label:'Flame Arrestors' },
-  'pressure-vacuum-vents': { code:'PV', path:'pv-valves',       label:'Pressure / Vacuum Valves' },
-  'flexible-hoses':        { code:'HS', path:'hoses',           label:'Hoses & Assemblies' },
-  // 'gaskets' (AST-GK) exists in ASTSPARES but has no L2 in this directory's
-  // 92-category scope — left out deliberately rather than inventing a category.
-};
 
 /** Hub directory, filtered to this category. */
 function tankonomicsUrl(slug) {
   return `${TANKONOMICS_BASE}/directory?category=${encodeURIComponent(slug)}`;
-}
-/** ASTSPARES parts catalogue for this master category, or null if no parts exist yet. */
-function astLink(slug) {
-  const a = AST_LINKS[slug];
-  return a ? { ...a, url: `${ASTSPARES_BASE}/products/${a.path}/` } : null;
 }
 
 const CATEGORY_TREE = [
@@ -1594,10 +1560,12 @@ const COMPANIES = [
     cats:["truck-loading-systems", "rail-loading-systems", "custody-transfer-metering", "flow-meters"],
     locations:[{ type:"registered-office", name:"Registered Office", address:"60-63, Por Industrial Park, Por, Vadodara, Gujarat 391243, India", city:"", lat:null, lng:null, placeId:"ChIJu_-PFwDDXzkRYaiUAKTVJt4" }] },
 { id:123, slug:"hd-fire-protect-private-limited", name:"HD Fire Protect Private Limited", logo:null, country:"India",
-    // NOTE: Brands as 'HD Fire Protect' — confirm exact registered entity name.
-    desc:"Manufacturer of foam-based fire suppression and rim seal fire protection systems for flammable liquid storage tanks; UL Listed and FM Approved.",
+    // NOTE: Brands as 'HD Fire Protect' — confirm exact registered entity name. Makes fire
+    // protection equipment FOR rim seals (foam pourers, foam dams), not rim seals themselves —
+    // correctly tagged to foam-chambers/foam-dams only, not to the rim-seals category.
+    desc:"Manufacturer of foam-based fire suppression systems for flammable liquid storage tanks, including foam pourers and foam dams for rim seal fire protection; UL Listed and FM Approved.",
     site:"https://www.hdfire.com",
-    cats:["foam-chambers", "foam-dams", "rim-seals"],
+    cats:["foam-chambers", "foam-dams"],
     locations:[{ type:"registered-office", name:"Registered Office", address:"D-6/2, Rd Number 34, Wagle Industrial Estate, Thane West, Maharashtra 400604, India", city:"", lat:null, lng:null, placeId:"ChIJRVR9ciHP5zsRuloU13vmgeo" }] },
 { id:124, slug:"foamtech-antifire-company", name:"Foamtech Antifire Company", logo:null, country:"India",
     // NOTE: Site shows both 'Foamtech Antifire Company' and 'Foamtech Antifire Pvt. Ltd.' — confirm the registered form.
@@ -2252,13 +2220,13 @@ function buildSidebar() {
       <div class="sheet-items">
         ${l1.items.map(it => `
           <div class="sheet-item" data-slug="${it.slug}" onclick="selectCategory('${it.slug}')">
-            <span class="item-code">${it.code}</span><span>${it.name}</span>${astLink(it.slug) ? `<span class="ast-dot" title="Parts available in ASTSPARES"></span>` : ''}
+            <span class="item-code">${it.code}</span><span>${it.name}</span>
           </div>
           ${(it.items && it.items.length) ? `
             <div class="sheet-subitems" data-parent="${it.slug}">
               ${it.items.map(sub => `
                 <div class="sheet-item sheet-subitem" data-slug="${sub.slug}" onclick="selectCategory('${sub.slug}')">
-                  <span class="item-code">${sub.code}</span><span>${sub.name}</span>${astLink(sub.slug) ? `<span class="ast-dot" title="Parts available in ASTSPARES"></span>` : ''}
+                  <span class="item-code">${sub.code}</span><span>${sub.name}</span>
                 </div>
               `).join('')}
             </div>` : ''}
@@ -2484,18 +2452,15 @@ function renderCompanyPage(slug) {
     if (!l) return '';
     const l1 = CATEGORY_TREE.find(l1 => (l1.items || []).some(it =>
       it.slug === s || (it.items || []).some(sub => sub.slug === s)));
-    const ast = astLink(s);
     return `
       <div class="product-tile">
         <div class="tile-code-row">
           <span class="tile-code">${l.code}</span>
-          ${ast ? `<span class="tile-ast-code" title="Parts available in ASTSPARES">AST-${ast.code}</span>` : ''}
         </div>
         <div class="tile-name">${l.name}</div>
         <div class="tile-sheet">${l1 ? l1.name : ''}</div>
         <div class="tile-links">
           <a class="xlink xlink-hub" href="${tankonomicsUrl(s)}" target="_blank" rel="noopener">Companies on Tankonomics ↗</a>
-          ${ast ? `<a class="xlink xlink-ast" href="${ast.url}" target="_blank" rel="noopener">Buy parts — ASTSPARES ↗</a>` : ''}
         </div>
       </div>`;
   }).join('');
@@ -3044,8 +3009,8 @@ function renderCompanyEditor() {
 
     <div class="ed-row"><label>Slug</label>
       <input type="text" value="${c.slug}" disabled>
-      <div class="ed-hint">Immutable — it's the shared identity key across Tankonomics,
-        TankBazaar and ASTSPARES. Changing it would break those joins.</div></div>
+      <div class="ed-hint">Immutable — it's the shared identity key across Tankonomics and
+        TankBazaar. Changing it would break those joins.</div></div>
 
     <div class="ed-row"><label>Description</label>
       <textarea rows="3" oninput="editField('desc', this.value)">${c.desc||''}</textarea></div>
