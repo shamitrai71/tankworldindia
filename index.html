@@ -1664,9 +1664,9 @@ const COMPANIES = [
     locations:[{ type:"registered-office", name:"Registered Office", address:"Mumbai, Maharashtra, India", city:"", lat:null, lng:null, placeId:null }] },
 { id:137, slug:"honeywell-automation-india-limited", name:"Honeywell Automation India Limited", logo:null, country:"India",
     // NOTE: Separate legal entity from 'Honeywell International Inc.' already in the roster — independently listed, majority-held by Honeywell.
-    desc:"Publicly listed (NSE: HONAUT) Indian subsidiary of Honeywell; tank inventory and radar gauging systems, including Enraf heritage.",
+    desc:"Publicly listed (NSE: HONAUT) Indian subsidiary of Honeywell; tank inventory and radar gauging systems including Enraf heritage, plus the HERMetic portable UTImeter (ullage/temperature/interface) manual gauging line and HERMetic portable gas-tight liquid samplers for terminal and refinery use.",
     site:"https://www.honeywell.com",
-    cats:["radar-level-gauges", "tank-gauging", "tank-inventory-systems", "terminal-automation"],
+    cats:["radar-level-gauges", "tank-gauging", "tank-inventory-systems", "terminal-automation", "manual-gauging-equipment", "tank-sampling-systems"],
     parent:{ name:"Honeywell International Inc.", slug:"", relationship:"subsidiary" },
     locations:[{ type:"registered-office", name:"Registered Office", address:"53-57, Hadapsar Industrial Estate, Pune, Maharashtra 411013, India", city:"", lat:null, lng:null, placeId:"ChIJf1dDL-vBwjsR9AeQQufa1kg" }] },
 { id:138, slug:"nivelco-instruments-india-private-limited", name:"Nivelco Instruments India Private Limited", logo:null, country:"India",
@@ -1888,9 +1888,9 @@ const COMPANIES = [
     locations:[{ type:"registered-office", name:"Registered Office", address:"Mumbai, Maharashtra (works approx. 35km from Kalyan)", city:"", lat:null, lng:null, placeId:"ChIJ7cF2mV3O5zsRtFoU9BA1TfI" }] },
 { id:174, slug:"technika", name:"Technika", logo:null, country:"India",
     // NOTE: No 'Pvt Ltd' or 'Limited' suffix found in any source — likely a proprietorship/partnership.
-    desc:"Established 1987; top/bottom loading arms and swivel joints, including swivel joints for floating roof tank and floating suction service, working in 450+ plants in India and abroad.",
+    desc:"Established 1987; top/bottom loading arms and swivel joints, including swivel joints for floating roof tank drain systems and floating suction service, working in 450+ plants in India and abroad.",
     site:"https://technika.co.in",
-    cats:["loading-arms"],
+    cats:["loading-arms", "swivel-joint-roof-drains"],
     locations:[{ type:"registered-office", name:"Registered Office", address:"G-9, Siddhi Apartments, 74/1, Cama Lane, Ghatkopar West, Mumbai", city:"", lat:null, lng:null, placeId:"ChIJsYe4NSrG5zsRG8DR9myXC6c" }] },
 { id:175, slug:"jre-private-limited", name:"JRE Private Limited", logo:null, country:"India",
     // NOTE: Verified via LinkedIn company page, 51-200 employees.
@@ -1907,9 +1907,9 @@ const COMPANIES = [
     locations:[{ type:"registered-office", name:"Registered Office", address:"4a/5, Bhartiya Kreeda Mandir, 57 Naigaum Cross Road, Wadala, Mumbai - 400031", city:"", lat:null, lng:null, placeId:"ChIJSV_XxR_P5zsRKx3abzzHJx0" }] },
 { id:177, slug:"kanon-loading-equipment-bv", name:"Kanon Loading Equipment B.V.", logo:null, country:"Netherlands",
     // NOTE: Dutch registration 12401448, LEI 724500SY7T5GU6U75111.
-    desc:"Founded 1978 as a family business; real named project at Mumbai Port Trust (7 marine loading arms for crude/black oil), with Engineers India Limited involved in the RFQ process. Represented in India via DKC International.",
+    desc:"Founded 1978 as a family business; real named project at Mumbai Port Trust (7 marine loading arms for crude/black oil), with Engineers India Limited involved in the RFQ process. Represented in India via DKC International. The only marine loading arm manufacturer in the world compliant with European Standard EN1474-1:2009 for LNG transfer, with a dedicated cryogenic LNG swivel joint and bunkering solution.",
     site:"https://kanon.nl",
-    cats:["loading-arms", "marine-loading-arms"],
+    cats:["loading-arms", "marine-loading-arms", "cryogenic-loading-systems-lng"],
     locations:[{ type:"registered-office", name:"Registered Office", address:"Edisonweg 27, 3899 AZ Zeewolde", city:"", lat:null, lng:null, placeId:"ChIJjcZSgoIwxkcR7KX9C-A-gnQ" }] },
 { id:178, slug:"snowtech-equipments-private-limited", name:"Snowtech Equipments Private Limited", logo:null, country:"India",
     // NOTE: GST 27AABCN2276M1Z5.
@@ -1931,9 +1931,9 @@ const COMPANIES = [
     locations:[{ type:"registered-office", name:"Registered Office", address:"Level 3, Sej Plaza, Marve Road, Near Nutan High School, Malad West, Mumbai - 400064, Maharashtra", city:"", lat:null, lng:null, placeId:"ChIJxc4KK6K25zsRnUZFFvNUiMg" }] },
 { id:181, slug:"milton-roy-india-private-limited", name:"Milton Roy India Private Limited", logo:null, country:"India",
     // NOTE: Global parent Milton Roy founded 1936; a real case study cites 16% annual power savings from this product line.
-    desc:"Established 1983; SRMix and Helisem side-entry mixer range engineered for crude oil storage tank agitation, tanks up to 210,000 m3.",
+    desc:"Established 1983; SRMix and Helisem side-entry mixer range engineered for crude oil storage tank agitation, tanks up to 210,000 m3, plus the Milton Roy metering/dosing pump range (the global namesake brand for precision metering pumps) for chemical injection applications.",
     site:"https://www.miltonroy.com",
-    cats:["mixers-and-agitators"],
+    cats:["mixers-and-agitators", "metering-pumps"],
     locations:[{ type:"registered-office", name:"Registered Office", address:"P 45/1, Domestic Tariff Area, Mahindra World City, 8th Avenue, Chengalpattu, Kanchipuram, Tamil Nadu - 603002", city:"", lat:null, lng:null, placeId:"ChIJryFojmD5UjoRvBhNiub52u4" }] },
 { id:182, slug:"galaxy-industrial-equipments-private-limited", name:"Galaxy Industrial Equipments Private Limited", logo:null, country:"India",
     // NOTE: GST registered Jul 2017, Legal Status 'Limited Company' per IndiaMART registration details; 15+ years experience.
@@ -2438,7 +2438,7 @@ const COMPANIES = [
     // does not reflect the company's actual PPE/fall-protection specialization.
     desc:"India's leading Personal Protective Equipment (PPE) and fall protection manufacturer; over 3,800 certified products (fall protection, head/eye/ear/respiratory protection, safety footwear, confined space equipment) conforming to IS, DGMS and international standards, exporting to 140+ countries.",
     site:"https://www.karam.in",
-    cats:["occupational-safety"],
+    cats:["occupational-safety", "industrial-safety-equipment"],
     locations:[{ type:"registered-office", name:"Registered Office", address:"C-35A, Phase III, Eldeco SIDCUL, Udham Singh Nagar, Uttarakhand 262405, India", city:"Sitarganj", lat:null, lng:null, placeId:null }] },
 { id:267, slug:"bureau-veritas-india-private-limited", name:"Bureau Veritas India Private Limited", logo:null, country:"India",
     // NOTE: Bureau Veritas has more than one India-registered entity (an older "Bureau Veritas
@@ -2450,12 +2450,11 @@ const COMPANIES = [
     parent:{ name:"Bureau Veritas", slug:"", relationship:"subsidiary" },
     locations:[{ type:"registered-office", name:"Registered Office", address:"72, Business Park, Ground Floor, Marol Industrial Area, Cross Road C, MIDC, Andheri East, Mumbai, Maharashtra 400093, India", city:"Mumbai", lat:null, lng:null, placeId:null }] },
 { id:268, slug:"agasti-tank-works-private-limited", name:"Agasti Tank Works Private Limited", logo:null, country:"India",
-    // NOTE: DPIIT-recognized startup (Startup India). Its product line also includes bypass
-    // conductors and roof drain systems, already covered by other entries in this roster — tagged
-    // here for its submerged shunt and rim seal products for floating roof tanks.
-    desc:"Manufacturer and exporter of vapour control and safety systems for floating roof oil storage tanks, established 2017; submerged shunts, bypass conductors, primary and secondary rim seals, and roof drain systems, exporting to Lebanon, Egypt, Bangladesh, Ecuador and Indonesia.",
+    // NOTE: DPIIT-recognized startup (Startup India). Its articulated-type drain joints for
+    // floating roof tanks are tagged here to articulated-roof-drains specifically.
+    desc:"Manufacturer and exporter of vapour control and safety systems for floating roof oil storage tanks, established 2017; submerged shunts, bypass conductors, primary and secondary rim seals, and articulated-type roof drain joint systems, exporting to Lebanon, Egypt, Bangladesh, Ecuador and Indonesia.",
     site:"https://www.agasticorporation.com",
-    cats:["submerged-shunts", "rim-seals"],
+    cats:["submerged-shunts", "rim-seals", "articulated-roof-drains"],
     locations:[{ type:"registered-office", name:"Registered Office", address:"R-2, 403, Panvelkar Regency, Khojgaon Netaji Bazar, Ambernath West, Thane, Maharashtra 421505, India", city:"Thane", lat:null, lng:null, placeId:null }] },
 { id:269, slug:"enviroguard-solutions-llp", name:"Enviroguard Solutions LLP", logo:null, country:"India",
     // NOTE: registered as an LLP (Limited Liability Partnership), LLPIN AAH-9886, not a private
@@ -2704,9 +2703,9 @@ const COMPANIES = [
     // NOTE: closes out EC-19.1 FPSO/FSO Design & Conversion — the last two empty categories in the
     // EC section. Global market leader with 40+ years and 40+ FPSOs delivered, pioneer of single
     // buoy mooring (SBM) systems, formerly IHC Caland N.V. prior to 2005.
-    desc:"World's leading FPSO contractor (Euronext Amsterdam: SBMO), founded 1965; design, construction, installation, leasing, operation and life extension of Floating Production Storage and Offloading (FPSO) and FSO vessels, Turret Mooring Systems and Tension Leg Platforms, with 40+ FPSOs delivered in deepwater and its standardized Fast4Ward® hull program.",
+    desc:"World's leading FPSO contractor (Euronext Amsterdam: SBMO), founded 1965 as Single Buoy Moorings Inc. — the pioneer and namesake of Single Point Mooring (SPM) technology; design, construction, installation, leasing, operation and life extension of Floating Production Storage and Offloading (FPSO) and FSO vessels, CALM buoys, Turret Mooring Systems and Tension Leg Platforms, with 40+ FPSOs delivered in deepwater and its standardized Fast4Ward® hull program.",
     site:"https://www.sbmoffshore.com",
-    cats:["fpso-fso-design-and-conversion"],
+    cats:["fpso-fso-design-and-conversion", "offshore-loading-systems-spm-calm"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Evert van de Beekstraat 1-77, 1118 CL Schiphol, Netherlands", city:"Schiphol", lat:null, lng:null, placeId:null }] },
 { id:303, slug:"modec-inc", name:"MODEC, Inc.", logo:null, country:"Japan",
     desc:"Publicly listed (TYO: 6269) global EPCI (Engineering, Procurement, Construction and Installation) contractor for floating production systems founded 1968; FPSO, FSO, FLNG, Tension Leg Platform (TLP) and Semi-Submersible units, a 50+ year specialist in the offshore floating oil & gas market with 4,000+ employees from 25+ countries.",
@@ -2878,7 +2877,76 @@ const COMPANIES = [
     desc:"Independent renewable energy engineering consultancy (QQEC); full lifecycle owner's and lender's engineering, feasibility studies, technical advisory and power system studies optimized for solar PV and BESS projects, with roughly 14 GW of engineering work executed across solar, wind, BESS and hybrid plants in India, the Middle East, USA and Africa.",
     site:"https://qqec.in",
     cats:["owner-s-engineers"],
-    locations:[{ type:"registered-office", name:"Registered Office", address:"3rd Floor, 304 - Radha Soami Sukun, Near APC Circle, Anand, Gujarat 388001, India", city:"Anand", lat:null, lng:null, placeId:null }] }
+    locations:[{ type:"registered-office", name:"Registered Office", address:"3rd Floor, 304 - Radha Soami Sukun, Near APC Circle, Anand, Gujarat 388001, India", city:"Anand", lat:null, lng:null, placeId:null }] },
+{ id:326, slug:"nilsan-nishotech-systems-private-limited", name:"Nilsan Nishotech Systems Private Limited", logo:null, country:"India",
+    // NOTE: primarily a pharmaceutical/food/dairy process engineering company (purified water
+    // systems, chromatography, membrane filtration, CIP/SIP) — Product Recovery Pigging Systems
+    // are one specific product line, not its core business, but a real, established one.
+    desc:"Process engineering company established 1989; purified water production systems, membrane filtration and CIP/SIP systems for pharmaceutical, biopharma, dairy and food industries, alongside a Product Recovery Pigging System line for cleaning and recovering product from pipelines.",
+    site:"https://www.nilsannishotech.com",
+    cats:["pigging-systems"],
+    locations:[{ type:"registered-office", name:"Registered Office", address:"W-199-E, MIDC, Industrial Area Khairne, Thane Belapur Road, Navi Mumbai, Maharashtra 400705, India", city:"Navi Mumbai", lat:null, lng:null, placeId:null }] },
+{ id:327, slug:"hytera-communications-corporation-limited", name:"Hytera Communications Corporation Limited", logo:null, country:"China",
+    // NOTE: international entity, no confirmed India subsidiary — listed (SZSE: 002583).
+    desc:"Global leader in Professional Mobile Radio (PMR) communications founded 1993; two-way radio terminals, DMR and TETRA trunked systems, with a dedicated line of intrinsically-safe radios (IECEx/ATEX certified) for hazardous-area use in petrochemical, oil & gas and other industrial process environments, serving 100+ countries.",
+    site:"https://www.hytera.com",
+    cats:["site-communication-systems"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Hytera Tower, Shenzhen Hi-Tech Industrial Park North, Beihuan Road 9108, Nanshan District, Shenzhen, Guangdong 518057, China", city:"Shenzhen", lat:null, lng:null, placeId:null }] },
+{ id:328, slug:"energy-efficiency-services-limited", name:"Energy Efficiency Services Limited", logo:null, country:"India",
+    // NOTE: trades as "EESL". A joint venture of NTPC, Power Finance Corporation, Rural
+    // Electrification Corporation and Power Grid Corporation of India, all under Ministry of Power.
+    desc:"South Asia's largest Energy Service Company (Super ESCO), established 2009 as a joint venture of four Central Power Sector PSUs; implements large-scale energy efficiency programmes (LED lighting, BLDC fans, EV charging infrastructure, demand-side management) for consumers, industry and government, and provides energy efficiency and carbon market consultancy.",
+    site:"https://eeslindia.org",
+    cats:["energy-efficiency-systems"],
+    locations:[{ type:"registered-office", name:"Registered Office", address:"NFL Building, 5th & 6th Floor, Core-III, SCOPE Complex, Lodhi Road, New Delhi 110003, India", city:"New Delhi", lat:null, lng:null, placeId:null }] },
+{ id:329, slug:"tata-consulting-engineers-limited", name:"Tata Consulting Engineers Limited", logo:null, country:"India",
+    // NOTE: trades as "TCE". Distinct from Tata Consultancy Services (TCS, IT services) despite
+    // the similar name — a common source of confusion.
+    desc:"Engineering, design and project management consultancy founded 1962, part of the Tata Group; multidisciplinary consultancy across power, oil & gas, infrastructure, metals, chemicals and water sectors, with 5,600+ employees across India.",
+    site:"https://www.tce.co.in",
+    cats:["consultancy-services"],
+    parent:{ name:"Tata Group", slug:"", relationship:"affiliate" },
+    locations:[{ type:"registered-office", name:"Registered Office", address:"1st Floor, 10, Elphinstone Building, Veer Nariman Road, Horniman Circle, Fort, Mumbai, Maharashtra 400001, India", city:"Mumbai", lat:null, lng:null, placeId:null }] },
+{ id:330, slug:"sanjana-cryogenic-storages-limited", name:"Sanjana Cryogenic Storages Limited", logo:null, country:"India",
+    // NOTE: closes RE-04 Ammonia Storage & Handling. Also diversified into wind power generation
+    // and non-ferrous metal trading (Nickel, Aluminium, Copper) as separate business lines — its
+    // ammonia storage business is tagged here specifically.
+    desc:"Pioneer of third-party ammonia cryogenic storage terminals in India, incorporated 1999; facilities at Dahej, Gujarat and Haldia, West Bengal serving fertilizer and chemical industry clients under Build-Own-Operate-Transfer (BOOT) arrangements, including an 8 km ammonia pipeline from unloading jetty to shore tank at Haldia, the longest in the country.",
+    site:"https://www.sanjanacryogenic.com",
+    cats:["ammonia-storage-and-handling"],
+    locations:[{ type:"registered-office", name:"Registered Office", address:"116, Bajaj Bhavan, 11th Floor, Nariman Point, Mumbai, Maharashtra 400021, India", city:"Mumbai", lat:null, lng:null, placeId:null }] },
+{ id:331, slug:"thyssenkrupp-industrial-solutions-india-private-limited", name:"thyssenkrupp Industrial Solutions (India) Private Limited", logo:null, country:"India",
+    // NOTE: trades under the "Uhde" heritage brand for chemical process technology. Real named
+    // project: India's largest single-location cryogenic ammonia tank installation (5 x 10,000 MT)
+    // for Paradeep Phosphates.
+    desc:"Indian subsidiary of thyssenkrupp AG (Germany), formerly Uhde India, established 1977; engineering and EPC for cryogenic storage of ammonia, LPG and other liquefied gases, electrolysis plants and chemical/metallurgical process plants, with a track record of 750+ projects in India and abroad.",
+    site:"https://www.thyssenkrupp-uhde.com/india",
+    cats:["ammonia-storage-and-handling"],
+    parent:{ name:"thyssenkrupp AG", slug:"", relationship:"subsidiary" },
+    locations:[{ type:"registered-office", name:"Registered Office", address:"Uhde House, L.B.S. Marg, Vikhroli West, Mumbai, Maharashtra 400083, India", city:"Mumbai", lat:null, lng:null, placeId:null }] },
+{ id:332, slug:"sun-engineering-services", name:"Sun Engineering Services", logo:null, country:"India",
+    // NOTE: closes TS-22 Water Draw-Off Systems. A Sole Proprietorship (owner Mr. K. Kesav Sankar),
+    // not incorporated as a company — no CIN applies. Established 2003/2004, Ahmedabad.
+    desc:"Manufacturer of carbon steel and stainless steel (SS 304/316) telescopic valves — also called Decanting Valves or Sludge Draw-off Valves — used to control liquid level in ponds, reservoirs and settling basins at water and sewage treatment plants, alongside a chlorination systems and accessories product line.",
+    site:"https://www.sunengineeringservices.com",
+    cats:["water-draw-off-systems"],
+    locations:[{ type:"registered-office", name:"Registered Office", address:"B No. 20, Srinathji Industrial Estate, Nr Nikol Ring Road, Nr Kathwara GIDC, Odhav, Ahmedabad, Gujarat 382350, India", city:"Ahmedabad", lat:null, lng:null, placeId:null }] },
+{ id:333, slug:"chase-associates", name:"Chase Associates", logo:null, country:"United States",
+    // NOTE: closes TS-11 Nozzles & Manways. International entity, trades as "Chase Manways" — a
+    // dedicated specialist (not a general tank fabricator) in quick-opening manway access products.
+    desc:"Specialist manufacturer of quick-opening manway access products for steel tanks, concrete walls and poly tanks, serving municipal water storage, wastewater treatment and pulp & paper industries since well before OSHA's Permit Required Confined Space rules were established; custom-fabricated to material, wall thickness, tank radius, static head pressure and gasketing requirements.",
+    site:"https://www.manways.com",
+    cats:["nozzles-and-manways"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Route 27 South, PO Box 75, Edgecomb, Maine 04556-0075, United States", city:"Edgecomb", lat:null, lng:null, placeId:null }] },
+{ id:334, slug:"y-access-manufacturing-private-limited", name:"Y-Access Manufacturing Private Limited", logo:null, country:"India",
+    // NOTE: closes TS-27 Industrial Ladders. Formerly Youngman Manufacturing India Private Limited
+    // — exclusive Indian promoter/manufacturer for the Youngman brand (UK, founded 1926 by Charles
+    // Youngman, now part of Werner Access Products UK Holdings). CIN incorporation date shows
+    // 2015, distinct from the 1926 heritage of the licensed UK brand itself.
+    desc:"India's leading manufacturer of FRP and aluminium industrial ladders, scaffolding, platform ladders and work-at-height equipment, exclusive Indian promoter of the Youngman brand; serves manufacturing, power, aerospace, railways, oil & gas and construction sectors from a manufacturing facility in Greater Noida, Uttar Pradesh.",
+    site:"https://www.ymfg.co.in",
+    cats:["industrial-ladders"],
+    locations:[{ type:"registered-office", name:"Registered Office", address:"Plot No. 14, Ecotech-1 Extension, Near Kasna, Greater Noida, Uttar Pradesh 201310, India", city:"Greater Noida", lat:null, lng:null, placeId:null }] }
 ];
 
 // Immutable copy of the in-page roster, taken BEFORE CompanyStore.load()
