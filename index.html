@@ -2806,7 +2806,33 @@ const COMPANIES = [
     desc:"Publicly listed (NSE/BSE: SNOWMAN) India's largest integrated temperature-controlled logistics company, founded 1993; cold storage warehousing and cold chain transportation for dairy, seafood, ice cream, meat, poultry, quick service restaurants and pharmaceutical clients nationwide.",
     site:"https://www.snowman.in",
     cats:["cold-storage"],
-    locations:[{ type:"registered-office", name:"Registered Office", address:"Plot No. M-8, Taloja Industrial Area, MIDC, Raigad, Navi Mumbai, Maharashtra 410206, India", city:"Navi Mumbai", lat:null, lng:null, placeId:null }] }
+    locations:[{ type:"registered-office", name:"Registered Office", address:"Plot No. M-8, Taloja Industrial Area, MIDC, Raigad, Navi Mumbai, Maharashtra 410206, India", city:"Navi Mumbai", lat:null, lng:null, placeId:null }] },
+{ id:318, slug:"rhenus-logistics-india-private-limited", name:"Rhenus Logistics India Private Limited", logo:null, country:"India",
+    // NOTE: closes the LT-07 Inland Waterways category gap flagged in this session. Indian arm of
+    // the German Rhenus Group; signed a real, named MoU with the Inland Waterways Authority of
+    // India (IWAI) on 5 May 2025 to deploy push boats and flat-bottom barges from Germany on the
+    // Ganges and Brahmaputra, scaling to 100 barges targeting 1 million+ tonnes of cargo annually.
+    desc:"Indian subsidiary of the Rhenus Group (Germany), a global logistics provider; ocean, air, road and rail freight, project logistics, contract warehousing across 31 Indian sites, and a newly launched inland waterway transport service on the Ganges and Brahmaputra rivers under an MoU with the Inland Waterways Authority of India.",
+    site:"https://www.rhenus.group/in/en",
+    cats:["inland-waterways", "freight-forwarding"],
+    parent:{ name:"Rhenus Group", slug:"", relationship:"subsidiary" },
+    locations:[{ type:"registered-office", name:"Registered Office", address:"401, Devkrupa, 28 Raichur Street, Masjid East, Mumbai, Maharashtra 400009, India", city:"Mumbai", lat:null, lng:null, placeId:null }] },
+{ id:319, slug:"assam-inland-waterways-company-limited", name:"Assam Inland Waterways Company Limited", logo:null, country:"India",
+    // NOTE: trades as "AIWCL". A Government of Assam-backed corporate entity, distinct from the
+    // Inland Waterways Authority of India (IWAI, a Union Government statutory body, not itself a
+    // company with a CIN).
+    desc:"State-backed corporate entity of the Government of Assam operating ferry and cargo services on the Brahmaputra river system and other inland waterways within the state.",
+    site:"https://aiwcl.assam.gov.in",
+    cats:["inland-waterways"],
+    locations:[{ type:"registered-office", name:"Registered Office", address:"DIWT, Ulubari, Guwahati, Assam 781007, India", city:"Guwahati", lat:null, lng:null, placeId:null }] },
+{ id:320, slug:"inland-and-coastal-shipping-limited", name:"Inland & Coastal Shipping Limited", logo:null, country:"India",
+    // NOTE: trades as "ICSL". A Union Government company and wholly-owned subsidiary of Shipping
+    // Corporation of India Limited, already in this roster as a separate entry.
+    desc:"Union Government company operating scheduled cargo services along India's national waterways and Indo-Bangladesh Protocol Routes, incorporated 2016 as a subsidiary of the Shipping Corporation of India.",
+    site:"",
+    cats:["inland-waterways"],
+    parent:{ name:"Shipping Corporation of India Limited", slug:"shipping-corporation-of-india-limited", relationship:"subsidiary" },
+    locations:[{ type:"registered-office", name:"Registered Office", address:"Shipping House, 13, Strand Road, Kolkata, West Bengal 700001, India", city:"Kolkata", lat:null, lng:null, placeId:null }] }
 ];
 
 // Immutable copy of the in-page roster, taken BEFORE CompanyStore.load()
