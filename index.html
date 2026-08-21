@@ -2832,7 +2832,53 @@ const COMPANIES = [
     site:"",
     cats:["inland-waterways"],
     parent:{ name:"Shipping Corporation of India Limited", slug:"shipping-corporation-of-india-limited", relationship:"subsidiary" },
-    locations:[{ type:"registered-office", name:"Registered Office", address:"Shipping House, 13, Strand Road, Kolkata, West Bengal 700001, India", city:"Kolkata", lat:null, lng:null, placeId:null }] }
+    locations:[{ type:"registered-office", name:"Registered Office", address:"Shipping House, 13, Strand Road, Kolkata, West Bengal 700001, India", city:"Kolkata", lat:null, lng:null, placeId:null }] },
+{ id:321, slug:"tuv-sud-south-asia-private-limited", name:"TÜV SÜD South Asia Private Limited", logo:null, country:"India",
+    // NOTE: established 1995 as a branch office (TÜV Bayern India), became a wholly-owned
+    // subsidiary of the TÜV SÜD Group in 1999.
+    desc:"Indian subsidiary of the German TÜV SÜD Group; owner's engineer and quality assurance services for conventional power and industrial assets, plus broader testing, inspection and certification (TIC) across 28+ regional offices in India.",
+    site:"https://www.tuvsud.com/en-in",
+    cats:["owner-s-engineers"],
+    parent:{ name:"TÜV SÜD Group", slug:"", relationship:"subsidiary" },
+    locations:[{ type:"registered-office", name:"Registered Office", address:"TÜV SÜD House, Off Saki Vihar Road, Saki Naka, Andheri East, Mumbai, Maharashtra 400072, India", city:"Mumbai", lat:null, lng:null, placeId:null }] },
+{ id:322, slug:"sgs-india-private-limited", name:"SGS India Private Limited", logo:null, country:"India",
+    // NOTE: formerly General Superintendence Company Limited/Private Limited — one of India's
+    // oldest TIC entities, incorporated 1950.
+    desc:"Indian subsidiary of SGS SA (Switzerland), the world's largest testing, inspection and certification company; independent owner's and lender's engineer services managing technical risk on industrial and infrastructure projects, alongside broader TIC services.",
+    site:"https://www.sgs.com/en-in",
+    cats:["owner-s-engineers"],
+    parent:{ name:"SGS SA", slug:"", relationship:"subsidiary" },
+    locations:[{ type:"registered-office", name:"Registered Office", address:"SGS House, 4-B, Adi Shankaracharya Marg, Powai Road, Vikhroli West, Mumbai, Maharashtra 400083, India", city:"Mumbai", lat:null, lng:null, placeId:null }] },
+{ id:323, slug:"sgurrenergy-india-private-limited", name:"SgurrEnergy India Private Limited", logo:null, country:"India",
+    // NOTE: some sources indicate an in-progress rebrand of the wider SgurrEnergy business —
+    // worth confirming current branding before outward-facing use.
+    desc:"Independent technical advisory firm specializing in renewable energy, founded 2009; design validation, quality assurance and owner's/lender's engineering for wind, solar and Battery Energy Storage System (BESS) projects.",
+    site:"https://sgurrenergy.com",
+    cats:["owner-s-engineers"],
+    locations:[{ type:"registered-office", name:"Registered Office", address:"Sr. No. 25, Office No. 5 & 6, Clover Highland, Kondhwa, Pune, Maharashtra 411048, India", city:"Pune", lat:null, lng:null, placeId:null }] },
+{ id:324, slug:"stup-consultants-private-limited", name:"STUP Consultants Private Limited", logo:null, country:"India",
+    // NOTE: trades as "Assystem in India" / "Assystem Stup" (assystem-india.com) following its
+    // acquisition by Assystem S.A. (France) in 2021. Co-founded 1963 by disciples of French
+    // engineer Eugène Freyssinet. IMPORTANT — do not confuse with the several other similarly
+    // named group entities: "Assystem India Limited" (STUP's own subsidiary, formerly L&T
+    // Infrastructure Engineering Limited, acquired by STUP in 2024) and "Assystem Technologies
+    // India Private Limited" / "Assystem Engineering Services India Private Limited" (separate,
+    // older Assystem group entities in India unrelated to the STUP acquisition). STUP itself is
+    // the entity actually operating the assystem-india.com website referenced in this session.
+    desc:"India's leading full-service design, engineering and project delivery consultancy, tracing roots to 1963; low-carbon power (including nuclear grids), transportation, water and urban infrastructure engineering, serving civic bodies, municipalities, government agencies and public/private clients across India.",
+    site:"https://assystem-india.com",
+    cats:["owner-s-engineers"],
+    parent:{ name:"Assystem S.A.", slug:"", relationship:"subsidiary" },
+    locations:[{ type:"registered-office", name:"Registered Office", address:"Unit No. 2702, 27th Floor, Rupa Renaissance, Plot D-33/D-207, Juinagar, MIDC TTC Industrial Area, Turbhe, Navi Mumbai, Maharashtra 400705, India", city:"Navi Mumbai", lat:null, lng:null, placeId:null }] },
+{ id:325, slug:"qq-engineering-and-consulting", name:"QQ Engineering & Consulting", logo:null, country:"India",
+    // NOTE: Medium confidence — company identity and real named clients (Torrent Power, K.P.
+    // Energy Limited, Zetwerk Manufacturing, Sterling Agro Industries) are well corroborated, but
+    // an independent CIN could not be confirmed in this research pass; a small firm (~37-50
+    // employees) based in Anand, Gujarat.
+    desc:"Independent renewable energy engineering consultancy (QQEC); full lifecycle owner's and lender's engineering, feasibility studies, technical advisory and power system studies optimized for solar PV and BESS projects, with roughly 14 GW of engineering work executed across solar, wind, BESS and hybrid plants in India, the Middle East, USA and Africa.",
+    site:"https://qqec.in",
+    cats:["owner-s-engineers"],
+    locations:[{ type:"registered-office", name:"Registered Office", address:"3rd Floor, 304 - Radha Soami Sukun, Near APC Circle, Anand, Gujarat 388001, India", city:"Anand", lat:null, lng:null, placeId:null }] }
 ];
 
 // Immutable copy of the in-page roster, taken BEFORE CompanyStore.load()
@@ -3075,9 +3121,34 @@ function categoryWithDescendants(slug) {
 }
 
 function setRegion(r) {
-  activeRegion = r;
-  renderRegionFilter();
-  renderAll();
+  location.hash = buildFilterHash(activeCategory, r, currentView);
+}
+
+// ── Filter/view state ↔ URL hash ────────────────────────────────────────
+// Category, region and list/map view were previously plain in-memory state:
+// clicking around never touched the URL, so none of it left a mark on
+// browser history. On mobile that meant one tap of the back button could
+// jump clean out of the app (nothing of substance to step back through)
+// instead of returning to the previous filter/category. Encoding this state
+// into the hash — and driving it exclusively through handleRoute() — means
+// every meaningful navigation is a real, back-button-able history entry.
+function buildFilterHash(cat, region, view) {
+  const params = [];
+  if (cat) params.push('cat=' + encodeURIComponent(cat));
+  if (region && region !== 'all') params.push('region=' + encodeURIComponent(region));
+  if (view && view !== 'list') params.push('view=' + encodeURIComponent(view));
+  return '#/' + (params.length ? ('?' + params.join('&')) : '');
+}
+
+function parseFilterHash(hash) {
+  const out = { cat: null, region: 'all', view: 'list' };
+  const qIdx = hash.indexOf('?');
+  if (qIdx === -1) return out;
+  const qs = new URLSearchParams(hash.slice(qIdx + 1));
+  if (qs.has('cat')) out.cat = qs.get('cat');
+  if (qs.has('region')) out.region = qs.get('region');
+  if (qs.has('view')) out.view = qs.get('view');
+  return out;
 }
 
 function renderRegionFilter() {
@@ -3134,20 +3205,13 @@ function toggleSheet(slug) {
 }
 
 function selectCategory(slug) {
-  activeCategory = (activeCategory === slug) ? null : slug;
-  document.querySelectorAll('.sheet-item').forEach(el => {
-    el.classList.toggle('active', el.dataset.slug === activeCategory);
-  });
-  renderAll();
+  const newCat = (activeCategory === slug) ? null : slug;
+  location.hash = buildFilterHash(newCat, activeRegion, currentView);
 }
 
 function clearFilters() {
-  activeCategory = null;
-  activeRegion = 'all';
   document.getElementById('searchBox').value = '';
-  renderRegionFilter();
-  document.querySelectorAll('.sheet-item.active').forEach(el => el.classList.remove('active'));
-  renderAll();
+  location.hash = buildFilterHash(null, 'all', currentView);
 }
 
 // Registered office is always locations[0] by construction — used anywhere
@@ -3249,6 +3313,13 @@ function renderAll() {
 }
 
 function setView(v) {
+  location.hash = buildFilterHash(activeCategory, activeRegion, v);
+}
+
+// Pure DOM/state sync for the current view — no hash writes, so it's safe
+// to call from handleRoute() (i.e. in response to a hash change) without
+// looping back into another navigation.
+function applyView(v) {
   currentView = v;
   document.getElementById('list-view').style.display = v === 'list' ? 'block' : 'none';
   document.getElementById('map-view').classList.toggle('active', v === 'map');
@@ -3418,7 +3489,28 @@ function handleRoute() {
     companyPanel.classList.remove('active');
     sidebar.style.display = '';
     header.querySelector('.view-toggle').style.display = '';
-    setView(currentView);
+
+    // Single source of truth for filter/view state: whatever's in the hash
+    // wins, whether we just navigated there or the user hit back/forward.
+    const parsed = parseFilterHash(hash);
+    activeCategory = parsed.cat;
+    activeRegion = parsed.region;
+
+    document.querySelectorAll('.sheet-item').forEach(el => {
+      el.classList.toggle('active', el.dataset.slug === activeCategory);
+    });
+    // Landing on a filtered state via back/forward can put the active
+    // category inside a sheet group that's currently collapsed — open it so
+    // the highlighted item is actually visible rather than hidden.
+    if (activeCategory) {
+      const activeEl = document.querySelector('.sheet-item[data-slug="' + activeCategory + '"]');
+      const group = activeEl && activeEl.closest('.sheet-group');
+      if (group) group.classList.add('open');
+    }
+
+    renderRegionFilter();
+    applyView(parsed.view);
+    renderAll();
   }
 }
 
