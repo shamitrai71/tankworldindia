@@ -845,6 +845,17 @@ const CATEGORY_TREE = [
   ]},
   { code:"LT", name:"Logistics & Transportation", slug:"logistics-and-transportation", items:[
     { code:"LT-01", name:"Marine & Port Equipment", slug:"marine-and-port-equipment" },
+    { code:"LT-02", name:"Trucking & Road Tankers", slug:"trucking-and-road-tankers" },
+    { code:"LT-03", name:"Port Operators", slug:"port-operators" },
+    { code:"LT-04", name:"Pipeline Operators", slug:"pipeline-operators" },
+    { code:"LT-05", name:"Marine Logistics", slug:"marine-logistics" },
+    { code:"LT-06", name:"Shipping Companies", slug:"shipping-companies" },
+    { code:"LT-07", name:"Inland Waterways", slug:"inland-waterways" },
+    { code:"LT-08", name:"Rail Logistics", slug:"rail-logistics" },
+    { code:"LT-09", name:"Freight Forwarding", slug:"freight-forwarding" },
+    { code:"LT-10", name:"Customs & Port Services", slug:"customs-and-port-services" },
+    { code:"LT-11", name:"Warehouse Operators", slug:"warehouse-operators" },
+    { code:"LT-12", name:"Cold Storage", slug:"cold-storage" },
   ]},
   { code:"ES", name:"Sustainability & Energy Transition", slug:"sustainability-and-energy-transition", items:[
     { code:"ES-01", name:"ESG Consulting", slug:"esg-consulting" },
@@ -2337,9 +2348,9 @@ const COMPANIES = [
     cats:["hydrogen-infrastructure"],
     locations:[{ type:"registered-office", name:"Registered Office", address:"IndianOil Bhavan, G-9, Ali Yavar Jung Marg, Bandra East, Mumbai, Maharashtra 400051, India", city:"Mumbai", lat:null, lng:null, placeId:null }] },
 { id:253, slug:"gail-india-limited", name:"GAIL (India) Limited", logo:null, country:"India",
-    desc:"Publicly listed (NSE/BSE: GAIL) Union Government natural gas PSU, formerly Gas Authority of India Limited, founded 1984; transitioning its extensive national natural gas pipeline infrastructure to accommodate hydrogen transportation and blending.",
+    desc:"Publicly listed (NSE/BSE: GAIL) Union Government natural gas PSU, formerly Gas Authority of India Limited, founded 1984; India's principal natural gas transmission utility with 16,000+ km of cross-country pipeline network, also transitioning that infrastructure to accommodate hydrogen transportation and blending.",
     site:"https://www.gailonline.com",
-    cats:["hydrogen-infrastructure"],
+    cats:["hydrogen-infrastructure", "pipeline-operators"],
     locations:[{ type:"registered-office", name:"Registered Office", address:"GAIL Bhawan, 16 Bhikaiji Cama Place, R.K. Puram, New Delhi 110066, India", city:"New Delhi", lat:null, lng:null, placeId:null }] },
 { id:254, slug:"mvs-engineering-private-limited", name:"MVS Engineering Private Limited", logo:null, country:"India",
     desc:"India's largest and most experienced on-site industrial gas equipment supplier, founded 1977; hydrogen gas plants using water electrolysis and ammonia cracking technology (400+ ammonia crackers supplied worldwide), alongside nitrogen and oxygen generation plants, with manufacturing at Okhla, New Delhi.",
@@ -2639,7 +2650,163 @@ const COMPANIES = [
     desc:"Publicly listed (NSE/BSE: JAINREC) non-ferrous metal recycler with 70+ years of history under the Jain Metal Group; recycles and manufactures copper, lead, aluminium and tin alloys and ingots from scrap, one of only two Indian recyclers with a London Metal Exchange-registered lead ingot brand, expanding into copper scrap recycling via a joint venture in Ahmedabad.",
     site:"https://www.jainmetalgroup.com",
     cats:["secondary-metals-and-recycling"],
-    locations:[{ type:"registered-office", name:"Registered Office", address:"The Lattice, Old No. 7/1, New No. 20, 4th Floor, Bishop Ezra Sargunam Road, Kilpauk, Chennai, Tamil Nadu 600010, India", city:"Chennai", lat:null, lng:null, placeId:null }] }
+    locations:[{ type:"registered-office", name:"Registered Office", address:"The Lattice, Old No. 7/1, New No. 20, 4th Floor, Bishop Ezra Sargunam Road, Kilpauk, Chennai, Tamil Nadu 600010, India", city:"Chennai", lat:null, lng:null, placeId:null }] },
+{ id:296, slug:"ems-limited", name:"EMS Limited", logo:null, country:"India",
+    // NOTE: sourced from Renewonomics Champions data (Water sector). Formerly EMS Infracon Private
+    // Limited, operating since 1998, converted to a public limited company in 2012.
+    desc:"Publicly listed multi-disciplinary EPC company headquartered in Delhi, ISO 9001:2015 certified; turnkey water and wastewater collection, treatment and disposal — Sewage Treatment Plants, sewerage networks, Water Treatment Plants, pumping stations and pipeline laying — for government authorities across Uttar Pradesh, Maharashtra, Bihar, Uttarakhand and Rajasthan.",
+    site:"https://ems.co.in",
+    cats:["wastewater-treatment", "industrial-water-systems"],
+    locations:[{ type:"registered-office", name:"Registered Office", address:"701, DLF Tower A, Jasola, New Delhi 110025, India", city:"New Delhi", lat:null, lng:null, placeId:null }] },
+{ id:297, slug:"denta-water-and-infra-solutions-limited", name:"Denta Water and Infra Solutions Limited", logo:null, country:"India",
+    // NOTE: sourced from Renewonomics Champions data (Water sector). Formerly Denta Properties and
+    // Infrastructure Private Limited, renamed 2023, IPO'd on BSE/NSE in 2024.
+    desc:"Publicly listed water engineering, procurement and construction (EPC) company founded 2016; groundwater recharging using recycled water, lift irrigation systems and water infrastructure management, with real named projects under India's Jal Jeevan Mission and Bengaluru's KC Valley wastewater reuse project.",
+    site:"https://denta.co.in",
+    cats:["industrial-water-systems"],
+    locations:[{ type:"registered-office", name:"Registered Office", address:"# 40, 3rd Floor, Sri Lakshminarayana Mansion, South End Road, Basavanagudi, Bengaluru, Karnataka 560004, India", city:"Bengaluru", lat:null, lng:null, placeId:null }] },
+{ id:298, slug:"enviro-infra-engineers-limited", name:"Enviro Infra Engineers Limited", logo:null, country:"India",
+    // NOTE: sourced from Renewonomics Champions data (Water sector). Sources show slightly
+    // differing CIN digit sequences across records (a common artifact of NIC activity-code
+    // updates at the RoC) — using the CIN most recently confirmed with financial filing data.
+    desc:"Publicly listed water and wastewater treatment plant builder founded 2009; designs, constructs and operates Sewage Treatment Plants, Water Treatment Plants and Effluent Treatment Plants for municipal and industrial clients.",
+    site:"https://www.eiel.in",
+    cats:["wastewater-treatment", "industrial-water-systems"],
+    locations:[{ type:"registered-office", name:"Registered Office", address:"Unit No. 201, Second Floor, Plot No. B, CSC/OCF-01, RG Metro Arcade, Sector-11, Rohini, New Delhi 110085, India", city:"New Delhi", lat:null, lng:null, placeId:null }] },
+{ id:299, slug:"felix-industries-limited", name:"Felix Industries Limited", logo:null, country:"India",
+    // NOTE: sourced from Renewonomics Champions data (Water sector). Also tagged to
+    // hydrocarbon-recovery given its explicit hydrocarbon recycling service line, alongside its
+    // core water/wastewater treatment business.
+    desc:"Publicly listed Ahmedabad-based environmental engineering firm built around a zero-waste philosophy, founded 2012; integrated water and wastewater treatment, zero liquid discharge (ZLD) systems, hydrocarbon recycling, and e-waste management under one roof.",
+    site:"https://www.felixindustries.co",
+    cats:["wastewater-treatment", "hydrocarbon-recovery"],
+    locations:[{ type:"registered-office", name:"Registered Office", address:"208, Devshruti Complex, Opp. Medisurge Hospital, Nr. Mithakhali Cross Road, Ellisbridge, Ahmedabad, Gujarat 380006, India", city:"Ahmedabad", lat:null, lng:null, placeId:null }] },
+{ id:300, slug:"indian-hume-pipe-company-limited", name:"The Indian Hume Pipe Company Limited", logo:null, country:"India",
+    // NOTE: sourced from Renewonomics Champions data (Water sector). Genuine fit for Pipes & Tubes
+    // — established 1926 to manufacture Hume Pipes specifically, making it one of the oldest
+    // continuously operating pipe manufacturers in India.
+    desc:"Publicly listed century-old pipe manufacturer founded 1926; Prestressed Concrete Pipes, Prestressed Concrete Cylinder Pipes, Bar Wrapped Steel Cylinder Pipes, Hume Steel Pipes and Welded Steel Penstocks, with over twenty factories and specialization in turnkey water supply and sewerage project execution for state water boards across India.",
+    site:"https://indianhumepipe.com",
+    cats:["pipes-and-tubes"],
+    locations:[{ type:"registered-office", name:"Registered Office", address:"Construction House, 5, Walchand Hirachand Road, Ballard Estate, Fort, Mumbai, Maharashtra 400001, India", city:"Mumbai", lat:null, lng:null, placeId:null }] },
+{ id:301, slug:"jash-engineering-limited", name:"Jash Engineering Limited", logo:null, country:"India",
+    // NOTE: sourced from Renewonomics Champions data (Water sector). Does NOT make pipes — tagged
+    // to Valves (its knife gate valves, water hammer control valves and energy dissipating valves
+    // line) rather than Pipes & Tubes, plus Industrial Water Systems since its full product range
+    // (water control gates, screening equipment, treatment-plant process equipment) serves that
+    // industry specifically. Owns UK brand Rodney Hunt (est. 1840s) and German brand Mahr
+    // Maschinenbau, exporting to 45+ countries.
+    desc:"Publicly listed global manufacturer of water and wastewater industry equipment founded 1972; water control gates, mechanized screening systems, knife gate valves, water hammer control valves, energy dissipating valves and Archimedes screw pumps for water intake systems, pumping stations, desalination and treatment plants, with manufacturing in India, the USA and UK.",
+    site:"https://jashindia.com",
+    cats:["valves", "industrial-water-systems"],
+    locations:[{ type:"registered-office", name:"Registered Office", address:"31, Sector-C, Sanwer Road, Industrial Area, Indore, Madhya Pradesh 452015, India", city:"Indore", lat:null, lng:null, placeId:null }] },
+{ id:302, slug:"sbm-offshore-nv", name:"SBM Offshore N.V.", logo:null, country:"Netherlands",
+    // NOTE: closes out EC-19.1 FPSO/FSO Design & Conversion — the last two empty categories in the
+    // EC section. Global market leader with 40+ years and 40+ FPSOs delivered, pioneer of single
+    // buoy mooring (SBM) systems, formerly IHC Caland N.V. prior to 2005.
+    desc:"World's leading FPSO contractor (Euronext Amsterdam: SBMO), founded 1965; design, construction, installation, leasing, operation and life extension of Floating Production Storage and Offloading (FPSO) and FSO vessels, Turret Mooring Systems and Tension Leg Platforms, with 40+ FPSOs delivered in deepwater and its standardized Fast4Ward® hull program.",
+    site:"https://www.sbmoffshore.com",
+    cats:["fpso-fso-design-and-conversion"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Evert van de Beekstraat 1-77, 1118 CL Schiphol, Netherlands", city:"Schiphol", lat:null, lng:null, placeId:null }] },
+{ id:303, slug:"modec-inc", name:"MODEC, Inc.", logo:null, country:"Japan",
+    desc:"Publicly listed (TYO: 6269) global EPCI (Engineering, Procurement, Construction and Installation) contractor for floating production systems founded 1968; FPSO, FSO, FLNG, Tension Leg Platform (TLP) and Semi-Submersible units, a 50+ year specialist in the offshore floating oil & gas market with 4,000+ employees from 25+ countries.",
+    site:"https://www.modec.com",
+    cats:["fpso-fso-design-and-conversion", "flng-systems"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Nihonbashi, Chuo-ku, Tokyo 103-0027, Japan", city:"Tokyo", lat:null, lng:null, placeId:null }] },
+{ id:304, slug:"bw-offshore-limited", name:"BW Offshore Limited", logo:null, country:"Bermuda",
+    // NOTE: part of the wider BW Group (also encompassing BW LNG, BW Energy, Hafnia, BW LPG),
+    // Bermuda-incorporated with its main office in Hamilton.
+    desc:"Global FPSO and FSO solutions provider spanning the full asset lifecycle from design and engineering through leasing and operation; part of the BW Group, with 10+ years of active FPSO operating experience across multiple continents.",
+    site:"https://www.bwoffshore.com",
+    cats:["fpso-fso-design-and-conversion"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Washington Mall Phase 2, 4th Floor, Suite 400, 22 Church Street, Hamilton HM 1189, Bermuda", city:"Hamilton", lat:null, lng:null, placeId:null }] },
+{ id:305, slug:"yinson-holdings-berhad", name:"Yinson Holdings Berhad", logo:null, country:"Malaysia",
+    desc:"Publicly listed (MYX: 7293) Malaysian energy infrastructure conglomerate founded 1984; FPSO ownership, operation, engineering and integrated services through its Yinson Production division, active in 15+ countries and territories including India, alongside offshore renewables through Yinson Renewables.",
+    site:"https://www.yinson.com",
+    cats:["fpso-fso-design-and-conversion"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Kuala Lumpur, Malaysia", city:"Kuala Lumpur", lat:null, lng:null, placeId:null }] },
+{ id:306, slug:"golar-lng-limited", name:"Golar LNG Limited", logo:null, country:"Bermuda",
+    // NOTE: closes out EC-19.2 FLNG Systems. The clearest pure-play FLNG specialist globally,
+    // distinct from FSRU-focused peers already in this roster — Golar delivered the world's first
+    // converted FLNG vessel (Hilli Episeyo, offshore Cameroon) and is developing Gimi FLNG with BP
+    // offshore Mauritania and Senegal.
+    desc:"Publicly listed (Nasdaq: GLNG) floating LNG infrastructure specialist, tracing roots to 1946; develops, owns and operates Floating LNG (FLNG) liquefaction vessels and Floating Storage and Regasification Units (FSRUs), delivering the world's first converted FLNG vessel (Hilli Episeyo) and building the broadest independent floating LNG asset base globally.",
+    site:"https://www.golarlng.com",
+    cats:["flng-systems"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Hamilton, Bermuda", city:"Hamilton", lat:null, lng:null, placeId:null }] },
+{ id:307, slug:"surabhi-transport-private-limited", name:"Surabhi Transport Private Limited", logo:null, country:"India",
+    // NOTE: closes the LT-02 Trucking & Road Tankers category gap flagged in this session —
+    // MCA's NIC classification for this CIN shows "Transport via railways", an evident
+    // administrative misclassification given the company's real, well-documented business
+    // (stainless steel tanker road transport). India's first ISO 9001-certified liquid-chemical
+    // transporter, certified by Bureau Veritas.
+    desc:"India's first ISO 9001-certified liquid-chemical transporter, operating since 1997; a fleet of 300+ fully-owned stainless steel tankers (304/316/316L grade) with in-house tank manufacturing at Kalamboli, Navi Mumbai, serving a pan-India and Nepal network with branch offices at every major chemical port and industrial cluster including Kandla, Hazira, Dahej and Jamnagar.",
+    site:"https://www.surabhitransport.com",
+    cats:["trucking-and-road-tankers"],
+    locations:[{ type:"registered-office", name:"Registered Office", address:"1104, 11th Floor, Ellora Fiesta, Sector-11, Opp. Juinagar Railway Station, Sanpada, Navi Mumbai, Maharashtra 400706, India", city:"Navi Mumbai", lat:null, lng:null, placeId:null }] },
+{ id:308, slug:"interstate-oil-carrier-limited", name:"Interstate Oil Carrier Limited", logo:null, country:"India",
+    desc:"Publicly listed bulk liquid road transport company founded 1970; a fleet of nearly 300 owned and dedicated-attached stainless steel tankers specializing in long-distance bulk liquid haulage across India, with real-time GPS tracking and cashless on-road movement.",
+    site:"https://isocl.in",
+    cats:["trucking-and-road-tankers"],
+    locations:[{ type:"registered-office", name:"Registered Office", address:"Kolkata, West Bengal, India", city:"Kolkata", lat:null, lng:null, placeId:null }] },
+{ id:309, slug:"rishi-kiran-logistics-private-limited", name:"Rishi Kiran Logistics Private Limited", logo:null, country:"India",
+    // NOTE: trades as "The Kiran Group" / "Kiran Group". Also has substantial bulk liquid storage
+    // terminal and custom clearing/forwarding businesses at Kandla Port beyond road transport —
+    // tagged here specifically for its transportation fleet.
+    desc:"Integrated logistics conglomerate founded 1982, based at Kandla Port, Gujarat; bulk liquid storage terminals, custom clearing & forwarding, port handling & stevedoring, warehousing and a 600+ heavy commercial vehicle fleet transporting hazardous and non-hazardous chemicals, edible oil, POL products, LPG and other bulk cargo across India.",
+    site:"https://www.thekirangroup.com",
+    cats:["trucking-and-road-tankers"],
+    locations:[{ type:"registered-office", name:"Registered Office", address:"Plot No. 8, Sector 8, Gandhidham, Kutch, Gujarat 370201, India", city:"Gandhidham", lat:null, lng:null, placeId:null }] },
+{ id:310, slug:"adani-ports-and-special-economic-zone-limited", name:"Adani Ports and Special Economic Zone Limited", logo:null, country:"India",
+    desc:"Publicly listed (NSE: ADANIPORTS, BSE: 532921) India's largest private port operator and integrated transport utility, founded 1998 as Gujarat Adani Port Limited; operates 15 ports and terminals across 8 Indian maritime states handling dry bulk, break bulk, liquid, crude and container cargo, plus 4 international ports and an integrated logistics business including inland container depots and warehousing.",
+    site:"https://www.adaniports.com",
+    cats:["port-operators"],
+    locations:[{ type:"registered-office", name:"Registered Office", address:"Adani Corporate House, Shantigram, Near Vaishno Devi Circle, S.G. Highway, Khodiyar, Ahmedabad, Gujarat 382421, India", city:"Ahmedabad", lat:null, lng:null, placeId:null }] },
+{ id:311, slug:"ocean-sparkle-limited", name:"Ocean Sparkle Limited", logo:null, country:"India",
+    // NOTE: acquired by Adani Ports and Special Economic Zone Limited in 2021 via subsidiary The
+    // Adani Harbour Services Limited — now part of the Adani Group alongside APSEZ itself, already
+    // in this roster as a separate, distinct company entry (port operations vs. marine services).
+    desc:"India's leading private-sector third-party marine services provider founded 1995; comprehensive port operation and management including towage, pilotage and dredging, operating a fleet of 90+ owned and 13+ third-party vessels across Indian ports.",
+    site:"https://www.oceansparkle.in",
+    cats:["marine-logistics"],
+    parent:{ name:"Adani Ports and Special Economic Zone Limited", slug:"adani-ports-and-special-economic-zone-limited", relationship:"subsidiary" },
+    locations:[{ type:"registered-office", name:"Registered Office", address:"1st Floor, Plot No.128, Srinagar Colony, Hyderabad, Telangana 500073, India", city:"Hyderabad", lat:null, lng:null, placeId:null }] },
+{ id:312, slug:"shipping-corporation-of-india-limited", name:"Shipping Corporation of India Limited", logo:null, country:"India",
+    desc:"Publicly listed (NSE/BSE: SCI) Navratna Central Public Sector Enterprise founded 1961, under the Ministry of Ports, Shipping and Waterways; India's largest shipping line, operating tankers, bulk carriers, container ships and offshore support vessels, plus chartering, lighterage and shipbuilding consultancy services.",
+    site:"https://www.shipindia.com",
+    cats:["shipping-companies"],
+    locations:[{ type:"registered-office", name:"Registered Office", address:"Shipping House, 245, Madame Cama Road, Mumbai, Maharashtra 400021, India", city:"Mumbai", lat:null, lng:null, placeId:null }] },
+{ id:313, slug:"container-corporation-of-india-limited", name:"Container Corporation of India Limited", logo:null, country:"India",
+    desc:"Publicly listed (NSE/BSE: CONCOR) Navratna Central Public Sector Enterprise founded 1988, under the Ministry of Railways; India's largest rail-based multimodal logistics company, operating a network of Inland Container Depots (ICDs) and Container Freight Stations (CFSs) connected by dedicated freight trains.",
+    site:"https://www.concorindia.co.in",
+    cats:["rail-logistics"],
+    locations:[{ type:"registered-office", name:"Registered Office", address:"CONCOR Bhawan, C-3, Mathura Road, Opposite Apollo Hospital, New Delhi 110076, India", city:"New Delhi", lat:null, lng:null, placeId:null }] },
+{ id:314, slug:"allcargo-logistics-limited", name:"Allcargo Logistics Limited", logo:null, country:"India",
+    desc:"Publicly listed (NSE: ALLCARGO, BSE: 532749) India's largest integrated logistics company founded 1993 by Shashi Kiran Shetty; multimodal transport, freight forwarding, contract logistics and container freight stations, operating worldwide through subsidiaries including ECU Worldwide and Gati.",
+    site:"https://www.allcargologistics.com",
+    cats:["freight-forwarding"],
+    locations:[{ type:"registered-office", name:"Registered Office", address:"6th Floor, Avashya House, CST Road, Kalina, Santacruz East, Mumbai, Maharashtra 400098, India", city:"Mumbai", lat:null, lng:null, placeId:null }] },
+{ id:315, slug:"jm-baxi-ports-and-logistics-private-limited", name:"J M Baxi Ports & Logistics Private Limited", logo:null, country:"India",
+    // NOTE: J M Baxi Group has multiple related legal entities (J M Baxi Container Holdings Private
+    // Limited, J M Baxi Ports Services Private Limited) following a 2024 business restructuring —
+    // this entry uses the primary holding entity.
+    desc:"India's oldest and largest privately-owned port and marine services group, founded 1916; port facilities, container and multi-cargo port terminals, container freight stations, inland container depots, customs house agency and technology solutions for maritime trade.",
+    site:"https://www.jmbaxi.com",
+    cats:["customs-and-port-services"],
+    locations:[{ type:"registered-office", name:"Registered Office", address:"Godrej Coliseum, Office No.801, C-Wing, Behind Everard Nagar, Off Somaiya Hospital Road, Sion East, Mumbai, Maharashtra 400022, India", city:"Mumbai", lat:null, lng:null, placeId:null }] },
+{ id:316, slug:"central-warehousing-corporation", name:"Central Warehousing Corporation", logo:null, country:"India",
+    // NOTE: a statutory body established under the Warehousing Corporations Act, 1962, not a
+    // company incorporated under the Companies Act — no CIN applies. Included given its scale and
+    // clear public-record identity as a Navratna CPSE.
+    desc:"Navratna Central Public Sector Enterprise under the Ministry of Consumer Affairs, Food & Public Distribution, established 1957; India's largest public warehouse operator with 700+ warehouses, custom bonded warehouses, Container Freight Stations and Inland Container Depots nationwide, plus container rail transportation.",
+    site:"https://cewacor.nic.in",
+    cats:["warehouse-operators"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Warehousing Bhawan, 4/1 Siri Institutional Area, August Kranti Marg, Hauz Khas, New Delhi 110016, India", city:"New Delhi", lat:null, lng:null, placeId:null }] },
+{ id:317, slug:"snowman-logistics-limited", name:"Snowman Logistics Limited", logo:null, country:"India",
+    desc:"Publicly listed (NSE/BSE: SNOWMAN) India's largest integrated temperature-controlled logistics company, founded 1993; cold storage warehousing and cold chain transportation for dairy, seafood, ice cream, meat, poultry, quick service restaurants and pharmaceutical clients nationwide.",
+    site:"https://www.snowman.in",
+    cats:["cold-storage"],
+    locations:[{ type:"registered-office", name:"Registered Office", address:"Plot No. M-8, Taloja Industrial Area, MIDC, Raigad, Navi Mumbai, Maharashtra 410206, India", city:"Navi Mumbai", lat:null, lng:null, placeId:null }] }
 ];
 
 // Immutable copy of the in-page roster, taken BEFORE CompanyStore.load()
