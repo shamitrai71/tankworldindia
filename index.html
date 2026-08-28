@@ -528,6 +528,10 @@ footer{
      sidebar height. */
   #twi-map{ height:60vh; }
   #twi-map{ height:60dvh; }
+  /* Hide the sidebar on mobile specifically when Map view is active — see
+     the comment in applyView() in the script for why. Scoped to this media
+     query only, so desktop's always-visible sidebar is untouched. */
+  .app-body.map-active .sidebar{ display:none; }
 }
 </style>
 </head>
@@ -3759,6 +3763,17 @@ function applyView(v) {
   document.getElementById('map-view').classList.toggle('active', v === 'map');
   document.getElementById('btnListView').classList.toggle('active', v === 'list');
   document.getElementById('btnMapView').classList.toggle('active', v === 'map');
+  // .sidebar is a SIBLING of <main>, not a child — this toggle only ever
+  // switched what's shown inside main (#list-view vs #map-view), never the
+  // sidebar itself. On desktop that's correct (.app-body is a row flex, so
+  // the sidebar sits beside the content and staying visible is intentional
+  // regardless of view). On mobile, .app-body switches to a column flex, so
+  // the (long, ~250-category) sidebar stacks ABOVE main — leaving it visible
+  // in Map view buries the actual map below a full screen of filters with no
+  // visible sign a map exists at all. The .map-active class lets the mobile
+  // media query hide the sidebar specifically for Map view; this class has
+  // no matching CSS rule outside that media query, so desktop is unaffected.
+  document.querySelector('.app-body').classList.toggle('map-active', v === 'map');
   if (v === 'map') {
     if (!map) initMap();
     // Two delays, not one: 50ms covers fast devices/desktop; the extra 350ms
