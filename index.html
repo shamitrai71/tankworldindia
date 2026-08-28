@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>TankWorld India — Engineering &amp; Equipment Directory</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <!-- Firebase compat SDK, classic script tags (not ES modules) so load order is
      predictable in a single-file app. AUTH ONLY — Firestore stays on the REST
      layer, mirroring TankBazaar, because the streaming SDK's WebChannel
@@ -79,13 +78,6 @@ header{
 }
 .header-stats{ display:flex; gap:18px; font-family:var(--font-mono); font-size:11px; color:var(--ink-muted); }
 .header-stats b{ color:var(--ink); font-weight:600; }
-.view-toggle{ display:flex; gap:2px; background:var(--paper); border:1.5px solid var(--ink); border-radius:var(--radius); padding:2px; }
-.view-toggle button{
-  border:0; background:none; padding:6px 14px; font-family:var(--font-mono);
-  font-size:11px; font-weight:600; letter-spacing:0.5px; text-transform:uppercase;
-  color:var(--ink-muted); border-radius:2px;
-}
-.view-toggle button.active{ background:var(--ink); color:var(--paper-raised); }
 
 /* ── LAYOUT ── */
 .app-body{ display:flex; align-items:flex-start; max-width:1440px; margin:0 auto; }
@@ -182,11 +174,6 @@ main{ flex:1; min-width:0; padding:20px 24px 60px; }
 .empty-state h3{ font-family:var(--font-display); font-size:18px; margin-bottom:6px; }
 
 /* ── MAP VIEW ── */
-#map-view{ display:none; }
-#map-view.active{ display:block; }
-#twi-map{ height:calc(100vh - 130px); min-height:420px; border:1.5px solid var(--ink); border-radius:var(--radius); }
-#twi-map{ height:calc(100dvh - 130px); } /* dvh accounts for mobile browser chrome show/hide; vh above is the fallback for browsers without dvh support */
-.leaflet-popup-content-wrapper{ border-radius:var(--radius); font-family:var(--font-body); }
 .map-pin-label{ font-family:var(--font-mono); font-size:9px; }
 
 /* ── COMPANY PAGE ── */
@@ -518,20 +505,6 @@ footer{
   header{ padding:12px 16px; }
   .header-stats{ display:none; }
   .company-grid{ grid-template-columns:1fr; }
-  /* The desktop #twi-map height assumes the sidebar sits BESIDE the map
-     (.app-body is display:flex, row direction) so only the header's height
-     needs subtracting. On mobile .app-body switches to flex-direction:column,
-     stacking the whole filter sidebar ABOVE main — so "100vh minus a fixed
-     130px for the header" is wrong here; it doesn't account for the
-     sidebar's height, which varies with how many filters are open. Use a
-     fixed viewport fraction instead, which stays correct regardless of
-     sidebar height. */
-  #twi-map{ height:60vh; }
-  #twi-map{ height:60dvh; }
-  /* Hide the sidebar on mobile specifically when Map view is active — see
-     the comment in applyView() in the script for why. Scoped to this media
-     query only, so desktop's always-visible sidebar is untouched. */
-  .app-body.map-active .sidebar{ display:none; }
 }
 </style>
 </head>
@@ -547,10 +520,6 @@ footer{
     <div>COMPANIES: <b id="statCompanies">0</b></div>
     <div>CATEGORIES: <b id="statCategories">0</b></div>
     <div>SHEETS: <b id="statSheets">0</b></div>
-  </div>
-  <div class="view-toggle">
-    <button id="btnListView" class="active" onclick="setView('list')">List</button>
-    <button id="btnMapView" onclick="setView('map')">Map</button>
   </div>
   <div class="auth-area" id="authArea"></div>
 </header>
@@ -636,9 +605,6 @@ footer{
         <p>Try clearing a filter or searching a different term.</p>
       </div>
     </div>
-    <div id="map-view">
-      <div id="twi-map"></div>
-    </div>
     <div id="company-view"></div>
     <div id="profile-view"></div>
     <div id="admin-view"></div>
@@ -649,7 +615,6 @@ footer{
   TANKWORLD INDIA — A DIRECTORY OF ENGINEERING &amp; EQUIPMENT COMPANIES SERVING THE TANK TERMINAL &amp; PROCESS INDUSTRIES SUPPLY CHAIN · DATA SCOPE: INDIA + INTERNATIONAL
 </footer>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 // ══════════════════════════════════════════════════════════════════════
 // CATEGORY TAXONOMY — sourced directly from the Tankonomics category-slug
@@ -3522,8 +3487,6 @@ let activeCategory = null;   // single L2 slug filter, or null
 // source of truth and no risk of the two drifting apart.
 let activeRegion = 'all';
 function isIndian(c) { return (c.country || '').trim().toLowerCase() === 'india'; }
-let currentView = 'list';
-let map = null, mapMarkers = [];
 
 // Category tree is now up to three levels: sheet (L1) → category (L2) →
 // sub-category (L3, e.g. TS-01.1 Radar Level Gauges under TS-01 Tank Gauging).
@@ -3559,7 +3522,7 @@ function categoryWithDescendants(slug) {
 }
 
 function setRegion(r) {
-  location.hash = buildFilterHash(activeCategory, r, currentView);
+  location.hash = buildFilterHash(activeCategory, r);
 }
 
 // ── Filter/view state ↔ URL hash ────────────────────────────────────────
@@ -3570,22 +3533,20 @@ function setRegion(r) {
 // instead of returning to the previous filter/category. Encoding this state
 // into the hash — and driving it exclusively through handleRoute() — means
 // every meaningful navigation is a real, back-button-able history entry.
-function buildFilterHash(cat, region, view) {
+function buildFilterHash(cat, region) {
   const params = [];
   if (cat) params.push('cat=' + encodeURIComponent(cat));
   if (region && region !== 'all') params.push('region=' + encodeURIComponent(region));
-  if (view && view !== 'list') params.push('view=' + encodeURIComponent(view));
   return '#/' + (params.length ? ('?' + params.join('&')) : '');
 }
 
 function parseFilterHash(hash) {
-  const out = { cat: null, region: 'all', view: 'list' };
+  const out = { cat: null, region: 'all' };
   const qIdx = hash.indexOf('?');
   if (qIdx === -1) return out;
   const qs = new URLSearchParams(hash.slice(qIdx + 1));
   if (qs.has('cat')) out.cat = qs.get('cat');
   if (qs.has('region')) out.region = qs.get('region');
-  if (qs.has('view')) out.view = qs.get('view');
   return out;
 }
 
@@ -3644,12 +3605,12 @@ function toggleSheet(slug) {
 
 function selectCategory(slug) {
   const newCat = (activeCategory === slug) ? null : slug;
-  location.hash = buildFilterHash(newCat, activeRegion, currentView);
+  location.hash = buildFilterHash(newCat, activeRegion);
 }
 
 function clearFilters() {
   document.getElementById('searchBox').value = '';
-  location.hash = buildFilterHash(null, 'all', currentView);
+  location.hash = buildFilterHash(null, 'all');
 }
 
 // Registered office is always locations[0] by construction — used anywhere
@@ -3725,84 +3686,9 @@ function renderCards() {
   }).join('');
 }
 
-function renderMap() {
-  if (!map) return;
-  mapMarkers.forEach(m => map.removeLayer(m));
-  mapMarkers = [];
-  const list = filteredCompanies();
-  list.forEach(c => {
-    const loc = primaryLocation(c);
-    // Skip companies whose registered office has no coordinates yet — real
-    // gaps rather than invented ones. They still appear in the list view and
-    // are flagged in the admin roster so the gap is visible, not hidden.
-    if (!loc || typeof loc.lat !== 'number' || typeof loc.lng !== 'number') return;
-    const marker = L.circleMarker([loc.lat, loc.lng], {
-      radius: 7, color: '#1B4B7A', weight: 2, fillColor: '#1B4B7A', fillOpacity: 0.55
-    }).addTo(map);
-    marker.bindPopup(`<b>${c.name}</b><br><span class="map-pin-label">${loc.city}</span>`);
-    marker.on('click', () => { location.hash = '#/company/' + c.slug; });
-    mapMarkers.push(marker);
-  });
-}
-
 function renderAll() {
   renderCards();
-  if (currentView === 'map') renderMap();
 }
-
-function setView(v) {
-  location.hash = buildFilterHash(activeCategory, activeRegion, v);
-}
-
-// Pure DOM/state sync for the current view — no hash writes, so it's safe
-// to call from handleRoute() (i.e. in response to a hash change) without
-// looping back into another navigation.
-function applyView(v) {
-  currentView = v;
-  document.getElementById('list-view').style.display = v === 'list' ? 'block' : 'none';
-  document.getElementById('map-view').classList.toggle('active', v === 'map');
-  document.getElementById('btnListView').classList.toggle('active', v === 'list');
-  document.getElementById('btnMapView').classList.toggle('active', v === 'map');
-  // .sidebar is a SIBLING of <main>, not a child — this toggle only ever
-  // switched what's shown inside main (#list-view vs #map-view), never the
-  // sidebar itself. On desktop that's correct (.app-body is a row flex, so
-  // the sidebar sits beside the content and staying visible is intentional
-  // regardless of view). On mobile, .app-body switches to a column flex, so
-  // the (long, ~250-category) sidebar stacks ABOVE main — leaving it visible
-  // in Map view buries the actual map below a full screen of filters with no
-  // visible sign a map exists at all. The .map-active class lets the mobile
-  // media query hide the sidebar specifically for Map view; this class has
-  // no matching CSS rule outside that media query, so desktop is unaffected.
-  document.querySelector('.app-body').classList.toggle('map-active', v === 'map');
-  if (v === 'map') {
-    if (!map) initMap();
-    // Two delays, not one: 50ms covers fast devices/desktop; the extra 350ms
-    // call is a safety net for slower mobile devices where the sidebar
-    // (stacked above the map on mobile — see the mobile media query) can
-    // still be settling its layout/fonts when the first call fires.
-    setTimeout(() => { map.invalidateSize(); renderMap(); }, 50);
-    setTimeout(() => { map.invalidateSize(); }, 350);
-  }
-}
-
-function initMap() {
-  map = L.map('twi-map').setView([22.5, 79.0], 5); // India-centered
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors', maxZoom: 18
-  }).addTo(map);
-}
-
-// Mobile browsers resize the real viewport as their address bar/toolbar
-// shows or hides during scroll (this is exactly what 100dvh in the CSS
-// tracks, but Leaflet caches its container's pixel size at init and won't
-// notice the change on its own — it needs to be told explicitly). Also
-// covers device rotation. Only acts when the map view is actually open.
-window.addEventListener('resize', () => {
-  if (map && currentView === 'map') map.invalidateSize();
-});
-window.addEventListener('orientationchange', () => {
-  if (map && currentView === 'map') setTimeout(() => map.invalidateSize(), 100);
-});
 
 // ── ROUTING ──
 // Hash-based so each company gets a real, addressable, bookmarkable URL —
@@ -3918,11 +3804,9 @@ function handleRoute() {
   const hash = location.hash || '#/';
   const m = hash.match(/^#\/company\/([a-z0-9-]+)$/);
   const listPanel = document.getElementById('list-view');
-  const mapPanel = document.getElementById('map-view');
   const companyPanel = document.getElementById('company-view');
   const profilePanel = document.getElementById('profile-view');
   const adminPanel = document.getElementById('admin-view');
-  const header = document.querySelector('header');
   const sidebar = document.querySelector('.sidebar');
 
   // Reset the two account panels on every route change; whichever branch
@@ -3936,27 +3820,23 @@ function handleRoute() {
     else { renderProfilePage(); profilePanel.classList.add('active'); }
     document.title = (isAdminRoute ? 'Admin' : 'Profile') + ' — TankWorld India';
     listPanel.style.display = 'none';
-    mapPanel.classList.remove('active');
     companyPanel.classList.remove('active');
     sidebar.style.display = 'none';
-    header.querySelector('.view-toggle').style.display = 'none';
     return;
   }
 
   if (m) {
     renderCompanyPage(m[1]);
     listPanel.style.display = 'none';
-    mapPanel.classList.remove('active');
     companyPanel.classList.add('active');
     sidebar.style.display = 'none';
-    header.querySelector('.view-toggle').style.display = 'none';
   } else {
     document.title = 'TankWorld India — Engineering & Equipment Directory';
     companyPanel.classList.remove('active');
     sidebar.style.display = '';
-    header.querySelector('.view-toggle').style.display = '';
+    listPanel.style.display = 'block';
 
-    // Single source of truth for filter/view state: whatever's in the hash
+    // Single source of truth for filter state: whatever's in the hash
     // wins, whether we just navigated there or the user hit back/forward.
     const parsed = parseFilterHash(hash);
     activeCategory = parsed.cat;
@@ -3975,7 +3855,6 @@ function handleRoute() {
     }
 
     renderRegionFilter();
-    applyView(parsed.view);
     renderAll();
   }
 }
