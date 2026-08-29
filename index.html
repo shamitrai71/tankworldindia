@@ -34,6 +34,7 @@
   --line: #D8CFB8;
   --line-blue: #C3D2DE;
   --ok: #3E7A4F;
+  --ok-soft: #DCEEE1;
   --font-display: 'Space Grotesk', sans-serif;
   --font-body: 'Inter', sans-serif;
   --font-mono: 'IBM Plex Mono', monospace;
@@ -408,6 +409,36 @@ main{ flex:1; min-width:0; padding:20px 24px 60px; }
   font-family:var(--font-mono); font-size:8.5px; font-weight:700; letter-spacing:0.5px;
   background:var(--rust); color:var(--paper-raised); padding:2px 5px; border-radius:2px;
 }
+/* MSME badge — distinct from .badge-admin (rust) so the two categories of tag
+   (site role vs. company classification) don't visually blur together. Shows
+   just "MSME" on cards (compact) and "MSME · <Category>" on the detail page
+   once a Micro/Small/Medium classification is confirmed. */
+.badge-msme{
+  font-family:var(--font-mono); font-size:8.5px; font-weight:700; letter-spacing:0.5px;
+  background:var(--ok); color:var(--paper-raised); padding:2px 5px; border-radius:2px;
+}
+/* UDYAM CTA — two states, same shape, different color+label so the button
+   itself communicates status at a glance rather than needing surrounding text.
+   Reuses --rust for "pending/needs action" (matching .badge-admin's existing
+   use of that color for admin-only actions) and --ok for "confirmed", so the
+   MSME badge and a verified UDYAM button read as visually related. Pending
+   state is clickable — the click explains the claim-process link (not yet
+   built, see admin-note in renderProfilePage) rather than dead-ending
+   silently; verified state is a plain, non-interactive status readout. */
+.udyam-cta{
+  font-family:var(--font-mono); font-size:10px; font-weight:700; letter-spacing:0.4px;
+  padding:4px 9px; border-radius:var(--radius); display:inline-block; border:1.5px solid transparent;
+}
+.udyam-cta.pending{
+  background:var(--rust-soft); color:var(--rust); border-color:var(--rust);
+  cursor:pointer;
+}
+.udyam-cta.pending:hover{ background:var(--rust); color:var(--paper-raised); }
+.udyam-cta.verified{
+  background:var(--ok-soft); color:var(--ok); border-color:var(--ok);
+}
+.card-msme-row{ display:flex; gap:6px; align-items:center; margin-top:6px; flex-wrap:wrap; }
+.cp-msme-row{ display:flex; gap:8px; align-items:center; margin:10px 0; flex-wrap:wrap; }
 
 /* Modal */
 .modal-backdrop{
@@ -1119,11 +1150,13 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     ] },
   { id:34, slug:"prashanth-projects-limited", name:"Prashanth Projects Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fprashanth-projects-limited.gif?alt=media&token=7d06bbb3-4ad1-4621-8a49-c9c90fa5d3d3", country:"India",
     cats:["epc-contractors","tank-construction"], desc:"Indian international turnkey EPC contractor, established 1978, for the design and construction of petroleum oil and gas storage terminals, cryogenic tanks, Horton spheres, and mounded bullets.", site:"https://www.prashanthprojects.com",
+    msme:{ category:null, udyamNumber:null },
     locations:[
       { type:"registered-office", name:"Registered Office", address:"Taloja, Panvel, Maharashtra 410208, India", city:"Navi Mumbai, Maharashtra", lat:19.03, lng:73.02, placeId:"ChIJuXEl2yDq5zsRo4DWs3vfcCQ" }
     ] },
   { id:35, slug:"vijay-tanks-and-vessels-private-limited", name:"Vijay Tanks And Vessels Private Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fvijay-tanks-and-vessels-private-limited.webp?alt=media&token=fda8cc8a-50a8-4616-96a9-6c0a7fce3486", country:"India",
     cats:["tank-construction","heavy-engineering-and-fabrication"], desc:"Leading Indian EPC contractor for storage terminals since 1956 — designed and built roughly 70% of India's crude oil storage capacity, including one of the world's largest storage terminals at RIL Jamnagar, and India's first LNG storage tanks.", site:"https://www.vjtanks.com",
+    msme:{ category:null, udyamNumber:null },
     locations:[
       { type:"registered-office", name:"Registered Office", address:"3rd Floor, Sears Towers, 304-308, Sevasi, Vadodara, Khanpur, Gujarat 391101, India", city:"Ranoli, Vadodara, Gujarat", lat:22.34, lng:73.19, placeId:"ChIJufyKGVjJXzkRV1slGOjPxwo" }
     ] },
@@ -1300,6 +1333,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     desc:"Indian storage tank construction and maintenance contractor.",
     site:"https://newtonengg.com",
     cats:["tank-construction", "mechanical-contractors"],
+    msme:{ category:"Medium", udyamNumber:null },
     locations:[{ type:"registered-office", name:"Registered Office", address:"864/A, GIDC Industrial Estate, Makarpura GIDC, Makarpura, Vadodara, Gujarat 390010, India", city:"", lat:null, lng:null, placeId:"ChIJAQAAACvEXzkRPV2kHWTEOdM" }] },
   { id:74, slug:"velankanni-engineers", name:"Velankanni Engineers", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fvelankanni-engineers.png?alt=media&token=6ec43b43-02d1-4812-a4b3-3faaa7d70ce8", country:"India",
     desc:"Indian storage tank construction and maintenance contractor.",
@@ -1533,6 +1567,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     desc:"Manufacturer of shot blasting and surface preparation equipment, including design, installation, commissioning, AMC and O&M.",
     site:"https://www.blastclean.in",
     cats:["blasting-and-painting-equipment", "surface-preparation-and-blasting"],
+    msme:{ category:null, udyamNumber:null },
     locations:[{ type:"registered-office", name:"Registered Office", address:"502, Rajhans Helix 3, Ghatkopar West, Mumbai, Maharashtra 400086, India", city:"", lat:null, lng:null, placeId:"ChIJmcFvOszH5zsRTA9yz2iRU44" }] },
 { id:114, slug:"surface-finishing-equipment-company", name:"Surface Finishing Equipment Company", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fsurface-finishing-equipment-company.jpg?alt=media&token=ca1d2361-081c-450e-99fd-1150fedae70d", country:"India",
     // NOTE: Confirm whether the registered entity is the 'Company' or 'Pvt Ltd' form — some listings show 'Surface Finishing Equipment Pvt. Ltd.'.
@@ -1697,6 +1732,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     desc:"Indore-based manufacturer of level switches and non-contact radar transmitters, family-owned for 30+ years.",
     site:"https://www.sapconinstruments.com",
     cats:["radar-level-gauges", "tank-gauging"],
+    msme:{ category:"Micro", udyamNumber:null },
     locations:[{ type:"registered-office", name:"Registered Office", address:"131, Palsikar Colony, Indore, Madhya Pradesh 452007, India", city:"", lat:null, lng:null, placeId:"ChIJq5oNLAH9YjkRrHJaWRPB18c" }] },
 { id:140, slug:"electronet-equipments-private-limited", name:"Electronet Equipments Private Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Felectronet-equipments-private-limited.jpg?alt=media&token=fe0cc7c2-f31f-4a6d-9bf5-6d1e4b37ad0c", country:"India",
     desc:"Manufacturer of electronic level transmitters including radar technologies.",
@@ -1801,6 +1837,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     desc:"One of India's largest fire safety companies; 'Shootfire' UL-Listed foam monitors and a dedicated Shootfire Rim Seal Fire Protection System.",
     site:"https://vimalfire.com",
     cats:["rim-seal-fire-protection", "rim-seal-foam-pourers", "foam-systems-and-equipment", "fire-detection"],
+    msme:{ category:null, udyamNumber:null },
     locations:[{ type:"registered-office", name:"Registered Office", address:"19/20, Vardhman Complex, Behind Punjab & Sind Bank, Opp Home Town, LBS Marg, Vikhroli West, Mumbai – 400083, Maharashtra", city:"", lat:null, lng:null, placeId:"ChIJq6qqapfH5zsRMBaLss2_CmU" }] },
 { id:158, slug:"patol-limited", name:"Patol Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fpatol-limited.png?alt=media&token=43fe7e22-961b-44b5-97b9-e81a564f3815", country:"United Kingdom",
     // NOTE: The patol.in site footer reads '© Patol Limited', not a distinct 'Patol India' name — this reads as the UK company's India sales presence rather than a separately incorporated Indian entity, so seeded here as the UK company.
@@ -2402,6 +2439,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     desc:"Specialized manufacturer of firefighting foam concentrate, dry chemical powder and hand-line applicators established 1984, with a manufacturing unit at Jalpaiguri, West Bengal; real named foam monitor product (IFP FIRESTORM) designed for flammable liquid storage tank protection.",
     site:"https://integratedfire.net",
     cats:["fire-fighting-foam", "foam-systems-and-equipment"],
+    msme:{ category:null, udyamNumber:null },
     locations:[{ type:"registered-office", name:"Registered Office", address:"60A, Pandit Madan Mohan Malabya Sarani, Chakraberia Road North, Kolkata, West Bengal 700020, India", city:"Kolkata", lat:null, lng:null, placeId:"ChIJxzG1Xzt3AjoRyjhKOBYWudE" }] },
 { id:259, slug:"padmini-industries-limited", name:"Padmini Industries Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fpadmini-industries-limited.jpg?alt=media&token=854199c0-75b8-4000-a2c0-2a712e633e73", country:"India",
     // NOTE: CIN U25199DL2000PLC105120 confirmed. Do not confuse with the unrelated "Padmini
@@ -2409,6 +2447,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     desc:"Fire safety and industrial rubber hose manufacturer founded 1986/1989 (incorporated as a limited company in 2000); fire extinguishers, hose pipes, hydrant system accessories, foam-making equipment and turnkey fire suppression system design/installation, approved by BIS, PDIL and DGQA (Ministry of Defence). CIN U25199DL2000PLC105120.",
     site:"https://padminiindia.com",
     cats:["portable-fire-equipment", "fire-water-systems"],
+    msme:{ category:null, udyamNumber:null },
     locations:[{ type:"registered-office", name:"Registered Office", address:"29, GF, Raghushree Complex, Ajmeri Gate, Delhi 110006, India", city:"Delhi", lat:null, lng:null, placeId:"ChIJd-3rnjD9DDkR6zbj0X8CgJk" }] },
 { id:260, slug:"uniphos-envirotronic-private-limited", name:"Uniphos Envirotronic Private Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Funiphos-envirotronic-private-limited.jpg?alt=media&token=430df140-a565-49e6-b47a-9a79f3a10ecf", country:"India",
     desc:"India's largest manufacturer of gas detection devices, established 1993; intrinsically-safe personal/portable monitors and flameproof fixed gas detection systems, plus Continuous Emission Monitoring Systems (CEMS) and Ambient Air Quality Monitoring Systems (AAQMS), exporting to 45+ countries.",
@@ -2471,6 +2510,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     desc:"Manufacturer and exporter of vapour control and safety systems for floating roof oil storage tanks, established 2017; submerged shunts, bypass conductors, primary and secondary rim seals, and articulated-type roof drain joint systems, exporting to Lebanon, Egypt, Bangladesh, Ecuador and Indonesia.",
     site:"https://www.agasticorporation.com",
     cats:["submerged-shunts", "rim-seals", "articulated-roof-drains"],
+    msme:{ category:null, udyamNumber:null },
     locations:[{ type:"registered-office", name:"Registered Office", address:"R-2, 403, Panvelkar Regency, Khojgaon Netaji Bazar, Ambernath West, Thane, Maharashtra 421505, India", city:"Thane", lat:null, lng:null, placeId:"ChIJM59wiRWT5zsRV9DsS_DC0sA" }] },
 { id:269, slug:"enviroguard-solutions-llp", name:"Enviroguard Solutions LLP", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fenviroguard-solutions-llp.jpg?alt=media&token=15fb2765-a5c9-4e09-bde2-72dc1e5b9fdc", country:"India",
     // NOTE: registered as an LLP (Limited Liability Partnership), LLPIN AAH-9886, not a private
@@ -3281,7 +3321,720 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     desc:"Specialist recruitment and HR services provider explicitly focused on the global oil, gas and petrochemical industry, per the company's own site. Registered legal entity name and headquarters address not independently confirmed beyond the company's own website.",
     site:"https://www.oilexec.com",
     cats:["industrial-staffing"],
-    locations:[{ type:"headquarters", name:"Headquarters", address:"(unconfirmed)", city:"", lat:null, lng:null, placeId:null }] }
+    locations:[{ type:"headquarters", name:"Headquarters", address:"(unconfirmed)", city:"", lat:null, lng:null, placeId:null }] },
+{ id:370, slug:"triveni-engineering-and-industries-limited", name:"Triveni Engineering & Industries Limited", logo:null, country:"India",
+    // NOTE: diversified conglomerate — sugar/alcohol/ethanol is the PRIMARY business, not
+    // industrial equipment. The relevant division for TWI is Water & Wastewater Treatment
+    // Solutions. The company's former Power Transmission (gears/gearboxes) division demerged
+    // into a separate, now-independent company — Triveni Power Transmission Limited, added
+    // separately below — do not attribute gearbox/turbine products to this parent entity.
+    desc:"Diversified conglomerate established 1932; relevant division is Water & Wastewater Treatment Solutions. Real review confirms genuine water treatment business ('Excellent Water Management Company with Good infrastructure and Credentials'). Historically also did defence-related turbine/EPC work (LM2500 gas turbine enclosures for Indian Navy vessels, Rolls-Royce Marine MoU) before the Power Transmission division's 2026 demerger.",
+    site:"https://www.trivenigroup.com",
+    cats:["environmental-monitoring"],
+    locations:[{ type:"headquarters", name:"Water Business Group", address:"Hosiery Complex Block A Rd, Phase-2, Noida, Uttar Pradesh 201304, India", city:"Noida", lat:null, lng:null, placeId:"ChIJgY4xy7joDDkRKoiEkIq5GW4" }] },
+{ id:371, slug:"triveni-turbine-limited", name:"Triveni Turbine Limited", logo:null, country:"India",
+    // NOTE: spun off from Triveni Engineering's turbine unit in 2011. One real review flags
+    // quality concerns worth independent verification, alongside an otherwise strong overall
+    // rating (4.4, 88 reviews).
+    desc:"Steam turbines manufacturer, publicly listed (BSE/NSE). One review flags real quality concerns ('turbine plant building is worst than ever... work don't have precision and accuracy') — worth checking alongside the otherwise strong overall rating.",
+    site:"https://www.triveniturbines.com",
+    cats:["power-generation"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"12A, Phase-1, Peenya, Bengaluru, Karnataka 560058, India", city:"Bengaluru", lat:null, lng:null, placeId:"ChIJ-78LMSU9rjsRURQXPknlBQI" }] },
+{ id:372, slug:"triveni-power-transmission-limited", name:"Triveni Power Transmission Limited", logo:null, country:"India",
+    // NOTE: demerged from Triveni Engineering & Industries Limited into a fully independent,
+    // separately-listed company in 2026 — very recent. Real, substantial: 50 years, 14,000+
+    // installations across 80+ countries, approved supplier to Siemens, MAN Energy Solutions,
+    // Mitsubishi, Atlas Copco, Doosan.
+    desc:"High-speed gearbox manufacturer since 1976, now a fully independent listed company (demerged from Triveni Engineering & Industries in 2026); 14,000+ installations across 80+ countries; approved supplier to Siemens, MAN Energy Solutions, Mitsubishi, Atlas Copco, Doosan; serves oil refineries, steel plants, naval vessels.",
+    site:"https://www.trivenipowertransmission.com",
+    cats:["heavy-engineering-and-fabrication"],
+    locations:[{ type:"headquarters", name:"Power Transmission Business", address:"No. 1-3 Belagola Industrial Area, KRS Rd, Metagalli, Mysuru, Karnataka 570016, India", city:"Mysuru", lat:null, lng:null, placeId:"ChIJ6T0WyD96rzsR0_KgS1IBfpI" }] },
+{ id:373, slug:"turbotech-precision-engineering-private-limited", name:"TurboTech Precision Engineering Private Limited", logo:null, country:"India",
+    // NOTE: CIN DISCREPANCY — a second, differently-numbered entity (CIN U29309TN1989PTC018078,
+    // Chennai, status "Not Available for eFiling") also uses this exact name. Used the active
+    // Bangalore entity (CIN U74200KA1989PTC015803), which matches the real operating address
+    // and reviews — verify which is intended before external use.
+    desc:"Full-fledged gas and steam turbine company — design, manufacture, testing, service; brings aerospace-derived turbine technology to industrial gas turbine manufacturing; only Indian privately-held company with full in-house turbine design/build/test facilities.",
+    site:"",
+    cats:["power-generation"],
+    locations:[{ type:"registered-office", name:"Registered Office", address:"Survey No. 8/2, Honnasandra Village, Kasaba Hobli, Nelamangala Taluk, Bengaluru Rural, Karnataka 562123, India", city:"Bengaluru Rural", lat:null, lng:null, placeId:"ChIJE8R9PncWrjsRoXNRRQmHVeA" }] },
+{ id:374, slug:"bharat-forge-limited", name:"Bharat Forge Limited", logo:null, country:"India",
+    // NOTE: massive, real, well-documented (1,074 reviews, 4.4 rating) — flagship of Kalyani
+    // Group. Multiple detailed reviews describe poor treatment of transport/logistics vendors —
+    // a genuine pattern worth knowing, kept separate from the company's real industrial
+    // legitimacy rather than used to exclude it.
+    desc:"World's largest forging company (per its own materials); front axle assemblies, general engineering equipment, hydraulic & mechanical presses, couplings, material handling equipment; serves automotive, power, oil & gas, construction & mining, marine, aerospace, defence. ₹15,122 Cr revenue (2025), flagship of Kalyani Group. CAUTION: multiple reviews describe poor treatment of transport/logistics vendors — a real pattern worth knowing, separate from the company's genuine industrial standing.",
+    site:"https://www.bharatforge.com",
+    cats:["heavy-engineering-and-fabrication"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"State Highway 5, Mundhwa Industrial Area, Mundhwa, Pune, Maharashtra 411036, India", city:"Pune", lat:null, lng:null, placeId:"ChIJAQAAAC3CwjsR-MiVOPdFdfI" }] },
+{ id:375, slug:"amic-forging-limited", name:"AMIC Forging Limited", logo:null, country:"India",
+    // NOTE: directly on-topic product line, but CAUTION: a real, detailed review alleges severe
+    // payment delays ("payment process...very much disappointed, payment would be cleared to the
+    // customers in 6 months to 1 year"). Worth checking directly before relying on this listing.
+    desc:"Open forgings — Rounds, Shafts, Blanks, Gear Couplings, Hubs, Flanges — for Heavy Engineering, Steel Industry, Oil & Gas, Petrochemicals, Refineries, Thermal/Nuclear/Hydro Power; established 1971. CAUTION: a real review alleges 6-12 month payment delays — worth checking before relying on this listing.",
+    site:"https://www.amicforgings.com",
+    cats:["forgings"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"3A, Garstin Place, 2nd Floor, Kolkata, West Bengal 700001, India", city:"Kolkata", lat:null, lng:null, placeId:"ChIJV9QWej2P-DkR3IziAkBkWrI" }] },
+{ id:376, slug:"jayaswal-neco-industries-limited", name:"Jayaswal Neco Industries Limited", logo:null, country:"India",
+    // NOTE: CIN L28920MH1972PLC016154, registered office independently re-confirmed (F-8, MIDC
+    // Industrial Area, Hingna Road, Nagpur — matches the company's own contact page, ZaubaCorp,
+    // Tracxn, Cleartax, NSE filings and the LEI registry, all consistent). Real, specific product
+    // line confirmed directly from the company's own site: Cast Iron pipe fittings manufacturer
+    // since 1972 — a large multi-site group (steel/pig iron/pipe fittings) with additional plants
+    // at D-3/1 Central MIDC Road, an Integrated Steel Plant Division at Siltara (Raipur,
+    // Chhattisgarh), and a Thanod Road (Rajnandgaon, Chhattisgarh) facility.
+    // CAUTION — real, serious complaints: two independent, detailed negative reviews allege
+    // unpaid invoices for a month-long credit supply ("bunch of cheaters... stopped answering our
+    // calls for the payment") and unfulfilled orders with refused refunds ("Absolutely poor work
+    // ethics... drag them to court"). This is a more serious pattern than a single complaint —
+    // added per explicit instruction, but the caution is carried directly in this entry, not
+    // smoothed over.
+    desc:"Manufacturer of Cast Iron Hubless Pipe fittings (Plain Yee, single/double branch tees, offset fittings, ventilation pipe) since 1972; part of the Neco Group, a large multi-site steel/pig iron/pipe-fittings conglomerate with plants across Nagpur (Maharashtra) and Raipur/Rajnandgaon (Chhattisgarh). CAUTION: two independent, detailed reviews allege serious non-payment/order-fulfillment issues — verify current business practices directly before relying on this listing.",
+    site:"https://www.jayaswalneco.com",
+    cats:["pipes-and-tubes"],
+    locations:[{ type:"registered-office", name:"Registered Office", address:"F-8, MIDC Industrial Area, Hingna Road, Nagpur, Maharashtra 440016, India", city:"Nagpur", lat:null, lng:null, placeId:"ChIJ5zG45bLq1DsR--uVNnrYFYc" }] },
+{ id:377, slug:"nssl-private-limited", name:"NSSL Private Limited", logo:null, country:"India",
+    // NOTE: added per explicit user instruction — confirmed genuine subsidiary of Jayaswal Neco
+    // Industries within the Neco Group, per Jayaswal Neco's own group-companies page ("Part of
+    // Neco Group... for Jayaswal Neco for Casting and NSSL for Casted Machined Products — This
+    // has ensured smooth flow of material (since Jayaswal Neco is next door)"). CIN
+    // U27310MH1981PTC163100, formerly Neco Schubert & Salzer Limited / Neco Valves Limited /
+    // NSSL Limited. Real, substantial: 526 employees, ₹40.04 Cr paid-up capital. Real
+    // international presence — NSSL Italia S.r.l. manufacturing plant (Rotterfeno, Italy) for
+    // large ball/plug/gate/globe/check valves, plus registered approvals in Kuwait, Saudi Arabia,
+    // Qatar, Oman, Malaysia, UAE and Iran. CAUTION: a real, detailed review alleges non-payment
+    // ("FRAUD... taken bulk materials and not providing payment Rs.700,000") — same pattern as
+    // Jayaswal Neco above; flagged with equal transparency. A related but distinct entity, NSSL
+    // Italia Valves Private Limited (CIN U27320MH2021PTC358670, incorporated 2021, same T-45 MIDC
+    // address, overlapping directors), also exists — do not conflate the two.
+    desc:"Fully machined industrial valves manufacturer dedicated substantially to oil and gas infrastructure — Gate, Globe, Check, Ball and Plug Valves in Cast Steel, Stainless Steel and Alloy Steel, Class 150-4500 PSI, sizes 2\" to 120\"; real named end markets: Oil, Natural Gas, Petroleum, Petrochemical, Fertilizer, Cement, Pulp, Power and Steel Sectors. In-house cryogenic testing (up to 24\" x 300# gate valve), Fire Safe testing, Fugitive Emission testing. Part of the Neco Group (~₹4,500 Cr), subsidiary of Jayaswal Neco Industries Limited. CAUTION: a real review alleges a serious non-payment dispute — verify current business practices directly before relying on this listing.",
+    site:"https://www.nsslindia.com",
+    cats:["valves"],
+    locations:[{ type:"registered-office", name:"Registered Office", address:"T-45, MIDC Industrial Area, Hingna Road, Nagpur, Maharashtra 440016, India", city:"Nagpur", lat:null, lng:null, placeId:"ChIJaX6hPDfr1DsRc0TcWuR8GJg" }] },
+{ id:378, slug:"ptc-industries-limited", name:"PTC Industries Limited", logo:null, country:"India",
+    // NOTE: one of the strongest candidates researched this session — precisely on-topic
+    // products, strongly reviewed, genuinely major named industrial clients.
+    desc:"Precision castings in stainless steel, duplex/super-duplex stainless steel, titanium and superalloy materials; explicitly manufactures Pump Housings, Valves, Flow Control components; real named industrial clients include Rolls-Royce, Metso, Siemens, Flowserve. Publicly listed (BSE: 539006, NSE: PTCIL), established 1963.",
+    site:"https://www.ptcil.com",
+    cats:["valves"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Advanced Manufacturing & Technology Centre, NH-25A, Sarai Sahjadi, Lucknow, Uttar Pradesh 226401, India", city:"Lucknow", lat:null, lng:null, placeId:"ChIJkyCEpD0InDkRv_-VJ4z9RWQ" }] },
+{ id:379, slug:"dorf-ketal-chemicals-india-limited", name:"Dorf Ketal Chemicals India Limited", logo:null, country:"India",
+    // NOTE: NAME UPDATE: the company's own current materials show CIN with 'PLC' (public) not 'PTC' (private) as the user's given name suggested — likely a recent conversion from Private Limited to Limited. Used the company's own official contact page as the authoritative source.
+    desc:"Major global specialty process chemicals producer; treats over one-third of the oil refined by the world's 20 largest refineries. Real named products: corrosion inhibitors, antifoulants, demulsifiers, anti-polymerants, sulfiding chemicals, H2S scavengers, scale inhibitors, water clarifiers, biocides.",
+    site:"https://dorfketal.com",
+    cats:["industrial-water-systems"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Dorf Ketal Tower, D'Monte Street, Orlem, Malad West, Mumbai, Maharashtra 400064, India", city:"Mumbai", lat:null, lng:null, placeId:"ChIJmeSKZAG35zsRwlTEv3TKD74" }] },
+{ id:380, slug:"chemtex-speciality-limited", name:"Chemtex Speciality Limited", logo:null, country:"India",
+    // NOTE: CAUTION: 272 real reviews are genuinely mixed — several detail specific fraud/non-delivery complaints alongside genuine positive ones. Worth checking directly before relying on this listing.
+    desc:"Specialty chemicals manufacturer since 1970; real product line includes Oil & Gas chemicals, cooling/boiler/effluent/RO water treatment chemicals, HVAC maintenance chemicals.",
+    site:"https://www.chemtexlimited.com",
+    cats:["industrial-water-systems"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Wing A, 1st Floor, Haute Street Corporate Park, 86A Topsia Road, Kolkata, West Bengal 700046, India", city:"Kolkata", lat:null, lng:null, placeId:"ChIJD18xvcB2AjoRoxv1YIrcOmA" }] },
+{ id:381, slug:"chemcon-speciality-chemicals-limited", name:"Chemcon Speciality Chemicals Limited", logo:null, country:"India",
+    // NOTE: Mixed fit — most of the business (pharma intermediates, silicones) is outside TWI's scope; only the oilfield completion-fluids line is relevant, and it's a secondary product, not the company's core identity.
+    desc:"Primarily a pharmaceutical intermediates and silicones manufacturer; real secondary product line in Oilfield Chemicals (Completion Fluids — Calcium Bromide, high-density brine solutions).",
+    site:"https://www.cscpl.com",
+    cats:["industrial-water-systems"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Block No. 355, Manjusar Kunpad Road, Village Manjusar, Taluka Savli, Vadodara, Gujarat 391775, India", city:"Vadodara", lat:null, lng:null, placeId:"ChIJdfiiNp3MXzkRtDhqG7T-6FQ" }] },
+{ id:382, slug:"roto-pumps-limited", name:"Roto Pumps Limited", logo:null, country:"India",
+    // NOTE: Strong candidate — real, well-reviewed corporate office (65 reviews, 4.3 rating), genuine specialization matching an already-established TWI category.
+    desc:"Publicly listed pump manufacturer since 1975 (or 1968 per company history); Progressive Cavity Pumps, Twin Screw Pumps, Single Screw Pumps, Gear Pumps, Macerator Pumps, retrofit spare parts.",
+    site:"https://rotopumps.com",
+    cats:["pumps"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Roto House, 13, Noida Special Economic Zone, Block A, Phase-2, Noida, Uttar Pradesh 201305, India", city:"Noida", lat:null, lng:null, placeId:"ChIJ-SYzCsToDDkR5FKVPT9N1RY" }] },
+{ id:383, slug:"seamec-limited", name:"SEAMEC Limited", logo:null, country:"India",
+    // NOTE: Same upstream/offshore-oilfield-services mismatch flagged repeatedly this session — real, substantial, well-reviewed company (101 reviews, 4.5 rating), but the core business is offshore diving/subsea support, not downstream tank-terminal supply chain.
+    desc:"India's largest offshore oilfield diving support vessel (DSV) operator; subsea maintenance, inspection, repair, light construction support for offshore oil production, plus bulk carrier operations and an EPC infrastructure JV.",
+    site:"https://seamec.in",
+    cats:["heavy-engineering-and-fabrication"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"9th Floor, A-901-905, 215 Atrium, Andheri Kurla Road, Andheri East, Mumbai, Maharashtra 400093, India", city:"Mumbai", lat:null, lng:null, placeId:"ChIJS2BDRzrI5zsR8baAG1Mfjfs" }] },
+{ id:384, slug:"bharat-bijlee-limited", name:"Bharat Bijlee Limited", logo:null, country:"India",
+    // NOTE: Strong candidate — real named client is SAIL, already independently verified and in TWI.
+    desc:"Publicly listed electrical engineering company since 1946; Power Transformers (up to 200MVA/200kV), Electric Motors (0.12kW-1250kW), Drives & Industrial Automation. Real named client: a 42-year-old transformer still running at SAIL's Durgapur Steel Plant.",
+    site:"https://www.bharatbijlee.com",
+    cats:["heavy-engineering-and-fabrication"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Electric Mansion, 6th Floor, Appasaheb Marathe Marg, Prabhadevi, Mumbai, Maharashtra 400025, India", city:"Mumbai", lat:null, lng:null, placeId:"ChIJ8-R7yr_O5zsRlG2Eh88UqPY" }] },
+{ id:385, slug:"the-anup-engineering-limited", name:"The Anup Engineering Limited", logo:null, country:"India",
+    // NOTE: Re-researched: earlier this session this company was checked against TS-11 Nozzles & Manways specifically and didn't fit (pressure-vessel fabrication is a different, broader scope than tank appurtenances). Genuinely fits EC-16 Heavy Engineering & Fabrication instead, alongside Vitech Heavy Equipments and other static-equipment fabricators already in TWI. CAUTION: one real review alleges project delays (6 months) and describes difficulty for independent contractors — worth checking alongside the otherwise strong signals (323 reviews, 4.2 rating).
+    desc:"Established manufacturer of heat exchangers, pressure vessels, reactors, columns/towers; real reviews confirm 'Most Familiar Company in Fabrication of Pressure Vessels, Drums, Heat Exchangers in Ahmedabad.'",
+    site:"https://www.anupengg.com",
+    cats:["heavy-engineering-and-fabrication"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Behind 66 KV Electric Sub Station, Odhav Road, GIDC Industrial Area, Odhav, Ahmedabad, Gujarat 382415, India", city:"Ahmedabad", lat:null, lng:null, placeId:"ChIJixpKcV-GXjkRBXw4c_nQCcM" }] },
+{ id:386, slug:"diamond-power-infrastructure-limited", name:"Diamond Power Infrastructure Limited", logo:null, country:"India",
+    // NOTE: Real, publicly listed (BSE: 522163). Note: acquired by The CKP Group in 2017 (implies a past restructuring event), but current filings (Dec 2025 earnings) show real, substantial revenue (₹15.5bn) — appears to be a genuine recovery, not ongoing distress.
+    desc:"Power transmission equipment manufacturer — power cables (LV/HV/EHV, fire-resistant, marine/offshore, instrumentation), transmission conductors, transmission towers, turnkey EPC services, under the 'Dicabs' brand.",
+    site:"https://www.dicabs.com",
+    cats:["cable-manufacturers"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Phase-II, Village Vadavala, Ta. Savli, Vadodara, Gujarat, India", city:"Vadodara", lat:null, lng:null, placeId:"ChIJrwSpVgAzXjkRDnIJL9moZRw" }] },
+{ id:387, slug:"vikran-engineering-limited", name:"Vikran Engineering Limited", logo:null, country:"India",
+    // NOTE: Strong candidate — real, substantial (₹477 Cr revenue, 1,045 employees), well-reviewed (87 reviews, 4.5 rating).
+    desc:"EPC company for power transmission lines, EHV substations (up to 400kV), power distribution, solar EPC, railway electrification, and water infrastructure. Formerly known as Ratangiri Financial Advisory Private Limited.",
+    site:"https://www.vikrangroup.com",
+    cats:["epc-contractors"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"B3, B Wing, Ashar IT Park, Road No. 16, Wagle Industrial Estate, Thane West, Thane, Maharashtra 400604, India", city:"Thane", lat:null, lng:null, placeId:"ChIJA7xeuQS55zsRo1EZfgHvlEs" }] },
+{ id:388, slug:"shilchar-technologies-limited", name:"Shilchar Technologies Limited", logo:null, country:"India",
+    // NOTE: Strong candidate, substantial and profitable (₹651.94 Cr revenue, ₹158.16 Cr profit, 2025-26). NOTE: MCA NIC classification in one source showed 'Dishwashers, manufacturing' — a clear data-entry error, not reflective of the company's real transformer business.
+    desc:"One of India's prominent manufacturers of Electronics & Telecom and Power & Distribution transformers — inverter-duty transformers for solar, generator transformers for wind, hydel transformers, furnace transformers; 7,500 MVA annual capacity.",
+    site:"https://www.shilchar.com",
+    cats:["heavy-engineering-and-fabrication"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Bill Road, Bill, Vadodara, Gujarat 391410, India", city:"Vadodara", lat:null, lng:null, placeId:"ChIJoVWksrLHXzkReuMnAL5_tL0" }] },
+{ id:389, slug:"transformers-and-rectifiers-india-limited", name:"Transformers and Rectifiers (India) Limited", logo:null, country:"India",
+    // NOTE: Strong candidate — publicly listed (BSE: 532928), well-reviewed (71 reviews, 4.5 rating). NOTE: multiple sources show incorrect NIC classifications ('measuring instruments', 'medical/precision/optical instruments') — same recurring data-quality issue seen elsewhere this session; the real business is clearly power transformers.
+    desc:"Manufacturer of Furnace Transformers, Rectifier Transformers, Specialty Transformers, Reactors, Distribution Transformers, Power Transformers; trades as 'TARIL'; real named milestone of 150+ dynamic short-circuit-tested transformers over two decades.",
+    site:"https://www.transformerindia.com",
+    cats:["heavy-engineering-and-fabrication"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Survey No. 427 P/3-4 & 431 P/1-2, Sarkhej-Bavla Highway, Village Moraiya, Ahmedabad, Gujarat 382213, India", city:"Ahmedabad", lat:null, lng:null, placeId:"ChIJI3-6KyiRXjkR_du3rj7m85o" }] },
+{ id:390, slug:"apar-industries-limited", name:"Apar Industries Limited", logo:null, country:"India",
+    // NOTE: Very strong candidate — major, well-documented, publicly listed (BSE: 532259, NSE: APARINDS) company with a genuinely long, relevant history in transformer oils specifically.
+    desc:"$1 billion diversified industrial company (68 years, founded 1958); HTLS conductors, OPGW for telecom, transformer oils (since 1968, one of India's earliest producers), speciality oils/lubricants, electric & telecom cables.",
+    site:"https://apar.com",
+    cats:["cable-manufacturers", "industrial-water-systems"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"301, Panorama Complex, R.C. Dutt Road, Vadodara, Gujarat 390007, India", city:"Vadodara", lat:null, lng:null, placeId:"ChIJud17SrDIXzkROmKAQpoCDzk" }] },
+{ id:391, slug:"yash-highvoltage-limited", name:"Yash Highvoltage Limited", logo:null, country:"India",
+    // NOTE: Solid, well-reviewed candidate (23 reviews, 4.2 rating) — BSE SME listed, genuinely specialized niche product.
+    desc:"Niche manufacturer of condenser-graded High Voltage and High Current Transformer Bushings; formerly Yash Highvoltage Insulators Private Limited; over 2 decades in global power transmission/generation, 50+ countries, 30,000+ installations.",
+    site:"https://www.yashhv.com",
+    cats:["heavy-engineering-and-fabrication"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Savli-Halol Road, Khakhariya, Vadodara, Gujarat 389330, India", city:"Vadodara", lat:null, lng:null, placeId:"ChIJzTvFNQMrXjkR16Fi2lKtqbg" }] },
+{ id:392, slug:"rishabh-instruments-limited", name:"Rishabh Instruments Limited", logo:null, country:"India",
+    // NOTE: Strong candidate — publicly listed, well-reviewed (64 reviews, 4.5 rating), genuinely relevant instrumentation/metering product line.
+    desc:"Global leader in energy efficiency solutions — electrical automation, metering and instrumentation devices, analog panel meters, low-voltage current transformers; ₹735 Cr revenue (2025), 563 employees, operations in India/Poland/China.",
+    site:"https://rishabh.co.in",
+    cats:["instrumentation-and-automation"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"F-31, MIDC, Satpur Colony, Nashik, Maharashtra 422007, India", city:"Nashik", lat:null, lng:null, placeId:"ChIJ9UVme37r3TsR2FJvaCKy304" }] },
+{ id:393, slug:"vivid-electromech-limited", name:"Vivid Electromech Limited", logo:null, country:"India",
+    // NOTE: Solid candidate — real, well-reviewed (77 reviews, 4.0 rating), genuine Schneider Electric partnership confirmed.
+    desc:"Motor and generator manufacturer, authorised channel partner of Schneider Electric for west-zone India; 35 years operating, recently converted from Private to Public Limited (Feb 2025) ahead of a planned IPO.",
+    site:"",
+    cats:["heavy-engineering-and-fabrication"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Vivid House, A-173/7, TTC Industrial Area, Kopar Khairane, Navi Mumbai, Maharashtra 400710, India", city:"Navi Mumbai", lat:null, lng:null, placeId:"ChIJQzpU1R_B5zsRtRkXzh4m9v0" }] },
+{ id:394, slug:"ravindra-energy-limited", name:"Ravindra Energy Limited", logo:null, country:"India",
+    // NOTE: Publicly listed (BSE), real UAE subsidiary. CAUTION: the only Google review found is strongly negative — 'no planning,' 'poor quality erection,' 'lack of technical knowledge in site survey team.' Worth checking directly given no positive reviews to counterbalance it.
+    desc:"Solar EPC company — rooftop and ground-mounted solar power systems, solar pumps for irrigation, EPC/O&M contract services; real UAE subsidiary (Renuka Energy Resource Holdings FZE); ~30MW of grid-connected projects in Karnataka.",
+    site:"https://www.ravindraenergy.com",
+    cats:["solar-power-systems"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"BC 105, Havelock Road, Camp, Belgaum, Karnataka 590001, India", city:"Belgaum", lat:null, lng:null, placeId:"ChIJnR_ks-pnvzsR04-TXnD5zLw" }] },
+{ id:395, slug:"ceigall-india-limited", name:"Ceigall India Limited", logo:null, country:"India",
+    // NOTE: Strong candidate overall (210 reviews, 4.2 rating, genuine substantive positive reviews about real infrastructure projects). NOTE: one review alleges poor staff treatment and uses a hostile term regarding share price performance ('chor company') — a minority view against an otherwise solid review base, included for balance rather than omitted.
+    desc:"Leading EPC/HAM infrastructure construction firm, 23+ years' experience — elevated roads, highways, expressways, railway overbridges, flyovers, bridges, airports, tunnels, metro, solar, water/irrigation, utility shifting.",
+    site:"https://ceigall.com",
+    cats:["epc-contractors"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"A-898, Tagore Nagar, Civil Lines, Ludhiana, Punjab 141001, India", city:"Ludhiana", lat:null, lng:null, placeId:"ChIJyTTxf-uDGjkR3kNgHtFS4X4" }] },
+{ id:396, slug:"h-g-infra-engineering-limited", name:"H.G. Infra Engineering Limited", logo:null, country:"India",
+    // NOTE: Strong candidate — publicly listed (NSE: HGINFRA), substantial (₹4,736 Cr market cap), real major infrastructure client roster.
+    desc:"Infrastructure construction company — roads, highways, bridges, railways, metro projects; real client base includes NHAI, MoRTH, Tata Projects, IRB; large owned construction-equipment fleet (crushers, pavers, excavators).",
+    site:"https://www.hginfra.com",
+    cats:["epc-contractors"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"14, Panchwati Colony, Ratanada, Jodhpur, Rajasthan 342011, India", city:"Jodhpur", lat:null, lng:null, placeId:"ChIJb1iIcluMQTkRwjwi8a_ckKY" }] },
+{ id:397, slug:"eimco-elecon-india-limited", name:"Eimco Elecon (India) Limited", logo:null, country:"India",
+    // NOTE: CIN DISCREPANCY: two independent sources show different CINs (L29199GJ1974PLC002574 vs L28249GJ1974PLC002574) — verify the correct one before any use. Real, established company (associate of Elecon Engineering), but underground mining equipment is a different segment from TWI's downstream tank-terminal scope.
+    desc:"Manufacturer of underground mining machinery — rocker shovels, side dump loaders, load-haul dumpers — for coal and metalliferous mines. Real Google review confirms: 'engaged in engineering and manufacturing of mining equipment...supplying underground mining loaders to Indian coal mining industry.'",
+    site:"",
+    cats:["heavy-engineering-and-fabrication"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"GWPP+H4H, Anand-Sojitra Road, Vithal Udyognagar, Vallabh Vidyanagar, Anand, Gujarat 388120, India", city:"Anand", lat:null, lng:null, placeId:"ChIJocA6lM9NXjkRLgxh-ezFWf4" }] },
+{ id:398, slug:"tega-industries-limited", name:"Tega Industries Limited", logo:null, country:"India",
+    // NOTE: Real, substantial, publicly listed company (₹500+ Cr revenue) — but core business is mining/mineral-processing wear parts, adjacent to rather than squarely within TWI's scope.
+    desc:"Manufacturer of wear-resistant specialised rubber products, primarily liners for mining/mineral-processing equipment (crushers, mills, screens); established 1976, real global subsidiaries (Australia, Singapore).",
+    site:"",
+    cats:["heavy-engineering-and-fabrication"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Godrej Waterside, Tower-II, Office 807, 8th Floor, Block DP-5, Salt Lake Sector V, Bidhannagar, Kolkata, West Bengal 700091, India", city:"Kolkata", lat:null, lng:null, placeId:"ChIJBeVHQ8RwAjoRC92LlsnndzU" }] },
+{ id:399, slug:"skipper-limited", name:"Skipper Limited", logo:null, country:"India",
+    // NOTE: Strong candidate — real named client already independently verified in TWI.
+    desc:"One of the world's largest integrated transmission tower manufacturers (top 3 in India, top 10 globally); also steel tubes, PVC pipes & fittings, fasteners, railway structures, EPC line construction. Real named client: Power Grid Corporation of India Limited (800kV order) — already in TWI.",
+    site:"https://www.skipperlimited.com",
+    cats:["heavy-engineering-and-fabrication"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"3A, Loudon Street, 1st Floor, Kolkata, West Bengal 700017, India", city:"Kolkata", lat:null, lng:null, placeId:"ChIJ97Qs9T13AjoR9IFB5OckfwE" }] },
+{ id:400, slug:"walchandnagar-industries-limited", name:"Walchandnagar Industries Limited", logo:null, country:"India",
+    // NOTE: CIN could not be independently confirmed in this research pass despite searching — verify directly before use. Real, publicly listed (BSE:507410, NSE:WALCHANNAG) company; Google location has very few reviews (4, rating 3.3) — worth a closer look before relying on the address.
+    desc:"Diversified engineering conglomerate — Boilers, Power Generation, Defence, Aerospace, Nuclear power, Industrial & Marine Transmissions, EPC Turnkey projects.",
+    site:"https://www.walchand.com",
+    cats:["epc-contractors"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Walchand House, 534, Sardar Vallabhbhai Patel Road, Opera House, Girgaon, Mumbai, Maharashtra 400007, India", city:"Mumbai", lat:null, lng:null, placeId:"ChIJ5TgWVw7O5zsRCtUqiRL8pI4" }] },
+{ id:401, slug:"batliboi-limited", name:"Batliboi Limited", logo:null, country:"India",
+    // NOTE: Strong, well-documented historic candidate. Note: a related but separate entity, Batliboi Environmental Engineering Limited (CIN U74210MH1959PLC011435), also exists — do not conflate the two.
+    desc:"One of India's oldest engineering companies, founded 1892 (133 years); Machine Tools, Air Engineering, Textile Machinery, Environmental Engineering, Wind Energy; real turnkey EPC contracting history, domestic and overseas.",
+    site:"https://batliboi.com",
+    cats:["epc-contractors"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Bharat House, 5th Floor, 104 Bombay Samachar Marg, Fort, Mumbai, Maharashtra 400001, India", city:"Mumbai", lat:null, lng:null, placeId:"ChIJted1k08ttyIRKVTTIZ4L2ZE" }] },
+{ id:402, slug:"marine-electricals-india-limited", name:"Marine Electricals (India) Limited", logo:null, country:"India",
+    // NOTE: Real, publicly listed (NSE: MARINE) company, but core focus is naval/defence vessels — tangential to TWI's downstream tank-terminal scope. CAUTION: a real, detailed negative review alleges a small unpaid invoice (₹11,565) with unprofessional conduct once materials were delivered — worth checking alongside the scope question.
+    desc:"Electrical equipment manufacturer with over four decades' expertise in naval operations — integrated electrical solutions for defence vessels, warships and submarines.",
+    site:"https://www.marineelectricals.com",
+    cats:["heavy-engineering-and-fabrication"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Udyog Sadan-3, B-1, MIDC, Marol Industrial Area, Andheri East, Mumbai, Maharashtra 400093, India", city:"Mumbai", lat:null, lng:null, placeId:"ChIJH5DwwCHI5zsR7w766y3rqx4" }] },
+{ id:403, slug:"mohindra-fasteners-limited", name:"Mohindra Fasteners Limited", logo:null, country:"India",
+    // NOTE: Solid candidate — real, well-reviewed (19 reviews, 4.4 rating), directly relevant product category.
+    desc:"Fasteners manufacturer established 1995; real reviews confirm 'Best fasteners manufacturer in NCR Rohtak as per Customer Requirements.'",
+    site:"",
+    cats:["heavy-engineering-and-fabrication"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"304, Gupta Arcade, Rohtak-Delhi Road, Inder Enclave, Paschim Vihar, Delhi 110087, India", city:"New Delhi", lat:null, lng:null, placeId:"ChIJCzrfSWsEDTkRDh7tYi89ECY" }] },
+{ id:404, slug:"the-braithwaite-burn-and-jessop-construction-company-limited", name:"The Braithwaite Burn and Jessop Construction Company Limited", logo:null, country:"India",
+    // NOTE: Strong candidate — genuinely historic PSU with 'Refinery piping works' explicitly in its own stated product list, real reviews confirm ('Big bridge building PSU in India').
+    desc:"Central PSU (Dept. of Heavy Industries) established 1935 (90 years); best known for bridge building (Howrah Bridge, Vidyasagar Setu) — also Industrial Structural works, Civil Engineering works, and explicitly 'Refinery piping works,' plus PMC/EPC-basis industrial structural jobs.",
+    site:"https://www.bbjconst.com",
+    cats:["epc-contractors", "heavy-engineering-and-fabrication"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"27, R.N. Mukherjee Road, Modi Building, Kolkata, West Bengal 700001, India", city:"Kolkata", lat:null, lng:null, placeId:"ChIJ0Z4HnaR3AjoRg9ERT1eJ7uc" }] },
+{ id:405, slug:"bechtel-corporation", name:"Bechtel Corporation", logo:null, country:"United States",
+    // NOTE: Source: Projectmaterials 'Top 20 EPC Contractors in Oil & Gas 2026' (Jan 2026). Revenue trend: peaked $32.9B (2016), recovered to $20.6B (2024) with a $58.2B backlog — its highest in decades.
+    desc:"The largest privately-held engineering and construction company in the world; delivers mega-projects across energy, infrastructure, nuclear, and defense in over 160 countries. $22B+ revenue, 55,000 employees. Real named legacy projects include the Hoover Dam and the Channel Tunnel, plus numerous LNG plants globally.",
+    site:"https://www.bechtel.com",
+    cats:["epc-contractors"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"12011 Sunset Hills Road, Reston, VA 20190, USA", city:"Reston", lat:null, lng:null, placeId:"ChIJD51uTxhItokRoGl3nN1TPlc" }] },
+{ id:406, slug:"fluor-corporation", name:"Fluor Corporation", logo:null, country:"United States",
+    // NOTE: Source: Projectmaterials 'Top 20 EPC Contractors in Oil & Gas 2026' (Jan 2026). Underwent strategic restructuring 2020-2021, exiting lower-margin businesses to focus on higher-value projects.
+    desc:"One of the largest publicly-traded EPC firms; engineering, procurement, construction and maintenance services for oil & gas, chemicals, mining, transportation and power. $15.5B revenue (2024), 32,000 employees, projects in over 100 countries.",
+    site:"https://www.fluor.com",
+    cats:["epc-contractors"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"6700 Las Colinas Boulevard, Irving, TX 75039, USA", city:"Irving", lat:null, lng:null, placeId:"ChIJeWnsQDooTIYREFKlivf-uFU" }] },
+{ id:407, slug:"technipfmc", name:"TechnipFMC", logo:null, country:"United States",
+    // NOTE: Source: Projectmaterials 'Top 20 EPC Contractors in Oil & Gas 2026' (Jan 2026). Dual-headquartered Houston & Paris; spun off Technip Energies in 2021.
+    desc:"Global leader in subsea systems and offshore energy, formed by the 2017 merger of Technip (France) and FMC Technologies (USA). Only company that designs, builds, installs and services vertically-integrated subsea systems from wellhead to platform with its own fleet. $7.8B revenue (2024), 21,000 employees.",
+    site:"https://www.technipfmc.com",
+    cats:["epc-contractors"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"11720 Katy Freeway, Houston, TX 77079, USA", city:"Houston", lat:null, lng:null, placeId:"ChIJO83SIkLJQIYRn29ilr2Th1k" }] },
+{ id:408, slug:"saipem-spa", name:"Saipem SpA", logo:null, country:"Italy",
+    // NOTE: Source: Projectmaterials 'Top 20 EPC Contractors in Oil & Gas 2026' (Jan 2026). PENDING MERGER: Saipem is in the process of merging with Subsea 7 (also added here) to form 'Saipem7' (targeted H2 2026, EUR 21B combined revenue) — both remain separate legal entities as of this addition; verify current corporate status before relying on this listing if referenced after the merger completes.
+    desc:"Italian EPC giant specializing in offshore and onshore engineering, construction and drilling; operates one of the world's largest deepwater construction fleets; 60+ years' experience in pipeline installations, FPSO/platform construction and LNG plant delivery across 70+ countries. EUR 14.6B revenue (2024), 30,000 employees.",
+    site:"https://www.saipem.com",
+    cats:["epc-contractors"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Via Alcide de Gasperi, 16, 20097 San Donato Milanese, Milan, Italy", city:"Milan", lat:null, lng:null, placeId:"ChIJ6QeEN17PhkcRwxtTorjpAoY" }] },
+{ id:409, slug:"kbr-inc", name:"KBR, Inc.", logo:null, country:"United States",
+    // NOTE: Source: Projectmaterials 'Top 20 EPC Contractors in Oil & Gas 2026' (Jan 2026). Strategic shift toward higher-margin technology licensing and consulting over fixed-price EPC; acquired LinQuest ($737M) September 2024.
+    desc:"Originally a Halliburton subsidiary, KBR pivoted from traditional EPC to technology and government services; provides engineering, technology licensing (ammonia, syngas, refining) and government solutions (defense, space, intelligence) — a major IP licensor for petrochemical processes. $7.6B revenue (2024), 36,000 employees.",
+    site:"https://www.kbr.com",
+    cats:["epc-contractors"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"601 Jefferson Street, Houston, TX 77002, USA", city:"Houston", lat:null, lng:null, placeId:"ChIJdR2sej-_QIYR8no-XVdNuiM" }] },
+{ id:410, slug:"worley-limited", name:"Worley Limited", logo:null, country:"Australia",
+    // NOTE: Source: Projectmaterials 'Top 20 EPC Contractors in Oil & Gas 2026' (Jan 2026). Energy transition and sustainability projects now represent 40%+ of revenue.
+    desc:"Australian-headquartered professional services firm providing engineering, procurement and project delivery across energy, chemicals and resources; one of the world's largest energy engineering consultancies since acquiring Jacobs' ECR division ($3.3B) in 2019. AUD 10.8B revenue (2025), 51,000 employees.",
+    site:"https://www.worley.com",
+    cats:["epc-contractors"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Level 19, 420 George Street, Sydney NSW 2000, Australia", city:"Sydney", lat:null, lng:null, placeId:"ChIJvwLZgO2uEmsRYe33r0Noisc" }] },
+{ id:411, slug:"mcdermott-international", name:"McDermott International", logo:null, country:"United States",
+    // NOTE: Source: Projectmaterials 'Top 20 EPC Contractors in Oil & Gas 2026' (Jan 2026). The costly CB&I integration led to Chapter 11 bankruptcy in 2020; emerged leaner with a strong LNG project pipeline.
+    desc:"Houston-based EPC contractor specializing in LNG, refining, petrochemicals and offshore/subsea; merged with CB&I in 2018 forming one of the largest integrated onshore-offshore EPC firms. $8B+ revenue, 30,000 employees.",
+    site:"https://www.mcdermott.com",
+    cats:["epc-contractors"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"915 N Eldridge Parkway, Houston, TX 77079, USA", city:"Houston", lat:null, lng:null, placeId:"ChIJ66DSg5HbQIYR1RsXDbxEwtQ" }] },
+{ id:412, slug:"wood-plc", name:"Wood PLC", logo:null, country:"United Kingdom",
+    // NOTE: Source: Projectmaterials 'Top 20 EPC Contractors in Oil & Gas 2026' (Jan 2026). Recently rejected multiple takeover bids from Sidara/Apollo, choosing to remain independent.
+    desc:"Formed from the 2017 merger of Wood Group and Amec Foster Wheeler; global consulting and engineering company serving energy, industrial and built-environment markets. Strong in North Sea operations, digital consulting and asset integrity services. $5.5B revenue (2024), 35,000 employees.",
+    site:"https://www.woodplc.com",
+    cats:["epc-contractors"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Wood Group House, Aberdeen AB12 3LE, United Kingdom", city:"Aberdeen", lat:null, lng:null, placeId:"ChIJP_NRPDoOhEgRmYBrcwY3YyE" }] },
+{ id:413, slug:"tecnicas-reunidas", name:"Técnicas Reunidas", logo:null, country:"Spain",
+    // NOTE: Source: Projectmaterials 'Top 20 EPC Contractors in Oil & Gas 2026' (Jan 2026). Nearly faced a liquidity crisis in 2020, rescued by a Spanish government-backed credit line; recovered since.
+    desc:"Spanish EPC contractor specializing in oil refining, petrochemicals, natural gas processing and power generation; deep expertise in refinery revamps and grassroots units, particularly in the Middle East. EUR 4.5B revenue (2024), 8,000 employees.",
+    site:"https://www.tecnicasreunidas.es",
+    cats:["epc-contractors"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Avenida de Vía de Servicio, 89F, Fuencarral-El Pardo, 28050 Madrid, Spain", city:"Madrid", lat:null, lng:null, placeId:"ChIJ7f9P11kpQg0Rf9o3EGmYS7o" }] },
+{ id:414, slug:"maire-spa", name:"MAIRE S.p.A.", logo:null, country:"Italy",
+    // NOTE: Source: Projectmaterials 'Top 20 EPC Contractors in Oil & Gas 2026' (Jan 2026), which referred to this company as 'MAIRE (Tecnimont)' — Tecnimont is the main operating EPC subsidiary; MAIRE S.p.A. is the correct publicly-listed (BIT: MT) parent legal entity, confirmed independently.
+    desc:"Italian technology-driven EPC group (formerly Tecnimont, merged from Fiat Engineering in 2005); operates through NextChem (green chemistry, decarbonization) and Integrated E&C Solutions (urea, fertilizers, petrochemicals, polymers). EUR 5.9B revenue (2024, highest ever), 9,500 employees.",
+    site:"https://www.groupmaire.com",
+    cats:["epc-contractors"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Via Gaetano de Castillia, 6A, 20159 Milan, Italy", city:"Milan", lat:null, lng:null, placeId:"ChIJvfuMScvGhkcR2_7OwpfJdbs" }] },
+{ id:415, slug:"samsung-e-and-a", name:"Samsung E&A", logo:null, country:"South Korea",
+    // NOTE: Source: Projectmaterials 'Top 20 EPC Contractors in Oil & Gas 2026' (Jan 2026), which referred to this company as 'Samsung Engineering' — confirmed renamed to 'Samsung E&A' via the company's current Google Places business listing. Revenue crashed from ~$10B (2012) to ~$4B (2016) after Middle East project losses; recovered to its highest results since 2012.
+    desc:"Part of Samsung Group; leading South Korean EPC contractor focused on hydrocarbon processing, petrochemicals and industrial plant construction, with core markets in the Middle East, Southeast Asia and the Americas. $8B revenue (2024), 5,000 employees.",
+    site:"https://www.samsungeanda.com",
+    cats:["epc-contractors"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"26 Sangil-ro 6-gil, Gangdong-gu, Seoul, South Korea", city:"Seoul", lat:null, lng:null, placeId:"ChIJRXqKfKamfDURKSUvONirUHE" }] },
+{ id:416, slug:"jgc-holdings-corporation", name:"JGC Holdings Corporation", logo:null, country:"Japan",
+    // NOTE: Source: Projectmaterials 'Top 20 EPC Contractors in Oil & Gas 2026' (Jan 2026).
+    desc:"One of Japan's premier EPC contractors, specializing in LNG plants, oil refineries, petrochemical facilities and gas processing; strong presence in the Middle East and Southeast Asia, a key participant in many of the world's largest LNG projects. ~$5.7B revenue (2024), 7,800 employees.",
+    site:"https://www.jgc.com",
+    cats:["epc-contractors"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"2-3-1 Minatomirai, Nishi Ward, Yokohama, Kanagawa 220-0012, Japan", city:"Yokohama", lat:null, lng:null, placeId:"ChIJ01GG91xcGGARlfqAPPb-kn0" }] },
+{ id:417, slug:"chiyoda-corporation", name:"Chiyoda Corporation", logo:null, country:"Japan",
+    // NOTE: Source: Projectmaterials 'Top 20 EPC Contractors in Oil & Gas 2026' (Jan 2026). A 2019 financial crisis from cost overruns on the Ichthys LNG project required a bailout from Mitsubishi Corporation; revenue has since stabilized.
+    desc:"Japanese EPC contractor specializing in LNG plants, gas processing and petrochemicals; one of the 'Big 3' Japanese contractors (with JGC and Toyo Engineering), lead contractor on multiple iconic LNG projects including Ichthys LNG in Australia. ~$3.4B revenue (2024), 8,000 employees.",
+    site:"https://www.chiyodacorp.com",
+    cats:["epc-contractors"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"4-6-2 Minatomirai, Nishi Ward, Yokohama, Kanagawa 220-0012, Japan", city:"Yokohama", lat:null, lng:null, placeId:"ChIJWXe5LWhcGGAREwB_On3JO1w" }] },
+{ id:418, slug:"atkinsrealis-group-inc", name:"AtkinsRéalis Group Inc.", logo:null, country:"Canada",
+    // NOTE: Source: Projectmaterials 'Top 20 EPC Contractors in Oil & Gas 2026' (Jan 2026). Renamed from SNC-Lavalin Group Inc. September 2023 (confirmed via the company's own press release); exited fixed-price EPC contracts after large project losses, now a higher-margin professional services firm.
+    desc:"Formerly SNC-Lavalin Group Inc. (renamed September 2023); Canadian engineering services and nuclear company providing consulting, engineering and project management across infrastructure, energy and defense. Strong nuclear capabilities (CANDU reactors) and a large UK presence via the Atkins acquisition. $7B revenue, 36,000 employees.",
+    site:"https://www.atkinsrealis.com",
+    cats:["epc-contractors"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"455 René-Lévesque Boulevard West, Montreal, QC H2Z 1Z3, Canada", city:"Montreal", lat:null, lng:null, placeId:"ChIJWVq-h7EbyUwR0Rmt0QZNLhs" }] },
+{ id:419, slug:"subsea-7-s-a", name:"Subsea 7 S.A.", logo:null, country:"Luxembourg",
+    // NOTE: Source: Projectmaterials 'Top 20 EPC Contractors in Oil & Gas 2026' (Jan 2026). PENDING MERGER: in the process of merging with Saipem (also added here) to form 'Saipem7' (targeted H2 2026, EUR 43B combined backlog) — both remain separate legal entities as of this addition; verify current corporate status before relying on this listing if referenced after the merger completes.
+    desc:"Luxembourg-based subsea engineering and construction company specializing in pipeline installation, subsea infrastructure and offshore wind; operates one of the most advanced deepwater construction fleets globally. $6.7B revenue (2024), $9B backlog.",
+    site:"https://www.subsea7.com",
+    cats:["epc-contractors"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"38 Grand-Rue, 1660 Ville-Haute, Luxembourg", city:"Luxembourg", lat:null, lng:null, placeId:"ChIJbZsVPkJPlUcRbPiPZ1MvTPU" }] },
+{ id:420, slug:"jacobs-solutions", name:"Jacobs Solutions", logo:null, country:"United States",
+    // NOTE: Source: Projectmaterials 'Top 20 EPC Contractors in Oil & Gas 2026' (Jan 2026). Sold its ECR (Energy, Chemicals, Resources) business to Worley (also added here) in 2019 to focus on higher-margin consulting.
+    desc:"One of the world's largest technical professional services firms; engineering, consulting and digital solutions across infrastructure, water, environment and advanced facilities (semiconductors, life sciences). $16.4B revenue (2025), 60,000 employees.",
+    site:"https://www.jacobs.com",
+    cats:["epc-contractors"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"1999 Bryan Street, Suite 3500, Dallas, TX 75201, USA", city:"Dallas", lat:null, lng:null, placeId:"ChIJ5z1kdGmcToYRaY2_hmUZA5o" }] },
+{ id:421, slug:"aecom", name:"AECOM", logo:null, country:"United States",
+    // NOTE: Source: Projectmaterials 'Top 20 EPC Contractors in Oil & Gas 2026' (Jan 2026). Exited the construction-at-risk business in 2020 to become a pure professional services firm.
+    desc:"Global infrastructure consulting firm providing planning, design, engineering and program management across transportation, water, environment and facilities; serves government and commercial clients across 150+ countries. $16.1B revenue (2025), 52,000 employees.",
+    site:"https://www.aecom.com",
+    cats:["epc-contractors"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"13355 Noel Road, Suite 400, Dallas, TX 75240, USA", city:"Dallas", lat:null, lng:null, placeId:"ChIJUzTseBiZToYRvZBzop-DycQ" }] },
+{ id:422, slug:"daewoo-e-and-c", name:"Daewoo E&C", logo:null, country:"South Korea",
+    // NOTE: Source: Projectmaterials 'Top 20 EPC Contractors in Oil & Gas 2026' (Jan 2026). Posted record operating profits in 2022; expanding global EPC footprint.
+    desc:"Major South Korean construction and engineering firm (part of the former Daewoo Group); operates across civil infrastructure, housing and plant/industrial construction, with key markets in the Middle East, Southeast Asia and domestic Korean projects. ~$8B revenue (2024), 6,500 employees.",
+    site:"https://www.daewooenc.com",
+    cats:["epc-contractors"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"170 Eulji-ro, Jung District, Seoul, South Korea", city:"Seoul", lat:null, lng:null, placeId:"ChIJF2QCAJOifDURqCq8_31Vz2E" }] },
+{ id:423, slug:"flowserve-corporation", name:"Flowserve Corporation", logo:null, country:"United States",
+    // NOTE: Source flagged for verification: article on athenavalve.com (Athena Engineering
+    // S.R.L.'s own site) ranked itself #3 on a "Top 10 valve manufacturers" list alongside this
+    // company — treated with real skepticism given the self-interest; Flowserve independently
+    // verified via Wikipedia, ZoomInfo and company history sources, all consistent. Real
+    // connection to L&T (already in TWI): acquired an L&T Valves manufacturing plant in
+    // Maraimalainagar, Tamil Nadu, in March 2013.
+    desc:"Publicly listed (NYSE: FLS) diversified flow-control manufacturer formed in 1997 from the merger of BW/IP and Durco International, with heritage tracing to 1790 (Worthington Simpson Pumps); actuators, ball/butterfly/control/plug valves, mechanical seals, pumps. Serves power, oil & gas, and chemical industries. ~$3.9B revenue, 17,000+ employees, 42 locations worldwide.",
+    site:"https://www.flowserve.com",
+    cats:["valves"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"5215 N O'Connor Blvd #700, Irving, TX 75039, USA", city:"Irving", lat:null, lng:null, placeId:"ChIJJa9yIJaCToYR8uaDf0xW0mo" }] },
+{ id:424, slug:"kitz-corporation", name:"Kitz Corporation", logo:null, country:"Japan",
+    // NOTE: founding year (1951) independently confirmed via a separate third-party source
+    // (imarcgroup.com's own "Top 11 Industrial Valves Manufacturers" list), not just the
+    // self-promotional athenavalve.com article this batch originated from.
+    desc:"One of Japan's largest comprehensive valve manufacturers, founded 1951 as Kitazawa Seisakusho; valve manufacturing, brass bar manufacturing, and related businesses — valves account for 80% of revenue. First company in Japan to use hot forging brass presses. Production and sales bases across Asia, Europe, North America and the Middle East.",
+    site:"https://www.kitz.com/en/",
+    cats:["valves"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"1-10-1 Nakase, Mihama Ward, Chiba 261-0023, Japan", city:"Chiba", lat:null, lng:null, placeId:"ChIJ5ZS7xDiBImARdFr-gn1nZeo" }] },
+{ id:425, slug:"avk-holding-a-s", name:"AVK Holding A/S", logo:null, country:"Denmark",
+    // NOTE: founding year and structure independently confirmed via a separate third-party source
+    // (imarcgroup.com), not just the self-promotional athenavalve.com article this batch
+    // originated from.
+    desc:"Privately-owned Danish valve group founded 1941, comprising 100+ companies across three business units — AVK Water (valves, hydrants, accessories for water/gas distribution), AVK Industrial (valve solutions for power generation, air separation, oil & gas, marine, pulp and paper, mining, chemical), and AVK Advanced Manufacturing (rubber/plastic/metal components).",
+    site:"https://www.avkvalves.com/en",
+    cats:["valves"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Søndergade 33, 8464 Galten, Denmark", city:"Galten", lat:null, lng:null, placeId:"ChIJP-8SeZE_TEYRsTloIAcOFEk" }] },
+{ id:426, slug:"herose-gmbh", name:"Herose GmbH", logo:null, country:"Germany",
+    // NOTE: SOURCE CORRECTION — the originating article (athenavalve.com) stated "Established:
+    // 1951" in its header but "founded in 1873...147 years" in its own body text, an internal
+    // contradiction. Independently confirmed via 6+ sources (company's own site, LinkedIn,
+    // Crunchbase, Ship Technology, Offshore Technology, RocketReach) that the real founding date
+    // is 1 April 1873 (as a fittings foundry by Theodor Rose), with the valve maker HERO
+    // (founded 1921) acquired and merged in 1947 to form HEROSE.
+    desc:"World-leading manufacturer of cryogenic and safety valves, founded 1873; globe, check, control and safety valves for liquefied industrial gases (oxygen, nitrogen, argon, hydrogen) down to -270°C and for LNG — directly relevant to tank/terminal cryogenic storage. 400,000-500,000 valves shipped per year, ~80% exported to 90+ countries. Subsidiaries in Germany, Spain, UK, China, India and Australia.",
+    site:"https://www.herose.com",
+    cats:["valves"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Elly-Heuss-Knapp-Straße 12, 23843 Bad Oldesloe, Germany", city:"Bad Oldesloe", lat:null, lng:null, placeId:"ChIJ3QK_EQUaskcRFK39xRtdiWk" }] },
+{ id:427, slug:"neway-valve-suzhou", name:"Neway Valve (Suzhou) Co., Ltd.", logo:null, country:"China",
+    // NOTE: SOURCE DISCREPANCY RESOLVED — the originating article (athenavalve.com) gave "2002"
+    // as the founding year; a separate independent source (imarcgroup.com) gave "1997". Multiple
+    // strong independent financial sources (PitchBook, Bloomberg, MarketScreener, Investing.com)
+    // all confirm 2002 as correct.
+    desc:"Publicly listed (SSE: 603699) Chinese industrial valve manufacturer founded 2002; gate, globe, check, ball and butterfly valves, cryogenic valves, subsea valves, nuclear and conventional power plant valves, actuators and control systems. Real named end markets: oil & gas, refining, chemicals, shipbuilding/offshore, power plants, long-distance pipelines, new energy. $1.13B trailing revenue, $6.2B market cap, 4,459 employees.",
+    site:"https://www.newayvalve.com",
+    cats:["valves"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"No. 999 Xiangjiang Road, Huqiu District, Suzhou, Jiangsu, China", city:"Suzhou", lat:null, lng:null, placeId:"ChIJJ0A1QuyfszURxKVkBHbDDhA" }] },
+{ id:428, slug:"rockwell-automation-india-private-limited", name:"Rockwell Automation India Private Limited", logo:null, country:"India",
+    // NOTE: source flagged for scrutiny — an SEO listicle from Vision Capital, a Gujarat loan/
+    // subsidy consultancy with no automation-industry expertise (its own site carries
+    // near-identical "Top 10" listicles for unrelated sectors like solar and packaging). The
+    // article's own disclaimer admits its data is "approximate" and unverified. Independently
+    // confirmed via CIN/MCA records regardless.
+    desc:"Indian subsidiary of Rockwell Automation, Inc. (Allen-Bradley hardware, FactoryTalk software); PLC and automation hardware, manufacturing intelligence software, SCADA integration, industrial IT solutions. ~2,739 employees.",
+    site:"https://www.rockwellautomation.com",
+    cats:["instrumentation-and-automation"],
+    locations:[{ type:"registered-office", name:"Registered Office", address:"131, Functional Industrial Estate, Patparganj, New Delhi, Delhi 110092, India", city:"New Delhi", lat:null, lng:null, placeId:"ChIJF_QWRzb7DDkRE2fUDDxP0pU" }] },
+{ id:429, slug:"yokogawa-india-limited", name:"Yokogawa India Limited", logo:null, country:"India",
+    // NOTE: source flagged for scrutiny — same Vision Capital listicle as above.
+    desc:"Indian subsidiary of Yokogawa Electric Corporation (Japan); process automation, distributed control systems (DCS), process control instruments, SCADA, and IIoT solutions for continuous-process industries including chemicals, oil & gas and water treatment. ~1,823 employees.",
+    site:"https://www.yokogawa.com/in/",
+    cats:["instrumentation-and-automation"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Plot No. 96, Electronic City Phase I, Hosur Road, Bengaluru, Karnataka 560100, India", city:"Bengaluru", lat:null, lng:null, placeId:"ChIJf1hqYJpsrjsRFED9c4fqfh0" }] },
+{ id:430, slug:"addverb-technologies-limited", name:"Addverb Technologies Limited", logo:null, country:"India",
+    // NOTE: source flagged for scrutiny — same Vision Capital listicle. Reliance Retail Ventures
+    // Limited shareholding independently confirmed via the company's own MGT-7 annual return
+    // filing (real, majority stake, acquired Jan 2022). CAUTION: a genuinely different, unrelated,
+    // much smaller company with an almost-identical name ("Addverb Technologies Private Limited,"
+    // CIN U74999DL2016PTC302008, a residential Delhi address) also exists in MCA records — do not
+    // conflate the two; this entry is the real, substantial Noida-headquartered robotics company.
+    desc:"Warehouse automation and robotics company — autonomous mobile robots (AMRs), AGVs, digital material handling, robotics software; majority-owned by Reliance Retail Ventures Limited (acquired Jan 2022). Targeting ₹8,000 Cr revenue within 5 years, ₹500 Cr investment in a Greater Noida manufacturing facility. ~957 employees. CAUTION: a real review describes poor treatment of third-party/contract workers — worth checking alongside the otherwise strong growth signals.",
+    site:"https://addverb.com",
+    cats:["digital-ai-and-robotics"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Plot No. 5, Sector-156, Phase-II, Noida, Uttar Pradesh 201301, India", city:"Noida", lat:null, lng:null, placeId:"ChIJHSlCjxfDDDkRcdDzzKsPRaU" }] },
+{ id:431, slug:"a-t-e-enterprises-private-limited", name:"A.T.E. Enterprises Private Limited", logo:null, country:"India",
+    // NOTE: source flagged for scrutiny — same Vision Capital listicle, whose header confusingly
+    // wrote this entry as "ATS Automation / A.T.E. Automation Pvt. Ltd.", conflating it with a
+    // separate, unrelated Canadian company (ATS Corporation). Independently confirmed this is
+    // genuinely just A.T.E. Enterprises Private Limited (trading in the automation space as "ATE
+    // Automation"), part of the A.T.E. Group (engineering group tracing to 1939).
+    desc:"Diversified engineering group (A.T.E. Group, tracing to 1939) — textile engineering, wastewater treatment, energy efficiency solutions, and industrial automation (PLC & SCADA systems, control panels, IIoT integration, machine automation). ~$27.1M revenue, ~542 employees.",
+    site:"https://www.ategroup.com",
+    cats:["instrumentation-and-automation"],
+    locations:[{ type:"headquarters", name:"Corporate Office", address:"43, Dr. V.B. Gandhi Marg, Fort, Mumbai, Maharashtra 400023, India", city:"Mumbai", lat:null, lng:null, placeId:"ChIJOb0jrMPR5zsROIVT8RJVxYY" }] },
+{ id:432, slug:"wipro-pari-private-limited", name:"Wipro PARI Private Limited", logo:null, country:"India",
+    // NOTE: source flagged for scrutiny — same Vision Capital listicle, which attributed this
+    // company's leadership to "Thierry Delaporte (Wipro Global CEO)." That's incorrect: Delaporte
+    // led Wipro Limited (the IT services arm); Wipro PARI is a subsidiary of Wipro Enterprises
+    // Private Limited, the SEPARATE diversified-conglomerate arm of the Wipro Group — different
+    // leadership entirely. Formerly Precision Automation and Robotics India Limited.
+    desc:"Global industrial automation and robotics company — turnkey automation for assembly, machining, material handling and logistics across automotive, consumer goods, home appliance and other manufacturing sectors; manufacturing facilities on 4 continents. ~1,600-3,700 employees (source range). CAUTION: a real review alleges a 2+ month delayed payment to an external service provider — worth checking alongside the otherwise strong global manufacturing presence.",
+    site:"https://www.wipropari.com",
+    cats:["digital-ai-and-robotics"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Gat No. 463/A/2/8 to 463/A/2/16, Village Dhangarwadi, Taluka Khandala, Satara, Maharashtra 412801, India", city:"Satara", lat:null, lng:null, placeId:"ChIJK0_p7HxYwjsRogZBa-GRgrU" }] },
+{ id:433, slug:"bender-gmbh-and-co-kg", name:"Bender GmbH & Co. KG", logo:null, country:"Germany",
+    // NOTE: sourced directly from the company's own refineries/petrochemicals solutions page
+    // (bender.de), not a third-party ranking. Founded 1946 by Walther Hans Bender, who personally
+    // invented and patented (1942) the world's first insulation monitoring device. 100%
+    // family-owned, now run by the third generation. Real integration partnership with Schneider
+    // Electric's EcoStruxure platform — Schneider already in TWI. No dedicated "Insulation
+    // Monitoring" or "Electrical Safety" category exists in TWI's tree yet; tagged to the two
+    // closest genuine fits (Instrumentation & Automation, Earthing & Bonding) rather than forced
+    // into just one — worth a dedicated category if more companies like this surface.
+    desc:"Global leader in electrical safety monitoring, explicitly marketed for refineries and petrochemical plants — ISOMETER® insulation monitoring devices, LINETRAXX® residual current monitoring, COMTRAXX® condition monitoring/gateway, and Neutral Grounding Resistance (NGR) monitoring, for interruption-free operation across all process stages. Compliant with EN 61557-8/9/15. €170M turnover (2020), 1,100+ employees, own subsidiaries in 15 of the 70+ countries it operates in.",
+    site:"https://www.bender.de",
+    cats:["instrumentation-and-automation", "earthing-and-bonding"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Londorfer Str. 65, 35305 Grünberg, Hesse, Germany", city:"Grünberg", lat:null, lng:null, placeId:"ChIJA43Ek8HtvEcRwOLQZ6IU9vY" }] },
+{ id:434, slug:"cosco-shipping-energy-transportation", name:"COSCO SHIPPING Energy Transportation Co., Ltd.", logo:null, country:"China",
+    // NOTE: sourced from a Top-30 container-shipping list (bcargob.com, citing Alphaliner
+    // TEU-capacity data) that named the broader COSCO SHIPPING parent group — deliberately added
+    // this specific, separately-listed subsidiary instead, since the parent is primarily a
+    // container-shipping conglomerate and this is the entity with the genuine, verifiable
+    // tanker/LNG/LPG business. Publicly listed (SEHK: 1138, SSE: 600026), formerly China Shipping
+    // Development Co., Ltd. No Google Places listing could be confirmed for this specific
+    // subsidiary among several unrelated COSCO entities in Shanghai (a container-line office, a
+    // shipyard) — placeId deliberately left null rather than misattribute one of those.
+    desc:"Chinese oil tanker, LNG and LPG shipping company, subsidiary of COSCO SHIPPING Holdings, founded 1994; transports crude oil, LNG and LPG. World's largest tanker operator — 150+ oil tankers (166 owned/chartered, ~25.24M DWT) plus 47 jointly-invested LNG vessels (38 in operation, 9 under construction). $8.57B market cap, ~7,850 employees.",
+    site:"https://en.energy.coscoshipping.com",
+    cats:["shipping-companies"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Hongkou District, Shanghai, China", city:"Shanghai", lat:null, lng:null, placeId:null }] },
+{ id:435, slug:"sinokor-merchant-marine", name:"Sinokor Merchant Marine Co., Ltd.", logo:null, country:"South Korea",
+    // NOTE: genuinely significant, very recent (late 2025-2026) development, independently
+    // corroborated across Bloomberg, Reuters, Forbes, gCaptain and Maritime Executive: Sinokor
+    // built one of the world's largest crude tanker (VLCC) fleets in a matter of months —
+    // acquiring 35 of 45 VLCCs sold globally in early 2026 alone, ~76-100+ VLCCs total, $3.3B+
+    // invested — and MSC (added below) took a confirmed 50% stake via regulatory filings in
+    // Cyprus and Greece (signed 2 Feb 2026). CORPORATE STRUCTURE NOTE: maritime-intelligence data
+    // (MagicPort) shows the tanker fleet is concentrated in a related entity at the same Seoul
+    // address — "Sinokor Maritime Co., Ltd." (89.36% tanker by DWT) — distinct from this main
+    // "Sinokor Merchant Marine Co., Ltd." entity (78.38% container, 14.86% tanker), which is the
+    // name used throughout the press coverage of the MSC deal. Verify the precise entity before
+    // any commercial use given this complexity.
+    desc:"South Korean shipping group, container/tanker/bulk carrier operator since 1989 (Korea-China container liner service); built a major crude oil tanker (VLCC) fleet in a rapid 2025-2026 acquisition spree — among the largest single-operator VLCC positions ever assembled, reportedly commanding a meaningful share of the global spot tanker fleet. MSC confirmed a 50% ownership stake in February 2026.",
+    site:"https://www.sinokor.co.kr",
+    cats:["shipping-companies"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"2nd Floor, Haenam Building, 64, Sejong-daero, Jung-gu, Seoul, South Korea", city:"Seoul", lat:null, lng:null, placeId:"ChIJzUdbpPSifDURKnEk0PHETBw" }] },
+{ id:436, slug:"mediterranean-shipping-company-sa", name:"MSC Mediterranean Shipping Company S.A.", logo:null, country:"Switzerland",
+    // NOTE: MSC's tanker exposure specifically comes via its confirmed 50% stake in Sinokor
+    // Merchant Marine (added above) — a joint-control investment through MSC's Luxembourg
+    // subsidiary SAS Shipping Agencies Services, not a wholly-owned MSC tanker fleet. Genuine and
+    // independently verifiable (Cyprus/Greece regulatory filings, PitchBook), but structured as a
+    // shared stake rather than a division — worth being precise about that distinction.
+    desc:"World's largest container shipping company by fleet size and capacity (21.2% of global container capacity, ~900 vessels, 7M TEU), founded 1970 by Gianluigi Aponte, family-owned (Aponte-Diamant family). Real, confirmed tanker-market exposure since February 2026 via a 50% ownership stake in Sinokor Merchant Marine's crude tanker (VLCC) business — one of the largest single moves into crude oil shipping by a container line. €86.4B revenue (2022), 200,000+ employees.",
+    site:"https://www.msc.com",
+    cats:["shipping-companies"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Chemin Rieu 12, 1208 Geneva, Switzerland", city:"Geneva", lat:null, lng:null, placeId:"ChIJl_8hw7Z6jEcRW-UMm2d62fM" }] },
+{ id:437, slug:"bygging-infrastructure-private-limited", name:"Bygging Infrastructure Private Limited", logo:null, country:"India",
+    // NOTE: CIN U45200MH1999PTC119477, incorporated 19-Apr-1999, Active. CROSS-VALIDATES the
+    // existing "Astha Infra Engg. (India) Private Limited" entry (already in TWI, id:67) — both
+    // appear alongside each other on multiple independent trade-directory listings as the core
+    // players in this specific Indian tank-jacking-equipment niche. Real, technically-specific
+    // Google reviews confirm genuine tank re-bottoming and silo-construction projects using the
+    // company's "Double Acting Jack" and "Lift n Weld" automatic girth-welding system. CAUTION —
+    // ENTITY AMBIGUITY: a separate "Bygging India Limited" also exists at a different Andheri
+    // West, Mumbai address — possibly a related group entity, not independently confirmed;
+    // verify before assuming the two are the same. Registered office (per MCA filings, BKC,
+    // Bandra East) differs from the operational/factory address used here (Rabale, Navi Mumbai) —
+    // the latter chosen since it's the address with real, substantive customer reviews.
+    desc:"Manufacturer of hydraulic tank jacking equipment since 1983 — Tank Jacking Equipment, Automatic Girth Welding Machines, and the 'Lift and Weld' system enabling automatic horizontal welding of both external and internal tank peripheries during erection. Explicitly serves oil refineries, petrochemical plants, fertilizer plants, power generating stations, petroleum product installations, and bulk liquid storage terminals at ports — precisely on-topic for TWI's scope. 300 units/month production capacity; also offers equipment rental, tank base repair, jack dynamic load testing and technical support services.",
+    site:"https://www.tankjackingequipment.com",
+    cats:["hydraulic-jacking-and-automatic-welding-systems", "tank-construction"],
+    locations:[{ type:"plant", name:"Works", address:"R-571 and R-570, T.T.C. Industrial Area, MIDC Industrial Area, Rabale, Navi Mumbai, Maharashtra 400701, India", city:"Navi Mumbai", lat:null, lng:null, placeId:"ChIJucP4ZgXB5zsRc0qHrsbJpUM" }] },
+{ id:438, slug:"sai-krishna-engineering-co", name:"Sai Krishna Engineering Co.", logo:null, country:"India",
+    // NOTE: a proprietorship (Mr. Mahesh R Chauhan, proprietor), not a private limited company —
+    // no CIN applies. A separately-registered "Sai Krishna Engg. & Construction Private Limited"
+    // (CIN U45400MH2013PTC251229) also exists, but its MCA classification ("Building completion")
+    // reads as generic construction finishing, not specifically tank-jacking equipment — not
+    // confidently the same business, so not conflated here. Real named client relationships
+    // (per the company's own materials) include Gannon Dunkerley & Co., Simplex Infrastructure,
+    // Bridge & Roof Co. India, and Paharpur Cooling Tower — several already independently
+    // verified elsewhere in this roster.
+    desc:"Manufacturer of hydraulic tank jacking systems since 1992 — Hydraulic Tank Jacking System, Tank Lifting Jacks, Slipform Hydraulic Jacks, and a real proprietary innovation: a 'J-hook type' tank jacking system offering an alternative to the standard lifting-arm method, requiring no welding to the tank shell. Serves storage tank construction companies directly. Real, well-reviewed (4.9 rating, 17 reviews) with substantive positive customer feedback.",
+    site:"https://saikrishnaengineeringco.com",
+    cats:["hydraulic-jacking-and-automatic-welding-systems", "tank-construction"],
+    locations:[{ type:"headquarters", name:"Works", address:"Shed No. 20, Gala No. 9, Shree Arihant Complex, Kalher Village, Taluka Bhiwandi, Thane, Maharashtra 421302, India", city:"Bhiwandi", lat:null, lng:null, placeId:"ChIJAQAAwEu55zsRYu3TU1Fp0O8" }] },
+{ id:439, slug:"ambuja-cements-limited", name:"Ambuja Cements Limited", logo:null, country:"India",
+    // NOTE: CIN L26942GJ1981PLC004717, incorporated 1981 (as Gujarat Ambuja Cement Limited, until
+    // 2007). Real, publicly listed (BSE: 500425, NSE: AMBUJACEM). Now majority-owned (63.2%) by
+    // the Adani Group, following Holcim's 2022 exit from the Indian market. Real subsidiaries
+    // include ACC — already independently verified and in TWI — plus Penna Cement, Sanghi
+    // Industries, Orient Cement, Jaypee Cement.
+    desc:"India's 9th largest building materials solutions provider globally (per its own materials); cement producer with real, substantial scale — ₹35,045 Cr revenue (2025), 18.6+ MTPA capacity, real export operations to the Middle East. Real named subsidiary relationship to ACC Limited, already in TWI.",
+    site:"https://www.ambujacement.com",
+    cats:["cement-and-aggregates"],
+    locations:[{ type:"registered-office", name:"Registered Office", address:"Adani Corporate House, Near Vaishnodevi Circle, Shantigram, S.G. Highway, Ahmedabad, Gujarat 382421, India", city:"Ahmedabad", lat:null, lng:null, placeId:"ChIJhVDm8B8oXDkRM7dQuXBZyN8" }] },
+{ id:440, slug:"shree-cement-limited", name:"Shree Cement Limited", logo:null, country:"India",
+    // NOTE: CIN L26943RJ1979PLC001935, incorporated 1979, founded by Benu Gopal Bangur, family-
+    // controlled since 1995. Real, publicly listed (BSE: 500387, NSE: SHREECEM).
+    desc:"India's third largest cement producer by capacity and by market capitalisation; 66.8 MTPA installed capacity including overseas operations. Also produces and sells power under 'Shree Power' and 'Shree Mega Power' brands. ₹19,872 Cr revenue (2025), 7,022 employees. Real named plants confirmed across Rajasthan (including Asia's largest single-location cement facility at Ras), Bihar, Chhattisgarh, Haryana, Jharkhand and Karnataka.",
+    site:"https://www.shreecement.com",
+    cats:["cement-and-aggregates"],
+    locations:[{ type:"registered-office", name:"Registered Office", address:"Bangur Nagar, Beawar, Rajasthan 305901, India", city:"Beawar", lat:null, lng:null, placeId:"ChIJlQvNqMtxaTkRlzR-Ly9f0BI" }] },
+{ id:441, slug:"jk-cement-limited", name:"JK Cement Limited", logo:null, country:"India",
+    // NOTE: CIN L17229UP1994PLC017199, incorporated 1994, part of the 108-year-old J.K.
+    // Organisation conglomerate (real, major Indian industrial group — also owns JK Tyre, JK
+    // Lakshmi Cement, JK Paper). Real, publicly listed (BSE: 532644, NSE: JKCEMENT). CAUTION: a
+    // detailed real review alleges post-payment unresponsiveness from the company ("responsive
+    // only until they receive the payment") — worth checking alongside otherwise positive reviews.
+    desc:"Major Indian cement manufacturer, part of the J.K. Organisation; ₹11,262 Cr revenue (2025), 3,606 employees. Real grey and white cement operations.",
+    site:"https://www.jkcement.com",
+    cats:["cement-and-aggregates"],
+    locations:[{ type:"registered-office", name:"Registered Office", address:"Kamla Tower, 29/1, Pheelkhana Road, Kanpur, Uttar Pradesh 208001, India", city:"Kanpur", lat:null, lng:null, placeId:"ChIJVVVQ2llHnDkRW7B9aDCTq44" }] },
+{ id:442, slug:"dalmia-cement-bharat-limited", name:"Dalmia Cement (Bharat) Limited", logo:null, country:"India",
+    // NOTE: CIN U65191TN1996PLC035963, confirmed correct via a real corporate genealogy —
+    // incorporated 1996 as "Avnija Finance Limited," renamed "Avnija Properties Limited" (2003),
+    // then "Dalmia Cement (Bharat) Limited" (2010). This is the correct operating subsidiary for
+    // cement manufacturing within the Dalmia Bharat Group, per the user's own confirmation —
+    // distinct from "Dalmia Bharat Limited," a separate group entity, per a real 2018 NCLT-
+    // approved Scheme of Arrangement and Amalgamation among Odisha Cement Limited, Dalmia Bharat
+    // Limited and this company. Real, direct connection to TWI's scope: described (per a third-
+    // party cement-industry directory citing the company's own materials) as "a pioneer in super
+    // specialty cements used for Oil wells, Railway sleepers and Air strips."
+    desc:"Key operating subsidiary of the Dalmia Bharat Group (founded 1930s) for cement manufacturing; leader in cement manufacturing since 1939, multi-state plant network (Tamil Nadu, Andhra Pradesh, Maharashtra, Bihar and more), 4,741 employees. Real specialty product line for oil wells, railway sleepers and airstrips — directly relevant to TWI's scope.",
+    site:"https://www.dalmiacement.com",
+    cats:["cement-and-aggregates"],
+    locations:[{ type:"registered-office", name:"Registered Office", address:"Dalmiapuram, District Tiruchirappalli, Tamil Nadu 621651, India", city:"Tiruchirappalli", lat:null, lng:null, placeId:"ChIJETEvSu7nqjsR6tXbqcE1CXs" }] },
+{ id:443, slug:"birla-corporation-limited", name:"Birla Corporation Limited", logo:null, country:"India",
+    // NOTE: CIN L01132WB1919PLC003334, incorporated 1919 (106+ years) — one of India's oldest
+    // industrial companies. Real, publicly listed (BSE: 500335, NSE: BIRLACORPN), flagship company
+    // of the M.P. Birla Group.
+    desc:"Historic Indian conglomerate (founded 1910s by Ghanshyam Das Birla, carried on by Madhav Prasad Birla), operating cement, jute, linoleum and auto trim divisions. Real named cement brands (MP Birla Cement Perfect Plus, Samrat, Ultimate Ultra, and others) and real named plants across Madhya Pradesh, Rajasthan, Uttar Pradesh, West Bengal and Maharashtra.",
+    site:"https://birlacorporation.com",
+    cats:["cement-and-aggregates"],
+    locations:[{ type:"registered-office", name:"Registered Office", address:"Birla Building, 9/1 R.N. Mukherjee Road, Kolkata, West Bengal 700001, India", city:"Kolkata", lat:null, lng:null, placeId:"ChIJj1goHwB3AjoRzO_hJ2iCimI" }] },
+{ id:444, slug:"nuvoco-vistas-corporation-limited", name:"Nuvoco Vistas Corporation Limited", logo:null, country:"India",
+    // NOTE: CIN L26940MH1999PLC118229, real, well-documented corporate history — incorporated
+    // 1999 as Infra Cement India Private Limited, renamed Lafarge India Limited (the real Indian
+    // subsidiary of the French cement giant Lafarge) in 2016, then renamed Nuvoco Vistas
+    // Corporation Limited in 2017 following divestment and acquisition by the Nirma Group. Real
+    // Google Places review independently confirms: "Head office of India's 5th Cement
+    // manufacturing company."
+    desc:"Part of the Nirma Group (a major Indian conglomerate); manufactures and sells Cement, Ready-Mix Concrete (RMX) and Modern Building Materials — 11 cement plants and 51 RMX plants across ~80 locations. Real named landmark projects: Lodha World One (Mumbai), Amritsar Entry Gate, and Metro Railways in Delhi, Jaipur, Noida and Mumbai. 3,369 employees.",
+    site:"https://www.nuvoco.com",
+    cats:["cement-and-aggregates", "ready-mix-concrete"],
+    locations:[{ type:"registered-office", name:"Registered Office", address:"Equinox Business Park, Tower-3, East Wing, 4th Floor, LBS Road, Kurla West, Mumbai, Maharashtra 400070, India", city:"Mumbai", lat:null, lng:null, placeId:"ChIJ1ZF1yo7I5zsRudROz-HmPSY" }] },
+{ id:445, slug:"udyogi-safety-appliances-private-limited", name:"Udyogi Safety Appliances Private Limited", logo:null, country:"India",
+    // NOTE: CIN U74900WB2008PTC122580, established 1982. IMPORTANT ADDRESS CORRECTION: a source
+    // list this company was originally sourced from gave an address at "26, N.S. Road, Marshall
+    // House" (700001) — WRONG. Independently re-verified via MCA filings, ZaubaCorp, IndiaFilings
+    // and the company's own contact page, all consistent on "294, B.B. Ganguly Street" (700012).
+    desc:"Manufacturer of a full range of PPE, per own materials India's largest PPE manufacturer/exporter — real substantial manufacturing infrastructure across Junglepur, Ranihati (West Bengal) and Dadra facilities (107,000+ sq ft). Real reviews are mixed — one alleges broken promises and unresponsive staff, another confirms 11 years of good service — worth checking directly.",
+    site:"https://udyogisafety.com",
+    cats:["occupational-safety"],
+    locations:[{ type:"registered-office", name:"Registered Office", address:"294, B.B. Ganguly Street, Kolkata, West Bengal 700012, India", city:"Kolkata", lat:null, lng:null, placeId:"ChIJlTwdVed3AjoR4pQMJg5854U" }] },
+{ id:446, slug:"mallcom-india-ltd", name:"Mallcom (India) Ltd.", logo:null, country:"India",
+    // NOTE: CIN L51109WB1983PLC037008, real, publicly listed. Address independently confirmed
+    // correct against multiple sources.
+    desc:"Major PPE brand — gloves, protective garments, safety footwear — with real presence in 50+ countries and 500,000 sq ft of manufacturing across 7 sites. One unrelated review describes an apparent job-scam complaint, not connected to the core PPE business.",
+    site:"https://www.mallcom.in",
+    cats:["occupational-safety"],
+    locations:[{ type:"registered-office", name:"Registered Office", address:"EN-12, Sector-V, Salt Lake City, Kolkata, West Bengal 700091, India", city:"Kolkata", lat:null, lng:null, placeId:"ChIJVVV5TK51AjoRTp3kfoIJqCo" }] },
+{ id:447, slug:"venus-safety-and-health-private-limited", name:"Venus Safety & Health Private Limited", logo:null, country:"India",
+    // NOTE: CIN U85100MH2007PTC172380, established 1986. ADDRESS CORRECTION: an originating
+    // source list gave the plot as "L-29, Taloja MIDC" — WRONG plot number; the real, MCA-
+    // verified address is Plot T-15, confirmed via multiple independent sources.
+    desc:"ISO 9001:2015 certified PPE manufacturer — respirators, masks, ear protection, filtration equipment; real global offices in the UAE, Netherlands, UK and USA. 180 employees. Strongly reviewed (4.8 rating, 247 reviews).",
+    site:"https://venusohs.com",
+    cats:["occupational-safety"],
+    locations:[{ type:"registered-office", name:"Registered Office", address:"Plot No. T-15, Taloja MIDC Industrial Area, Village Khairane-Budruk, Navi Mumbai, Raigad, Maharashtra 410208, India", city:"Navi Mumbai", lat:null, lng:null, placeId:"ChIJ1R3uYjTq5zsRkn6vxagQN-A" }] },
+{ id:448, slug:"3m-india-limited", name:"3M India Limited", logo:null, country:"India",
+    // NOTE: CIN L31300KA1987PLC013543, real, publicly listed since 1987, Indian subsidiary of the
+    // global 3M Company. ADDRESS CORRECTION: an originating source list gave "Concorde Block, UB
+    // City" — this is a different, older corporate office; the current MCA-registered office,
+    // confirmed via ZaubaCorp/NSE/BSE filings, is at Electronic City.
+    desc:"Major PPE manufacturer — respirators, ear protection — part of the global 3M Company. Strongly reviewed (4.4 rating, 385 reviews).",
+    site:"https://www.3mindia.in",
+    cats:["occupational-safety"],
+    locations:[{ type:"registered-office", name:"Registered Office", address:"Plot Nos. 48-51, Electronic City, Hosur Road, Bengaluru, Karnataka 560100, India", city:"Bengaluru", lat:null, lng:null, placeId:"ChIJRSQ0m4RsrjsRyM4uVvfvS3Q" }] },
+{ id:449, slug:"liberty-shoes-limited", name:"Liberty Shoes Limited", logo:null, country:"India",
+    // NOTE: CIN L19201HR1986PLC033185, real, publicly listed, founded 1954, ₹750 Cr revenue.
+    // CAUTION: this company's connection to the "Warrior" safety-shoe brand specifically was NOT
+    // independently confirmed during research — verify before relying on that particular product
+    // association. Address independently confirmed correct.
+    desc:"Publicly listed footwear company, founded 1954; real, detailed negative review about product quality and staff conduct exists alongside otherwise positive coverage — worth checking directly.",
+    site:"https://www.libertyshoesonline.com",
+    cats:["occupational-safety"],
+    locations:[{ type:"registered-office", name:"Registered Office", address:"Libertypuram, 13th Milestone, G.T. Karnal Road, Karnal, Haryana 132114, India", city:"Karnal", lat:null, lng:null, placeId:"ChIJXdy1KxRxDjkRcsfMwhStpjE" }] },
+{ id:450, slug:"sure-safety-india-limited", name:"Sure Safety (India) Limited", logo:null, country:"India",
+    // NOTE: CIN U31903GJ2013PLC073194, ISO 9001:2008 certified. SEVERE ADDRESS CORRECTION: an
+    // originating source list placed this company in Ankleshwar — WRONG CITY; the real, MCA-
+    // verified registered office is in Vadodara/Chhani, ~60km away.
+    desc:"PPE manufacturer — fall protection and respiratory protection equipment. Real reviews are mixed — some strongly positive, one describes a denied return on defective N95 masks — worth checking directly.",
+    site:"https://suresafety.com",
+    cats:["occupational-safety"],
+    locations:[{ type:"registered-office", name:"Registered Office", address:"Plot No. 42, A/B, Yoginagar Township, Beside Zenith Tin, NH No. 8, Chhani, Vadodara, Gujarat 391740, India", city:"Vadodara", lat:null, lng:null, placeId:"ChIJVVVVVTrJXzkR_bAXwQHCv-0" }] },
+{ id:451, slug:"hicare-protectivewear-pvt-ltd", name:"HiCare Protectivewear Pvt. Ltd.", logo:null, country:"India",
+    // NOTE: real but small, recently founded (2017); recently renamed from "Hi-Care Safety
+    // Solutions" to "HiCare Protectivewear" per its own LinkedIn. CIN not independently confirmed.
+    // SEVERE ADDRESS CORRECTION: an originating source list placed this company in Chennai — WRONG
+    // STATE; the company is genuinely based in Navi Mumbai, Maharashtra. CAUTION: multiple
+    // detailed, credible negative reviews allege missed delivery dates, demands for full advance
+    // payment followed by non-delivery, and low product quality — a real pattern worth weighing
+    // seriously given the company's small size and short track record.
+    desc:"PPE manufacturer (helmets, eyewear per original product listing). CAUTION: multiple detailed negative reviews allege demanding full advance payment then missing delivery dates, plus low-quality product — verify directly before relying on this listing given the company's limited track record.",
+    site:"https://www.hicaresafety.com",
+    cats:["occupational-safety"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"First Floor, MIDC Industrial Road, TTC Industrial Area, Mahape, Navi Mumbai, Maharashtra 400701, India", city:"Navi Mumbai", lat:null, lng:null, placeId:"ChIJi3s6-YvA5zsRjiHd2suDTEQ" }] },
+{ id:452, slug:"joseph-leslie-and-co-llp", name:"Joseph Leslie & Co. LLP", logo:null, country:"India",
+    // NOTE: LLP — no CIN applies. Real, substantial, long history ("Since 1933"). ADDRESS
+    // CORRECTION: an originating source list gave an address at Fort, Mumbai — WRONG; the real,
+    // current address (Dadar West) is confirmed via the company's own materials.
+    desc:"Manufactures PPE in-house AND represents international safety brands exclusively in India; real regional offices in Gujarat, Delhi, Kolkata and Chennai plus international agents in Bangladesh and the Middle East. Explicitly serves Oil & Gas, Petrochemical, Automotive and Pharmaceutical industries — directly on-topic for TWI. Strongly reviewed (4.7 rating, 15 reviews).",
+    site:"https://www.josephleslie.com",
+    cats:["occupational-safety"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Off 87-C, 3rd Floor, Leslico House, Prof. VS Agashe Road, Dadar West, Mumbai, Maharashtra 400028, India", city:"Mumbai", lat:null, lng:null, placeId:"ChIJd82aN8PO5zsRNowPm5JvvnI" }] },
+{ id:453, slug:"exide-energy-solutions-limited", name:"Exide Energy Solutions Limited", logo:null, country:"India",
+    // NOTE: CIN U31100WB2022PLC252459, incorporated 2022, real subsidiary of publicly listed
+    // Exide Industries. CAUTION: a genuinely different, unrelated entity — "Exide Energy Private
+    // Limited" (CIN U74999WB2018PTC259348, Gujarat) — also exists; do not conflate the two.
+    desc:"Building India's first Lithium-Ion Cell Giga plant in Bengaluru; real subsidiary of Exide Industries (publicly listed, ₹16,588 Cr revenue).",
+    site:"https://www.exideenergy.in",
+    cats:["bess-systems"],
+    locations:[{ type:"registered-office", name:"Registered Office", address:"Exide House, 59E Chowringhee Road, Kolkata, West Bengal 700020, India", city:"Kolkata", lat:null, lng:null, placeId:"ChIJt5ZUJQB3AjoRW-cVIXBYM5g" }] },
+{ id:454, slug:"tata-autocomp-systems-limited", name:"Tata AutoComp Systems Limited", logo:null, country:"India",
+    // NOTE: CIN U34100MH1995PLC093733, part of Tata Group.
+    desc:"Real battery pack manufacturing and energy storage integration business. Strongly reviewed (4.3 rating, 52 reviews).",
+    site:"https://www.tataautocomp.com",
+    cats:["bess-systems"],
+    locations:[{ type:"registered-office", name:"Registered Office", address:"TACO House, Off Law College Road, Damle Path, Pune, Maharashtra 411004, India", city:"Pune", lat:null, lng:null, placeId:"ChIJcXEqDsG7wjsRYdYnbaIkcwM" }] },
+{ id:455, slug:"replus-engitech-private-limited", name:"Replus Engitech Private Limited", logo:null, country:"India",
+    // NOTE: CIN not independently confirmed. CAUTION: a detailed review describes the team as
+    // "severely understaffed" with resulting service-quality impact — worth checking alongside
+    // otherwise positive reviews.
+    desc:"Real BESS-focused startup, subsidiary of Bhilwara Energy Ltd (a real Indian conglomerate) per ZoomInfo.",
+    site:"",
+    cats:["bess-systems"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"SB 701, 702 and SB 716, 7th Floor South Block, Sacred World, Wanwadi, Pune, Maharashtra 411040, India", city:"Pune", lat:null, lng:null, placeId:"ChIJl1BEdE3BwjsRXGY1XyOs_bk" }] },
+{ id:456, slug:"statcon-energiaa-private-limited", name:"Statcon Energiaa Private Limited", logo:null, country:"India",
+    // NOTE: CIN not independently confirmed. CAUTION: real reviews are genuinely mixed — some
+    // strongly positive about ESS products working flawlessly, but also a detailed complaint
+    // about non-functional batteries and 7 days of unresponsive customer support — worth checking
+    // directly.
+    desc:"Established Noida-based power-electronics/energy-storage manufacturer with a substantial public footprint (604 Google reviews).",
+    site:"",
+    cats:["bess-systems"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"B-81, B Block, Sector 63, Noida, Uttar Pradesh 201309, India", city:"Noida", lat:null, lng:null, placeId:"ChIJu3y6avXvDDkRSZ7075WeU5Q" }] },
+{ id:457, slug:"delta-electronics-india-private-limited", name:"Delta Electronics India Private Limited", logo:null, country:"India",
+    // NOTE: CIN U32109TN2008FTC120482, real, substantial (₹1,574 Cr paid-up capital), Indian
+    // subsidiary of the global Delta Electronics (Taiwan). CAUTION: a related sibling entity
+    // within the same group — "Delta Energy Systems (India) Private Limited" (CIN
+    // U32308HR1996PTC034410, Gurgaon, sharing directors with this entity) — is confirmed "Under
+    // Liquidation." This entry uses the correct, active entity; do not conflate the two.
+    desc:"Real Indian subsidiary of the global Delta Electronics (Taiwan), power electronics and energy storage systems.",
+    site:"",
+    cats:["bess-systems"],
+    locations:[{ type:"registered-office", name:"Registered Office", address:"87/48, 1st Floor, ASV Chamiers Square, Chamiers Road, Chennai, Tamil Nadu 600028, India", city:"Chennai", lat:null, lng:null, placeId:"ChIJiR0a7rZnUjoRA_fc-JnyH60" }] },
+{ id:458, slug:"hitachi-energy-india-limited", name:"Hitachi Energy India Limited", logo:null, country:"India",
+    // NOTE: CIN L31904KA2019PLC121597, real, publicly listed, incorporated 2019 (spun off from
+    // ABB's power grids business).
+    desc:"Real, publicly listed power grid and energy technology company. Strongly reviewed (4.5 rating, 78 reviews).",
+    site:"",
+    cats:["bess-systems"],
+    locations:[{ type:"registered-office", name:"Registered Office", address:"8th Floor, No. 70/401, Kodigehalli Main Road, Bengaluru, Karnataka 560092, India", city:"Bengaluru", lat:null, lng:null, placeId:"ChIJcbQa8FkXrjsRMlD76srmfxE" }] }
 ];
 
 // Immutable copy of the in-page roster, taken BEFORE CompanyStore.load()
@@ -3671,6 +4424,7 @@ function renderCards() {
       return l ? `<span class="tag">${l.code}</span>` : '';
     }).join('');
     const more = c.cats.length > 3 ? `<span class="tag more">+${c.cats.length - 3}</span>` : '';
+    const msmeRow = c.msme ? `<div class="card-msme-row">${msmeBadgeHtml(c, true)}${udyamCtaHtml(c)}</div>` : '';
     return `
       <a class="company-card" href="#/company/${c.slug}">
         <div class="card-header">
@@ -3682,6 +4436,7 @@ function renderCards() {
         </div>
         <div class="card-desc">${c.desc}</div>
         <div class="card-tags">${tags}${more}</div>
+        ${msmeRow}
       </a>`;
   }).join('');
 }
@@ -3724,6 +4479,29 @@ function parentLineHtml(c) {
     ? `<a href="#/company/${p.slug}">${p.name}</a>`
     : `<span class="rel-unlisted" title="Not listed in this directory">${p.name}</span>`;
   return `<div class="cp-rel">${label} ${target}</div>`;
+}
+
+// c.msme = { category: "Micro"|"Small"|"Medium"|null, udyamNumber: string|null }.
+// category is null when a company is confirmed MSME-scale but the specific
+// tier hasn't been verified yet (most of the roster, at least for now — see
+// the sourcing notes on why Udyam numbers in particular are hard to verify
+// independently: no public name-based lookup exists the way MCA/CIN has one).
+function msmeBadgeHtml(c, compact) {
+  if (!c.msme) return '';
+  const label = compact ? 'MSME' : (c.msme.category ? `MSME · ${c.msme.category}` : 'MSME');
+  return `<span class="badge-msme" title="Micro, Small &amp; Medium Enterprise">${label}</span>`;
+}
+
+// Pending state is clickable — explains today's real status (claiming isn't
+// built yet) rather than dead-ending on a button that looks actionable but
+// does nothing. Once claiming ships, this onclick becomes the real trigger.
+function udyamCtaHtml(c) {
+  if (!c.msme) return '';
+  const num = c.msme.udyamNumber;
+  if (num) {
+    return `<span class="udyam-cta verified" title="Udyam Registration Number">UDYAM: ${num}</span>`;
+  }
+  return `<span class="udyam-cta pending" onclick="event.preventDefault(); alert('Udyam number not yet added. Once company claiming is live (via TankWorld India or Tankonomics), verified owners will be able to add this directly from their listing.');" title="Click for status">UDYAM:</span>`;
 }
 
 // Reverse view: entities in the directory that name THIS company as parent.
@@ -3790,6 +4568,7 @@ function renderCompanyPage(slug) {
         ${parentLineHtml(c)}
       </div>
     </div>
+    ${c.msme ? `<div class="cp-msme-row">${msmeBadgeHtml(c, false)}${udyamCtaHtml(c)}</div>` : ''}
     <div class="cp-desc">${c.desc}</div>
     <a class="cp-site" href="${c.site}" target="_blank" rel="noopener">Visit Website ↗</a>
     <div class="cp-section-label">Locations (${c.locations.length})</div>
