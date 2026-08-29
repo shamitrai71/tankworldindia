@@ -772,6 +772,9 @@ const CATEGORY_TREE = [
     { code:"FT-18", name:"Rail Loading Systems", slug:"rail-loading-systems" },
     { code:"FT-19", name:"Offshore Loading Systems (SPM/CALM)", slug:"offshore-loading-systems-spm-calm" },
     { code:"FT-20", name:"Cryogenic Loading Systems (LNG)", slug:"cryogenic-loading-systems-lng" },
+    { code:"FT-21", name:"Heat Exchangers", slug:"heat-exchangers" },
+    { code:"FT-22", name:"Filtration & Separation Technology", slug:"filtration-and-separation-technology" },
+    { code:"FT-23", name:"Membrane Technologies", slug:"membrane-technologies" },
   ]},
   { code:"IA", name:"Instrumentation & Automation", slug:"instrumentation-and-automation", items:[
     { code:"IA-01", name:"Terminal Automation", slug:"terminal-automation" },
@@ -857,6 +860,7 @@ const CATEGORY_TREE = [
   { code:"MR", name:"Industrial Supplies (MRO)", slug:"industrial-supplies-mro", items:[
     { code:"MR-01", name:"Industrial Safety Equipment", slug:"industrial-safety-equipment" },
     { code:"MR-02", name:"Gaskets", slug:"gaskets" },
+    { code:"MR-03", name:"Welding Equipment & Consumables", slug:"welding-equipment-and-consumables" },
   ]},
   { code:"LT", name:"Logistics & Transportation", slug:"logistics-and-transportation", items:[
     { code:"LT-01", name:"Marine & Port Equipment", slug:"marine-and-port-equipment" },
@@ -914,10 +918,9 @@ const CATEGORY_TREE = [
       { code:"UE-06.2", name:"UPS Systems", slug:"ups-systems" },
       { code:"UE-06.3", name:"Power Distribution Equipment", slug:"power-distribution-equipment" },
     ]},
-    { code:"UE-07", name:"Renewable Energy", slug:"renewable-energy" },
-    { code:"UE-08", name:"Battery Energy Storage", slug:"battery-energy-storage" },
     { code:"UE-09", name:"Hydrogen Infrastructure", slug:"hydrogen-infrastructure" },
     { code:"UE-10", name:"Utility Contractors", slug:"utility-contractors" },
+    { code:"UE-11", name:"Industrial Burners & Boilers", slug:"industrial-burners-and-boilers" },
   ]},
   { code:"RE", name:"Renewables & Energy Storage", slug:"renewables-and-energy-storage", items:[
     { code:"RE-01", name:"Solar Power Systems", slug:"solar-power-systems" },
@@ -1439,19 +1442,19 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     site:"http://www.nvent.com",
     cats:["heating-systems", "electrical-and-instrumentation"],
     locations:[{ type:"registered-office", name:"Registered Office", address:"6th Floor, Jolly Board Tower, D-Wing, i-Think Techno Campus, Nehru Nagar, Kanjurmarg East, Mumbai, Maharashtra 400042, India", city:"", lat:null, lng:null, placeId:"ChIJm9-TaADH5zsRGeHegZoDHCA" }] },
-{ id:94, slug:"uop-india-private-limited", name:"UOP India Private Limited", logo:null, country:"India",
+{ id:94, slug:"uop-india-private-limited", name:"UOP India Private Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fuop-india-private-limited.jpg?alt=media&token=5495fea1-de61-448c-8024-e77d25aa9e6a", country:"India",
     desc:"Indian subsidiary of Honeywell UOP, a global licensor of refining and petrochemical process technologies — fluid catalytic cracking, hydrocracking, isomerization, propane dehydrogenation — and associated catalysts and adsorbents. CIN U74210DL1999PTC099471.",
     site:"https://www.uop.com",
     cats:["process-technology-licensors", "refining-process-technologies", "petrochemical-process-technologies"],
     parent:{ name:"Honeywell UOP", slug:"", relationship:"subsidiary" },
     locations:[{ type:"registered-office", name:"Registered Office", address:"5th & 6th Floor, Tower B, Building No. 9, DLF Cyber City, Phase 3, Sector 24, Gurugram, Haryana 122002, India", city:"Gurugram, Haryana", lat:28.4962362, lng:77.0929376, placeId:"ChIJMRKe0DcZDTkRAj5sJenQZF4" }] },
-{ id:95, slug:"axens-india-private-limited", name:"Axens India Private Limited", logo:null, country:"India",
+{ id:95, slug:"axens-india-private-limited", name:"Axens India Private Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Faxens-india-private-limited.jpg?alt=media&token=451386c5-e94a-4ea7-a66e-60b0004b4e33", country:"India",
     desc:"Indian subsidiary of Axens SA, a French licensor of refining, petrochemical, and gas processing process technologies, plus associated catalysts and adsorbents. CIN U24100DL2008PTC185946.",
     site:"https://www.axens.net",
     cats:["process-technology-licensors", "refining-process-technologies", "petrochemical-process-technologies"],
     parent:{ name:"Axens SA", slug:"", relationship:"subsidiary" },
     locations:[{ type:"registered-office", name:"Registered Office", address:"Intermediate Floor, F Block, American Plaza, International Trade Tower, Nehru Place, New Delhi, Delhi 110019, India", city:"New Delhi", lat:null, lng:null, placeId:"ChIJVVW57lLiDDkRd9lKQvRAACE" }] },
-{ id:96, slug:"haldor-topsoe-india-private-limited", name:"Haldor Topsoe India Private Limited", logo:null, country:"India",
+{ id:96, slug:"haldor-topsoe-india-private-limited", name:"Haldor Topsoe India Private Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fhaldor-topsoe-india-private-limited.png?alt=media&token=9280081d-6199-4ac3-9ffa-98d32af454e3", country:"India",
     // NOTE: MCA statutory registered office is Jasola, New Delhi (used below). Some current
     // online listings show a Noida DLF Techpark address instead — worth reconfirming which is
     // the company's actual working office before treating either as final.
@@ -2362,14 +2365,25 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
 { id:244, slug:"tata-power-renewable-energy-limited", name:"Tata Power Renewable Energy Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Ftata-power-renewable-energy-limited.png?alt=media&token=5d45da88-0e26-4b2c-b464-43f3ebc957ee", country:"India",
     desc:"Renewable energy subsidiary of The Tata Power Company Limited; solar, wind and hybrid solar-plus-storage EPC and asset development at utility scale, including Battery-Backed Supply Purchase Agreement (BESPA) contracting models, alongside rooftop and distributed solar.",
     site:"https://www.tatapower.com/renewables",
-    cats:["renewable-energy", "battery-energy-storage"],
+    // NOTE: previously tagged ["renewable-energy", "battery-energy-storage"] (UE-07/UE-08) —
+    // both removed as redundant duplicates of the dedicated RE section (RE-02 bess-systems is
+    // the same concept as the old UE-08, just a different slug; UE-07 was a vague catch-all the
+    // RE section already covers with more granularity). Re-tagged to the correct RE equivalents,
+    // both directly confirmed by this company's own description (solar + hybrid solar-plus-
+    // storage/BESPA). Real wind business too, per the description, but no "Wind Power Systems"
+    // category exists anywhere in the RE section — not force-tagged to an unrelated category;
+    // worth considering as a genuine future addition given this company's real wind portfolio.
+    cats:["solar-power-systems", "bess-systems"],
     parent:{ name:"The Tata Power Company Limited", slug:"", relationship:"subsidiary" },
     locations:[{ type:"registered-office", name:"Registered Office", address:"C/o The Tata Power Company Ltd, Corporate Center A Block, 34 Sant Tukaram Road, Carnac Bunder, Mumbai, Maharashtra 400009, India", city:"Mumbai", lat:null, lng:null, placeId:"ChIJq6q6_iXO5zsRFjWPwCHHTB8" }] },
 { id:245, slug:"amara-raja-energy-and-mobility-limited", name:"Amara Raja Energy & Mobility Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Famara-raja-energy-and-mobility-limited.jpg?alt=media&token=1747d9da-13dc-45af-b5d7-5c2a02014e39", country:"India",
     // NOTE: formerly Amara Raja Batteries Limited; flagship listed entity of the Amara Raja Group.
     desc:"Publicly listed (NSE/BSE) flagship company of the Amara Raja Group, founded 1985; industrial and automotive lead-acid batteries plus an expanding lithium-ion and Battery Energy Storage System (BESS) business for grid, industrial and telecom applications, exporting to 65+ countries.",
     site:"https://www.amararajabatteries.com",
-    cats:["battery-energy-storage"],
+    // NOTE: previously tagged ["battery-energy-storage"] (UE-08) — removed as a redundant
+    // duplicate slug for the same concept as RE-02 (bess-systems). Re-tagged to the correct,
+    // single canonical BESS category.
+    cats:["bess-systems"],
     locations:[{ type:"registered-office", name:"Registered Office", address:"Renigunta-Cuddapah Road, Karakambadi, Tirupati, Andhra Pradesh 517520, India", city:"Tirupati", lat:null, lng:null, placeId:"ChIJdRQdCs9JTToR2nmweW5rk4g" }] },
 { id:247, slug:"reliance-industries-limited", name:"Reliance Industries Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Freliance-industries-limited.jpg?alt=media&token=86d2235c-ae61-4609-aacd-8e3b151cc589", country:"India",
     desc:"Publicly listed (NSE/BSE: RELIANCE) India's largest private conglomerate; building a fully integrated green hydrogen giga-ecosystem at Jamnagar, Gujarat, targeting 3 GW annual electrolyser manufacturing capacity and 3 million tonnes per annum of green hydrogen production by 2032.",
@@ -3007,7 +3021,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     site:"https://www.ymfg.co.in",
     cats:["industrial-ladders"],
     locations:[{ type:"registered-office", name:"Registered Office", address:"Plot No. 14, Ecotech-1 Extension, Near Kasna, Greater Noida, Uttar Pradesh 201310, India", city:"Greater Noida", lat:null, lng:null, placeId:"ChIJLSmipg_BDDkR564wn7K6uBc" }] },
-{ id:335, slug:"chemie-tech-dmcc", name:"Chemie-Tech DMCC", logo:null, country:"United Arab Emirates",
+{ id:335, slug:"chemie-tech-dmcc", name:"Chemie-Tech DMCC", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fchemie-tech-dmcc.png?alt=media&token=5a4bd3c8-41fa-4601-bf15-5185aa3553ef", country:"United Arab Emirates",
     // NOTE: entity corrected from initial entry — confirmed via EME Outlook Magazine and CB
     // Insights that DMCC, not LLC, is the group's flagship contracting entity, with named
     // Chairman & Managing Director M.K. Saiyed. Group lineage: founded in India in 1997 as
@@ -3023,7 +3037,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     site:"https://www.chemietech.com",
     cats:["epc-contractors", "tank-construction"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"P.O. Box 29781, 502, Al Majaz Pearl Building, 44 Northern Park Street, Al Majaz Park, Sharjah, United Arab Emirates", city:"Sharjah", lat:null, lng:null, placeId:null }] },
-{ id:336, slug:"nan-technical-trading-wll", name:"NAN Technical Trading W.L.L.", logo:null, country:"Bahrain",
+{ id:336, slug:"nan-technical-trading-wll", name:"NAN Technical Trading W.L.L.", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fnan-technical-trading-wll.jpg?alt=media&token=fa2b18ac-1fca-4978-966f-578e27d9c5f0", country:"Bahrain",
     // NOTE: the user referred to this as a UAE company, but the site's phone country code (+973),
     // "W.L.L." (With Limited Liability) company suffix, and multiple independent Bahrain business
     // directories (Dun & Bradstreet, Bahrain Yellow Pages, Made in Bahrain Gate) all confirm
@@ -3050,7 +3064,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     site:"https://www.simplexinfra.com/",
     cats:["heavy-engineering-and-fabrication"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Kolkata, West Bengal, India", city:"Kolkata", lat:null, lng:null, placeId:"ChIJ6SbkxQVb4jkRHJGDApyKwPs" }] },
-{ id:338, slug:"kalpataru-projects-international-limited", name:"Kalpataru Projects International Limited", logo:null, country:"India",
+{ id:338, slug:"kalpataru-projects-international-limited", name:"Kalpataru Projects International Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fkalpataru-projects-international-limited.jpg?alt=media&token=8840895c-6647-4f3d-916d-efe8badada9a", country:"India",
     // NOTE: sourced from Bridge & Roof's 2014 list, which listed "JMC Project (India) Ltd." —
     // that entity has since been legally amalgamated into Kalpataru Projects International
     // Limited (formerly Kalpataru Power Transmission Limited) per an NCLT order effective 4
@@ -3060,7 +3074,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     site:"https://kalpataruprojects.com",
     cats:["epc-contractors"],
     locations:[{ type:"registered-office", name:"Registered Office", address:"Plot No. 101, Part-III, G.I.D.C. Estate, Sector-28, Gandhinagar, Gujarat 382028, India", city:"Gandhinagar", lat:null, lng:null, placeId:"ChIJpewESYArXDkRWKHYA0xaF8o" }] },
-{ id:340, slug:"cemindia-projects-limited", name:"Cemindia Projects Limited", logo:null, country:"India",
+{ id:340, slug:"cemindia-projects-limited", name:"Cemindia Projects Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fcemindia-projects-limited.jpg?alt=media&token=4d8a7460-3234-4a92-8d4c-268882248239", country:"India",
     // NOTE: sourced from Bridge & Roof's 2014 list, which listed "Skanska Cementation India
     // Limited" (Category I, Structure Fabrication & Erection). Name history: Skanska Cementation
     // India Limited → renamed ITD Cementation India Limited in May 2005 (after Skanska's
@@ -3073,7 +3087,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     site:"https://www.itdcem.co.in",
     cats:["epc-contractors", "heavy-engineering-and-fabrication"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Office-1, DP Block, Sector V, Bidhannagar, Kolkata, West Bengal 700091, India", city:"Kolkata", lat:null, lng:null, placeId:"ChIJkfv-q8t1AjoRRIdsSVlM6gA" }] },
-{ id:341, slug:"gillanders-arbuthnot-and-co-ltd", name:"Gillanders Arbuthnot & Co Ltd", logo:null, country:"India",
+{ id:341, slug:"gillanders-arbuthnot-and-co-ltd", name:"Gillanders Arbuthnot & Co Ltd", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fgillanders-arbuthnot-and-co-ltd.jpg?alt=media&token=febc4f1c-a5bc-4e6d-bf13-1cc9509b5ea9", country:"India",
     // NOTE: sourced from Bridge & Roof's 2014 list (Category I, Structure Fabrication & Erection).
     // CIN-verified Active, publicly listed. One of Kolkata's oldest business houses, tracing to
     // the British managing-agency era (19th century) — a genuine heritage building per Google
@@ -3082,7 +3096,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     site:"https://www.gillandersarbuthnot.com",
     cats:["heavy-engineering-and-fabrication"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"C-4, Netaji Subhas Road, Murgighata, B.B.D. Bagh, Kolkata, West Bengal 700001, India", city:"Kolkata", lat:null, lng:null, placeId:"ChIJ77mAR7t3AjoRQ_qTzdpGa8I" }] },
-{ id:342, slug:"sew-infrastructure-limited", name:"Sew Infrastructure Limited", logo:null, country:"India",
+{ id:342, slug:"sew-infrastructure-limited", name:"Sew Infrastructure Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fsew-infrastructure-limited.jpg?alt=media&token=4041393e-c857-4cc2-bba7-f60e78b9a6a8", country:"India",
     // NOTE: sourced from Bridge & Roof's 2014 list, listed there as "Sew Construction Ltd." CIN-
     // verified Active. Real Google review confirms: "50 years plus Infrastructure company...part
     // of prestigious Nagarjuna sagar Dam construction in 50s and 60s."
@@ -3090,7 +3104,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     site:"https://www.sewinfrastructure.com",
     cats:["epc-contractors"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"6-3-871, Snehalatha, Greenlands Road, Begumpet, Hyderabad, Telangana 500016, India", city:"Hyderabad", lat:null, lng:null, placeId:"ChIJRXSAqLWQyzsR2YrA8bFCOg8" }] },
-{ id:343, slug:"adarsh-noble-corporation-limited", name:"Adarsh Noble Corporation Limited", logo:null, country:"India",
+{ id:343, slug:"adarsh-noble-corporation-limited", name:"Adarsh Noble Corporation Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fadarsh-noble-corporation-limited.jpg?alt=media&token=083aa79e-5152-418f-b15a-9501d9a509c2", country:"India",
     // NOTE: sourced from Bridge & Roof's 2014 list (Category I, Tank Construction section, the
     // ONLY Category I entry in that entire section). CIN-verified Active. The mapped Google
     // Places location is a workshop/plant, not the registered office — flagged via location type.
@@ -3098,7 +3112,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     site:"",
     cats:["tank-construction", "epc-contractors"],
     locations:[{ type:"plant", name:"Workshop", address:"Gumakarama, Odisha 768212, India", city:"", lat:null, lng:null, placeId:"ChIJ8VvA3IUdIToRwyGOffIsXIg" }] },
-{ id:344, slug:"sterling-and-wilson-private-limited", name:"Sterling and Wilson Private Limited", logo:null, country:"India",
+{ id:344, slug:"sterling-and-wilson-private-limited", name:"Sterling and Wilson Private Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fsterling-and-wilson-private-limited.png?alt=media&token=da3c248b-eed4-4fa0-a623-4aa566b4ab39", country:"India",
     // NOTE: sourced from Bridge & Roof's 2014 list (Category I, Electrical-Instrumentation
     // Works). CIN-verified Active, part of Shapoorji Pallonji Group. Distinct from the separate,
     // publicly-listed Sterling and Wilson Renewable Energy Limited (CIN L74999MH2017PLC292281,
@@ -3107,7 +3121,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     site:"https://www.sterlingandwilson.com",
     cats:["epc-contractors"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"9, Universal Majestic, P.L. Lokhande Marg, Chembur West, Mumbai, Maharashtra 400043, India", city:"Mumbai", lat:null, lng:null, placeId:"ChIJ8c_6GhfG5zsRroIjGIGXZcQ" }] },
-{ id:345, slug:"power-mech-projects-limited", name:"Power Mech Projects Limited", logo:null, country:"India",
+{ id:345, slug:"power-mech-projects-limited", name:"Power Mech Projects Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fpower-mech-projects-limited.png?alt=media&token=f6d77e18-f7d3-49ef-a5e2-5376fc1fddea", country:"India",
     // NOTE: sourced from Bridge & Roof's 2014 list (Category I, Boiler Fabrication & Erection).
     // CIN-verified Active, publicly listed. Real Google review confirms: "major clients like
     // BHEL" (BHEL already independently verified elsewhere in this roster).
@@ -3115,14 +3129,14 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     site:"https://www.powermechprojects.com",
     cats:["heavy-engineering-and-fabrication"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Plot No 56/8,9,10,11, IT Building, Jubilee Enclave, Madhapur, Hyderabad, Telangana 500081, India", city:"Hyderabad", lat:null, lng:null, placeId:"ChIJedURQ8WTyzsRM9OMenj6Blw" }] },
-{ id:346, slug:"vijay-m-mistry-construction-private-limited", name:"Vijay M. Mistry Construction Private Limited", logo:null, country:"India",
+{ id:346, slug:"vijay-m-mistry-construction-private-limited", name:"Vijay M. Mistry Construction Private Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fvijay-m-mistry-construction-private-limited.png?alt=media&token=4e03a40c-ab8f-41bd-b167-72f6e169b856", country:"India",
     // NOTE: sourced from Bridge & Roof's 2014 list (Category I, Structure Fabrication &
     // Erection). CIN-verified Active, healthy (33.96% networth growth).
     desc:"Infrastructure construction company, 60 years operating; bridges, flyovers, harbour works and ports across India. Bridge & Roof's own Category I (highest tier) approved vendor for structure fabrication and erection.",
     site:"https://www.vmmcl.com",
     cats:["heavy-engineering-and-fabrication"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"'Mistry House', 9, Preyas Society, Gulbai Tekra, Ambawadi, Ahmedabad, Gujarat 380015, India", city:"Ahmedabad", lat:null, lng:null, placeId:"ChIJk4vixc-EXjkRyFqa9wzEZYE" }] },
-{ id:347, slug:"jrp-infra-limited", name:"JRP Infra Limited", logo:null, country:"India",
+{ id:347, slug:"jrp-infra-limited", name:"JRP Infra Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fjrp-infra-limited.jpg?alt=media&token=7e9c6225-6b34-4070-ba32-013690029f97", country:"India",
     // NOTE: sourced from Bridge & Roof's 2014 list (Category I in both Boiler Fabrication &
     // Erection AND Pipes Fabrication & Erection sections — the only company appearing as
     // Category I in two different sections of that document). CIN confirmed by the user:
@@ -3135,7 +3149,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     site:"",
     cats:["heavy-engineering-and-fabrication"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"\"Kalyan Lakshmi\" II Floor, 6, First Main Road, Kasturba Nagar, Adyar, Chennai, Tamil Nadu 600020, India", city:"Chennai", lat:null, lng:null, placeId:null }] },
-{ id:348, slug:"geo-miller-and-company-private-limited", name:"Geo Miller & Company Private Limited", logo:null, country:"India",
+{ id:348, slug:"geo-miller-and-company-private-limited", name:"Geo Miller & Company Private Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fgeo-miller-and-company-private-limited.png?alt=media&token=771998eb-8b74-40b2-9fc5-078ce6d61134", country:"India",
     // NOTE: sourced from Bridge & Roof's 2014 list (Category I, Structure Fabrication &
     // Erection). CIN-verified Active. MCA NIC classification shows "commission agents/wholesale"
     // — an evident misclassification given the company's real construction/geotechnical business.
@@ -3143,7 +3157,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     site:"https://www.geomiller.com",
     cats:["heavy-engineering-and-fabrication"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"F-3/2, Pocket F, Okhla Industrial Estate, Phase I, New Delhi, Delhi 110020, India", city:"New Delhi", lat:null, lng:null, placeId:"ChIJ5QlVe1nhDDkRAg0ewiSusqk" }] },
-{ id:349, slug:"bhagheeratha-engineering-ltd", name:"Bhagheeratha Engineering Ltd", logo:null, country:"India",
+{ id:349, slug:"bhagheeratha-engineering-ltd", name:"Bhagheeratha Engineering Ltd", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fbhagheeratha-engineering-ltd.jpg?alt=media&token=1c4cd269-cc73-4aa5-90d0-6c42563d2fd5", country:"India",
     // NOTE: sourced from Bridge & Roof's 2014 list, listed there as "Bhagheeratha Electricals &
     // Structurals" (Category I, Structure Fabrication & Erection) — likely a specific division
     // within this same corporate entity, though not fully confirmed; worth verifying before
@@ -3152,7 +3166,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     site:"https://www.bhagheeratha.co.in",
     cats:["heavy-engineering-and-fabrication"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Bhagheeratha Residency, Banerji Road, RBI Junction, Kacheripady, Kochi, Kerala 682017, India", city:"Kochi", lat:null, lng:null, placeId:"ChIJ5yVLcUENCDsRZNCAFYgy9eQ" }] },
-{ id:350, slug:"bsbk-private-limited", name:"BSBK Private Limited", logo:null, country:"India",
+{ id:350, slug:"bsbk-private-limited", name:"BSBK Private Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fbsbk-private-limited.jpg?alt=media&token=79bbd001-ded8-409e-8755-c400fe4a568b", country:"India",
     // NOTE: sourced from Bridge & Roof's 2014 list (Category I, Structure Fabrication &
     // Erection). CIN-verified Active. CAUTION: at least 2 other, genuinely distinct "BSBK"-named
     // entities exist in MCA records (BSBK Engineers Pvt Ltd, Kanpur; B S B K Engineers Pvt Ltd,
@@ -3163,7 +3177,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     site:"https://www.bsbkltd.com",
     cats:["heavy-engineering-and-fabrication"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"4th Floor, Surya Treasure Island Mall, Junwani, Bhilai, Chhattisgarh 490020, India", city:"Bhilai", lat:null, lng:null, placeId:"ChIJo9XyvTw9KToRLhAtcjsI8j8" }] },
-{ id:351, slug:"pcp-international-limited", name:"PCP International Limited", logo:null, country:"India",
+{ id:351, slug:"pcp-international-limited", name:"PCP International Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fpcp-international-limited.jpg?alt=media&token=fb28d124-a9f7-464c-89d3-017f3842bd4b", country:"India",
     // NOTE: sourced from Bridge & Roof's 2014 list (Category I, Structure Fabrication &
     // Erection). CIN-verified Active. Real Google review confirms: "Company dealing in Thermal
     // Power Plant Mechanical Construction work."
@@ -3171,7 +3185,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     site:"https://www.pcpil.in",
     cats:["heavy-engineering-and-fabrication"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"SCO 66-67, Sector 34A, Chandigarh 160022, India", city:"Chandigarh", lat:null, lng:null, placeId:"ChIJ____z7XtDzkR7STYVqRwkJU" }] },
-{ id:352, slug:"vasavi-power-services-private-limited", name:"Vasavi Power Services Private Limited", logo:null, country:"India",
+{ id:352, slug:"vasavi-power-services-private-limited", name:"Vasavi Power Services Private Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fvasavi-power-services-private-limited.jpg?alt=media&token=5e1a8ade-7257-4660-8533-a6411ef7689c", country:"India",
     // NOTE: sourced from Bridge & Roof's 2014 list (Category I, Boiler Fabrication & Erection).
     // CIN-verified Active — genuinely strong. Mapped Google Places location is a sub-office, not
     // the registered office (Vijayawada per MCA records).
@@ -3189,7 +3203,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     site:"https://www.harji.in",
     cats:["heavy-engineering-and-fabrication"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"7, Aravali Shopping and Office Complex, Alaknanda, New Delhi, Delhi 110019, India", city:"New Delhi", lat:null, lng:null, placeId:"ChIJq6qqanvhDDkRXFZziT861vA" }] },
-{ id:354, slug:"bhavani-erectors-private-limited", name:"Bhavani Erectors Private Limited", logo:null, country:"India",
+{ id:354, slug:"bhavani-erectors-private-limited", name:"Bhavani Erectors Private Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fbhavani-erectors-private-limited.jpg?alt=media&token=3e0d7dfc-af38-4d77-a0ce-3cb21e92b9c0", country:"India",
     // NOTE: sourced from Bridge & Roof's 2014 list (Category I, Boiler Fabrication & Erection).
     // CIN-verified Active with a real CRISIL credit rating (BBB-/Stable/A3) — one of the more
     // strongly independently corroborated entries in this batch.
@@ -3198,7 +3212,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     cats:["heavy-engineering-and-fabrication"],
     locations:[{ type:"headquarters", name:"Head Office", address:"Bhavani Trade Centre, High School Junction, Karunagappally, Kollam, Kerala 690518, India", city:"Karunagappally", lat:null, lng:null, placeId:"ChIJbw5mopoDBjsR6G3l2HcVGRg" },
       { type:"registered-office", name:"Registered Office", address:"P.B. No. 002, Plot No. 103 & 104, Sri Sugureshwar Nagar, Shaktinagar, Raichur, Karnataka 584170, India", city:"Raichur", lat:null, lng:null, placeId:null }] },
-{ id:355, slug:"sangha-erectors-private-limited", name:"Sangha Erectors Private Limited", logo:null, country:"India",
+{ id:355, slug:"sangha-erectors-private-limited", name:"Sangha Erectors Private Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fsangha-erectors-private-limited.jpg?alt=media&token=8ade77e5-18bb-4593-bdb4-efa49ad374d7", country:"India",
     // NOTE: sourced from Bridge & Roof's 2014 list (Category I, Pipes Fabrication & Erection).
     // CIN-verified Active MCA status, established 2006. CAUTION: one data source shows its GST
     // registration as "CANCELLED_ON_APPLICATION," and a Google review for the matched location
@@ -3209,7 +3223,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     site:"https://www.sanghaerectors.com",
     cats:["pipes-and-tubes", "heavy-engineering-and-fabrication"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Plot No. 1, Vasavi Nagar, Kakaguda Village, Secunderabad, Telangana 500003, India", city:"Secunderabad", lat:null, lng:null, placeId:"ChIJEycZBkOayzsRZRqE7tQHwD8" }] },
-{ id:356, slug:"vitech-heavy-equipments-private-limited", name:"Vitech Heavy Equipments Private Limited", logo:null, country:"India",
+{ id:356, slug:"vitech-heavy-equipments-private-limited", name:"Vitech Heavy Equipments Private Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fvitech-heavy-equipments-private-limited.jpg?alt=media&token=e4b1a2a5-6f5a-4587-a9bc-6b8c2d5eb252", country:"India",
     // NOTE: from "TWI New Batch 1." CIN U29253MH2012PTC238912 confirmed. Google's business
     // listing shows "Vitech Equipments Pvt Ltd" (a shortened name) at the exact same registered
     // address — same company. Real reviews confirm genuine fabrication/design work.
@@ -3217,7 +3231,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     site:"https://vitechgroupindia.com",
     cats:["tank-construction", "heavy-engineering-and-fabrication"],
     locations:[{ type:"registered-office", name:"Registered Office", address:"R-495/2, M.I.D.C., T.T.C. Industrial Area, Rabale, Navi Mumbai, Maharashtra 400701, India", city:"Navi Mumbai", lat:null, lng:null, placeId:"ChIJt3MeWl-_5zsRr3LMJD_lyME" }] },
-{ id:357, slug:"fleurdelis-technologies-private-limited", name:"Fleurdelis Technologies Private Limited", logo:null, country:"India",
+{ id:357, slug:"fleurdelis-technologies-private-limited", name:"Fleurdelis Technologies Private Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Ffleurdelis-technologies-private-limited.jpg?alt=media&token=81d43f57-48fb-44fd-8515-4a18b82a6bd0", country:"India",
     // NOTE: from "TWI New Batch 1." CIN U72200KA2006PTC046975 confirmed. Real Google review names
     // a specific completed job — INS Sindhukirti, an Indian Navy Sindhughosh-class submarine —
     // confirming genuine defence-sector on-site machining work.
@@ -3225,7 +3239,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     site:"https://www.ftpl.co.in",
     cats:["heavy-engineering-and-fabrication"],
     locations:[{ type:"registered-office", name:"Registered Office", address:"No. 440, 4th Phase, Peenya Industrial Area, Bangalore, Karnataka 560058, India", city:"Bangalore", lat:null, lng:null, placeId:"ChIJbTcGqPw8rjsRfHDL1Z5yfPQ" }] },
-{ id:358, slug:"ramboll-india-private-limited", name:"Ramboll India Private Limited", logo:null, country:"India",
+{ id:358, slug:"ramboll-india-private-limited", name:"Ramboll India Private Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Framboll-india-private-limited.png?alt=media&token=c0e73136-652e-4200-8de6-e46bca0d6a5f", country:"India",
     // NOTE: from "TWI New Batch 1." CIN U72200DL2006PTC276587 confirmed (registered office New
     // Delhi). Google Places resolved to their Gurugram operating office (381 reviews, real
     // confirmation: "great civil engineering consultancy with HQ in Copenhagen") — used here as
@@ -3235,7 +3249,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     site:"https://www.ramboll.com/locations/asia-pacific/india",
     cats:["engineering-consultants"],
     locations:[{ type:"branch-office", name:"Gurugram Office", address:"Level 17, Building No. 5, Tower B, DLF Cyber City, Phase III, Sector 24, Gurugram, Haryana 122002, India", city:"Gurugram", lat:null, lng:null, placeId:"ChIJDwAAQDgZDTkRgJ7GbWMGrg0" }] },
-{ id:359, slug:"simon-india-limited", name:"Simon India Limited", logo:null, country:"India",
+{ id:359, slug:"simon-india-limited", name:"Simon India Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fsimon-india-limited.jpg?alt=media&token=c460da50-05af-43b4-a815-bc39e7c72271", country:"India",
     // NOTE: from "TWI New Batch 1." CIN U74899DL1995PLC071074 confirmed. Google Places resolved
     // to their Gurugram office at "Adventz, Global Business Park" — directly confirms the Adventz
     // Group (Zuari Global) ownership independently verified earlier.
@@ -3243,14 +3257,14 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     site:"https://www.simonindia.com",
     cats:["epc-contractors", "engineering-consultants"],
     locations:[{ type:"branch-office", name:"Gurugram Office", address:"8th Floor, Adventz, Global Business Park, Mehrauli-Gurgaon Road, Sikanderpur, Sector 26, Gurugram, Haryana 122002, India", city:"Gurugram", lat:null, lng:null, placeId:"ChIJ9QUI9AYfDTkRd9EZN3RWgwg" }] },
-{ id:360, slug:"ozone-plant-design-services-private-limited", name:"Ozone Plant Design Services Private Limited", logo:null, country:"India",
+{ id:360, slug:"ozone-plant-design-services-private-limited", name:"Ozone Plant Design Services Private Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fozone-plant-design-services-private-limited.jpg?alt=media&token=0924f064-c6e6-449d-adf4-81c0126a5072", country:"India",
     // NOTE: from "TWI New Batch 1." CIN U29220DL2011PTC223679 confirmed. No Google Places
     // business listing could be found despite two search attempts — placeId left null.
     desc:"Independent engineering and project management services company specialized in oil & gas, established 2011; covers the full asset lifecycle — Pre-bid, FEED, Detailed Engineering, Project Engineering, Procurement Engineering and Revamp — with a specialization in turnkey packaged process units/skids for offshore and onshore; also offers rooftop solar EPC project management.",
     site:"https://ozone-group.net",
     cats:["engineering-consultants"],
     locations:[{ type:"registered-office", name:"Registered Office", address:"B-6/54, Sector-3, Rohini, Delhi 110085, India", city:"Delhi", lat:null, lng:null, placeId:null }] },
-{ id:361, slug:"petrohorizon-oil-gas-engineering-private-limited", name:"Petrohorizon Oil Gas Engineering Private Limited", logo:null, country:"India",
+{ id:361, slug:"petrohorizon-oil-gas-engineering-private-limited", name:"Petrohorizon Oil Gas Engineering Private Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fpetrohorizon-oil-gas-engineering-private-limited.jpg?alt=media&token=234cdf68-ad01-4295-9a1f-84493ffc11da", country:"India",
     // NOTE: from "TWI New Batch 1." CIN U74999UR2016PTC007335 confirmed. Business description
     // confirmed directly by the user: engineering design consultancy plus mechanical and
     // electrical engineering training and skill development.
@@ -3258,14 +3272,14 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     site:"",
     cats:["engineering-consultants", "training-and-skilling"],
     locations:[{ type:"registered-office", name:"Registered Office", address:"Ekta Vihar, Lane No-13, Shastradhara Road, Dehradun, Uttarakhand 248001, India", city:"Dehradun", lat:null, lng:null, placeId:"ChIJgziDOunXCDkReTfhIi4WY2A" }] },
-{ id:362, slug:"suwaidi-engineering-group", name:"Suwaidi Engineering Group", logo:null, country:"United Arab Emirates",
+{ id:362, slug:"suwaidi-engineering-group", name:"Suwaidi Engineering Group", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fsuwaidi-engineering-group.png?alt=media&token=6fda9247-d5ea-4011-8acd-e9afaa05b43b", country:"United Arab Emirates",
     // NOTE: from "TWI New Batch 1." UAE entity, no CIN (India-specific concept); trade licence not
     // independently located, verified via multiple independent corroborating sources instead.
     desc:"Established engineering and systems-integration firm founded 1982 (44 years); exclusive UAE agent for Technip and sole distributor/agent for Tyco-Grinnell fire protection; real named projects include ADGAS LNG train contracts (with Air Products) and IGD-1 ($1.25bn, with Technip/Bechtel); service lines directly matching TWI: pressure vessels, vacuum columns & reactors, piping systems, turnkey fire protection design/engineering/supply, and water handling systems. Purchased controlling stake in Al Sagar Engineering Group (est. 1970).",
     site:"https://www.suwaidieng.com",
     cats:["engineering-consultants", "foam-systems-and-equipment", "industrial-water-systems"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"6th Floor, Bin Brook Building, Hamdan Street, Abu Dhabi, United Arab Emirates", city:"Abu Dhabi", lat:null, lng:null, placeId:"ChIJN4Zh1l1mXj4Rr9FJR_Xk9A4" }] },
-{ id:363, slug:"airswift-holdings-limited", name:"Airswift Holdings Limited", logo:null, country:"United Kingdom",
+{ id:363, slug:"airswift-holdings-limited", name:"Airswift Holdings Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fairswift-holdings-limited.png?alt=media&token=e62e6e36-61d5-442a-a0fe-f4e13dfcce53", country:"United Kingdom",
     // NOTE: from "TWI New Batch 1." UK entity; Companies House #09913704. Real Google reviews are
     // predominantly negative (job-seeker service complaints) — typical for large recruitment
     // agencies and not disqualifying, but noted for balance.
@@ -3273,13 +3287,13 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     site:"https://www.airswift.com",
     cats:["industrial-staffing"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Delphian House, 4th Floor, Riverside, New Bailey Street, Manchester, Greater Manchester M3 5FS, United Kingdom", city:"Manchester", lat:null, lng:null, placeId:"ChIJBUj_ZMCxe0gRRQBBrU-xdJ8" }] },
-{ id:364, slug:"hays-specialist-recruitment-limited", name:"Hays Specialist Recruitment Limited", logo:null, country:"United Kingdom",
+{ id:364, slug:"hays-specialist-recruitment-limited", name:"Hays Specialist Recruitment Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fhays-specialist-recruitment-limited.jpg?alt=media&token=8ac8b13f-e2ee-4cda-b48c-d92e0503abb6", country:"United Kingdom",
     // NOTE: from "TWI New Batch 1." UK entity; Companies House #00975677.
     desc:"Publicly listed (LSE: HAS) global specialist recruitment group, incorporated 1970 (as Accountancy Personnel (Assignments) Limited, renamed Hays in 2004); operates in 33+ countries; confirmed dedicated Oil & Gas/Energy executive search practice serving the UAE and wider MENA region.",
     site:"https://www.hays.com",
     cats:["industrial-staffing"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"4th Floor, 107 Cheapside, London EC2V 6DN, United Kingdom", city:"London", lat:null, lng:null, placeId:"ChIJTdMN4FpIdkgRzVIX9IC6NZw" }] },
-{ id:365, slug:"tasc-outsourcing", name:"TASC Outsourcing", logo:null, country:"United Arab Emirates",
+{ id:365, slug:"tasc-outsourcing", name:"TASC Outsourcing", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Ftasc-outsourcing.png?alt=media&token=1fa2129b-d016-44f5-9df6-b605edabd948", country:"United Arab Emirates",
     // NOTE: from "TWI New Batch 1." Confirmed via Wikipedia as a real, established company; this
     // also resolves the "Top Talent" brand referenced in earlier research — confirmed as a TASC
     // subsidiary, not a separate legal entity. UAE entity, no CIN.
@@ -3287,7 +3301,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     site:"https://tascoutsourcing.com",
     cats:["industrial-staffing"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Nassima Tower, 2403, Sheikh Zayed Road, Trade Center First, Dubai, United Arab Emirates", city:"Dubai", lat:null, lng:null, placeId:"ChIJi35IlO1CXz4RQ8_6uueO4Xo" }] },
-{ id:366, slug:"world-star-manpower-solutions", name:"World Star Manpower Solutions", logo:null, country:"United Arab Emirates",
+{ id:366, slug:"world-star-manpower-solutions", name:"World Star Manpower Solutions", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fworld-star-manpower-solutions.jpg?alt=media&token=6ebe571b-3a64-44f4-8c67-5f8a3c2e19a6", country:"United Arab Emirates",
     // NOTE: from "TWI New Batch 1." UAE entity, subsidiary of World Star Holding (est. 2008).
     // Real reviews confirm an active client relationship "since 2018" with consistent positive
     // feedback on reliability and timely payment.
@@ -3295,7 +3309,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     site:"https://www.worldstarmanpower.ae",
     cats:["industrial-staffing"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"World Star Holding, Musaffah, M2, Abu Dhabi, United Arab Emirates", city:"Abu Dhabi", lat:null, lng:null, placeId:"ChIJYxjQFDdGXj4RCnJQzofqfYA" }] },
-{ id:367, slug:"talascend-llc", name:"Talascend LLC", logo:null, country:"United States",
+{ id:367, slug:"talascend-llc", name:"Talascend LLC", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Ftalascend-llc.png?alt=media&token=c7ca5e0d-3a4e-4b48-9034-74968c9b5032", country:"United States",
     // NOTE: from "TWI New Batch 1." US entity, Troy, Michigan. Real company confirmed (79 years,
     // Newsweek/SIA workplace awards); a specific oil & gas practice wasn't independently confirmed
     // beyond its Energy Dais listing under the UAE oil & gas consulting category — flagged as
@@ -3304,7 +3318,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     site:"https://www.talascend.com",
     cats:["industrial-staffing"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"901 Tower Drive, Suite 420-AG, Troy, Michigan 48098, United States", city:"Troy", lat:null, lng:null, placeId:"ChIJHef8Y2DBJIgRyxrWhM403Ls" }] },
-{ id:368, slug:"alliance-recruitment-agency-private-limited", name:"Alliance Recruitment Agency Private Limited", logo:null, country:"India",
+{ id:368, slug:"alliance-recruitment-agency-private-limited", name:"Alliance Recruitment Agency Private Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Falliance-recruitment-agency-private-limited.jpg?alt=media&token=5bf73db2-b4b0-4f68-9a72-f83d11d7d93c", country:"India",
     // NOTE: from "TWI New Batch 1," corrected per explicit user instruction to use the
     // India-registered entity (CIN U78100DL2024PTC436943), NOT the Dubai/UAE-based "Alliance
     // Recruitment Agency" business researched earlier in this session. IMPORTANT DISTINCTION:
@@ -3317,7 +3331,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     site:"https://www.alliancerecruitmentagency.ae",
     cats:["industrial-staffing"],
     locations:[{ type:"registered-office", name:"Registered Office", address:"81, National Park, Lajpat Nagar, South Delhi, New Delhi, Delhi 110024, India", city:"New Delhi", lat:null, lng:null, placeId:"ChIJ7V39_2mFXjkR5n_f8W6Z_8w" }] },
-{ id:369, slug:"oilexec-international", name:"OilExec International", logo:null, country:"Unconfirmed",
+{ id:369, slug:"oilexec-international", name:"OilExec International", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Foilexec-international.jpg?alt=media&token=ecdc9803-2b31-4eb9-8860-2ccd8fc05bcc", country:"Unconfirmed",
     // NOTE: from "TWI New Batch 1." Jurisdiction/registration details not independently
     // confirmed beyond the company's own website — held at Medium confidence. No Google Places
     // listing could be confirmed — placeId left null. Country field is a placeholder pending
