@@ -5493,6 +5493,15 @@ async function seedCompanies() {
           ...(c.logo ? { logo: c.logo } : {}),
           cats: c.cats || [], locations: c.locations || [],
           parent: (c.parent && c.parent.name) ? c.parent : null,
+          // msme has no independent Firestore-only source yet (no admin
+          // editor for it exists) — unlike logo, there's nothing to
+          // accidentally clobber, so it's always written straight from the
+          // in-page array, same as cats/locations/desc. BUG FIX: this field
+          // was missing entirely from the original seed payload, so every
+          // company seeded before this fix has no msme data in Firestore
+          // regardless of what the in-page array says — re-run Seed
+          // Companies after deploying this fix to backfill all 538 records.
+          msme: c.msme || null,
           updatedAt: new Date(),
         });
         ok++;
