@@ -412,10 +412,14 @@ main{ flex:1; min-width:0; padding:20px 24px 60px; }
 /* MSME badge — distinct from .badge-admin (rust) so the two categories of tag
    (site role vs. company classification) don't visually blur together. Shows
    just "MSME" on cards (compact) and "MSME · <Category>" on the detail page
-   once a Micro/Small/Medium classification is confirmed. */
+   once a Micro/Small/Medium classification is confirmed. Sized to match
+   .udyam-cta exactly (font-size, padding, border-width) — the two always
+   appear side by side as a pair, so they need the same box dimensions even
+   though badge-msme has no separate "pending" state to size around. */
 .badge-msme{
-  font-family:var(--font-mono); font-size:8.5px; font-weight:700; letter-spacing:0.5px;
-  background:var(--ok); color:var(--paper-raised); padding:2px 5px; border-radius:2px;
+  font-family:var(--font-mono); font-size:10px; font-weight:700; letter-spacing:0.4px;
+  background:var(--ok); color:var(--paper-raised); padding:4px 9px; border-radius:var(--radius);
+  display:inline-block; border:1.5px solid var(--ok);
 }
 /* UDYAM CTA — two states, same shape, different color+label so the button
    itself communicates status at a glance rather than needing surrounding text.
