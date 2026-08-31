@@ -875,6 +875,7 @@ const CATEGORY_TREE = [
     { code:"LT-10", name:"Customs & Port Services", slug:"customs-and-port-services" },
     { code:"LT-11", name:"Warehouse Operators", slug:"warehouse-operators" },
     { code:"LT-12", name:"Cold Storage", slug:"cold-storage" },
+    { code:"LT-13", name:"Heavy Lift & Transport", slug:"heavy-lift-and-transport" },
   ]},
   { code:"ES", name:"Sustainability & Energy Transition", slug:"sustainability-and-energy-transition", items:[
     { code:"ES-01", name:"ESG Consulting", slug:"esg-consulting" },
@@ -906,6 +907,7 @@ const CATEGORY_TREE = [
     { code:"MM-16", name:"Refractory Materials", slug:"refractory-materials" },
     { code:"MM-17", name:"Insulation Materials", slug:"insulation-materials" },
     { code:"MM-18", name:"Secondary Metals & Recycling", slug:"secondary-metals-and-recycling" },
+    { code:"MM-19", name:"Catalysts & Adsorbents", slug:"catalysts-and-adsorbents" },
   ]},
   { code:"UE", name:"Utilities & Energy", slug:"utilities-and-energy", items:[
     { code:"UE-01", name:"Industrial Water Systems", slug:"industrial-water-systems" },
@@ -4764,7 +4766,1635 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     site:"https://kk-electricalservices.com",
     msme:{ category:null, udyamNumber:null },
     cats:["electrical-contractors"],
-    locations:[{ type:"headquarters", name:"Headquarters", address:"21, FF, Bala Tripura Industrial Estate, Santej, Khatraj, Gujarat 382722, India", city:"", lat:null, lng:null, placeId:"ChIJaTOWnASdXjkRCqnEvQofegg" }] }
+    locations:[{ type:"headquarters", name:"Headquarters", address:"21, FF, Bala Tripura Industrial Estate, Santej, Khatraj, Gujarat 382722, India", city:"", lat:null, lng:null, placeId:"ChIJaTOWnASdXjkRCqnEvQofegg" }] },
+{ id:548, slug:"a-d-tubi-inossidabili-spa", name:"A.D. Tubi Inossidabili SpA & CPC Inox SpA", logo:null, country:"Italy",
+    // NOTE: sourced from a real ADIPEC 2026 exhibitor list (Carbon Capture category) — confirmed
+    // authentic via "Join the conversation at ADIPEC" appearing in the source document, and cross-
+    // referenced against archived ADIPEC 2022/2023 exhibitor lists showing many of the same
+    // companies as repeat, long-standing exhibitors. Founded 1997, part of Cardinali Holding since
+    // 2023. Real, strongly reviewed (4.9 rating, 13 reviews).
+    desc:"Italian manufacturer of welded tubes (stainless steel, 6Moly, duplex/superduplex, nickel alloys, titanium) for heat transfer applications — power generation (incl. nuclear), oil & gas, chemical/petrochemical, desalination. Second manufacturing plant in North Carolina, USA since 2019. ~$24.6M revenue, 30 employees. ADIPEC 2026: Hall 15, Stand #15340.",
+    site:"https://adtubi.com/en/",
+    cats:["heat-exchangers", "pipes-and-tubes"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Via Adige 2, 22070 Casnate con Bernate (CO), Italy", city:"Casnate con Bernate", lat:null, lng:null, placeId:"ChIJ0z0Z2JCbhkcRiCnoPX5ZMnU" }] },
+{ id:549, slug:"abtech-ltd", name:"Abtech Ltd", logo:null, country:"United Kingdom",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list (see A.D. Tubi entry for
+    // source verification notes). Real, 40+ years, $8.3M revenue, 76 employees, involved in oil &
+    // gas since the 1970s.
+    desc:"Manufacturer of hazardous area electrical enclosures — Ex-junction boxes, high voltage Ex-junction boxes, LED/HID hazardous-area lighting, cable connection products. Head office Sheffield, UK, with locations in Houston, Bünde (Germany), Busan (Korea) and Singapore. ISO 9001:2015 certified. ADIPEC 2026: Hall 8, Stand #8333.",
+    site:"https://www.abtech.co.uk",
+    cats:["hazardous-area-equipment"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"199 Newhall Road, Attercliffe, Sheffield S9 2QJ, UK", city:"Sheffield", lat:null, lng:null, placeId:"ChIJzwhOFBl4eUgRc-wAe69CKAQ" }] },
+{ id:550, slug:"aeromeccanica-stranich-spa", name:"Aeromeccanica Stranich SpA", logo:null, country:"Italy",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, founded 1928,
+    // genuine long-standing leadership in ventilation/dust control. CAUTION: multiple Google
+    // Places listings exist for this company across nearby Milan-area locations (Pioltello, Sesto
+    // San Giovanni) — used the one with more reviews (21 vs 7) as the likely primary site; verify
+    // before use given the company may have moved or operates multiple facilities.
+    desc:"Italian manufacturer of ventilation and dust control equipment since 1928 — centrifugal fans, axles, shutters, dry filters, cyclones, washers, pneumatic cleaning/transport systems for gaseous and dusty pollutant control. Real reviews describe it as 'a good manufacturer of industrial centrifugal fans.' ADIPEC 2026: Concourse, Stand #CN112.",
+    site:"",
+    cats:["filtration-and-separation-technology"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Via Sondrio 4, 20096 Pioltello MI, Italy", city:"Pioltello", lat:null, lng:null, placeId:"ChIJTXhDE1vIhkcRDrckVuNWs6w" }] },
+{ id:551, slug:"aertssen-machinery-services-abu-dhabi", name:"Aertssen Machinery Services Limited - Abu Dhabi", logo:null, country:"United Arab Emirates",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, part of the Belgian
+    // Aertssen Group, a family business established 1964. Strongly reviewed (4.6 rating, 105
+    // reviews) — "the best crane company in Middle East."
+    desc:"Heavy lifting and heavy transport division of the Aertssen Group active in the Middle East (UAE, Qatar, Saudi Arabia, plus activities in Oman, Morocco, Iraq and Africa) — mobile telescopic cranes (Tadano, Liebherr), crawler cranes (Hitachi, Terex), SPMTs (Self Propelled Modular Trailers), plus a trading department for second-hand machinery. New warehouse/workshop openings confirmed in Abu Dhabi (2025) and Ras Laffan, Qatar (Dec 2025). ADIPEC 2026: Concourse, Stand #CN36.",
+    site:"https://www.aertssen.ae",
+    cats:["crane-and-lifting-equipment-rental"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Abu Dhabi Industrial City - ICAD III, Abu Dhabi, United Arab Emirates", city:"Abu Dhabi", lat:null, lng:null, placeId:"ChIJy73_27E_Xj4RdOEuy2qv9BQ" }] },
+{ id:552, slug:"aerzen-uae", name:"AERZEN", logo:null, country:"United Arab Emirates",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, well-known global
+    // blower/compressor manufacturer (Germany-headquartered). No confident Google Places match
+    // found for the specific UAE exhibiting entity — placeId left null rather than misattribute.
+    desc:"International manufacturer of Positive Displacement Blowers, Hybrid Blowers, Screw Compressors and Turbo Blowers for air and gas applications — wastewater treatment, pneumatic conveying of bulk materials, process gas conveying. Also provides rental blowers. ADIPEC 2026: Hall 8, Stand #8756.",
+    site:"",
+    cats:["blowers"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"(unconfirmed — UAE)", city:"", lat:null, lng:null, placeId:null }] },
+{ id:553, slug:"al-gharbia-pipe-company-llc", name:"Al Gharbia Pipe Company LLC", logo:null, country:"United Arab Emirates",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, substantial JV
+    // between SENAAT (part of ADQ, UAE's largest industrial investment holding), JFE Steel (8th
+    // largest steel manufacturer globally) and Marubeni-Itochu Steel. Strongly reviewed (4.8
+    // rating, 49 reviews).
+    desc:"Established 2015, the region's most advanced carbon steel LSAW pipe manufacturer — sour service line pipe and structural pipe, 18\"-60\" diameter, up to 44.5mm wall thickness. Fully automated Industry 4.0 production line, 400,000 tons/year capacity, 700,000+ MT delivered milestone reached. Real named deliveries to ADNOC for critical sour service; recently developed Longitudinal SAW Pipe for High-Pressure Hydrogen Transport. ADIPEC 2026: Hall 10, Stand #10612.",
+    site:"https://algharbiapipe.com",
+    cats:["pipes-and-tubes"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"KIZAD - A8 - 351 Al Intifa' St, Al Taweelah, Khalifa Industrial Zone, Abu Dhabi, United Arab Emirates", city:"Abu Dhabi", lat:null, lng:null, placeId:"ChIJp1DLkI9VXj4R-zETSCTb5e8" }] },
+{ id:554, slug:"allseas-engineering-bv", name:"Allseas Engineering B.V.", logo:null, country:"Netherlands",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, globally famous
+    // offshore contractor — a Google review referencing "the Pioneering Spirit" (Allseas' famous
+    // vessel, the world's largest construction ship) independently confirms this is genuinely the
+    // well-known Allseas. CAUTION: alongside overwhelmingly positive reviews (146 total, 4.3
+    // rating), one review is starkly negative ("horrible... shame for the countries that work with
+    // it") — an outlier worth being aware of, not disqualifying given the broader pattern.
+    desc:"Major offshore contractor specializing in pipelay, subsea construction and heavy lift — real involvement in FPSO/subsea infrastructure and carbon capture/storage (CCS) offshore pipeline projects. ADIPEC 2026: Hall 11, Stand #11210.",
+    site:"https://allseas.com",
+    cats:["offshore-floating-systems"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Poortweg 12, 2612 PA Delft, Netherlands", city:"Delft", lat:null, lng:null, placeId:"ChIJreVAffG1xUcRDxBJTM2YtjE" }] },
+{ id:555, slug:"almas-group-iraq", name:"Almas Group", logo:null, country:"Iraq",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, well-reviewed (4.6
+    // rating, 32 reviews) freight/logistics company with genuine, real oil & gas sector focus.
+    desc:"Freight forwarding and logistics company specializing in Iraq and the Kurdistan Region — rig site deliveries, heavy-lift transportation, customs clearance, warehousing for upstream/midstream/downstream oil & gas operations; also handles breakbulk cargo (transformers, generators, steel structures, large tanks and pressure vessels). ADIPEC 2026: Hall 15, Stand #15430.",
+    site:"https://www.almastpgroup.com",
+    cats:["freight-forwarding"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Office 1, Floor 22, Tower 4, Empire Business Towers, Erbil, Erbil Governorate 44001, Iraq", city:"Erbil", lat:null, lng:null, placeId:"ChIJ9TZ5E-EjB0AR1YMx87gpXw4" }] },
+{ id:556, slug:"amtec-gmbh", name:"amtec Advanced Measurement Messtechnischer Service GmbH", logo:null, country:"Germany",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, 40+ years, a
+    // certified training facility; subcontractor of the European Sealing Association (ESA),
+    // developed the industry-standard ESAdata.org gasket database.
+    desc:"Flange/valve tightness measurement and ageing management services for chemical installations and nuclear power plants; also trains fitters in flanged-connection tightness per EN 1591-4 as a certified training facility. ADIPEC 2026: Hall 13, Stand #13391.",
+    site:"https://www.amtec.eu",
+    cats:["calibration-services"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Hoher Steg 13, 74348 Lauffen am Neckar, Germany", city:"Lauffen am Neckar", lat:null, lng:null, placeId:"ChIJXyl_RAYsmEcRjcg2JqCdtq4" }] },
+{ id:557, slug:"aveva-uae", name:"AVEVA", logo:null, country:"United Arab Emirates",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, globally major
+    // industrial software company (majority-owned by Schneider Electric, already in TWI).
+    desc:"Global industrial software company — engineering design, operations, and asset performance management software (including PDMS plant design) for process industries. Real regional office confirmed in Dubai. ADIPEC 2026: Hall 4, Stand #4410.",
+    site:"https://www.aveva.com",
+    cats:["digital-ai-and-robotics"],
+    locations:[{ type:"regional-office", name:"MEA Regional Office", address:"201 Office Park, Block D, Al Safouh Second, Dubai, United Arab Emirates", city:"Dubai", lat:null, lng:null, placeId:"ChIJcZfzGkNrXz4RuC0AITM2AdM" }] },
+{ id:558, slug:"barton-firtop-engineering-co-ltd", name:"Barton Firtop", logo:null, country:"United Kingdom",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, 50+ years'
+    // experience, genuine LNG project deliveries confirmed via the company's own materials (30"
+    // Class 300# strainers for a North American LNG project). Real manufacturing plant in Goa,
+    // India in addition to the UK.
+    desc:"World-leading filtration equipment manufacturer — Filters, Strainers, Coalescers, Separators, Pressure Vessels, Flame Arresters, Sight Glasses, Static Mixers, Industrial Silencers and Spools; testing facilities up to 1,700 Bar g (25,000 psi). ISO 9001:2015, ISO 3834-2:2005, ISO 14001:2015, ISO 45001:2018 certified. ADIPEC 2026: Hall 5, Stand #5240.",
+    site:"https://www.bartonfirtop.co.uk",
+    cats:["filtration-and-separation-technology"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Silverwoods Way, Kidderminster, Worcestershire DY11 7DT, UK", city:"Kidderminster", lat:null, lng:null, placeId:"ChIJ-3X1upvscEgRod75C7jz_No" }] },
+{ id:559, slug:"breda-energia-spa", name:"BREDA ENERGIA SPA", logo:null, country:"Italy",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, self-described
+    // Italian leader in oil & gas equipment with an explicit energy-transition (CO2/H2) product
+    // line. Independently cross-referenced as a real repeat ADIPEC exhibitor (appeared in an
+    // archived ADIPEC 2023 exhibitor list too).
+    desc:"Italian manufacturer of equipment for the global oil & gas market — traditional upstream solutions (wellheads, valves) plus energy transition technologies (CO2 and H2 gas handling); design, manufacturing, testing, installation and after-sales service. ADIPEC 2026: Hall 1, Stand #1452.",
+    site:"https://bredaenergia.it",
+    cats:["valves"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Viale Sarca 336, 20126 Milano MI, Italy", city:"Milano", lat:null, lng:null, placeId:"ChIJXz93hF_HhkcRqiTma00_J28" }] },
+{ id:560, slug:"buhlmann-group", name:"BUHLMANN", logo:null, country:"Germany",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, founded 1945,
+    // genuine recent M&A activity confirmed (acquisition of Trupply, announced Feb 2025,
+    // strengthening its North America position).
+    desc:"Premium distributor of steel pipes, tubes, pipe fittings, valves and accessories, including duplex, nickel alloy and titanium special materials, for energy, petrochemical, chemical, oil & gas, offshore, pipeline/plant engineering and shipbuilding. Consulting, project management and logistics services included. ADIPEC 2026: Hall 8, Stand #8717.",
+    site:"https://buhlmann-group.com",
+    cats:["pipes-and-tubes"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Arberger Hafendamm 1, 28309 Bremen-Hemelingen, Germany", city:"Bremen", lat:null, lng:null, placeId:"ChIJqcYFgojYsEcRf-eQeUkOQLk" }] },
+{ id:561, slug:"burckhardt-compression-middle-east-fze", name:"Burckhardt Compression (Middle East) FZE", logo:null, country:"Switzerland",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list, which named the regional
+    // "(Middle East) FZE" subsidiary specifically — used the global parent's real, verified Swiss
+    // HQ address here since a confident Place ID match for the Middle East FZE entity specifically
+    // wasn't found; verify before use if the distinct regional entity's address is needed. Real,
+    // massive, publicly listed (SIX: BCHN), founded 1844 (180+ years).
+    desc:"Global market leader in reciprocating compressor technology — Laby (labyrinth piston), process gas and hyper compressors for chemical/petrochemical, refining, air separation, and gas transport/storage. CHF 1.095B revenue (2024), 3,336 employees. ADIPEC 2026: Concourse, Stand #CN100.",
+    site:"https://www.burckhardtcompression.com",
+    cats:["compressors"],
+    locations:[{ type:"headquarters", name:"Global Headquarters", address:"Franz Burckhardt-Strasse 5, 8404 Winterthur, Switzerland", city:"Winterthur", lat:null, lng:null, placeId:"ChIJRfeBJfGZmkcRVVkl5OPhpJ0" }] },
+{ id:562, slug:"calico-metal-alloys-llp", name:"CALICO METAL ALLOYS LLP", logo:null, country:"India",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, strongly reviewed
+    // (4.7 rating, 3 reviews) India-based specialty steel stockist/supplier.
+    desc:"Supplier and stockist of Duplex Steel, Super Duplex Steel, SMO 254, AL6XN and Lean Duplex 2101 — plates, sheets, round bars, pipes, flanges, fittings, fasteners, coils, custom profiles and perforated sheets. ADIPEC 2026: Hall 13, Stand #13685.",
+    site:"https://www.calicometal.com",
+    cats:["plates-and-sheets", "alloy-steel"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Office No. 811, 8th Floor, Prasad Chambers, Tata Road No 2, Opera House, Girgaon, Mumbai, Maharashtra 400004, India", city:"Mumbai", lat:null, lng:null, placeId:"ChIJAQAQPhDO5zsRivhMMnPZVhY" }] },
+{ id:563, slug:"cenosco-bv", name:"Cenosco", logo:null, country:"Netherlands",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list (see A.D. Tubi entry,
+    // batch 1, for source verification notes). Real, founded 2000, originally built its Risk and
+    // Reliability System (RRM) for Shell Global Solutions. 20+ years' product leadership, real
+    // reviews describe the office as "a truly proud workplace."
+    desc:"Cloud-based asset integrity management software (IMS suite) for the oil, gas and chemical industries — reliability, functional safety and compliance across pressure equipment, pipelines and civil structures; real named modules include Flange Management (IMS FCM), Pipeline & Subsea Integrity (IMS PLSS), and Pressure Equipment Integrity (IMS PEI). Several hundred assets managed across 50+ countries. ADIPEC 2026: Hall 16, Stand #16257.",
+    site:"https://cenosco.com",
+    cats:["integrity-management"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Bezuidenhoutseweg 12, 2594 AV Den Haag, Netherlands", city:"The Hague", lat:null, lng:null, placeId:"ChIJ8597IzO3xUcR-eXxA3E3Gig" }] },
+{ id:564, slug:"cosco-lianyungang-liquid-loading-unloading-equipment", name:"COSCO (Lianyungang) Liquid Loading & Unloading Equipment Co., Ltd.", logo:null, country:"China",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, founded 1994,
+    // genuinely distinct subsidiary of China COSCO Shipping Corporation Limited from COSCO
+    // SHIPPING Energy Transportation Co., Ltd. (already in TWI, tanker/LNG shipping) — this
+    // entity manufactures loading/unloading EQUIPMENT rather than operating vessels. 70%+ market
+    // share in China, real named clients (Shell, Vopak, CNPC, Sinopec, BASF, Formosa). No
+    // confident Google Places match found for this specific facility — placeId left null.
+    desc:"Design, manufacturing, sales and maintenance of fluid loading & unloading equipment — Marine and Land Loading Arms, Automatic Loading Systems, Twin/Double-Sealed Guide Way Valves, Vapor Recovery Systems, LNG loading/unloading equipment, plus wharf equipment (gangways, quick release hooks, hose cranes). 30 years' experience, 117 patents, 88,000 m² facility. Real named awards for double-sealed guide valve technology and LNG land handling devices (Jiangsu Province, 1999-2011). ADIPEC 2026: Hall 13, Stand #13913.",
+    site:"http://www.lygcosco.com.cn",
+    cats:["offshore-loading-systems-spm-calm"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"No. 33 Huanghai Road, Lianyun District, Lianyungang, Jiangsu 222047, China", city:"Lianyungang", lat:null, lng:null, placeId:null }] },
+{ id:565, slug:"duechting-pumpen", name:"DÜCHTING PUMPEN", logo:null, country:"Germany",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list — independently
+    // cross-confirmed as a genuine exhibitor via ADIPEC's own official German Pavilion exhibitor
+    // page, which lists the exact same booth number (13490) as the source document. Real, founded
+    // 1938, 3rd-generation family-owned. Strongly reviewed (4.9 rating, 16 reviews).
+    desc:"Manufacturer of advanced, wear-resistant centrifugal pumps (single and multistage) for desalination reverse osmosis, flue gas desulphurization, mining, and chemical pigment industries. ~120 employees, global presence. ADIPEC 2026: Hall 13, Stand #13490.",
+    site:"https://www.duechting.com",
+    cats:["pumps"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Wilhelm-Düchting-Straße 22, 58453 Witten, Germany", city:"Witten", lat:null, lng:null, placeId:"ChIJoyd1rnIiuUcRtgDvp4R3po4" }] },
+{ id:566, slug:"enerflex-ltd", name:"Enerflex Ltd", logo:null, country:"Canada",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, publicly listed
+    // (TSX: EFX), founded 1980, ~$1.4B CAD revenue, 4,600+ employees. Real, significant M&A
+    // history — acquired Exterran Corporation in October 2022, a major consolidation in the gas
+    // compression/processing equipment space.
+    desc:"Worldwide supplier of energy infrastructure and energy transition solutions — natural gas compression, oil & gas processing equipment (sale or lease), refrigeration systems, power generation equipment, field maintenance and contracting. Operations across Canada, US, Argentina, Colombia, Brazil, Mexico, Australia, UK, UAE, Kuwait, Oman, Bahrain and Indonesia. Real named review confirms a Vapor Recovery Unit (VRU) supply relationship with an Encana project. ADIPEC 2026: Hall 3, Stand #3175.",
+    site:"https://www.enerflex.com",
+    cats:["compressors"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"4700 47 St SE, Calgary, AB T2B 3R1, Canada", city:"Calgary", lat:null, lng:null, placeId:"ChIJLUBkPFB6cVMRiEYdk3ls4ms" }] },
+{ id:567, slug:"fima-maschinenbau-gmbh", name:"FIMA Maschinenbau GmbH", logo:null, country:"Germany",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list — independently cross-
+    // confirmed as a genuine exhibitor via ADIPEC's own official German Pavilion exhibitor page.
+    // Real, has its own dedicated after-sales service team.
+    desc:"German manufacturer of single- and multistage radial blowers and turbo compressors. ADIPEC 2026: Hall 8, Stand #8815.",
+    site:"",
+    cats:["blowers", "compressors"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Oberfischacher Str. 58, 74423 Obersontheim-Oberfischach, Germany", city:"Obersontheim", lat:null, lng:null, placeId:"ChIJj5IKyOVWmEcReQUUj6jAids" }] },
+{ id:568, slug:"gea-westfalia-separator-group", name:"GEA Westfalia Separator Group GmbH", logo:null, country:"Germany",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, massive, part of GEA
+    // Group; founded September 1893 (130+ years). CAUTION: a real, detailed review alleges a
+    // non-payment dispute over a shipment to Spain — worth checking alongside otherwise strongly
+    // positive reviews (4.5 rating, 122 total reviews).
+    desc:"German manufacturer of separators and decanters — mechanical clarification and separation of liquids for food, chemicals, pharmaceuticals, biotechnology, energy, shipping and environmental technology. ~3,000 employees. ADIPEC 2026: Hall 8, Stand #8733.",
+    site:"",
+    cats:["filtration-and-separation-technology"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Werner-Habig-Straße 1, 59302 Oelde, Germany", city:"Oelde", lat:null, lng:null, placeId:"ChIJA2WdPMqGuUcR-piYAg1ntx8" }] },
+{ id:569, slug:"cannon-artes-spa", name:"CANNON ARTES SPA", logo:null, country:"Italy",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, since 1977, part of
+    // Cannon Group.
+    desc:"Engineering and construction company providing tailored water and wastewater treatment plants, particularly for Oil & Gas, Petrochemicals, Power Generation, Pulp & Paper and Pharmaceutical markets. ADIPEC 2026: Hall 2, Stand #2112.",
+    site:"https://www.cannonartes.com",
+    cats:["wastewater-treatment"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Zona Industriale Staglioni, 84020, Italy", city:"", lat:null, lng:null, placeId:"ChIJUWnDymdvORMRyrrOzy-AS3g" }] },
+{ id:570, slug:"danem-test-and-certificate-ag", name:"Danem Test and Certificate AG", logo:null, country:"Switzerland",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, has a dedicated
+    // oil & gas industry page on its own site.
+    desc:"Testing and certification services for high-risk industries — built to help meet strict standards, reduce operational risk, and maintain confidence in demanding environments including oil & gas. ADIPEC 2026: Hall 16, Stand #16115.",
+    site:"https://danem-test.com",
+    cats:["inspection-and-certification"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Zugerstrasse 76a, 6340 Baar, Switzerland", city:"Baar", lat:null, lng:null, placeId:"ChIJ7bUWhT6rmkcRMoi0-mBh7CY" }] },
+{ id:571, slug:"dnv-uae", name:"DNV", logo:null, country:"United Arab Emirates",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, globally major
+    // Norwegian classification society and certification body. CAUTION: multiple real DNV-branded
+    // Google Places entities exist around Dubai (a general Dubai Branch at Expo City, a separate
+    // "DNV Ship Management & Operation LLC") — used the Expo City branch as the most likely
+    // general exhibiting entity given ADIPEC's own venue proximity; verify before use if a
+    // specific DNV subsidiary matters.
+    desc:"Global classification society and certification body — real, well-known independent assurance and risk management provider for the maritime, energy and other industries. Strongly reviewed (5.0 rating). ADIPEC 2026: Hall 9, Stand #9150.",
+    site:"",
+    cats:["inspection-and-certification", "certification-bodies"],
+    locations:[{ type:"regional-office", name:"Dubai Branch", address:"Madinat Al Mataar, Expo City Dubai, Dubai, United Arab Emirates", city:"Dubai", lat:null, lng:null, placeId:"ChIJ25h7OwBzXz4RbkCla0bRmpg" }] },
+{ id:572, slug:"donelli-alexo-srl", name:"DONELLI ALEXO S.R.L.", logo:null, country:"Italy",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, part of the Donelli
+    // Group (business started 1911 by Giovanni Donelli, controlled by holding company Euros
+    // S.r.l., 7 firms total). Real, substantial group-level sector split confirms ~50% of Donelli
+    // Group revenue comes from oil & gas/energy, ~5% from valves. Genuine German technology
+    // partnership (Säkaphen licensed applicator) with a real co-patented pipe-coating spray
+    // system (EP4100171B1). Strongly reviewed (4.7 rating, 20 reviews).
+    desc:"Anti-corrosion coatings, fire protection and insulation for plants in the energy, oil & gas, chemical and offshore sectors — internal/external coating of valves and heat exchangers; licensed applicator of Säkaphen (Italy/France) and Heresite systems. ISO 9001, ISO 9100, ISO 14001, ISO 45001, Qualisteel Coat, AMPP QP3 certified. Four production facilities in the Milan area. ADIPEC 2026: Hall 1, Stand #1160.",
+    site:"https://www.donelli.it",
+    cats:["protective-coatings", "corrosion-protection"],
+    locations:[{ type:"plant", name:"Impianto di Cuggiono", address:"Via Francesco Somma 64, 20012 Cuggiono MI, Italy", city:"Cuggiono", lat:null, lng:null, placeId:"ChIJ72rnOmn0hkcR4dH9D_pLwB8" }] },
+{ id:573, slug:"excen-srl", name:"EXCEN S.R.L.", logo:null, country:"Italy",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real; CAUTION — shares
+    // the exact same exhibitor stand as Donelli Alexo (Hall 1, #1160), but independently
+    // confirmed to be a genuinely DIFFERENT, unrelated business (explosion protection/ATEX
+    // conversion of machinery, not coatings) — not a Donelli Group sister company as the shared
+    // stand might suggest; likely just a co-exhibiting arrangement.
+    desc:"Explosion protection specialist — converts electric and diesel machines (forklifts, lift tables, gen-sets, batteries, solar systems) for safe operation in potentially explosive atmospheres (ATEX/IECEx certified), serving chemical, petrochemical, pharmaceutical, food & beverage, cosmetics, oil & gas and explosives industries. ADIPEC 2026: Hall 1, Stand #1160.",
+    site:"",
+    cats:["hazardous-area-equipment"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Via G. Marcora 69, 20097 San Donato Milanese MI, Italy", city:"San Donato Milanese", lat:null, lng:null, placeId:"ChIJoRaQ9SzFhkcR3Y-SwCxcf84" }] },
+{ id:574, slug:"esma-industrial-enterprises-llc", name:"ESMA Industrial Enterprises LLC", logo:null, country:"United Arab Emirates",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, 40+ years' history,
+    // genuinely strongly reviewed (multiple detailed positive reviews about calibration support
+    // and custom technical skid fabrication for PhD-level mechanical engineering research).
+    desc:"Leading UAE engineering company — Hydraulic Test Centre (testing open/closed type hydraulic pumps, high/low speed hydraulic motors, hydraulic cylinders/actuators, CETOP hydraulic valves, solenoid/relief valves, servo pumps & valves), plus filtration and separation solutions for upstream production and oil services (onshore and offshore). ADIPEC 2026: Hall 5, Stand #514.",
+    site:"https://esmagroup.com",
+    cats:["filtration-and-separation-technology", "calibration-services"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Street 12A/11B, Al Khabaisi Area, Deira, Dubai, United Arab Emirates", city:"Dubai", lat:null, lng:null, placeId:"ChIJt39WVcJcXz4R263eAyoEsvQ" }] },
+{ id:575, slug:"cc7-global-engineering-solutions-llc", name:"CC7 Global Engineering Solutions", logo:null, country:"United Arab Emirates",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, UAE regional EPC
+    // platform of CNCEC Seven (China National Chemical Engineering & Construction Corporation
+    // Seven Ltd.), part of CNCEC — a major Chinese state-owned engineering conglomerate,
+    // described as the "founder of China's petroleum and chemical industrial system." Roots
+    // trace to 1964. Strongly reviewed (5.0 rating).
+    desc:"UAE regional EPC platform delivering complex industrial projects across the Middle East and Africa. ADIPEC 2026: Hall 13, Stand #13580.",
+    site:"https://cc7international.com",
+    cats:["epc-contractors"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Burj Khalifa, Downtown Dubai, Dubai, United Arab Emirates", city:"Dubai", lat:null, lng:null, placeId:"ChIJ9Rg-VQBpXz4R96thlO4YSKw" }] },
+{ id:576, slug:"gerab-national-enterprises-llc", name:"Gerab National Enterprises Llc", logo:null, country:"United Arab Emirates",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, founded 1977,
+    // substantial (385+ staff across offices in Saudi Arabia, Oman, Qatar, UAE, Kuwait, India,
+    // Iraq, USA, South Korea and China). Real named client testimonial confirms on-time bulk
+    // piping delivery during a COVID-19 pandemic shutdown. Strongly reviewed (4.5 rating, 62
+    // reviews).
+    desc:"Middle East's leading bulk supplier of seamless pipes and allied components — pipes, fittings, flanges, stud bolts, valves, gaskets and instrumentation accessories, in carbon steel, stainless steel, duplex, super duplex and special alloys — for oil & gas, power generation, water desalination, mining and construction. ADIPEC 2026: Hall 1, Stand #1111.",
+    site:"https://www.gerabnationalenterprises.com",
+    cats:["pipes-and-tubes", "valves"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"P.O. Box 17719, Jebel Ali Free Zone, Dubai, United Arab Emirates", city:"Dubai", lat:null, lng:null, placeId:"ChIJ0437qIwNXz4Rggvuf5UXelc" }] },
+{ id:577, slug:"hangzhou-zhongtai-cryogenic-technology", name:"Hangzhou Zhongtai Cryogenic Technology Corporation", logo:null, country:"China",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, LEI-registered,
+    // genuine major named clients (Air Liquide, Air Products, Aramco, Total), exports to 50+
+    // countries and regions.
+    desc:"Leading supplier of cryogenic technology and equipment — process design and whole solutions, key products include plate fin heat exchangers and cold box packages; expertise in LNG/GPP, nitrogen wash units, H2/CO cryogenic separation, PDH cryogenic separation, ethylene cold boxes, rare gas purification and helium recovery. ADIPEC 2026: Hall 13, Stand #13114.",
+    site:"",
+    cats:["heat-exchangers", "cryogenic-and-lng-storage-tanks"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"228 Gao Er Fu Lu, Fuyang District, Hangzhou, Zhejiang 311401, China", city:"Hangzhou", lat:null, lng:null, placeId:"ChIJxe_OYbWCSzQRYxlCiMu31co" }] },
+{ id:578, slug:"grupo-cunado", name:"Grupo Cunado", logo:null, country:"Spain",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, founded 1963,
+    // substantial (265,000+ m² across 18 warehouses/offices).
+    desc:"Spanish group of specialized companies supplying pipes, valves, fittings and miscellaneous items — real named served industries include chemicals/petrochemicals, oil & gas, nuclear power plants, metallurgical/iron & steel, shipbuilding, combined-cycle and renewable energy power plants, paper and food industry, water treatment plants, and gas processing plants. Real, substantial public footprint (142 reviews). ADIPEC 2026: Hall 5, Stand #5240.",
+    site:"https://grupocunado.com",
+    cats:["pipes-and-tubes", "valves"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Camino el Olivar 2, 28806 Alcalá de Henares, Madrid, Spain", city:"Alcalá de Henares", lat:null, lng:null, placeId:"ChIJI1hvIYZJQg0RIIq0-pqM5Pk" }] },
+{ id:579, slug:"hytorc", name:"HYTORC", logo:null, country:"United States",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, globally known
+    // industrial bolting/torque tools manufacturer. CAUTION: a real, detailed review alleges a
+    // wage/territory dispute with a former salesperson — worth being aware of, not disqualifying
+    // given the otherwise strong overall pattern (4.3 rating, 11 reviews).
+    desc:"Manufacturer of hydraulic and mechanical industrial bolting/torque tools — real presence across energy and building/construction markets. ADIPEC 2026: Hall 7, Stand #7252.",
+    site:"",
+    cats:["heavy-engineering-and-fabrication"],
+    locations:[{ type:"headquarters", name:"World Headquarters", address:"333 NJ-17, Mahwah, NJ 07430, USA", city:"Mahwah", lat:null, lng:null, placeId:"ChIJD7ablxnhwokRZIz_8_rRFH4" }] },
+{ id:580, slug:"ingersoll-rand-italy", name:"Ingersoll Rand", logo:null, country:"Italy",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list, which named the Italy
+    // exhibiting entity specifically — used the real, verified global corporate HQ address here
+    // since a confident Place ID match for the Italy-specific entity wasn't found; verify before
+    // use if the distinct regional entity's address is needed. Real, publicly listed, globally
+    // major. CAUTION: multiple real, detailed negative reviews describe slow service response
+    // and high diagnostic/repair charges — worth being aware of alongside the company's genuine
+    // industrial legitimacy and scale.
+    desc:"Global manufacturer of air compressors, pumps, blowers, and industrial tools/material handling equipment; publicly listed, major industrial conglomerate.",
+    site:"",
+    cats:["compressors"],
+    locations:[{ type:"headquarters", name:"Corporate Headquarters", address:"525 Harbour Place Dr #600, Davidson, NC 28036, USA", city:"Davidson", lat:null, lng:null, placeId:"ChIJRT_oHk-qVogR18vBHetH3Rk" }] },
+{ id:581, slug:"kobelco-machinery-middle-east-fze", name:"Kobelco Machinery Middle East FZE", logo:null, country:"United Arab Emirates",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real. CAUTION: a
+    // genuinely different, unrelated-by-product-line entity — "Kobelco Construction Equipment
+    // India Private Limited" — also exists (already in TWI); this entity's own website domain
+    // (kobelcocompressors.com, per D&B) confirms it's the compressor business specifically, not
+    // construction equipment — correctly not a duplicate.
+    desc:"Manufacturer of air and gas compressors, including vacuum pumps and refrigeration/air conditioning compressors, for the Middle East region. ADIPEC 2026: Hall 2, Stand #2352.",
+    site:"https://www.kobelcocompressors.com",
+    cats:["compressors"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Dubai Airport Free Zone, Dubai, United Arab Emirates", city:"Dubai", lat:null, lng:null, placeId:"ChIJc6SzY7FdXz4RRNXZBT0__68" }] },
+{ id:582, slug:"intech-automation-and-intelligence", name:"INTECH Automation & Intelligence", logo:null, country:"United Arab Emirates",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, 25+ years' regional
+    // experience, genuine recent major contract confirmed — a fully integrated electrical
+    // automation package (SIL 3 PLC systems, redundant controllers, process control/ESD/fire &
+    // gas detection) for a significant onshore field development, for a "prominent regional
+    // energy firm." Strongly reviewed (4.5 rating, 15 reviews).
+    desc:"Electrical and instrumentation automation company for the energy sector — engineering, design, system configuration, staging, integration, testing, factory/site acceptance and commissioning for PLC/SCADA/safety systems, including Safety Integrity Level 3 (SIL 3) applications for power skids. ADIPEC 2026: Hall 5, Stand #5120.",
+    site:"",
+    cats:["instrumentation-and-automation"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Jebel Ali Free Zone, Dubai, United Arab Emirates", city:"Dubai", lat:null, lng:null, placeId:"ChIJoaXJkO0NXz4RgCFWPdVC_mY" }] },
+{ id:583, slug:"laversab-inc", name:"LAVERSAB, INC.", logo:null, country:"United States",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, genuine dual-market
+    // manufacturer (Aviation Systems + Oilfield Systems divisions). Strongly reviewed (5.0
+    // rating, 8 reviews).
+    desc:"Manufacturer of electronic instrumentation for aviation and oilfield markets. Oilfield Systems division designs and manufactures hazardous area computers for oilfield service — MWD Surface Systems, Rig Floor Computers, Depth Tracking Systems — Class 1 Div 1/Div 2 (UL), Zone 1/2 (ATEX), and IECEx certified. Direct locations in USA, Canada, Mexico, Germany, Taiwan and India, plus 25+ distribution/calibration/repair partners worldwide. ADIPEC 2026: Hall 8, Stand #8170.",
+    site:"https://laversab.com",
+    cats:["hazardous-area-equipment"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"505 Gillingham Ln, Sugar Land, TX 77478, USA", city:"Sugar Land", lat:null, lng:null, placeId:"ChIJQYTVzATnQIYRnQDm66B0Mrk" }] },
+{ id:584, slug:"ovs-officine-valle-seriana-spa", name:"O.V.S. - OFFICINE VALLE SERIANA S.P.A.", logo:null, country:"Italy",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, founded 1973 (52
+    // years), strongly reviewed (5.0 rating, 4 reviews — one specifically congratulating the
+    // company on its 50th anniversary). CAUTION: shares the same exhibitor stand (Hall 1, #1160)
+    // as Donelli Alexo, EXCEN and MATEC GROUP — a cluster worth noting, though at least two of
+    // those (Donelli Alexo, EXCEN) are independently confirmed as genuinely different, unrelated
+    // businesses rather than a single group; don't assume a connection here without evidence.
+    desc:"Leading manufacturer specialized in design and fabrication of shell & tube heat exchangers for process industries — oil & gas, refineries, chemical, petrochemical, energy and fertilizer industries. Manufactures in a broad range of materials including low alloys, duplex, copper alloys, nickel alloys and titanium. ADIPEC 2026: Hall 1, Stand #1160.",
+    site:"https://ovsspa.it",
+    cats:["heat-exchangers"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Via Cinque Martiri 33, 24029 Vertova BG, Italy", city:"Vertova", lat:null, lng:null, placeId:"ChIJpfd64ETig0cRIJxIf4UdHQU" }] },
+{ id:585, slug:"klopper-therm-gmbh", name:"Klopper-Therm", logo:null, country:"Germany",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, 50+ years, real
+    // extensive certifications (ISO 9001, SCC, ATEX 94/9/EC, IECEx, PED 97/23/EC, ASME VIII Div.
+    // 1, AD 2000-Rules, GOST TR/R, RTN).
+    desc:"Electrical heating systems for industrial process applications — engineering, manufacturing, installation, commissioning and maintenance for oil & gas transportation/processing/storage, chemical and petrochemical industry, refineries and power stations. ADIPEC 2026: Hall 8, Stand #8730.",
+    site:"",
+    cats:["heating-systems"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Unterste-Wilms-Straße 21, 44143 Dortmund-Brackel, Germany", city:"Dortmund", lat:null, lng:null, placeId:"ChIJuULgh9QQuUcRqDlLBy60X34" }] },
+{ id:586, slug:"nov-inc", name:"NOV", logo:null, country:"United States",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, globally major,
+    // publicly listed oilfield equipment manufacturer (formerly National Oilwell Varco). CAUTION:
+    // NOV has numerous real facilities across the Houston area — this entry uses one confirmed,
+    // real NOV-branded location, not necessarily the exact specific facility that exhibited at
+    // ADIPEC; verify before use if a specific site/division matters.
+    desc:"Global manufacturer of technology, equipment and components for the oil & gas industry — drilling, completion and production equipment. ADIPEC 2026: Hall 7, Stand #7250.",
+    site:"",
+    cats:["heavy-engineering-and-fabrication"],
+    locations:[{ type:"headquarters", name:"Facility", address:"5100 North Sam Houston Pkwy W, Houston, TX 77086, USA", city:"Houston", lat:null, lng:null, placeId:"ChIJSYBaBpjOQIYRkg3dFKT8y6s" }] },
+{ id:587, slug:"muller-co-ax-gmbh", name:"müller co-ax gmbh", logo:null, country:"Germany",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, founded 1960 (65
+    // years), inventor of coaxial valve technology. Real "World Market Leader Champion 2025"
+    // award from WirtschaftsWoche (a reputable German business publication). Strongly reviewed
+    // (4.3 rating, 30 reviews — including "King of valves").
+    desc:"Manufacturer of coaxial and high-pressure industrial valves — switches highest pressures with smallest forces; real named hydrogen valve product rated to 1,000 bar. Real global subsidiary network (USA, Spain, Sweden, Thailand, Turkey, Ukraine, China). ADIPEC 2026: Hall 13, Stand #13494.",
+    site:"https://co-ax.com",
+    cats:["valves"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Friedrich-Müller-Straße 1, 74670 Forchtenberg, Germany", city:"Forchtenberg", lat:null, lng:null, placeId:"ChIJ4c34AwNAmEcRjWXW_oY5XG8" }] },
+{ id:588, slug:"peroni-pompe-spa", name:"PERONI POMPE SPA", logo:null, country:"Italy",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, founded 1895 (130
+    // years). Independently cross-confirmed via ADIPEC's own official marketing/exhibitor
+    // brochure domain, with the exact same booth number (Hall 2, #2236) as the source document.
+    // Real, patented Dedalo® seal technology, real CO2 Injection Pumps for carbon storage —
+    // genuinely relevant to this exhibitor category's Carbon Capture theme specifically.
+    desc:"Global manufacturer of API-compliant reciprocating industrial pumps — plunger pumps, steam-driven pumps, process diaphragm pumps, metering pumps — for oil & gas, refining, petrochemical, steel, chemical, food, and energy transition markets. Real named recent delivery: an ammonia fuel pump to Alfa Laval for WinGD testing (zero emissions performance). ADIPEC 2026: Hall 2, Stand #2236.",
+    site:"https://peronipompe.com",
+    cats:["pumps"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Via Tacito 4, 20094 Corsico MI, Italy", city:"Corsico", lat:null, lng:null, placeId:"ChIJRc2sa2bChkcRoETg0kfO0xE" }] },
+{ id:589, slug:"oms-saleri", name:"O.M.S. Saleri Spa", logo:null, country:"Italy",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, since 1896 (129
+    // years). CAUTION: a genuinely different, unrelated-by-current-business "Saleri" company
+    // (Industrie Saleri Italo S.p.A. — automotive water pumps/thermal management) also exists;
+    // likely a historical family connection but a distinct current business — do not conflate the
+    // two. Real, well-reviewed (3.9 rating, 15 reviews).
+    desc:"Industrial valve manufacturer with 120+ years of experience, described by its own materials as one of the world's leading valve manufacturers. ADIPEC 2026: Hall 1, Stand #138.",
+    site:"https://www.oms-saleri.it",
+    cats:["valves"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Via Vallesabbia 2, 25076 Odolo BS, Italy", city:"Odolo", lat:null, lng:null, placeId:"ChIJw8VmsfeDgUcR5mipX2Q3HMM" }] },
+{ id:590, slug:"petroseal", name:"PETROSEAL", logo:null, country:"France",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, since 1974 (50+
+    // years). Genuinely unique niche: repairs industrial leaks online, without plant shutdown —
+    // "boxes in" the leak with a metallic/custom enclosure and injects compressed chemical
+    // compounds to seal it, working on pressures up to 240 kg/cm² and temperatures from -180°C to
+    // +700°C. Real named applicable equipment: flanges, valve bonnets, heat exchangers, blind
+    // flanges, manholes. No dedicated "leak repair" category exists in TWI's tree — tagged to
+    // Gaskets as the closest fit given the bolted-flange-connection focus.
+    desc:"Online industrial leak sealing without shutdown — steam, air, water, hydrocarbon, chemical and acid leaks, ASME-compliant procedures, serving oil & gas, petrochemical, power generation and manufacturing sectors. ADIPEC 2026: Hall 9, Stand #9354.",
+    site:"https://leaksealing.com",
+    cats:["gaskets"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Parc d'Activités de l'Aérodrome, 76430 Saint-Romain-de-Colbosc, France", city:"Saint-Romain-de-Colbosc", lat:null, lng:null, placeId:"ChIJZ2a9LfxH4EcRQGnxQbPyTuw" }] },
+{ id:591, slug:"phoenix-mecano-middle-east-fze", name:"PHOENIX MECANO MIDDLE EAST FZE", logo:null, country:"United Arab Emirates",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, global parent
+    // (Phoenix Mecano AG) is publicly listed (SIX: PMN), founded 1975, €757.3M revenue, 7,500
+    // employees — genuinely different, unrelated company from "Phoenix Contact India Private
+    // Limited" (already in TWI), despite the shared "Phoenix" prefix. No confident Google Places
+    // match found for this specific UAE FZE subsidiary among several unrelated Phoenix-branded
+    // entities in the same free zone — placeId deliberately left null rather than misattribute.
+    desc:"Regional arm of Phoenix Mecano AG, a Swiss technology company — technical enclosures, electronic components, actuators, and system integrations for industrial applications. ADIPEC 2026: Hall 13, Stand #13492.",
+    site:"https://www.phoenix-mecano.com",
+    cats:["heavy-engineering-and-fabrication"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"(unconfirmed — Jebel Ali Free Zone, Dubai, UAE)", city:"Dubai", lat:null, lng:null, placeId:null }] },
+{ id:592, slug:"petrofix-oil-and-gas-services-llc", name:"Petrofix Oil & Gas Services LLC", logo:null, country:"United Arab Emirates",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, substantial —
+    // genuinely different, unrelated company from "Petrofac Engineering India Private Limited"
+    // despite the similar name. Real named specific chemical products (Glut and THPS-based
+    // biocides, MICROBIOCIDE-B, CORRTREAT 15927, ZK Oil, Vitec 7000 antiscalants), real network
+    // of 1,250+ partner companies/OEMs/contractors. No confident Google Places match found for
+    // this specific entity among several unrelated "Petro"-prefixed companies in the same area —
+    // placeId deliberately left null rather than misattribute.
+    desc:"End-to-end oil & gas products and services — repair & retrofit, O&M support, turnaround support; high-performance equipment (pumps, compressors, steam/gas turbines, seals, pipes, motors, transformers, switchgear, wellheads, SCADA, F&G systems); specialty chemicals (biocides, corrosion inhibitors, scale control, antifoams, demulsifiers, glycols); wellhead and coil tubing skid maintenance. ADIPEC 2026: Hall 16, Stand #16235.",
+    site:"https://petrofixuae.com",
+    cats:["industrial-water-systems"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"(unconfirmed — Dubai, UAE)", city:"Dubai", lat:null, lng:null, placeId:null }] },
+{ id:593, slug:"rittal-fze", name:"RITTAL FZE", logo:null, country:"United Arab Emirates",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, genuinely major —
+    // subsidiary of the Friedhelm Loh Group (founded 1961, Herborn, Germany, €2.5B global
+    // revenue). Address and phone number independently confirmed to match exactly against the
+    // company's own official regional contact page. Strongly reviewed (4.7 rating, 7 reviews).
+    desc:"Global manufacturer of industrial enclosure systems — power distribution, climate control, IT infrastructure, and software & services — used across electrical engineering/automation, renewable energy, information technology, infrastructure, mechanical engineering and transport applications. ADIPEC 2026: Hall 16, Stand #16268.",
+    site:"https://www.rittal.com",
+    cats:["hazardous-area-equipment", "electrical-contractors"],
+    locations:[{ type:"regional-office", name:"Middle East Headquarters", address:"Offices 2421-2423, 24th Floor, Tower B, Jafza One, Jebel Ali Free Zone, Dubai, United Arab Emirates", city:"Dubai", lat:null, lng:null, placeId:"ChIJ7U-q3-xpXz4RVIAjMiKBWIU" }] },
+{ id:594, slug:"spp-pumps-ltd", name:"SPP Pumps", logo:null, country:"United Kingdom",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, founded 1875 (150
+    // years), genuine real connection: part of the Kirloskar Group (Alok Kirloskar is Managing
+    // Director) — the same family conglomerate behind Kirloskar Brothers Limited, already
+    // independently verified and in TWI. $200M revenue, ~500 employees.
+    desc:"Manufacturer of centrifugal pumps and associated systems, real product heritage tracing to the 1875 Pulsometer steam pump. ADIPEC 2026: Hall 8, Stand #8432.",
+    site:"https://www.spppumps.com",
+    cats:["pumps"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"1420 Lakeview, Arlington Business Park, Theale, Reading RG7 4SA, UK", city:"Reading", lat:null, lng:null, placeId:"ChIJ3xhEoUCZdkgRkbSUtve_5Yk" }] },
+{ id:595, slug:"trouvay-and-cauvin-group", name:"TROUVAY & CAUVIN GROUP", logo:null, country:"United Arab Emirates",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, established 1881
+    // (144 years) in Le Havre, France. Strongly reviewed (4.7 rating, 26+16 reviews across two
+    // Dubai facilities) — "one stop shop for piping materials."
+    desc:"Global leader in piping solutions — pipes, valves, fittings, structural steel, special piping materials, gauges, equipment and related components — for large-scale energy projects. Real ESG program targeting reduced operational carbon footprint across global operations. ADIPEC 2026: Hall 9, Stand #9350.",
+    site:"https://trouvaycauvin.com",
+    cats:["pipes-and-tubes", "valves"],
+    locations:[{ type:"headquarters", name:"Head Office & Yard", address:"740th St, Mina Jebel Ali, Jebel Ali Free Zone, Dubai, United Arab Emirates", city:"Dubai", lat:null, lng:null, placeId:"ChIJyxa0DYASXz4R9tjpheYWVV4" }] },
+{ id:596, slug:"strohm-bv", name:"Strohm bv", logo:null, country:"Netherlands",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, founded 1995
+    // (formerly Airborne Oil & Gas), genuine substantial funding history ($32.23M raised June
+    // 2024, Private Equity stage). Strongly reviewed (4.8 rating, 12 reviews).
+    desc:"Manufacturer of fully bonded, thermoplastic composite pipes — lightweight, high-strength, corrosion-resistant, for flowline, jumper and riser applications in both renewable energy and conventional offshore oil & gas industries. ADIPEC 2026: Hall 11, Stand #11200.",
+    site:"",
+    cats:["pipes-and-tubes"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Monnickendamkade 1, 1976 EC IJmuiden, Netherlands", city:"IJmuiden", lat:null, lng:null, placeId:"ChIJe2rJJfTxxUcR8aeBHzqoj-0" }] },
+{ id:597, slug:"teledyne-gas-and-flame-detection", name:"Teledyne Gas and Flame Detection", logo:null, country:"France",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, subsidiary of
+    // publicly listed Teledyne Technologies Incorporated (NYSE: TDY). Genuine, documented
+    // corporate history — Teledyne acquired 3M's gas and flame detection business (Oldham,
+    // Simtronics, GMI, Detcon brands) for $230M in August 2019, confirmed via the company's own
+    // SEC filing. 100+ years of combined industry experience across those legacy brands.
+    desc:"Global fixed and portable gas and flame detection leader — real named legacy brands Oldham, Simtronics, Gas Measurement Instruments (GMI) and Detcon, serving oil & gas, petrochemical, power generation, food & beverage, marine, mining and wastewater treatment. Real reviews are mixed — several strongly positive ('best gas detectors'), alongside real customer service complaints about phone responsiveness — worth checking directly. ADIPEC 2026: Hall 9, Stand #9413.",
+    site:"https://www.teledynegasandflamedetection.com",
+    cats:["gas-detection"],
+    locations:[{ type:"headquarters", name:"Teledyne Oldham Simtronics SAS", address:"Rue Mathieu Orfila, 62027 Arras, France", city:"Arras", lat:null, lng:null, placeId:"ChIJW-mPsEVI3UcRxLiPN2uY3NM" }] },
+{ id:598, slug:"valvitalia-spa", name:"Valvitalia S.p.A.", logo:null, country:"Italy",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, major Italian valve
+    // group, genuine detailed real facility specs confirmed via the company's own materials —
+    // 53,100 m² Rivanazzano Terme HQ, 60-ton gantry cranes, cryogenic testing to -196°C, high-
+    // temperature testing to +300°C. CAUTION: real, detailed reviews allege slow after-sales
+    // service response for repair kits/spares and difficulty reaching the Middle East sales team —
+    // worth checking directly alongside the otherwise strong industrial legitimacy (4.2 rating, 45
+    // reviews).
+    desc:"Major global group designing, producing and supplying valves, actuators, fittings, flanges, isolation joints, fluid/gas measurement-filtration-regulation systems, and fire-fighting systems for energy, marine and civil industries — ball, plug and butterfly valves, plus a dedicated Control Valves Division (linear globe, in-line/corner, rotary ball/butterfly) serving Oil & Gas, Power, Chemical, Fertilizers & Urea, Oxygen and Turbine By-pass/Steam Reduction applications. ADIPEC 2026: Hall 4, Stand #444.",
+    site:"https://www.valvitalia.com",
+    cats:["valves"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Via Tortona 69, 27055 Rivanazzano Terme PV, Italy", city:"Rivanazzano Terme", lat:null, lng:null, placeId:"ChIJU9KS4UpHh0cReSD9nCjfbB4" }] },
+{ id:599, slug:"tomoe-valve-ltd", name:"Tomoe Valve Ltd", logo:null, country:"United Kingdom",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, UK arm of a
+    // Japanese valve manufacturer. Strongly reviewed (5.0 rating, 3 reviews) — "the best valve
+    // company in Japan is now in Newport."
+    desc:"Engineers bespoke industrial valves — cast steel to exotic materials (titanium, Inconel, duplex), 2 inch to 84 inch, triple offset valves — pipeline valves for companies worldwide. ADIPEC 2026: Hall 8, Stand #8650.",
+    site:"",
+    cats:["valves"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Queensway Meadows Industrial Estate, Clearwater Rd, Newport NP19 4ST, UK", city:"Newport", lat:null, lng:null, placeId:"ChIJSXc7xXrmcUgRW36V0q-jMLY" }] },
+{ id:600, slug:"voestalpine-tubulars", name:"voestalpine Tubulars", logo:null, country:"Austria",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, genuinely major
+    // (326 Google reviews). Real reviews independently confirm API 5CT and API 5L tubular
+    // production — Oil Country Tubular Goods (OCTG) and line pipe standards — directly on-topic
+    // for TWI's scope. Part of the voestalpine Group, a real, major Austrian steel conglomerate.
+    desc:"Manufacturer of tubular steel products — real confirmed API 5CT (casing/tubing) and API 5L (line pipe) grades — for the oil & gas industry. ADIPEC 2026: Hall 9, Stand #9536.",
+    site:"",
+    cats:["pipes-and-tubes"],
+    locations:[{ type:"headquarters", name:"Mill", address:"Alpinestraße 17, 8652 Kindberg, Austria", city:"Kindberg", lat:null, lng:null, placeId:"ChIJvznIr8MabkcRy7p2oBExqpk" }] },
+{ id:601, slug:"serimax", name:"Serimax", logo:null, country:"Saudi Arabia",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, since 2010 a
+    // subsidiary of Vallourec Group (a real, major, publicly-listed French tubular solutions
+    // company); the company's own history traces back 45+ years. Genuine, well-documented major
+    // projects — 32,000 welds on the Hasbah offshore project (Saudi Arabia), a 125km/72" water
+    // pipeline (Ras Az-Zawr to Riyadh), and the Mellitah Bahr Essalam project in Libya. Real named
+    // proprietary equipment (Saturnax automatic welding system, CleverScan, CleverWeld). Precisely
+    // matches TWI's Welding Equipment & Consumables category, added earlier this session.
+    desc:"World's foremost pipeline welding partner — fully integrated manual and automatic welding and fabrication solutions for landline and sub-sea pipeline projects, plus real welder training school and welding technology development centre in Paris. Offices worldwide including USA, Brazil, France, UK, Norway, Kazakhstan, Australia, China, Singapore, Saudi Arabia and Malaysia. ADIPEC 2026: Hall 14, Stand #14416.",
+    site:"https://serimax.com",
+    cats:["welding-equipment-and-consumables"],
+    locations:[{ type:"regional-office", name:"Welding Technology Centre (WTC)", address:"346 Rue de la Belle Étoile, 95700 Roissy-en-France, France", city:"Roissy-en-France", lat:null, lng:null, placeId:"ChIJmYzMmf8U5kcRdmerwh-7WT4" }] },
+{ id:602, slug:"siad-macchine-impianti", name:"SIAD MACCHINE IMPIANTI", logo:null, country:"Italy",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, founded 1953 (72
+    // years), part of the SIAD Group (a real, leading Italian chemical group). Real named major
+    // project: supplied two BOG (Boil-Off Gas) compressors for the first coastal LNG storage
+    // facility built in the Mediterranean (for Gas and Heat). Explicit real CO2 capture and
+    // liquefaction plant product line — directly relevant to this exhibitor category's Carbon
+    // Capture theme specifically. One real review is genuinely confusing/contradictory (warns
+    // against a named individual while also calling the company "very reputable" in the same
+    // breath) — noted as ambiguous rather than a clear caution.
+    desc:"World leader in reciprocating compressors (process gas and air, including API 618) and air separation units, plus natural gas liquefaction (LNG) plants, CO2 capture and liquefaction plants, biogas/biomethane upgrading and liquefaction (Bio-LNG) plants, and combustion systems — serving Refinery, Petrochemical, Chemical, Energy and Food sectors. Certified Service Centres across five continents. ADIPEC 2026: Hall 2, Stand #2130.",
+    site:"https://www.siadmi.com",
+    cats:["compressors"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Via delle Canovine 2/4, 24126 Bergamo BG, Italy", city:"Bergamo", lat:null, lng:null, placeId:"ChIJJS-dQaRRgUcRSmZ6tMW8bfU" }] },
+{ id:603, slug:"tps-technitube-roehrenwerke", name:"TPS-Technitube Roehrenwerke GmbH", logo:null, country:"Germany",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, privately owned.
+    desc:"Manufacturer of seamless alloy and stainless tubes, nickel and titanium alloyed tubes, carbon steel tubes, non-ferrous tubes, oil- and gasfield tubular products, and extended surface tubes, plus special piping and tubing products and accessories. ADIPEC 2026: Hall 8, Stand #8752.",
+    site:"",
+    cats:["pipes-and-tubes"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Julius-Saxler-Straße 7, 54550 Daun, Germany", city:"Daun", lat:null, lng:null, placeId:"ChIJFQrSEPm1v0cRwA3k72nDhVc" }] },
+{ id:604, slug:"voith-gmbh", name:"Voith", logo:null, country:"Germany",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, genuinely massive —
+    // founded 1867 (158 years), 100% family-owned, €4.8-5.2B revenue, ~20,000-22,000 employees,
+    // locations in 60+ countries. Real, specific turbomachinery product line confirmed via the
+    // company's own materials: actuators and control systems used on 30,000+ steam turbines and
+    // 950 gas turbines worldwide, serving 1,200 customers over 40+ years. Strongly reviewed (4.3
+    // rating, 41 reviews at the Turbo subsidiary specifically).
+    desc:"Global technology group (energy, paper, raw materials and transport markets) — turbomachinery actuators, control systems and valve assemblies for steam and gas turbines, compressors and other driven machines, plus hydraulic valve technology (high dynamics, short response times). ADIPEC 2026: Hall 8, Stand #8835.",
+    site:"https://www.voith.com",
+    cats:["heavy-engineering-and-fabrication"],
+    locations:[{ type:"headquarters", name:"Voith Turbo GmbH & Co. KG", address:"Alexanderstraße 2, 89522 Heidenheim an der Brenz, Germany", city:"Heidenheim an der Brenz", lat:null, lng:null, placeId:"ChIJAfejIdwVmUcRYBvWkWgxrU4" }] },
+{ id:605, slug:"schroeder-valves-gmbh", name:"Schroeder Valves", logo:null, country:"Germany",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, strongly reviewed
+    // (4.7 rating, 6 reviews).
+    desc:"German industrial valve manufacturer. ADIPEC 2026: Hall 13, Stand #13652.",
+    site:"",
+    cats:["valves"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Archimedesstr. 3, 51647 Gummersbach, Germany", city:"Gummersbach", lat:null, lng:null, placeId:"ChIJ018Yg2zKvkcRrBOS5b0Qlow" }] },
+{ id:606, slug:"sud-robinetterie-industrie", name:"SUD ROBINETTERIE INDUSTRIE", logo:null, country:"France",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, strongly reviewed
+    // (4.7 rating, 7 reviews).
+    desc:"French industrial valve ('robinetterie') manufacturer. ADIPEC 2026: Hall 9, Stand #9237.",
+    site:"",
+    cats:["valves"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"305 Bd Danielle Casanova, 13014 Marseille, France", city:"Marseille", lat:null, lng:null, placeId:"ChIJiZw-PmnAyRIRnloj9qau6QE" }] },
+{ id:607, slug:"thermon-fati", name:"Thermon-FATI", logo:null, country:"Italy",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. The exhibitor name
+    // suggests a joint listing between Thermon (a real, well-known global heat-tracing company)
+    // and F.A.T.I., a real, separate Italian manufacturer (Cusago, near Milan) — used F.A.T.I.'s
+    // own confirmed Italian address given the exhibitor entry is under the Italy hall/stand,
+    // suggesting F.A.T.I. is the local exhibiting entity; verify the precise corporate
+    // relationship before use. Real, well-reviewed ("Big company", 4.5 rating, 8 reviews).
+    desc:"Industrial manufacturer, real named partnership/co-exhibition with Thermon (global heat-tracing systems company) suggested by the exhibitor's joint name. ADIPEC 2026: Hall 2, Stand #2455.",
+    site:"",
+    cats:["heating-systems"],
+    locations:[{ type:"headquarters", name:"F.A.T.I. Headquarters", address:"Viale A. Volta 52, 20047 Cusago MI, Italy", city:"Cusago", lat:null, lng:null, placeId:"ChIJtah0OKTphkcRTk6u3FBlXI0" }] },
+{ id:608, slug:"teufelberger-redaelli", name:"Teufelberger-Redaelli", logo:null, country:"Austria",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, well-documented
+    // 2017 merger — Austrian Teufelberger (225+ years' history at the time) acquired Italian wire
+    // rope specialist Redaelli Tecna (founded 1819) from Severstal metiz. Real combined scale
+    // (1,280+ then, ~1,500 total staff now, 14 locations across 9 countries). Real Guinness World
+    // Records for largest/heaviest ropes. CAUTION: a real, detailed review alleges "poor rope
+    // quality... sheath slippage and inferior, substandard quality" despite "top prices" — worth
+    // checking directly alongside the otherwise strong industrial pedigree.
+    desc:"Manufacturer of high-performance steel wire ropes — real named applications for the oil & gas industry (offshore and onshore), plus mining, cableways, cranes, construction and material transportation. Digital continuous production monitoring (GLD) over the entire rope length; in-house test rig plus third-party testing organizations. Real Tier 1 supplier status to major crane/construction machinery OEMs. ADIPEC 2026: Hall 14, Stand #14680.",
+    site:"https://www.teufelberger.com",
+    cats:["heavy-engineering-and-fabrication"],
+    locations:[{ type:"headquarters", name:"Teufelberger Holding", address:"Vogelweiderstraße 50, 4600 Wels, Austria", city:"Wels", lat:null, lng:null, placeId:"ChIJhU7v--nyc0cRHZCR9oI5L4U" }] },
+{ id:609, slug:"thermo-cables-limited", name:"Thermo Cables Limited", logo:null, country:"India",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, substantial —
+    // genuinely different, unrelated company from "Thermosystems Private Limited" despite a
+    // similar-sounding name, correctly identified as distinct during initial overlap-checking
+    // earlier in this batch's research. Two real manufacturing units confirmed (Jeedimetla and
+    // Jadcherla, Telangana), strongly reviewed (4.3 rating across both, 51+36 reviews) — real
+    // named long-term client relationships with Railways and the Navy.
+    desc:"Cable manufacturer — real reviews confirm decades of serving diverse industries including Railways and Navy, with customization capability across cable sizes from 0.1mm to 200mm. World-class integrated manufacturing across two units. ADIPEC 2026: Hall 13, Stand #13172.",
+    site:"",
+    cats:["cable-manufacturers"],
+    locations:[{ type:"headquarters", name:"Unit-I", address:"Plot No. D44-D45 & D48-D49, Phase-5, IDA, Shapur Nagar, Chinthal, Jeedimetla, Hyderabad, Telangana 500055, India", city:"Hyderabad", lat:null, lng:null, placeId:"ChIJb-G5Jh2QyzsR7Nv3cRA0Ufc" }] },
+{ id:610, slug:"zalux", name:"ZALUX", logo:null, country:"Spain",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, 45 years'
+    // experience, real ATEX/IECEx/CE/RoHS/REACH certified. CAUTION: alongside a real positive
+    // review ("very professional team, good service"), one review reads as either spam or a
+    // genuinely confused/unrelated complaint (references "buying a tobacconist from the
+    // Chinese") — not treated as a meaningful signal either way given its incoherence.
+    desc:"Manufacturer of protected (hazardous-area) luminaires explicitly for offshore oil & gas platforms and onshore refineries, real named upstream and downstream applications — LED lighting technology with intelligent controls claiming up to 80% operational cost savings versus traditional lighting. ADIPEC 2026: Hall 14, Stand #14693.",
+    site:"https://zalux.com",
+    cats:["hazardous-area-equipment"],
+    locations:[{ type:"headquarters", name:"Factory", address:"Av. Manuel Rodríguez Ayuso 114, Centro Empresarial Miralbueno, 50012 Zaragoza, Spain", city:"Zaragoza", lat:null, lng:null, placeId:"ChIJR6QuHAVrWQ0RuyorOP36g1s" }] },
+{ id:611, slug:"tgsk-turbo-gears-services-kempten", name:"TGSK - Turbo Gears - Services - Kempten", logo:null, country:"Germany",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list — independently cross-
+    // confirmed as a genuine exhibitor via ADIPEC's own official German Pavilion exhibitor page.
+    // Real, strongly reviewed (5.0 rating, 2 reviews).
+    desc:"Specialist in turbo gears and related services — service, spare parts and upgrades for steam turbines and turbo compressors, delivered by experienced project managers, engineers and designers. ADIPEC 2026: Hall 8, Stand #8830.",
+    site:"",
+    cats:["heavy-engineering-and-fabrication"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Heisinger Str. 17, 87437 Kempten (Allgäu)-Hub, Germany", city:"Kempten", lat:null, lng:null, placeId:"ChIJJZc8IO95nEcRFOrnCcNu2l4" }] },
+{ id:612, slug:"tecnar-automation-ltee", name:"Tecnar Automation Ltee", logo:null, country:"Canada",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, founded 1989 (37
+    // years), Saint-Bruno, Quebec. Genuine, real Canadian government funding record — a $300,000
+    // CAD repayable contribution in August 2011 (an official government press release), to
+    // commercialize its Laser-Ultrasonic (LUT) technology internationally. Strongly reviewed (4.6
+    // rating, 9 reviews).
+    desc:"Designs, develops, manufactures and markets advanced sensors for industrial process monitoring and control — automated welding systems, thermal and cold spray diagnostics, laser-induced breakdown spectroscopy (LIBS) for metal analysis, and laser ultrasonics for non-destructive testing. ADIPEC 2026: Hall 3, Stand #3153.",
+    site:"https://tecnar.com",
+    cats:["non-destructive-testing-ndt", "welding-equipment-and-consumables"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"1021 Rue Marie-Victorin, Saint-Bruno-de-Montarville, QC J3V 0M7, Canada", city:"Saint-Bruno-de-Montarville", lat:null, lng:null, placeId:"ChIJJcQJCbQGyUwRN3i9icYIe1E" }] },
+{ id:613, slug:"valmark-dwc-llc", name:"ValMark DWC LLC", logo:null, country:"United Arab Emirates",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, genuinely strong
+    // named client list confirmed via the company's own materials — ADNOC, PDO, OXY, KNPC, KOC,
+    // ARAMCO, SABIC, SEC, BAPCO, BANAGAS, BP, ENI, Exxon, Shell, Total, Siemens, Aker, Bechtel,
+    // Fluor, RasGas, ONGC, Qatar Gas, QP, QAFCO and QAPCO. Real named product: FLOWSAR High
+    // Pressure 3-Piece Trunnion Mounted DBB Valve for water injection pump pressure upgrades.
+    desc:"Supplier and stockist of Ball, Gate, Globe, Check and Butterfly valves plus exotic alloy and specialty valves, serving chemical, oilfield, petrochemical, refining, power and water treatment industries across the Middle East, Africa, UK, US, Asia and Russia. Also supplies pipes, fittings, flanges, studbolts and gaskets. Real reviews describe it as 'the most trusted supplier of industrial valves and piping materials.' ADIPEC 2026: Hall 14, Stand #14690.",
+    site:"https://www.valmark.ae",
+    cats:["valves"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"DWC Business Center, Office 129, Block A3, Dubai South Business Park, Dubai, United Arab Emirates", city:"Dubai", lat:null, lng:null, placeId:"ChIJBejC1pQMXz4R997e87aiRak" }] },
+{ id:614, slug:"qapqa-bv", name:"Qapqa", logo:null, country:"Netherlands",
+    // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, 30+ years'
+    // experience, ISO certified. Strongly reviewed (4.7 rating, 6 reviews).
+    desc:"Automatic pipeline welding systems for oil, gas and water projects — rent or full-service welding solutions worldwide. ADIPEC 2026: Hall 9, Stand #9170.",
+    site:"https://qapqa.com",
+    cats:["welding-equipment-and-consumables"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"De Amer 24, 8253 RC Dronten, Netherlands", city:"Dronten", lat:null, lng:null, placeId:"ChIJb-CQtvUqxkcRTRG4aWSSjTQ" }] },
+{ id:615, slug:"hirva-anwesha-infratech-limited", name:"Hirva Anwesha Infratech Limited", logo:null, country:"India",
+    // NOTE: CIN U45309GJ2022PLC135084, confirmed Active. Incorporated August 2022 — genuinely
+    // young (3 years old). CAUTION: 2 of the 4 reference projects cited on the company's own site
+    // are anonymized ("Refinery (leadership-led)" rather than a named client) — likely reflects
+    // the leadership team's prior industry experience rather than this specific entity's own
+    // delivered track record; a common, legitimate pattern for young companies, but worth knowing
+    // the distinction before treating all 4 references as equally verified.
+    desc:"Petroleum and crude oil storage tank manufacturer and EPC contractor — API 650 EFR/IFR/DDFR and cone roof tanks for crude oil, diesel, petrol, naphtha, ATF, kerosene and furnace oil. Real named project: IOCL Barauni Refinery (Coker-B Revamp) — tankage support, piping, painting, civil, multi-discipline EPCC. Also real named delivery to IOCL's terminal at Amlekhgunj, Nepal. 33,000 sq.ft. fabrication workshop at Kalol, Gujarat.",
+    site:"https://hail.ltd",
+    cats:["tank-construction", "epc-contractors"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Kalpavruksh Complex, A-401, Gotri Road, Vadodara, Gujarat 390021, India", city:"Vadodara", lat:null, lng:null, placeId:"ChIJefaBXSXJXzkRGyGKFek32O0" }] },
+{ id:616, slug:"pt-redeco-petrolin-utama", name:"PT Redeco Petrolin Utama", logo:null, country:"Indonesia",
+    // NOTE: real since 1986, confirmed via Chandra Asri Group's own official 3Q2024 consolidated
+    // financial statements — 50.75% owned by PT Chandra Daya Investasi Tbk (CDI Group), itself
+    // 100% owned by Chandra Asri Group (a real, major, publicly-listed Southeast Asian
+    // petrochemical and infrastructure company). Real classified business activity: "Tanks
+    // lease." One of the most thoroughly verified entities added this session — corroborated at
+    // essentially audited-financial-statement level.
+    desc:"Liquid bulk terminal operator in Banten, Indonesia — receipt, storage and handling of chemicals, petrochemicals and oil refinery products. Real confirmed assets: 2 jetties (200m LOA each, suitable for 35,000 DWT vessels with 10m draft) and 72 tanks with 130,000 m³ total capacity. ISO certified, real Centralized Filling Station for road tankers.",
+    site:"https://www.redeco-rpu.com",
+    cats:["port-operators"],
+    locations:[{ type:"headquarters", name:"Jakarta Office", address:"Cyber 2 Tower, 30th Floor, Jl. H.R. Rasuna Said, Kuningan Barat No.2, Jakarta Selatan 12950, Indonesia", city:"Jakarta", lat:null, lng:null, placeId:"ChIJAQBAMu_zaS4RILr4PsfYSqQ" }] },
+{ id:617, slug:"potential-engineering", name:"Potential Engineering", logo:null, country:"India",
+    // NOTE: real, confirmed matching phone number between the company's own site and its Google
+    // Places listing. Strongly reviewed (4.8 rating, 9 reviews) — a real review directly names
+    // it "A Engineering Company for Oil separation."
+    desc:"Broad range of oil-water separation and pollution-control equipment — CPI, TPI, hydrocyclone and coalescer oil water separators; industrial oil skimmers (belt, tube, disc); oil spill response equipment (booms, vacuum systems, dispersant spray); storage tank equipment (floating suction assemblies, tank cleaning robots); mechanical screens and sludge/scum scrapers. Real named served industries explicitly include Oil & Gas.",
+    site:"https://potentialengineering.com",
+    cats:["wastewater-treatment"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Plot No- B-45, MIDC Road, TTC Industrial Area, Airoli, Navi Mumbai, Maharashtra 400708, India", city:"Navi Mumbai", lat:null, lng:null, placeId:"ChIJ7xa9DsXH5zsRy_QYzwvHYUc" }] },
+{ id:618, slug:"ecologics-india-pvt-ltd", name:"Ecologics India Pvt. Ltd.", logo:null, country:"India",
+    // NOTE: real, exceptionally strongly reviewed (4.9 rating, 117 reviews — multiple detailed,
+    // technically-specific reviews about real MBR/MBBR plant installations).
+    desc:"Oil Water Separation (OWS) plant manufacturer and turnkey wastewater treatment company — API separators (for petrochemical plants, oil refineries, natural gas refineries and chemical plants), marine oil water separators, and gravity plate separators. Broader portfolio includes Sewage Treatment, Effluent Treatment, Zero Liquid Discharge, Ultra Filtration, Reverse Osmosis and Demineralisation plants.",
+    site:"https://www.ecologicsindia.com",
+    cats:["wastewater-treatment"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Second Floor, F-Block, Plot No. 59C, Sushant Lok-II, Sector 57, Gurugram, Haryana 122002, India", city:"Gurugram", lat:null, lng:null, placeId:"ChIJV2XDCAwjDTkRqI6rGPUkLOY" }] },
+{ id:619, slug:"wte-infra-projects-private-limited", name:"WTE Infra Projects Private Limited", logo:null, country:"India",
+    // NOTE: CIN U41000PN2011PTC140129, confirmed Active, incorporated 2011. Real, substantial —
+    // 677 employees, ₹131Cr+ in disclosed borrowings across HDFC Bank, Axis Bank and Kotak
+    // Mahindra Bank. Exceptionally well-reviewed (4.8 rating, 2,313 reviews) — real reviews name
+    // real individuals (Nitish, Yogesh, Tushar) and a real named client project ("NTPC
+    // projects"), plus real named client testimonials (Kolte Patil Developers, Exotech Zanini
+    // Industries).
+    desc:"Water and wastewater treatment plant manufacturer — Oil Water Separator (OWS), Produced Water Treatment, ETP for Refinery Effluent, ASME Pressure Vessels, Desalination Plants, Effluent Treatment Plants, Sewage Treatment Plants, Tube Settler Systems, Ultra-Filtration Plants and Clarifier Systems. ISO 9001:2015 certified, ASME 'U' and 'R' stamp authorized. Delivers across India and international markets, serving municipal, industrial, infrastructure and EPC sectors.",
+    site:"https://wteinfra.com",
+    cats:["wastewater-treatment"],
+    locations:[{ type:"plant", name:"Factory Unit I, Chakan", address:"PAP-S-77, MIDC Phase II, Sawardari, Khed, Pune, Maharashtra 410501, India", city:"Pune", lat:null, lng:null, placeId:"ChIJeaUvFz-0wjsRcbhFhbvEfb8" }] },
+{ id:620, slug:"k-pack-systems-private-limited", name:"K Pack Systems Private Limited", logo:null, country:"India",
+    // NOTE: CIN U51909GJ1991PTC016385, confirmed Active, incorporated 1991 (34 years). Real
+    // director (Vivek Vinay Shah) independently cross-validated between MCA/ZaubaCorp records and
+    // the company's own contact page ("Mr. Vivek V Shah, M.D."). CAUTION: registered office per
+    // CIN is in Vadodara, Gujarat, while its operational presence (used here) is in Bengaluru,
+    // Karnataka — a common, non-suspicious registered-vs-operational split, not a discrepancy to
+    // be concerned about, but worth knowing which address is which. Real, strongly reviewed (4.8
+    // rating, 19 reviews) including one directly citing "best solutions in the Oil Water space."
+    desc:"Pollution control equipment manufacturer since 1991 — Dissolved Air Flotation (DAF), TPI/CPI and API oil water separators, Lamella Settler & Clarifier, Oil Skimmers, Induced Air Flotation (IAF), MBR-based STPs, Cross Flow Separator, Mechanical Bar Screen and Sluice Gates. Real named served industries include Petrochemical, Refineries, Oil Industry and Steel Production. Active across India, Europe, Middle East and Africa.",
+    site:"https://www.k-pack.in",
+    cats:["wastewater-treatment"],
+    locations:[{ type:"headquarters", name:"Bengaluru Office", address:"Unit 4, Embassy Square, No. 148, Infantry Road, Vasanth Nagar, Bengaluru, Karnataka 560001, India", city:"Bengaluru", lat:null, lng:null, placeId:"ChIJTVtRL28WrjsREyFXP5_axl0" }] },
+{ id:621, slug:"ocean-enterprises-oil-skimmer", name:"Ocean Enterprises", logo:null, country:"India",
+    // NOTE: real proprietorship (GSTIN 27BQCPV4831P1Z4 confirmed via the company's own site),
+    // ISO 9001:2015 certified. Real reviews are exceptionally strong (5.0 rating, 16 reviews).
+    // CAUTION: a separate Google Places listing under the same name and phone number also
+    // advertises boiler/heat-exchanger components (economisers, superheaters, waste heat
+    // boilers) — this entity may be a diversified small business beyond just oil-water separation
+    // equipment; worth confirming scope directly before assuming oil skimmers are its sole focus.
+    desc:"Manufacturer of oil skimmers (belt, tube, disc types) and oil-water separators for industrial and marine applications — removal of floating oils, fuels and hydrocarbons from water. Multi-stage separation (gravity, coalescing media, centrifugal/lamella plate) achieving >98% removal of 15-20 µm oil droplets, <10 ppm oil discharge. 24/7 support.",
+    site:"https://www.oceanoilskimmer.com",
+    cats:["wastewater-treatment"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"S. No 139/3, Plot No E/19, Near Roshal Garden, MIDC Bhosari, Pimpri-Chinchwad, Maharashtra 411039, India", city:"Pune", lat:null, lng:null, placeId:"ChIJ-dt2NQ3HwjsRK2XBCilveEQ" }] },
+{ id:622, slug:"aquarius-projects-and-consultant", name:"Aquarius Projects And Consultant", logo:null, country:"India",
+    // NOTE: real proprietorship (GST No. 24BHIPS7422L2ZW confirmed via the company's own
+    // listing), business formally established 2021, though the company's own materials claim
+    // "2.0 Decades Experience" — likely reflecting the founders' prior industry experience rather
+    // than this specific entity's own operating history; worth knowing the distinction.
+    desc:"Water, wastewater and membrane technology systems and consultancy — Tilted Plate Interceptor (TPI) / Corrugated Plate Interceptor (CPI) oil water separators; sedimentation, clarification, filtration (conventional and membrane-based: ultrafiltration, microfiltration, nanofiltration); full EPC/turnkey project management from concept design through commissioning.",
+    site:"",
+    cats:["wastewater-treatment"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"C, Sepal Residency, 403, Opp. Old Jakatnaka Road, Gotri, Vadodara, Gujarat 390024, India", city:"Vadodara", lat:null, lng:null, placeId:"ChIJ__-PNCDPXzkR7G0UsoTr-UM" }] },
+{ id:623, slug:"dow-chemical-international-private-limited", name:"Dow Chemical International Private Limited", logo:null, country:"India",
+    // NOTE: sourced from an article that surfaced this alongside a self-promotional "Top 10"
+    // list — this specific entity independently re-verified regardless. CIN
+    // U24239MH1998PTC113551, confirmed Active, incorporated 1998. Real, substantial: ₹500Cr+
+    // revenue, 1,000+ employees across 6 locations in India (3 manufacturing plants, 3 Centres of
+    // Excellence, 1 commercial office). Indian subsidiary of the global Dow materials science
+    // company.
+    desc:"Real Indian subsidiary of Dow, delivering performance materials, industrial intermediates and plastics — includes membrane and water treatment chemistry (DOWEX ion exchange resins, FILMTEC reverse osmosis elements) among its broader materials science portfolio for packaging, infrastructure and consumer care applications.",
+    site:"https://in.dow.com",
+    cats:["membrane-technologies"],
+    locations:[{ type:"registered-office", name:"Registered Office", address:"Unit No. 801, 8th Floor, Building No. 9, Gigaplex, TTC Industrial Area, MIDC, Airoli, Navi Mumbai, Maharashtra 400708, India", city:"Navi Mumbai", lat:null, lng:null, placeId:"ChIJ1a_KFQC_5zsRN0rk72Q-rf4" }] },
+{ id:624, slug:"toray-industries-india-private-limited", name:"Toray Industries (India) Private Limited", logo:null, country:"India",
+    // NOTE: CIN U17120AP2013FTC115887, confirmed Active, incorporated 2013, ₹1,336 Cr paid-up
+    // capital. CAUTION — GENUINE ENTITY COMPLEXITY: at least 3 separate real "Toray"-named
+    // Indian entities exist (this SriCity, Andhra Pradesh manufacturing entity; a separate
+    // Haryana-registered entity, CIN U17120HR2013FTC051118; and "Toray International India
+    // Private Limited," CIN U74999MH2011FTC214592, a Mumbai trading entity) — likely reflecting
+    // Toray's genuinely diversified business (textiles, films, carbon fiber, chemicals,
+    // membranes). This entry uses the largest, manufacturing-focused entity; verify which
+    // specific Toray entity is relevant before assuming this one covers membrane products
+    // specifically, given Toray's real breadth beyond membranes. Real reviews confirm a massive,
+    // currently-expanding 86-acre SriCity complex with real named customers (Unicharm, Apollo
+    // Tyres) — though this expansion appears broader than membrane technology alone.
+    desc:"Indian manufacturing subsidiary of Toray Industries (Japan) — a globally major, diversified materials science company whose real product range includes water treatment membranes (RO, UF, NF) alongside textiles, films, carbon fiber and chemicals. Real, large-scale SriCity, Andhra Pradesh manufacturing complex.",
+    site:"",
+    cats:["membrane-technologies"],
+    locations:[{ type:"registered-office", name:"Registered Office", address:"1800, EMC Road, Irugulam, Sri City, Andhra Pradesh 517646, India", city:"Sri City", lat:null, lng:null, placeId:"ChIJpTW8LcN7TToRSUrfC3XvVWQ" }] },
+{ id:625, slug:"pall-india-private-limited", name:"Pall India Private Limited", logo:null, country:"India",
+    // NOTE: CIN U33110MH1996PTC100046, confirmed Active, incorporated 1996. Part of Pall
+    // Corporation, a real, globally major filtration/separation technology company (part of
+    // Danaher Corporation). CAUTION: real reviews describe significant difficulty reaching the
+    // company by phone ("impossible to get through to an operator") — worth checking alongside
+    // its genuine industrial legitimacy.
+    desc:"Indian subsidiary of Pall Corporation (part of Danaher) — filtration, separation and purification technologies; real product range spans industrial process filtration alongside pharmaceutical and medical device filtration.",
+    site:"",
+    cats:["membrane-technologies", "filtration-and-separation-technology"],
+    locations:[{ type:"registered-office", name:"Registered Office", address:"7th Floor, CTS 419, Marol Maroshi Road, Marol, Andheri East, Mumbai, Maharashtra 400059, India", city:"Mumbai", lat:null, lng:null, placeId:"ChIJFZ459RnI5zsRC2TerYr7NZw" }] },
+{ id:626, slug:"pentair-water-india-private-limited", name:"Pentair Water India Private Limited", logo:null, country:"India",
+    // NOTE: CIN U29197GA1996PTC002193, confirmed Active, incorporated 1996, 558 employees. A
+    // related sibling entity, "Pentair Water Treatment Private Limited" (CIN
+    // U29197GA1997PTC002373, same Verna Industrial Estate address, same directors), also exists —
+    // do not conflate the two. Real, substantial public footprint (168 reviews).
+    desc:"Indian manufacturing subsidiary of Pentair, a globally major water treatment company — water purification instruments and equipment manufacturing at a substantial Verna, Goa facility, real regular multi-state distribution operations.",
+    site:"",
+    cats:["membrane-technologies"],
+    locations:[{ type:"registered-office", name:"Registered Office", address:"L 52-55, Phase II, Verna Industrial Estate, Verna, Salcete, South Goa, Goa 403722, India", city:"Verna", lat:null, lng:null, placeId:"ChIJb8anTE23vzsR3mewO905J44" }] },
+{ id:627, slug:"acme-process-systems-pvt-ltd", name:"Acme Process Systems Pvt Ltd", logo:null, country:"India",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list (India-listed exhibitors). Real, CIN
+    // U74999PN2017PTC169180, confirmed Active. Established 2010 (per own materials), 350+
+    // clients including Fortune 500 companies. Strongly reviewed (4.8 rating, 30 reviews).
+    desc:"Engineering/supply company for critical equipment and turnkey solutions for the process industry — industrial agitators/mixers, pressure vessels, nutsche filters, twin shaft dispersers, storage tanks and shell & tube heat exchangers, designed to ASME Sec VIII Div. I and PED 2014/68/EU. Serves chemical, pharmaceutical, paints, dyes and allied process industries. ADIPEC 2022: Stall 13134.",
+    site:"https://acmeprocess.net",
+    cats:["heat-exchangers", "heavy-engineering-and-fabrication"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Plot No. E-6, MIDC, Bhosari, Pune, Maharashtra 411026, India", city:"Pune", lat:null, lng:null, placeId:"ChIJlQEdcIrHwjsRQs2AKDhK0UQ" }] },
+{ id:628, slug:"baumer-technologies-india-private-limited", name:"Baumer Technologies India Pvt Ltd", logo:null, country:"India",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list. Real, CIN U29299MH1989PTC050808,
+    // confirmed Active, 36+ years old (incorporated 1989). CAUTION — real name-change history:
+    // formerly "Waaree Instruments Limited" — this real corporate history suggests a licensed/
+    // branded relationship with the globally known Baumer name (a Swiss/German sensor technology
+    // group) rather than necessarily being Baumer's own directly-owned Indian subsidiary; verify
+    // the precise relationship before assuming direct ownership. 202 employees, ₹207 Cr settled
+    // loans.
+    desc:"Manufacturer of industrial testing and measurement equipment, per MCA classification 'other special purpose machinery.' ADIPEC 2022: Stall 13243.",
+    site:"",
+    cats:["instrumentation-and-automation"],
+    locations:[{ type:"registered-office", name:"Registered Office", address:"Kanakia Wall Street, B Wing, 401 & 402, Andheri-Kurla Road, Chakala, Andheri East, Mumbai, Maharashtra 400093, India", city:"Mumbai", lat:null, lng:null, placeId:"ChIJ-2ENFifI5zsRk76ntDcgTgg" }] },
+{ id:629, slug:"detect-technologies-private-limited", name:"Detect Technologies Private Limited", logo:null, country:"India",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list. Real, CIN U74900TN2016PTC104314,
+    // confirmed Active, incorporated 2016. Real origin at IIT Madras Research Park (a genuine,
+    // prestigious Indian startup incubator). Strongly reviewed (4.7 rating, 62 reviews).
+    desc:"Industrial AI and inspection technology company — real named platform 'Qualis' for drone and robot-based visual inspection of tanks, pipelines and industrial assets, with AI-driven defect detection and asset integrity analytics. ADIPEC 2022: Stall 13416.",
+    site:"https://detecttechnologies.com",
+    cats:["digital-ai-and-robotics", "inspection-drones-and-crawlers"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Module No. 2A, 3rd Floor, Block-A, Phase-II, IIT Madras Research Park, Kanagam Road, Taramani, Chennai, Tamil Nadu 600113, India", city:"Chennai", lat:null, lng:null, placeId:"ChIJd_IxDX1dUjoR7QeaMU9RP_g" }] },
+{ id:632, slug:"cords-cable-industries-limited", name:"Cords Cable Industries Limited", logo:null, country:"India",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list. Real, publicly listed (BSE: 532941,
+    // NSE: CORDSCABLE), described by its own Wikipedia entry as "the largest instrumentation
+    // cable maker in India." Independently cross-confirmed as a genuine ADIPEC exhibitor via the
+    // company's own LinkedIn post naming the exact same stall number (13177) as the source list.
+    // Strongly reviewed (4.4 rating, 66 reviews).
+    desc:"India's largest instrumentation cable manufacturer — instrumentation, control, thermocouple extension/compensating, medium-tension power and control cables (up to 3.3kV), signal and data cables. Real named served industries include electric power, steel, cement, fertilizers, chemicals, and refinery/petroleum. ADIPEC 2022: Stall 13177.",
+    site:"",
+    cats:["cable-manufacturers"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"94, 1st Floor, Near Shambhu Dayal Bagh, Old Ishwar Nagar, Okhla Industrial Area Phase-III, Kalkaji, New Delhi, Delhi 110020, India", city:"New Delhi", lat:null, lng:null, placeId:"ChIJ8Xo3Uc_mDDkRPGTDyfBLrQA" }] },
+{ id:633, slug:"flovel-valves-private-limited", name:"Flovel Valves Pvt. Ltd", logo:null, country:"India",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list. Real, CIN U29120GJ2005PTC047307,
+    // confirmed Active. Strongly reviewed (4.6 rating, 18 reviews).
+    desc:"Manufacturer of general purpose machinery/valves, per MCA classification. ADIPEC 2022: Stall 13142.",
+    site:"",
+    cats:["valves"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Plot No. 1201, Phase IV, GIDC Industrial Estate, Vithal Udyog Nagar, Anand, Gujarat 388121, India", city:"Anand", lat:null, lng:null, placeId:"ChIJJ1Yq2etNXjkRBzWmiGUvs_w" }] },
+{ id:634, slug:"crescent-valves-international-private-limited", name:"Crescent Valves International Pvt. Ltd.", logo:null, country:"India",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list. Real, CIN U28900MH2018PTC313699,
+    // incorporated 2018. CAUTION — real entity complexity: a genuinely different, older, separate
+    // real company, "Crescent Valves Manufacturing Company Private Limited" (CIN
+    // U74999MH1975PTC018141, incorporated 1975, different registered address), also exists —
+    // possibly a related family/brand entity given both share "Crescent Valves" branding and the
+    // company's own site claims heritage to 1951, but the corporate relationship (if any) between
+    // the two is not confirmed; do not conflate them.
+    desc:"Global manufacturer of precision-engineered flow control solutions — real specific product line: cladded Ball Valves and Double Block & Bleed (DBB) Valves, with full-body or targeted semi-cladding (Seat Pocket, Stem Seal areas) via controlled semi-automatic GTAW overlay welding. Supplies cladded valves 4\" to 24\", pressure classes 150# to 2500#. ADIPEC 2022: Stall 10230.",
+    site:"https://crescentvalves.com",
+    cats:["valves"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"518, Lodha Supremus, Road Number 11, Off Mahakali Caves Road, Chakala Industrial Area (MIDC), Andheri East, Mumbai, Maharashtra 400093, India", city:"Mumbai", lat:null, lng:null, placeId:"ChIJ7dMOi8bJ5zsRX1qAIIVGtVc" }] },
+{ id:635, slug:"chemtron-science-laboratories-private-limited", name:"Chemtron Science Laboratories Pvt. Ltd.", logo:null, country:"India",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list. Real, CIN U24111MH2004PTC144357,
+    // confirmed Active, established 2004, real international distributor network (Bahrain,
+    // Kuwait, Belgium). CAUTION — SERIOUS, REPEATED PATTERN: 5 real reviews describe non-payment
+    // to vendors/suppliers, with multiple independent complainants naming the same specific
+    // individual by name across separate reviews, plus a warranty-service complaint and one
+    // review explicitly using the word "Fraud." This is a more serious, corroborated pattern than
+    // an isolated complaint — genuinely real and active as a company, but this reputation issue
+    // should be verified directly before any commercial engagement, not treated as routine.
+    desc:"Manufacturer of basic chemicals (excluding fertilizers and nitrogen compounds), per MCA classification, with a real, substantial international distributor network. CAUTION: see note — a serious, repeated non-payment complaint pattern was found during research, not an isolated incident. ADIPEC 2022: Stall 13132.",
+    site:"https://www.chemtronlabs.com",
+    cats:["industrial-water-systems"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"EL-47, Electronic Zone, TTC Industrial Area, MIDC Mahape, Navi Mumbai, Maharashtra 400710, India", city:"Navi Mumbai", lat:null, lng:null, placeId:"ChIJ0VV9ciHP5zsR7a6xyLjfZEg" }] },
+{ id:636, slug:"hawa-valves-india-private-limited", name:"Hawa Valves (India) Private Limited", logo:null, country:"India",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list. Real, CIN U32100MH2001PTC133511,
+    // confirmed Active, substantial (₹612 Cr paid-up capital). Real, significant credentials:
+    // holds official API-6A, API-6D and API-600 Monogram Licenses from the American Petroleum
+    // Institute; ISO 9001, ISO 14001, OHSAS 18001, SIL3, CE/PED and ATEX compliant; designated
+    // 100% Export Oriented Unit and Star Export House by the Government of India. CAUTION: a
+    // separate, genuinely different, much smaller "Hawa Valves and Tubes Pvt Ltd" (CIN
+    // U29100MH1982PTC027472, ₹1 lakh paid-up capital, different address) also exists — likely a
+    // related family entity given the shared name, but do not conflate the two.
+    desc:"Manufacturer and exporter of valves for Oil & Gas Upstream, Midstream and Downstream, Chemical, Power, Marine, Mining and general industry — 4 manufacturing facilities, 2 of the most modern near Mumbai, in-house ERP for large/complex orders. ADIPEC 2022: Stall CN50.",
+    site:"",
+    cats:["valves"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"R-16/R-954, Sector 8, MIDC Industrial Area, TTC Industrial Area, Rabale, Navi Mumbai, Maharashtra 400701, India", city:"Navi Mumbai", lat:null, lng:null, placeId:"ChIJrao6caDA5zsRcMQ9QypBlaE" }] },
+{ id:637, slug:"chw-forge-private-limited", name:"CHW Forge Pvt Ltd", logo:null, country:"India",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list. Real, CIN U27310UP1970PTC057609,
+    // confirmed Active. Real reviews confirm even deeper history — "formerly known as Chaudhry
+    // Hammer Works," established 1956 (69 years), the 1970 CIN date likely reflecting later
+    // formal incorporation. Real, substantial named oil & gas industry approvals: SABIC, SAMREF,
+    // ADCO, ADNOC, YASREF, PDO, ZADCO, SATROP, KNPC, ADMA and FLUOR. Strongly reviewed (4.2
+    // rating, 66 reviews).
+    desc:"South Asia's leading forging manufacturer — carbon steel, alloy steel, stainless steel and duplex steel forgings; real named product lines include material handling/earth moving equipment components, rings for slew bearings & gear rings, rolled & forged flanges, and tower flanges for wind turbines. Real served industries: Aerospace, Defence, Oil & Gas, Heavy Industrial Equipment. ADIPEC 2022: Stall 13286.",
+    site:"",
+    cats:["forgings"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Unit 1, Near Hapur Road Flyover, Maliwara, Nehru Nagar, Ghaziabad, Uttar Pradesh 201001, India", city:"Ghaziabad", lat:null, lng:null, placeId:"ChIJF9qFshLuDDkRnEwsnB4GuI4" }] },
+{ id:638, slug:"kirloskar-ebara-pumps-limited", name:"Kirloskar Ebara Pumps Limited", logo:null, country:"India",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list. Real, CIN U29120MH1988PLC045865,
+    // confirmed Active. Genuine 1988 joint venture between Kirloskar Group (India) and Ebara
+    // Corporation (Japan) — a third real Kirloskar-family company now confirmed in TWI alongside
+    // Kirloskar Brothers Limited and SPP Pumps. ISO 9001:2008, ISO 14001:2004, OHSAS 18001:2007
+    // accredited. CAUTION: the Google Places listing found for this company includes a review
+    // alleging the listed address was wrong ("I reached Sai residency but there is no any
+    // office") — used the MCA-confirmed registered address instead of that specific listing.
+    desc:"Manufacturer of API and Non-API process pumps, boiler feed water pumps, and steam turbines for mechanical drive and generation — real named critical applications include hydrocarbon processing and nuclear power plants, plus fertilizer, water treatment, oil & gas and power industries.",
+    site:"",
+    cats:["pumps"],
+    locations:[{ type:"registered-office", name:"Registered Office", address:"KEPL Office, Pride Kumar Senate, Senapati Bapat Road, Shivajinagar, Pune, Maharashtra 411016, India", city:"Pune", lat:null, lng:null, placeId:"ChIJKYsUtKu_wjsRKGjzv_zWwQU" }] },
+{ id:639, slug:"steelstrong-valves-india-private-limited", name:"Steel Strong Valves", logo:null, country:"India",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list. Real, since 1982 (43 years), 2
+    // manufacturing plants (Navi Mumbai, Maharashtra and Sanand, Gujarat). Real reviews directly
+    // confirm the product line and materials range.
+    desc:"Valve manufacturer — design, material procurement, manufacturing, assembly and testing of Gate, Globe, Check, Ball and Cryogenic Valves to ASME-ANSI, API and BS standards, in Carbon Steel, Alloy Steel, Stainless Steel, Duplex and Monel materials. ADIPEC 2022: Stall 13010.",
+    site:"",
+    cats:["valves"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"R-241, MIDC Industrial Area, Rabale, Navi Mumbai, Maharashtra 400701, India", city:"Navi Mumbai", lat:null, lng:null, placeId:"ChIJ_____6rA5zsR6UEOzMGeI7A" }] },
+{ id:640, slug:"rockwin-flowmeter-india-private-limited", name:"Rockwin Flowmeter India Pvt Ltd", logo:null, country:"India",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list. Real, strongly reviewed (4.4 rating, 30
+    // reviews) — real reviews explicitly confirm oil & gas sector focus and specific product
+    // range.
+    desc:"Manufacturer of flow measurement equipment — real reviews confirm supply of Turbine Meters, Mass Flow Meters, Magnetic Flow Meters, plus pressure reduction and metering skids, serving the oil & gas sector. ADIPEC 2022: Stall 13272.",
+    site:"",
+    cats:["flow-meters"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"PIR Colony, B-24/IV, Sahibabad, Ghaziabad, Uttar Pradesh 201010, India", city:"Ghaziabad", lat:null, lng:null, placeId:"ChIJAQAAMJv6DDkRHNRYvNBpW04" }] },
+{ id:641, slug:"orient-ceratech-limited", name:"Orient Ceratech Limited", logo:null, country:"India",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list, where it appeared as "Orient Abrasives
+    // Limited" — CONFIRMED RENAMED: per the company's own official site, "Orient Ceratech
+    // Limited, formerly known as Orient Abrasive Limited, was acquired in 2015 by the Ashapura
+    // Group of Industries." Real, founded 1971/1974, India's largest producer of Calcined and
+    // Fused Alumina products. CAUTION — RELEVANCE UNCERTAIN: this company's core business
+    // (refractories, furnace linings, ceramic proppants for the steel/foundry industry) is more
+    // tangential to TWI's tank-terminal scope than most entries — the connection is thin (Fused
+    // Alumina used as shot-blasting/surface-prep media). Real and substantial, but a lower-
+    // confidence fit; worth a second look before treating as core.
+    desc:"India's largest producer of Calcined and Fused Alumina products, refractories and monolithics — Brown/White/Pink Fused Alumina, Fused Zirconia Mullite, Calcined Bauxite; some products used for shot blasting and surface cleaning. Real named customers include Grindwell Norton (Saint-Gobain) and Carborundum Universal. ADIPEC 2022: Stall 10112 (listed as Orient Abrasives Limited).",
+    site:"https://www.orientceratech.com",
+    cats:["surface-preparation-and-blasting"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Chiranjiv Tower, 1307, 43, Nehru Place, New Delhi, Delhi 110019, India", city:"New Delhi", lat:null, lng:null, placeId:"ChIJ-efT_M_jDDkR6jrfopZyUlk" }] },
+{ id:642, slug:"bhola-engineers-private-limited", name:"Bhola Engineers Pvt Ltd", logo:null, country:"India",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list — cross-confirmed as a genuine exhibitor
+    // via what appears to be an official ADIPEC exhibitor profile PDF hosted on
+    // energyconnects.com, dated exactly to the 2022 event. Real, CIN U74999MH2016PTC280325,
+    // confirmed Active, founded 1995 (30 years). CAUTION: alongside strongly positive reviews
+    // (4.3 rating, 42 reviews), one describes poor employee treatment ("good only for the owner,
+    // don't trust them") — an internal workplace complaint, not a product/service quality issue,
+    // but worth being aware of.
+    desc:"Manufacturer of industrial valves and stainless steel tube fittings — Ball Valves, Double Block & Bleed Valves, Gate Valves, Globe Valves, Check Valves, Monoflange Valves, precision double compression tube fittings, instrumentation ball/needle valves and manifolds (INLOK brand). Real named served industries: Oil & Gas, LNG, Refineries, Marine, Chemicals, Petrochemicals, Atomic Energy, Cryogenic, Water. ADIPEC 2022: Stall 13187.",
+    site:"https://bholaengineers.com",
+    cats:["valves"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Plot No. 57, Apple Industrial Hub, NH No. 8, Pelhar Road, Wakanpada, Nalasopara East, Vasai-Virar, Maharashtra 401208, India", city:"Vasai-Virar", lat:null, lng:null, placeId:"ChIJcdU7_oyo5zsR6tviRegsgxY" }] },
+{ id:643, slug:"beda-flow-systems-private-limited", name:"BEDA Flow Systems Pvt. Ltd.", logo:null, country:"India",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list. Real, CIN U29120DL2005PTC137951,
+    // confirmed Active, founded 2005 (21 years). Real, genuine distribution partnership with the
+    // German e.holding Fluid Technology Group (VSE, Beinlich, DST) plus partners Rotary Power,
+    // Suco and ESI — confirmed via real, recent (2025) product news on the parent group's own
+    // site.
+    desc:"Indian distribution and technical support partner for German fluid technology manufacturers — VSE precision flow meters, Beinlich performance/gear pumps, DST magnetic couplings, Suco pressure switches, plus hydraulic components and pressure monitoring systems. Real served industries: plastics, polyurethane, chemical, pharmaceutical, paint and varnish, hydraulic and automobile. ADIPEC 2022: Stall 13781.",
+    site:"https://www.bedaflow.com",
+    cats:["flow-meters", "pumps"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"W-7, W Block, Sector 11, Noida, Uttar Pradesh 201301, India", city:"Noida", lat:null, lng:null, placeId:"ChIJAQAAwALlDDkR0HE-4jzzkCg" }] },
+{ id:644, slug:"niton-valve-industries-private-limited", name:"Niton Valve Industries Private Limited", logo:null, country:"India",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list. Real, CIN U27300MH1985PTC037156,
+    // confirmed Active, founded 1978 (47 years), incorporated 1985. Real, substantial: ₹129.77
+    // Cr revenue (FY2024, up 12% YoY), 201 employees. Real credentials: ISO 9001:2000 certified,
+    // API-6D and API-600 Monogram Licensee — matching the same credential type held by Hawa
+    // Valves (also in TWI). 5 manufacturing plants. Strongly reviewed (4.7 rating, 22 reviews) —
+    // "One of the best Valve industry in India."
+    desc:"Manufacturer of Gate, Globe, Check, Ball, Dual Plate Check, Through Conduit Gate and specialty valves for critical and non-critical applications — real specific products include Trunnion Mounted Ball Valves and Dual Plate Check Valves with sea-water resistant coating. ADIPEC 2022: Stall 8250.",
+    site:"",
+    cats:["valves"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"D-115, Road No 6, Amrut Nagar, Ghatkopar Industrial Estate, Lal Bahadur Shastri Marg, Ghatkopar West, Mumbai, Maharashtra 400086, India", city:"Mumbai", lat:null, lng:null, placeId:"ChIJq6qqqs_H5zsRHh9ffrwC9MI" }] },
+{ id:645, slug:"pmt-valves-private-limited", name:"PMT Valves Pvt Ltd", logo:null, country:"India",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list. Real, CIN U29299GJ2019PTC107572,
+    // confirmed Active, incorporated 2019, ₹25.6 Cr revenue (FY2024). Real confirmed UDYAM
+    // registration number given directly — UDYAM-GJ-01-0051217 — genuinely rare to have this
+    // level of specific MSME confirmation. CAUTION: the source classifying it lists "Micro
+    // enterprise" status, but ₹25.6 Cr revenue appears inconsistent with the Micro threshold
+    // under any MSME classification scheme — category left unset rather than asserted with
+    // unwarranted confidence; UDYAM number itself is solid. Also real: a review alleging rude
+    // phone conduct toward prospective new customers, alongside otherwise positive reviews.
+    desc:"Manufacturer of instrumentation valves — Needle Valves, Manifold Valves, Ball Valves, Check Valves, Pressure Relief Valves, Bleed Valves, Tube Fittings, plus accessories (Airheader, Condensate Pot, Thermowell, Syphon, Orifice Plate Assembly). ADIPEC 2022: Stall 13176.",
+    site:"https://pmtvalvesfittings.com",
+    msme:{ category:null, udyamNumber:"UDYAM-GJ-01-0051217" },
+    cats:["valves"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"460/1, Near Shreeji Estate, Phase-1, GIDC Naroda, Ahmedabad, Gujarat 382330, India", city:"Ahmedabad", lat:null, lng:null, placeId:"ChIJA_Q1fveBXjkRN2WTuRCq9BE" }] },
+{ id:646, slug:"suraj-limited", name:"Suraj Limited", logo:null, country:"India",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list. Real, publicly listed, CIN
+    // L27100GJ1994PLC021088, confirmed Active, incorporated 1994. Real, substantial: ₹100-500 Cr
+    // revenue range, real recent growth (EBITDA +12.86% YoY, net worth +17.26% YoY). CAUTION —
+    // real sibling-entity complexity: several related "Suraj"-named entities exist at the same
+    // Usmanpura, Ahmedabad address (Suraj Steelmet Private Limited, Suraj Stainless Limited),
+    // sharing directors (Kunal Tarachand Shah appears across multiple) — likely a family of
+    // group companies; this entry uses the correct, largest, publicly-listed entity matching the
+    // exhibitor list's exact name. Strongly reviewed (4.5 rating, 38 reviews).
+    desc:"Manufacturer of stainless steel seamless heat exchanger tubes, stainless steel flanges, seamless pipes, seamless buttweld fittings, instrumentation tubes and U-tubes — real named served industries include Nuclear Power Plants, Automotive, Aerospace, Medical and Pharmaceutical. ADIPEC 2022: Stall 13280.",
+    site:"https://www.surajgroup.com",
+    cats:["heat-exchangers", "pipes-and-tubes"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Suraj House, Ashram Road, Opp. Usmanpura Garden, Sattar Taluka Society, Usmanpura, Ahmedabad, Gujarat 380009, India", city:"Ahmedabad", lat:null, lng:null, placeId:"ChIJidxBcWKEXjkRX9e5S4m4fa0" }] },
+{ id:648, slug:"pon-pure-chemical-india-private-limited", name:"Pon Pure Chemical India Pvt Ltd", logo:null, country:"India",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list. Real, CIN U24111TN1998PTC040872,
+    // confirmed Active, founded 1981 by M. Ponnuswami (1998 CIN date reflects formal
+    // incorporation). Real, substantial: 833 employees, 25 domestic + 5 global offices (Dubai,
+    // Sri Lanka, Australia, Kenya, Singapore). Real, genuinely impressive named client roster
+    // includes Aditya Birla Chemicals, BASF, Bayer, BPCL, Dow Chemicals, Evonik Industries, Exxon
+    // Mobil Chemical and Formosa Plastics. CAUTION: a related "Speciality Office" listing under
+    // the same group has real, detailed complaints about dispatch delays after advance payment
+    // collection and a transport-overcharging complaint naming a specific individual — worth
+    // checking alongside the otherwise strong Corporate Office reviews (4.5 rating, 19 reviews).
+    desc:"Global chemical manufacturer, exporter, wholesaler and distributor — Aliphatic Solvents, Acid Derivatives, Chemical Alcohols, Speciality Chemicals, Water Treatment Chemicals, plus real named products Acetone, N-Hexane, Diethylene Glycol (DEG), Isopar M and Mono Ethylene Glycol (MEG). Warehouse in Kandla Special Economic Zone. ADIPEC 2022: Stall 13236.",
+    site:"https://www.purechemicalsco.in",
+    cats:["industrial-water-systems"],
+    locations:[{ type:"headquarters", name:"Corporate Office", address:"118, 4th Avenue, AB Block, Shanthi Colony, Anna Nagar, Chennai, Tamil Nadu 600040, India", city:"Chennai", lat:null, lng:null, placeId:"ChIJi3f2xh1lUjoRasW0UuRgl00" }] },
+{ id:649, slug:"smec-automation-private-limited", name:"SMEC Automation Private Limited", logo:null, country:"India",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list. Real, CIN U45309KL2001PTC014516,
+    // confirmed Active, incorporated 2001. CAUTION — real name-collision: a genuinely different,
+    // unrelated company, "SMEC (India) Private Limited" (engineering consultancy subsidiary of
+    // Australia's SMEC International Pty Ltd, different CIN, different founding date) also
+    // exists — do not conflate the two. Real, multinational marine & industrial automation EPC
+    // company — real authorized system integrator relationships confirmed (Schneider Electric,
+    // VAF, Kangrim, GE-IP, Banner Engineering), real contracted shipyard work (STXOSV.com), 9+
+    // branch offices across India plus a Paris office and Sharjah, UAE task force.
+    desc:"Marine and industrial automation EPC company — control panels, alarm & monitoring systems, propulsion systems, boiler control, navigational systems, AMF systems, air-dryer pump control, power/building management systems. Real served sectors: Oil & Gas, Marine, Defense, Engineering, across 5 continents. ISO 9001:2008 certified. ADIPEC 2022: Stall 13154.",
+    site:"https://www.smec.in",
+    cats:["instrumentation-and-automation", "epc-contractors"],
+    locations:[{ type:"headquarters", name:"Kochi Office", address:"2nd Floor, Kaloor Bus Stand Complex, Kaloor, Kochi, Kerala 682017, India", city:"Kochi", lat:null, lng:null, placeId:"ChIJV0PoQzwNCDsRaO4N08BP-qs" }] },
+{ id:650, slug:"axis-solutions-limited", name:"Axis Solutions Limited", logo:null, country:"India",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list, where it appeared as "Axis Solutions
+    // Private Limited" (CIN U31909GJ2005PTC046004) — CONFIRMED: that specific private-limited
+    // entity's status now shows "Amalgamated," reflecting a real corporate evolution into "Axis
+    // Solutions Limited," now a BSE-listed public company. Founded 1999 by Dr. Bijal Sanghvi.
+    // Independently cross-confirmed as a genuine, repeat ADIPEC exhibitor via a real ZoomInfo
+    // mention of attending ADIPEC 2025 too. Strongly reviewed (4.2 rating, 181 reviews) — real
+    // reviews directly confirm the product line ("manufacturer of Pressure Regulators, gas
+    // Analysis equipment"). CAUTION: one review alleges rude treatment of a visiting prospective
+    // client by a named individual — worth checking alongside the otherwise strong pattern.
+    desc:"BSE-listed engineering and manufacturing company — analytical instrumentation, process automation, industrial shelters, hazardous area HVAC, environmental monitoring; real named product lines include CEMS, SWAS, Gas Systems, Purge Panels, Analyzer Shelters, EQMS and AAQMS Analyzers. Real served industries: Oil & Gas, Petrochemical, Refineries, Power, Coal & Mining, Chemical, Water & Wastewater — across India, SAARC, Europe, Middle East and Africa. ADIPEC 2022: Stall 13185 (listed as Axis Solutions Private Limited).",
+    site:"https://axisindia.in",
+    cats:["instrumentation-and-automation", "hazardous-area-equipment"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Plot No. 107-112, Road Number 6, Khodal Dham Society, Kathwada GIDC, Odhav Industrial Estate, Ahmedabad, Gujarat 382430, India", city:"Ahmedabad", lat:null, lng:null, placeId:"ChIJ8_qnyIqEXjkRDja1d3J8L3s" }] },
+{ id:651, slug:"tianmo-environmental-india-private-limited", name:"Tianmo Environmental India Pvt. Ltd.", logo:null, country:"India",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list. Real, CIN U29309UP2017PTC089596,
+    // confirmed Active, incorporated 2017. CAUTION — real spelling discrepancy between sources:
+    // the company's own domain consistently uses "Tianmo," while the MCA/ZaubaCorp record shows
+    // "Trinamo Environmental India Private Limited" for the same CIN — used the company's own
+    // self-identified name. Real, direct confirmation of on-topic work: a Google review states
+    // "EXCELLENT WORK IN IOCL TERMINAL VASHI" — genuine confirmation of a real terminal project.
+    // ISO 9001:2015, ISO 14001:2015, OHSAS 18001:2007 certified.
+    desc:"Design and construction of coded pressure vessels, shell and tube heat exchangers, distillation columns, Vapour Recovery Units (VRU) and pressurized filter vessels — real named applications in Oil & Gas refineries, Petrochemicals, Pharmaceuticals and Refrigeration. ADIPEC 2022: Stall 13143.",
+    site:"https://tianmoindia.com",
+    cats:["heat-exchangers"],
+    locations:[{ type:"headquarters", name:"Headquarters (TEIPL)", address:"Plot No. 22, 809, Tower 2, Assotech Business Cresterra, Sector 135, Noida, Uttar Pradesh 201304, India", city:"Noida", lat:null, lng:null, placeId:"ChIJq6r6hSbmDDkRF4VL2UougqU" }] },
+{ id:652, slug:"veer-o-metals-private-limited", name:"VEER-O-METALS PRIVATE LIMITED", logo:null, country:"India",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list. Real, established 1965 (60 years).
+    // CAUTION — genuinely repeated pattern: across multiple Google listings for different
+    // facilities, several reviews describe unresponsive contact numbers, rude reception staff,
+    // and poor visitor/vendor experience at the gate — not an isolated complaint, worth being
+    // aware of directly rather than assuming a single bad review. Real explicit oil & gas
+    // application tag among its stated served industries (alongside medical, automotive,
+    // aerospace).
+    desc:"Metal engineering manufacturer — Stamped Parts, Precision Sheet Metal Fabrication, Busbar Critical Machining, Mechanical Assembly, and metal 3D printing/additive manufacturing. Real named served industries: medical, automotive, aerospace, oil & gas. 4 manufacturing units in Bengaluru, engaged in defence-related parts and assemblies. ADIPEC 2022: Stall 13273.",
+    site:"https://www.veerometals.com",
+    cats:["heavy-engineering-and-fabrication"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"No. A-02, BEL Industrial Estate, Sundara Nagar, Gokula Extension, Jalahalli, Bengaluru, Karnataka 560013, India", city:"Bengaluru", lat:null, lng:null, placeId:"ChIJS4SXS1g9rjsRak741wqtsAg" }] },
+{ id:653, slug:"syno-pumps-i-private-limited", name:"SYNO PUMPS (I) PVT. LTD", logo:null, country:"India",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list. Real, genuine history back to 1968
+    // (founded by Late Shri Ishwar Singh as Syno Pumps & Applied Rubber Industries), formally
+    // incorporated as a Private Limited Company in 1975 (57 years). Real, substantial scale —
+    // 50,000+ installations worldwide, primarily Asia, South America and the Middle East, over 20
+    // series and 1,400 specifications of Progressive Cavity Pumps. Strongly reviewed (4.9 rating,
+    // 18 reviews) with detailed, genuine technical feedback.
+    desc:"Manufacturer of Progressive Cavity Pumps, Cavity Pumps, Hygienic Pumps and Dosing Pumps — real named served industries directly include Waste Water, Oil, Power and Chemical Industries, alongside Pulp & Paper, Food, Sugar & Distillery, Pharmaceuticals and Fertilizer. Complete in-house manufacturing infrastructure (SPMs, CNCs, VMCs, HCP Plant, rubber mixing/formulation). ADIPEC 2022: Stall 13234.",
+    site:"",
+    cats:["pumps"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"E30, Site 3, Industrial Area, Panki, Kanpur, Uttar Pradesh 208022, India", city:"Kanpur", lat:null, lng:null, placeId:"ChIJAQAAAORHnDkRKOywakCTP6o" }] },
+{ id:654, slug:"mallak-specialties-private-limited", name:"Mallak Specialities Pvt Ltd", logo:null, country:"India",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list. Real, CIN U24200MH2004PTC147466,
+    // confirmed Active, founded 2004. CAUTION — RELEVANCE UNCERTAIN: similar to Orient Ceratech
+    // (also in TWI), this company's core business (pigments, colorants, pharma/chemical
+    // intermediates, surfactants) is more tangential to TWI's tank-terminal scope than most
+    // entries — real and substantial, but a lower-confidence fit; worth a second look before
+    // treating as core.
+    desc:"Manufacturer and supplier of pigments and colorants, chemical and pharmaceutical intermediates, ionic liquids, and surfactants — real named products include beta blue pigments (inks & paints) and pharma intermediates. Multiple facilities (Mahad and Bharuch). ADIPEC 2022: Stall 13152.",
+    site:"https://www.mallakindia.com",
+    cats:["industrial-water-systems"],
+    locations:[{ type:"headquarters", name:"Corporate Office", address:"Unit 216, Mahavir Industrial Estate, Plot 32, Off Mahakali Caves Road, Satya Darshan Colony, Gundavali, Andheri East, Mumbai, Maharashtra 400093, India", city:"Mumbai", lat:null, lng:null, placeId:"ChIJ5foHrS_I5zsR_KtEsASQOu8" }] },
+{ id:655, slug:"unicare-emergency-equipment-private-limited", name:"Unicare Emergency Equipment Pvt. Ltd.", logo:null, country:"India",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list. Real, CIN U29299MH1998PTC114299,
+    // confirmed Active, founded 1981 (44 years), ISO 9001-2008 certified, real product
+    // certifications (CE, UL, BIS, tested to ANSI and EN specs, Directive 89/686/EEC Article
+    // 11B). Real, substantial (₹50-100 Cr revenue range, 101-500 employees). CAUTION: real
+    // financial data shows a 1-year revenue CAGR of -7% and EBITDA CAGR of -25% (FY2025) — a
+    // genuine recent decline worth being aware of, not necessarily disqualifying. Strongly
+    // reviewed (4.9 rating, 7 reviews).
+    desc:"Safety industry manufacturer — Fall Protection, Fire Fighting, Search and Rescue Products, Environmental Health and Safety, and Face Protection equipment. Branch offices across India plus principal representations in Europe and the United States. ADIPEC 2022: Stall 13210.",
+    site:"https://www.unicareemergency.com",
+    cats:["occupational-safety", "fire-protection"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"2nd Floor, Leslico House, Prof. VS Agashe Road, Near Kabutar Khana, Dadar West, Mumbai, Maharashtra 400028, India", city:"Mumbai", lat:null, lng:null, placeId:"ChIJ____v8TO5zsRVSG0wkM560k" }] },
+{ id:656, slug:"uniflow-controls-private-limited", name:"Uniflow Controls Pvt Ltd", logo:null, country:"India",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list. Real, over a decade of operation. Real,
+    // genuinely impressive named engineering-consultant relationships confirmed via the
+    // company's own LinkedIn: Thyssenkrupp Industrial Solutions (formerly UHDE India Ltd),
+    // Jacobs, Tata Consulting Engineers (TCE), Aker Solutions, Mott MacDonald, Mecon.
+    desc:"Control valve manufacturer providing customized solutions to process industries — real named served industries: Oil & Gas, Petrochemical, Fertiliser, Chemicals, Pharmaceutical, Paper, Cement, Steel & Power, Sugar. ADIPEC 2022: Stall 523.",
+    site:"",
+    cats:["valves"],
+    locations:[{ type:"headquarters", name:"Corporate & Sales Office", address:"B-303, Mahavir Icon, Sector 15, CBD Belapur, Navi Mumbai, Maharashtra 400614, India", city:"Navi Mumbai", lat:null, lng:null, placeId:"ChIJOcEOBlPC5zsRXMnug2-Htu8" }] },
+{ id:657, slug:"thermal-instrument-india-private-limited", name:"Thermal Instrument India Pvt. Ltd.", logo:null, country:"India",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list. Real, CIN U74999MH2000PTC127532,
+    // confirmed Active. Since 1983 (42 years), largest manufacturer of primary process control
+    // instruments in India — 2 manufacturing plants, 210+ employees, ISO 9001:2015, ISO
+    // 14001:2015 and OHSAS 18001:2007 certified across all plants. Real offices in all major
+    // Indian metros plus representation across South East Asia, Africa, Middle East, Australia,
+    // Europe and North East Asia.
+    desc:"Manufacturer of primary process control instruments — temperature gauges, pressure gauges, Resistance Temperature Detectors (RTDs), mineral insulated thermocouples, tube skin thermocouples, thermowells (including Vanstone and Helical types), level gauges, orifice plates, flow nozzles, Venturi tubes, differential pressure gauges, V-Cone flow elements and manifold valves. ADIPEC 2022: Stall 13133.",
+    site:"https://thermalinstrument.net",
+    cats:["instrumentation-and-automation", "flow-meters"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"B-1009, 10th Floor, Kohinoor Square, Plot No. 46, N.C. Kelkar Marg, Opp. Shivsena Bhavan, Dadar West, Mumbai, Maharashtra 400028, India", city:"Mumbai", lat:null, lng:null, placeId:"ChIJRaw68dHO5zsRkxQcimIlOEk" }] },
+{ id:658, slug:"tubefit-engineers", name:"Tubefit Engineers", logo:null, country:"India",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list. Real, proprietorship, since 1995 (30
+    // years), ISO 9001:2015 and CE/PED accredited. Independently cross-confirmed as a genuine,
+    // repeat exhibitor at a DIFFERENT major trade show (India Energy Week 2024, Goa) via the
+    // company's own LinkedIn — real named partnership with Al Masaood Group (a major, real UAE
+    // conglomerate). CAUTION: a real review alleges a payment delay (60-day terms extended to 6
+    // months) — worth checking alongside the otherwise strong, detailed positive reviews (4.2
+    // rating, 54 reviews).
+    desc:"Design, engineering and manufacture of Tube Fittings (Double Ferrule, Single Ferrule, DIN-2353), Pipe Fittings, Instrumentation Valves, Air Headers, Condensate Pots, Manifolds and Chemical Injection Quills — real named product lines include hydrogen fittings, double block & bleed, cryogenic valves and sampling systems, serving worldwide customers across North/South America, Europe, Australia, Middle East and Far East Asia. ADIPEC 2022: Stall 416.",
+    site:"https://www.tubefiteng.com",
+    cats:["valves", "pipes-and-tubes"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Building No. 4, Sativali Road, Near Sai Baba Mandir, Sheetal Supreme Industrial Estate, Golani Naka, Vasai East, Vasai-Virar, Maharashtra 401208, India", city:"Vasai-Virar", lat:null, lng:null, placeId:"ChIJPdr-s9ao5zsR2jqXQKFGbwk" }] },
+{ id:659, slug:"leak-proof-engineering-india-private-limited", name:"Leak Proof Engineering (India) Private Limited", logo:null, country:"India",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list. Real, CIN U28920MH1996PTC102768,
+    // confirmed Active. Strongly reviewed (4.7 rating, 27 reviews) — real, detailed reviews
+    // confirming a genuinely broad, specific product line beyond what the company name alone
+    // suggests.
+    desc:"Manufacturer of mechanical seals, bearing isolators, rotary joints, flexible graphite products, metal bellow seals and agitator seals — real reviews confirm application in extreme-temperature pumping services with both single and dual seal configurations, serving multiple hardware industries.",
+    site:"",
+    cats:["gaskets"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Khadija House, Pushtikar Society, 36-B, B R Nagar, Jogeshwari West, Mumbai, Maharashtra 400102, India", city:"Mumbai", lat:null, lng:null, placeId:"ChIJq6qq9iK25zsRzmLmQHPP9xE" }] },
+{ id:660, slug:"fourwents-engineering-company", name:"Fourwents Engineering Company", logo:null, country:"India",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list. Real, since 1958 (originally "Chhaya
+    // Engineering Corporation," 67 years), a Partnership entity. Real confirmed UDYAM MSME
+    // registration — UDYAM-GJ-01-0034789, classified as Micro enterprise, registered since
+    // 26/12/2020 — a genuinely rare, solid MSME confirmation given the Partnership structure
+    // plausibly fits Micro scale, unlike some other UDYAM matches found this session. Real,
+    // explicit named served industries include Oil & Gas Rig Services and Ships & Ports,
+    // directly on-topic for TWI.
+    desc:"Manufacturer of precision castings, machined components and industrial spare parts — Flexible Hose Products (gases, solids, fluids under high temperature/pressure/vacuum/vibration), Hydraulic Rotary Unions, Rotary Joints, Steam Tube Dryers, Air Shafts, Carbon/Graphite dynamic sealing products, and Precision Blades. Real named served industries span Chemical & Petrochemical Plants, Marine, Oil & Gas Rig Services, Ships & Ports, plus many others.",
+    site:"",
+    msme:{ category:"Micro", udyamNumber:"UDYAM-GJ-01-0034789" },
+    cats:["heavy-engineering-and-fabrication", "flexible-hoses"],
+    locations:[{ type:"headquarters", name:"Registered Office", address:"1st Floor, Ashirwad Building, Opp. H.K. House, Ashram Road, Navrangpura, Ahmedabad, Gujarat 380009, India", city:"Ahmedabad", lat:null, lng:null, placeId:"ChIJLVp_EV-EXjkRKlptZfu6idU" }] },
+{ id:661, slug:"marathon-heater-india-private-limited", name:"Marathon Heater (India) Pvt. Ltd.", logo:null, country:"India",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list. Real, CIN U31909RJ2008PTC026148
+    // (Rajasthan registration matches the real, confirmed Udaipur location — a different Gujarat
+    // CIN also surfaced in research and appears to be an unrelated/incorrect match, not used
+    // here). Real, well-documented 2007 50:50 joint venture between Marathon Heater, Inc. (USA,
+    // founded 1996, real recognition as one of Inc. Magazine's 500 fastest-growing privately held
+    // US companies in 2002) and Tempsens Instruments (a real, established Indian company). Real,
+    // substantial certifications: UL, CE, ISO, ATEX, IECEx, PESO, BIS. CAUTION: real, detailed
+    // reviews allege rude customer service from named individuals when inquiring about products —
+    // worth checking alongside genuine positive after-sales support reviews (3.7 rating, 10
+    // reviews — a real mixed pattern).
+    desc:"Manufacturer of industrial heaters and temperature sensors — Cartridge Heaters, Silicone Rubber Heaters, Mica Band Heaters, Strip Heaters, Ceramic Band Heaters, Duct Heaters, Explosion-Proof Heaters, Skid Mounted Circulation Heaters, and thermocouples/RTDs. 160+ employees across a 12,000 sq ft India facility. ADIPEC 2022: Stall 13240.",
+    site:"",
+    cats:["heating-systems"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"B-188, B-189, Road No. 5, Mewar Industrial Area, Madri, Udaipur, Rajasthan 313003, India", city:"Udaipur", lat:null, lng:null, placeId:"ChIJCVr3VtLpZzkRKU0KTgED9dE" }] },
+{ id:662, slug:"shrimaruti-precision-engineering-private-limited", name:"Shri Maruti Precision Engineering Pvt Ltd", logo:null, country:"India",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list. Real, CIN U33300GJ2016PTC092007,
+    // confirmed Active, business since 1989 (formerly "Maruti Engineering Works," 36 years), 3
+    // manufacturing facilities in Gujarat, ISO 9001:2015 certified via Bureau Veritas. Real named
+    // client relationship — premier supplier to Rexroth India Ltd. (a real Bosch subsidiary) for
+    // 5 consecutive years. CAUTION: a real review alleges being charged freight after receiving a
+    // defective product — worth checking alongside otherwise positive reviews (4.0 rating, 9
+    // reviews).
+    desc:"Manufacturer and exporter of Internal Gear Pumps, Rotary Gear Pumps, Oil Pump Gears, Bitumen Pumps, Industrial Gear Pumps, Oil Transfer Pumps, Fuel Transfer Gear Pumps, Air Operated Diaphragm Pumps and Oil Burner Pumps — real applications for Boilers and Hydraulic Drives, sustaining high pressure with liquids up to 450 cSt. ADIPEC 2022: Stall 13246.",
+    site:"https://www.marutipump.com",
+    cats:["pumps"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"A/7, Mahadev Estate, Part-3, Near Ramol Police Station, CTM-Ramol Road, Ahmedabad, Gujarat 382449, India", city:"Ahmedabad", lat:null, lng:null, placeId:"ChIJJ_frKCOGXjkR3859OTJwT_I" }] },
+{ id:663, slug:"enopeck-seals-industries-private-limited", name:"Enopeck Seals Industries", logo:null, country:"India",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list. Real, CIN U74900MH2014PTC256684,
+    // confirmed Active, established 2003 (2014 formal incorporation), real substantial (₹15.2Cr
+    // revenue FY2024, 30% CAGR growth, 83 employees), ISO 9001:2015 certified. CAUTION —
+    // RELEVANCE UNCERTAIN: despite the "Seals Industries" name, real reviews and product
+    // listings confirm the actual product is security/tamper-evident seals (Plastic Strip Seals,
+    // Wire Seals) for cargo/logistics use — NOT industrial gaskets or mechanical seals. This is a
+    // genuinely different product category than the name suggests; a real, legitimate business,
+    // but its fit within TWI's tank-terminal equipment scope is thin and worth a second look.
+    desc:"Manufacturer of security and tamper-evident seals — Plastic Strip Seals, Plastic Seals, Wire Seals — for cargo and logistics security applications.",
+    site:"https://www.enopeckeseals.in",
+    cats:["gaskets"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"1112, 11th Floor, Techno IT Park, Near Eskay Resort, New Link Road, Borivali West, Mumbai, Maharashtra 400091, India", city:"Mumbai", lat:null, lng:null, placeId:"ChIJq6oaWCKx5zsRmhyQp8cwLAI" }] },
+{ id:664, slug:"fluidfit-engineers-private-limited", name:"Fluidfit Engineers Pvt Ltd", logo:null, country:"India",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list. Real, CIN U29253MH1996PTC103018,
+    // confirmed Active, since 1990 (35 years). Real named brand "FLUID-LOK," explicitly described
+    // as interchangeable with international brands Swagelok and Parker. Independently cross-
+    // confirmed as a genuine, repeat ADIPEC exhibitor via a real LinkedIn post using the hashtag
+    // "#ADIPEC2023." Real revenue growth (₹6.12Cr, 31% CAGR). CAUTION: genuinely mixed reviews
+    // (2.8 rating, 9 reviews) — one detailed positive employee review naming the owners
+    // (Abdullah, Farhan) alongside a starkly negative, undetailed one ("Worst company ever") —
+    // worth checking directly given the split pattern.
+    desc:"Manufacturer and exporter of Instrumentation Valves & Fittings — Manifold Valves, Monoflange Valves, Needle Valves, Twin Ferrule Fittings, Pipe Fittings & Adapters, 37° JIC Flare Fittings, Hydraulic Adapters (BS5200), DIN 2353 Tube Fittings — in stainless steel and other exotic materials, regularly exported to USA, UK and European countries. ADIPEC 2022: Stall 13230.",
+    site:"https://www.fluidfitengg.com",
+    cats:["valves"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Unit 12, Supreme Estate, Lucky Compound, Kaman Bhiwandi Road, Chinchoti Phata, Vasai East, Vasai-Virar, Maharashtra 401208, India", city:"Vasai-Virar", lat:null, lng:null, placeId:"ChIJXZHva4ul5zsR2dJtTUm22x0" }] },
+{ id:665, slug:"red-fort-ppe-industries-private-limited", name:"Red Fort PPE Industries Pvt Ltd", logo:null, country:"India",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list. Real, since 2009 (16 years), real
+    // substantial production capacity (150,000 workwear units/month), real named certifications
+    // (EN, ISO, ASTM, UL, CAN, NFPA, NZ, AS, BS, ISI). Real, explicit named served industries
+    // include Oil & Gas, Refineries and EPC. Independently cross-confirmed as a genuine exhibitor
+    // at a different major international trade fair (A+A Düsseldorf, a real global safety/PPE
+    // exhibition) via the company's own LinkedIn. CAUTION: genuinely mixed reviews (3.7 rating,
+    // 9 reviews) — a detailed negative review about product quality and customer service
+    // alongside a positive one — worth checking directly given the split pattern.
+    desc:"Manufacturer of industrial safety workwear and advanced technical textiles — real named product lines include Coveralls, Fire Fighting Suits, Rain Wear, Boiler Suits and Turn Out Gear (brands: Red Fort Workwear, Red Star WorkWear, Prime Victor, Pro Blaze, Desert King Workwear). Real served industries: Oil & Gas, Pharma, Engineering, Chemical, Refineries, EPC. ADIPEC 2022: Stall 13135.",
+    site:"",
+    cats:["occupational-safety"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Building No. E-4 (Sutra), Asmeeta Texpa Phase 2, MIDC Plot No. 1, Additional Kalyan Bhiwandi Industrial Area, Kon, Bhiwandi, Maharashtra 421311, India", city:"Bhiwandi", lat:null, lng:null, placeId:"ChIJh8HwgCuW5zsRqDI0vNsjlXs" }] },
+{ id:666, slug:"goodluck-engineering-co-forgings", name:"Goodluck Engineering Co. (Forgings)", logo:null, country:"India",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list. Real — this is the Forgings division of
+    // Goodluck India Limited, CIN L74899DL1986PLC050910, publicly listed since 1995, genuinely
+    // major (2,573 employees, ₹500+ Cr revenue range). Real, explicit named specialization in
+    // "flanges and forged products for the oil and gas industry" per the company's own materials,
+    // real recent news (artillery shell manufacturing licence, AMCA fighter jet consortium,
+    // ₹468M solar module mounting structures order). CAUTION — real entity complexity: a
+    // separate, much smaller, likely-dormant "Good Luck Engineering Works Private Limited" (CIN
+    // U74899DL1987PTC029658, ₹11.5 lakh paid-up capital, no MCA filing since 2007) also exists —
+    // do not conflate the two; this entry uses the correct, active, large-scale entity. Real
+    // reviews (Sikandrabad facility) directly confirm forged flanges and custom forgings
+    // production, founded by IIT alumni with 37 years' experience.
+    desc:"Forgings division of Goodluck India Limited, a major diversified Indian manufacturer — flanges and forged products specifically for the oil and gas industry, plus custom forgings for defense and aerospace. Broader group also produces ERW Precision & CDW Tubes, Power & Telecom Towers, Solar Structures, and ERW Hot Dip Galvanized Pipes. ADIPEC 2022: Stall 8255.",
+    site:"https://www.goodluckindia.com/forging/",
+    cats:["forgings"],
+    locations:[{ type:"headquarters", name:"Works", address:"A-51, Industrial Area, Sikandrabad, District Bulandshahr, Uttar Pradesh 203206, India", city:"Sikandrabad", lat:null, lng:null, placeId:"ChIJNzMniPG9DDkRRUTdAZLswOw" }] },
+{ id:667, slug:"emypro-construction-ltda", name:"EMYPRO Construction Ltda", logo:null, country:"Brazil",
+    // NOTE: sourced from a user-provided Brazil storage tank registry. Real, genuine offshoot of
+    // a Spanish company (Emypro S.A.), established in Brazil in 2002 by real named founders
+    // (Engº Ernando Alves de Araújo, Pedro Paulo Barbosa de Araújo — the latter with 30+ years'
+    // industry experience). Real, substantial (250 employees, HQ Recife + branch Ipojuca/PE).
+    // Real, genuinely major named projects: the Decal Brasil terminal (167,000 m³ capacity) and
+    // the Puma Storage terminal (87,800 m³ capacity).
+    desc:"Engineering, construction and turnkey solutions for liquid bulk storage terminals — alcohol, chemicals, petroleum and derivatives. Full scope from design/feasibility studies through procurement, construction, licensing, assembly and commissioning of storage bases and terminals.",
+    site:"https://www.emypro.com.br",
+    cats:["tank-construction", "epc-contractors"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"R. Eng. José Brandão Cavalcante, 117, Imbiribeira, Recife, PE 51170-135, Brazil", city:"Recife", lat:null, lng:null, placeId:"ChIJQSEmYvwfqwcRRXqoNYmeEpU" }] },
+{ id:668, slug:"singular-industrial", name:"Singular Industrial", logo:null, country:"Brazil",
+    // NOTE: sourced from a user-provided Brazil storage tank registry. Real web presence
+    // confirmed (singularindustrial.com.br). CIN/registration not independently confirmed;
+    // no Google Places match independently derived — flagged rather than guessed.
+    desc:"Storage tank construction — API 650 tanks, tank fabrication and erection, API 653 maintenance, floating roofs/seals, piping and EPC services.",
+    site:"https://www.singularindustrial.com.br",
+    cats:["tank-construction"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Brazil", city:"", lat:null, lng:null, placeId:null }] },
+{ id:669, slug:"romao-tecnologias-industriais", name:"Romão Tecnologias Industriais", logo:null, country:"Brazil",
+    // NOTE: sourced from a user-provided Brazil storage tank registry, which flagged its own
+    // uncertainty about the Place ID ("ChIJ...?"). Independently re-derived and confirmed a real,
+    // different Place ID — strongly reviewed (4.4 rating, 8 reviews), including a real named
+    // long-term business partner (RBC Tur, since 2020). Real genuine social responsibility
+    // program confirmed via the company's own site: the "ROMÃO EDUCAR PROJECT" (launched 2022),
+    // providing professional/personal development for young people in the Japeri region.
+    desc:"Manufacturer of tank protection equipment — internal floating roofs, geodesic domes, floating seals, pressure/vacuum relief valves, emergency vents, flame arrestors and gauging hatches.",
+    site:"https://romaotecnologias.com.br",
+    cats:["tank-construction"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"R. Xingu, 1, Cidade Jardim Marajoara, Japeri, RJ 26413-110, Brazil", city:"Japeri", lat:null, lng:null, placeId:"ChIJsyM_2XpamQARuqa0aihYS3U" }] },
+{ id:670, slug:"ibt-tanques", name:"IBT Tanques", logo:null, country:"Brazil",
+    // NOTE: sourced from a user-provided Brazil storage tank registry. Real, genuine 45-year
+    // history — founded 1980 as "Moncal Ind. Tanques," later "Calmon Ind. Tanques," now IBT.
+    // Place ID independently re-verified as an exact match to the source registry's own data,
+    // confirming the registry's overall reliability.
+    desc:"Manufacturer of industrial tanks — carbon steel and stainless steel tanks, floating roof tanks, pressure vessels, reactors and industrial heat exchangers; also operates a used-equipment resale division (mixers, pressure vessels, columns).",
+    site:"https://www.ibtanques.com.br",
+    cats:["tank-construction", "heat-exchangers"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"R. Marquês de Santo Amaro, 1025, Vila California, São Paulo, SP 03214-080, Brazil", city:"São Paulo", lat:null, lng:null, placeId:"ChIJOfmsYuNczpQRxwwWlpDiUjI" }] },
+{ id:671, slug:"eurotanks", name:"Eurotanks", logo:null, country:"Brazil",
+    // NOTE: sourced from a user-provided Brazil storage tank registry. Place ID independently
+    // re-verified as an exact match to the source registry's own data.
+    desc:"Manufacturer of glass-fused-to-steel (vitrified) storage reservoirs and tank equipment — tank roofs, geodesic domes, floating seals and internal floating roofs.",
+    site:"https://eurotanks.com.br",
+    cats:["tank-construction"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Av. Marquês de São Vicente, 446, Antigo 10, Sala 105, Várzea da Barra Funda, São Paulo, SP 01139-000, Brazil", city:"São Paulo", lat:null, lng:null, placeId:"ChIJz-BbEQdYzpQRaP_iROUgyo4" }] },
+{ id:672, slug:"tanks-br", name:"Tanks BR", logo:null, country:"Brazil",
+    // NOTE: sourced from a user-provided Brazil storage tank registry. Real, founded 2005. Place
+    // ID independently re-verified as an exact match to the source registry's own data. Real
+    // named client confirmed via LinkedIn — a water-supply expansion project delivered in
+    // partnership with SANEPAR (a real Brazilian state water/sanitation utility company, Paraná).
+    // Strongly reviewed (4.6 rating, 39 reviews).
+    desc:"Manufacturer of bolted steel tanks (glass-fused and epoxy-coated), aluminium domes and storage tanks for potable water, raw water, industrial water and other fluids — serving industry, agribusiness and civil construction.",
+    site:"https://tanksbr.com.br",
+    cats:["bolted-steel-tanks", "tank-construction"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Av. 1, 2031, Jardim Mirassol, Rio Claro, SP 13503-141, Brazil", city:"Rio Claro", lat:null, lng:null, placeId:"ChIJF67MSvzax5QRq02D22ifNhM" }] },
+{ id:673, slug:"tank-brazil-equipamentos-e-solucoes", name:"Tank Brazil Equipamentos e Soluções", logo:null, country:"Brazil",
+    // NOTE: sourced from a user-provided Brazil storage tank registry. Real web presence
+    // confirmed (tankbrazil.com.br) — fuel storage tanks, fueling modules, filtration/dispensing
+    // equipment, and a "Smart Tank" remote fuel-management platform, serving agro, mining,
+    // construction, transport and aviation sectors. Place ID as provided by the registry, not
+    // independently re-derived.
+    desc:"Fuel storage and dispensing solutions — industrial tanks, custom fueling modules for fleets/machinery, filtration and dispensing equipment (rocket filters, pumps, meters, hoses), and JET A-1/AV Gas aviation fuel tanks and skids with regulatory documentation.",
+    site:"https://tankbrazil.com.br",
+    cats:["tank-construction"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Cuiabá, Mato Grosso, Brazil", city:"Cuiabá", lat:null, lng:null, placeId:"ChIJqa4ghu2tnZMRNkRX4I94bbM" }] },
+{ id:674, slug:"hidro-tank-reservatorios", name:"Hidro Tank Reservatórios", logo:null, country:"Brazil",
+    // NOTE: sourced from a user-provided Brazil storage tank registry. Place ID as provided by
+    // the registry, not independently re-derived; not independently verified beyond the source.
+    desc:"Manufacturer of storage reservoirs and metalwork.",
+    site:"",
+    cats:["tank-construction"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Fernando Prestes, São Paulo, Brazil", city:"Fernando Prestes", lat:null, lng:null, placeId:"ChIJHaPcEg5NuZQRlex5UFWxD0c" }] },
+{ id:675, slug:"tech-tank", name:"Tech Tank", logo:null, country:"Brazil",
+    // NOTE: sourced from a user-provided Brazil storage tank registry. Place ID as provided by
+    // the registry, not independently re-derived; not independently verified beyond the source.
+    desc:"Tank and reservoir engineering solutions.",
+    site:"",
+    cats:["tank-construction"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Piracicaba, São Paulo, Brazil", city:"Piracicaba", lat:null, lng:null, placeId:"ChIJnb-cUJgxxpQRkMhq05FFP5Y" }] },
+{ id:676, slug:"twd-tanques", name:"TWD Tanques", logo:null, country:"Brazil",
+    // NOTE: sourced from a user-provided Brazil storage tank registry. Place ID as provided by
+    // the registry, not independently re-derived; not independently verified beyond the source.
+    desc:"Tank manufacturer.",
+    site:"",
+    cats:["tank-construction"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Itu, São Paulo, Brazil", city:"Itu", lat:null, lng:null, placeId:"ChIJ6fUX6IJcz5QROGrdP78z6vY" }] },
+{ id:677, slug:"inoxcva-south-america", name:"INOXCVA South America", logo:null, country:"Brazil",
+    // NOTE: sourced from a user-provided Brazil storage tank registry. Real, genuinely major —
+    // INOXCVA is a real, well-documented brand of INOX India (a real, publicly-traded major
+    // Indian company), formed when INOX India acquired a majority stake in Cryogenic Vessel
+    // Alternatives (CVA), a US manufacturer, in 2009. Real global operations: India (Vadodara,
+    // Kalol, Silvassa), Brazil (Indaiatuba — this unit opened 2016 specifically to serve South
+    // American customers), and Europe (Alblasserdam, Netherlands). A genuinely nice cross-
+    // connection back to TWI's primary India market. Place ID as provided by the registry.
+    desc:"Manufacturer of cryogenic storage and transport equipment — industrial tanks, stainless steel equipment, and storage/process equipment for liquefied gases, opened in Brazil in 2016 to serve South American customers with locally produced products and repair services.",
+    site:"https://inoxcva.com/brazil.php",
+    cats:["cryogenic-and-lng-storage-tanks"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Rua Akio Umeda, 236, Centro Empresarial de Indaiatuba, Indaiatuba, SP, Brazil", city:"Indaiatuba", lat:null, lng:null, placeId:"ChIJLRi32ItMz5QRUGs8iBecBnE" }] },
+{ id:678, slug:"brasil-tanques", name:"Brasil Tanques", logo:null, country:"Brazil",
+    // NOTE: sourced from a user-provided Brazil storage tank registry. Place ID as provided by
+    // the registry, not independently re-derived; not independently verified beyond the source.
+    desc:"Tank manufacturer and metalwork company.",
+    site:"",
+    cats:["tank-construction"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Uberlândia, Minas Gerais, Brazil", city:"Uberlândia", lat:null, lng:null, placeId:"ChIJDe4gHMJHpJQR2fMlH1dBqf8" }] },
+{ id:679, slug:"samekh-solutions-ltda", name:"SAMEKH SOLUTIONS LTDA", logo:null, country:"Brazil",
+    // NOTE: sourced from a user-provided Brazil storage tank registry. Real web presence
+    // confirmed (samekhsolutions.com.br). CIN/registration and Google Places listing not
+    // independently confirmed — flagged rather than guessed.
+    desc:"Storage tank construction — API 650 tanks, tank engineering, fabrication, erection, and electromechanical tank lifting.",
+    site:"https://samekhsolutions.com.br",
+    cats:["tank-construction"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Av. Prefeito Isaias Herminio Romano, 264, Jardim Souza Queiroz, Santa Bárbara d'Oeste, SP, Brazil", city:"Santa Bárbara d'Oeste", lat:null, lng:null, placeId:null }] },
+{ id:680, slug:"python-engenharia-ltda", name:"PYTHON ENGENHARIA LTDA", logo:null, country:"Brazil",
+    // NOTE: sourced from a user-provided Brazil storage tank registry. Real web presence
+    // confirmed (pythonengenharia.com.br). CIN/registration and Google Places listing not
+    // independently confirmed — flagged rather than guessed.
+    desc:"Storage tank engineering — API 650, API 620, tank fabrication for Oil & Gas and Chemical industries, including sulfuric acid tanks, plus inspection services.",
+    site:"https://www.pythonengenharia.com.br",
+    cats:["tank-construction"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Rua Butantã, 461, Conjunto 82, Pinheiros, São Paulo, SP 05424-140, Brazil", city:"São Paulo", lat:null, lng:null, placeId:null }] },
+{ id:681, slug:"token-engenharia", name:"TOKEN ENGENHARIA", logo:null, country:"Brazil",
+    // NOTE: sourced from a user-provided Brazil storage tank registry. Real web presence
+    // confirmed (tokenengenharia.com.br) — genuine, detailed technical content citing real
+    // Brazilian standards (ABNT NBR 17505 series, NR 20, NBR-7821). CAUTION: at least 3
+    // different, unrelated "Token"-named companies were found in Brazil during Place ID research
+    // (an electrical/electromechanical services company in Volta Redonda, RJ; two unrelated São
+    // Paulo businesses) — none clearly matched this tank-fabrication company, so no Place ID is
+    // included here rather than risk misattributing to the wrong entity.
+    desc:"Atmospheric storage tanks and pressure vessels — API 650, ASME VIII, carbon steel and stainless steel tanks, NDT and hydrostatic testing.",
+    site:"https://tokenengenharia.com.br",
+    cats:["tank-construction"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Brazil", city:"", lat:null, lng:null, placeId:null }] },
+{ id:682, slug:"theodosio-randon-tr-equipamentos", name:"THEODOSIO RANDON / TR EQUIPAMENTOS", logo:null, country:"Brazil",
+    // NOTE: sourced from a user-provided Brazil storage tank registry. Real, confirmed via
+    // LinkedIn (2,480 followers) — "Indústria Mecânica Theodosio Randon Ltda." Real, explicit
+    // named served industries: mineral water, food, chemical, pharmaceutical, mining,
+    // petrochemical, plastic, beverages. Strongly reviewed (4.9 rating, 26 reviews).
+    desc:"Manufacturer of API tanks, stainless steel tanks and process equipment — chemical storage, petroleum derivatives, petrochemical plants and distribution terminals; also reactors, mixers and silos in stainless steel and aluminum.",
+    site:"https://tr.ind.br",
+    cats:["tank-construction"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"R. Jacob Luchesi, 5039, Santa Lúcia, Caxias do Sul, RS 95032-000, Brazil", city:"Caxias do Sul", lat:null, lng:null, placeId:"ChIJKX7SdXyiHpURTPJTiv2nWyY" }] },
+{ id:683, slug:"itkbr", name:"ITKBR", logo:null, country:"Brazil",
+    // NOTE: sourced from a user-provided Brazil storage tank registry. Real web presence
+    // confirmed (itkbr.com.br). CIN/registration and Google Places listing not independently
+    // confirmed — flagged rather than guessed.
+    desc:"Petroleum storage tank engineering — API 650, API 620, basic and detailed engineering, foam chambers, pressure/vacuum relief valves, and hydrostatic test engineering.",
+    site:"https://itkbr.com.br",
+    cats:["tank-construction"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Brazil", city:"", lat:null, lng:null, placeId:null }] },
+{ id:684, slug:"tanques-api-ltda", name:"TANQUES API LTDA", logo:null, country:"Brazil",
+    // NOTE: sourced from a user-provided Brazil storage tank registry. Real, genuine detailed
+    // real project specifications confirmed via the company's own site (specific tank dimensions
+    // and capacities across multiple real projects). Independently re-verified Place ID.
+    // Compliant with ASTM A-36/A-283, API 650, NBR 7821 and NBR 15461 per its own materials.
+    desc:"Manufacturer of industrial storage tanks — petrochemical tanks (API 650, API 620, NBR 7821, NBR 15461), LNG cryogenic tanks, pressure vessels, reactors and heat exchangers, for light and heavy petroleum derivatives.",
+    site:"https://www.tanquesapi.com.br",
+    cats:["tank-construction", "cryogenic-and-lng-storage-tanks"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"R. São Raimundo, 871, Vila Alpina, São Paulo, SP 03216-040, Brazil", city:"São Paulo", lat:null, lng:null, placeId:"ChIJD_-InW1dzpQRzHANV1QHme8" }] },
+{ id:685, slug:"tenaris-etihad-tubulars", name:"Tenaris (Etihad Tubulars)", logo:null, country:"United Arab Emirates",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list (UAE-listed). Real, genuinely massive —
+    // Tenaris S.A. is publicly listed (NYSE: TS), $14.868B revenue (2023), 29,134 employees,
+    // majority-owned by the Techint Group, headquartered in Luxembourg. Real, substantial UAE
+    // presence: Etihad Tubulars, a 235,000 m² complex in Abu Dhabi Industrial City (ICAD III) —
+    // real API Q1 and API 5CT certifications, real recognition as an Industry 4.0 Digital Leader
+    // by the UAE's Ministry of Industry and Advanced Technology (MoIAT). CAUTION: one real
+    // review alleges safety practice concerns ("all safety peoples wrong") alongside a positive
+    // one — worth checking directly.
+    desc:"Global manufacturer and supplier of steel pipes and related services for the energy industry — real named local operations include the Rig Direct service model and One Line pipeline solutions, OCTG threading, and a fully equipped pipe service yard for storage, inspection and preparation of tubulars.",
+    site:"https://www.tenaris.com",
+    cats:["pipes-and-tubes"],
+    locations:[{ type:"headquarters", name:"Etihad Tubulars", address:"Abu Dhabi Industrial City, ICAD 3, Abu Dhabi, United Arab Emirates", city:"Abu Dhabi", lat:null, lng:null, placeId:"ChIJwdbSpos_Xj4RclBDGg92Sng" }] },
+{ id:686, slug:"tuv-sud-middle-east-llc", name:"TUV SUD Middle East LLC", logo:null, country:"United Arab Emirates",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list (UAE-listed). Real, well-known global
+    // testing/inspection/certification body. Strongly reviewed (4.3 rating, 52 reviews) — real,
+    // detailed positive training feedback naming a specific instructor (Adnan Abbas), alongside
+    // minor logistics complaints about the facility's remote location.
+    desc:"Testing, inspection, certification and training services — real Abu Dhabi Industrial City (ICAD III) facility offering technical training programs.",
+    site:"",
+    cats:["inspection-and-certification", "certification-bodies"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Ahl Al Ilm St, Abu Dhabi Industrial City, ICAD III, Abu Dhabi, United Arab Emirates", city:"Abu Dhabi", lat:null, lng:null, placeId:"ChIJzfQD711mXj4R6vMGz6ZiUCg" }] },
+{ id:687, slug:"intertek-inspec-abu-dhabi", name:"Intertek (Inspec)", logo:null, country:"United Arab Emirates",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list (UAE-listed). Real, globally major
+    // testing/inspection/certification company. CAUTION: multiple real Intertek-branded
+    // facilities exist in the Abu Dhabi area (a training center, this Inspec/NDT division, and a
+    // Ruwais location) — used the Inspec division given a real review directly calls it "Number
+    // one NDT inspection company in UAE," most directly relevant to TWI's inspection scope;
+    // verify which specific facility matters before use if precision is needed. Strongly reviewed
+    // (4.6 rating, 22 reviews).
+    desc:"NDT inspection services — real reviews confirm Mechanical Testing, PWHT (Post Weld Heat Treatment) and inspection assistance.",
+    site:"",
+    cats:["non-destructive-testing-ndt", "inspection-and-certification"],
+    locations:[{ type:"headquarters", name:"Inspec (International Inspection Services)", address:"Musaffah 26, Abu Dhabi, United Arab Emirates", city:"Abu Dhabi", lat:null, lng:null, placeId:"ChIJa8VwwIlBXj4RrYMQ1ZNp_t0" }] },
+{ id:688, slug:"veolia-environmental-services-uae", name:"Veolia Environmental Services", logo:null, country:"United Arab Emirates",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list (UAE-listed, as "VEOLIA" / "VEOLIA WATER
+    // SYSTEMS"). Real, globally major water/waste/energy management company. Strongly reviewed
+    // (4.5 rating, 40 reviews) — genuinely positive, detailed reviews naming specific staff.
+    desc:"Environmental and water treatment services — real Musaffah, Abu Dhabi operations base.",
+    site:"",
+    cats:["wastewater-treatment"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Musaffah, MW4, Abu Dhabi, United Arab Emirates", city:"Abu Dhabi", lat:null, lng:null, placeId:"ChIJcwQ7ekRAXj4Rn3i2ZKBKoeo" }] },
+{ id:689, slug:"basf-middle-east-chemicals-llc", name:"BASF Middle East Chemicals LLC", logo:null, country:"United Arab Emirates",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list (UAE-listed). Real, genuine joint venture
+    // between BASF (globally major chemical company) and the Kanoo Group (a real, major UAE-
+    // based diversified family-owned conglomerate). Real, present in the UAE since the 1970s.
+    // Real, specific business focus at the Abu Dhabi office: gas treatment, catalysts and
+    // adsorbents, and petrochemical solutions — directly on-topic for TWI.
+    desc:"Sub-regional headquarters and JV entity for BASF's Middle East and Egypt operations — real named business units include chemicals, coatings, performance materials, plastics and oilfield solutions, plus a dedicated Abu Dhabi office focused on gas treatment, catalysts/adsorbents and petrochemical solutions.",
+    site:"https://www.basf.com/ae/en",
+    cats:["catalysts-and-adsorbents"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"JAFZA One Building, Mina Jebel Ali, Jebel Ali Free Zone, Dubai, United Arab Emirates", city:"Dubai", lat:null, lng:null, placeId:"ChIJb7F5hX4SXz4RgXCPc9x1xz8" }] },
+{ id:690, slug:"liebherr-middle-east-fze", name:"Liebherr Middle East FZE", logo:null, country:"United Arab Emirates",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list (UAE-listed). Real, globally major crane
+    // and heavy equipment manufacturer. Strongly reviewed (4.7 rating, 27 reviews) — real
+    // positive feedback naming a specific regional lead ("Mr Hoelger"). CAUTION: one real,
+    // detailed negative review alleges unresponsiveness ("no one takes the calls on landline nor
+    // responds to emails") — worth checking alongside the otherwise strong pattern.
+    desc:"Manufacturer of heavy equipment and cranes — real reviews confirm relevance to construction, manufacturing, shipping and infrastructure development, including high-rise construction, bridge building and ship loading applications.",
+    site:"",
+    cats:["crane-and-lifting-equipment-rental"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Jebel Ali Free Zone (South), Plot No. S 10508, Jebel Ali Industrial 2, Dubai, United Arab Emirates", city:"Dubai", lat:null, lng:null, placeId:"ChIJj3SjbnMNXz4RsHiUSEgyiB8" }] },
+{ id:691, slug:"mammoet-general-transport-abu-dhabi", name:"Mammoet General Transport", logo:null, country:"United Arab Emirates",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list (UAE-listed). Real, globally major heavy-
+    // lift and transport company. CAUTION: the Google Places listing found has a real review
+    // alleging "Wrong location," and only 3 total reviews (3.3 rating) — genuine business
+    // legitimacy is not in doubt given Mammoet's real global scale, but this specific address/
+    // listing carries more uncertainty than most entries; verify before use.
+    desc:"Heavy lift and transport services — real global company specializing in engineered heavy lifting and specialized transport for large-scale industrial projects.",
+    site:"",
+    cats:["heavy-lift-and-transport"],
+    locations:[{ type:"headquarters", name:"Abu Dhabi Office", address:"16th Street, Musaffah, M37, Abu Dhabi, United Arab Emirates", city:"Abu Dhabi", lat:null, lng:null, placeId:"ChIJWRgo7ARBXj4Ru1A3Fnpimww" }] },
+{ id:692, slug:"ppg-industrial-coatings-middle-east", name:"PPG Industrial Coatings Middle East", logo:null, country:"United Arab Emirates",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list (UAE-listed, as "PPG INDUSTRIES"). Real,
+    // globally major paints/coatings company. CAUTION: a separate, more generic "PPG" listing
+    // also exists nearby with a real unresponsiveness complaint ("no one responds to the calls")
+    // — used this more specifically-named Industrial Coatings entity instead, given it's more
+    // directly relevant to TWI's protective coatings scope.
+    desc:"Industrial coatings division of PPG — real global paints and coatings manufacturer.",
+    site:"",
+    cats:["protective-coatings"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"All Metal Industries Foundry LLC, Jebel Ali Industrial 1, Dubai, United Arab Emirates", city:"Dubai", lat:null, lng:null, placeId:"ChIJq0_wPUoNXz4RzAay5oQKv8Y" }] },
+{ id:693, slug:"baker-hughes-surface-pressure-control-abu-dhabi", name:"Baker Hughes (Abu Dhabi Surface Pressure Control Solutions Center)", logo:null, country:"United Arab Emirates",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list (UAE-listed). Real, globally massive
+    // oilfield services and equipment company. CAUTION — genuine scope note: much of Baker
+    // Hughes' real, documented UAE activity is upstream-focused (directional drilling, logging
+    // tools, rotary steerable technology, wellhead facilities) — the same category excluded
+    // elsewhere in this session (WELLTEC, Varel, Gumpro, etc.). This specific entry uses the
+    // Surface Pressure Control Solutions Center — a real, substantial 46,000 m² manufacturing
+    // plant, confirmed via Baker Hughes' own press materials — since surface/pressure-control
+    // equipment is more directly relevant to TWI's downstream/midstream scope than Baker Hughes'
+    // broader drilling services; other Baker Hughes divisions remain genuinely upstream-focused.
+    // Also real: a remote monitoring/diagnostic center for 300+ gas turbines across the MENAT
+    // region, relevant to power generation equipment used at terminals/refineries.
+    desc:"Real, substantial (46,000 m²) manufacturing and solutions center for surface pressure control equipment, purpose-built to serve UAE and Middle East customers with faster turnaround and greater equipment range. Strongly reviewed (5.0 rating, 17 reviews).",
+    site:"",
+    cats:["compressors"],
+    locations:[{ type:"headquarters", name:"Surface Pressure Control Solutions Center", address:"Musaffah, ICAD I, Abu Dhabi, United Arab Emirates", city:"Abu Dhabi", lat:null, lng:null, placeId:"ChIJGbG9TABBXj4RqgGxAg0Rsvc" }] },
+{ id:694, slug:"vallourec-tubular-services-abu-dhabi", name:"Vallourec Middle East (VTSA)", logo:null, country:"United Arab Emirates",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list (UAE-listed). Real, genuinely massive
+    // parent company — Vallourec S.A., publicly listed (Euronext Paris), €5.1B revenue (2023),
+    // 17,000 employees, founded 1957 — the same real parent group behind Serimax, already
+    // independently verified and added to TWI earlier this session. Real 40+ year Middle East
+    // presence, real named major clients (Saudi Aramco, ADNOC, KOC, CNOOC, ExxonMobil). CAUTION —
+    // genuine scope note: OCTG (Oil Country Tubular Goods) is inherently upstream-adjacent, though
+    // Vallourec's broader pipe/tube manufacturing has real downstream relevance too. Real,
+    // exceptionally strong reviews (4.7 rating, 21 reviews) — one directly describing this
+    // facility as "the best in class" after "almost 30 years in the business."
+    desc:"Vallourec Tubular Services Abu Dhabi (VTSA) — real pipe yard offering OCTG storage, rig site service and related pipe services, operated in partnership with ADOS (Abu Dhabi Oilfield Services Company).",
+    site:"https://middle-east.vallourec.com",
+    cats:["pipes-and-tubes"],
+    locations:[{ type:"headquarters", name:"VTSA", address:"Al Athlah St, Abu Dhabi Industrial City, ICAD III, Abu Dhabi, United Arab Emirates", city:"Abu Dhabi", lat:null, lng:null, placeId:"ChIJVef3q00_Xj4RifWtTQWWFD4" }] },
+{ id:695, slug:"ad-ports-group", name:"AD Ports Group", logo:null, country:"United Arab Emirates",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list (UAE-listed). Real, genuinely major —
+    // publicly listed (ADX: ADPORTS), founded 2006, AED 5.498B revenue (2022), 4,061 employees.
+    // Real, substantial named subsidiaries directly relevant to TWI's scope: Abu Dhabi Ports,
+    // Fujairah Terminals, SAFEEN Feeders, Abu Dhabi Maritime, KEZAD Group (economic/industrial
+    // zones). Exceptionally strong public footprint (256 reviews, 4.6 rating). CAUTION: one real
+    // review alleges unresponsive staff, and another notes insufficient worker shelter from heat
+    // — worth being aware of alongside the overwhelmingly positive pattern.
+    desc:"Exclusive developer and regulator of ports and related infrastructure in Abu Dhabi — real named operating clusters spanning Ports, Maritime, Logistics, Digital, and Economic Cities & Free Zones. Real headquarters adjacent to Zayed Port, a major cruise tourism hub and Abu Dhabi's first port.",
+    site:"https://www.adportsgroup.com",
+    cats:["port-operators"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Al Meena St, Zayed Port, Al Mina Area, Abu Dhabi, United Arab Emirates", city:"Abu Dhabi", lat:null, lng:null, placeId:"ChIJI6u84eRmXj4RLtdQhHliODw" }] },
+{ id:696, slug:"drager-safety-dubai", name:"Dräger Safety AG & Co. KGaA (Branch Office)", logo:null, country:"United Arab Emirates",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list (UAE-listed). Real, genuinely major
+    // safety/medical technology company — founded 1889 (136 years), Lübeck, Germany. Real,
+    // confirmed direct branch office (distinct from Dräger's separate Hospital/medical branch,
+    // both co-located in Dubai Healthcare City). Real, precisely on-topic industrial gas
+    // detection product line — fixed/single/multi/area gas monitors, flame detectors. CAUTION —
+    // GENUINE REPEATED PATTERN: 3 separate real reviews describe total unresponsiveness ("never
+    // answers any call... also email," "No answer at all") — a corroborated pattern, not an
+    // isolated complaint, worth checking directly before relying on this contact channel.
+    desc:"Industrial safety and gas detection technology — real product line includes fixed, single and multi gas detectors, area gas monitors, and flame detectors, with long-life sensors and real-time wireless connectivity.",
+    site:"https://www.draeger.com/en_me/Home",
+    cats:["gas-detection"],
+    locations:[{ type:"headquarters", name:"Branch Office", address:"Building 25, Dubai Healthcare City, 46 Riyadh St, Umm Hurair Second, Dubai, United Arab Emirates", city:"Dubai", lat:null, lng:null, placeId:"ChIJka_5DDhdXz4R1NFPlOORsW4" }] },
+{ id:697, slug:"kaeser-kompressoren-fze", name:"Kaeser Kompressoren FZE", logo:null, country:"United Arab Emirates",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list (UAE-listed, as "Kaeser Kompressoren
+    // Fze"). Real, German family-owned company, confirmed genuine air compressor/blower/
+    // compressed-air-treatment manufacturer with a real, direct Jebel Ali Free Zone office.
+    desc:"Manufacturer of air compressors, low pressure blowers, and compressed air treatment equipment — a globally family-owned German company.",
+    site:"",
+    cats:["compressors"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Street N203, Jebel Ali Free Zone (North), Dubai, United Arab Emirates", city:"Dubai", lat:null, lng:null, placeId:"ChIJs-tzFtJrXz4RWRQ8nD86d6g" }] },
+{ id:698, slug:"vega-instruments-middle-east-llc", name:"VEGA Instruments Middle East LLC", logo:null, country:"United Arab Emirates",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list (UAE-listed, as "VEGA"). Real, confirmed
+    // genuine VEGA (level/pressure instrumentation) regional entity.
+    desc:"Regional supplier of level, pressure and point level measurement instrumentation.",
+    site:"",
+    cats:["instrumentation-and-automation"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Al Gurg Building, 5th Floor, Baniyas Rd, Riggat Al Buteen, Deira, Dubai, United Arab Emirates", city:"Dubai", lat:null, lng:null, placeId:"ChIJd4I_lt1cXz4R8laajdRMcrU" }] },
+{ id:699, slug:"nouryon-middle-east-fze", name:"Nouryon Middle East FZE", logo:null, country:"United Arab Emirates",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list (UAE-listed). Real, confirmed genuine
+    // Nouryon (specialty chemicals company, formerly AkzoNobel Specialty Chemicals) regional
+    // entity, based at Dubai Science Park.
+    desc:"Regional office of Nouryon, a specialty chemicals company — real Dubai Science Park facility.",
+    site:"https://www.nouryon.com",
+    cats:["catalysts-and-adsorbents"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Dubai Science Park, Lab Complex, Office 319, Dubai, United Arab Emirates", city:"Dubai", lat:null, lng:null, placeId:"ChIJm4XiDYJlXz4Rzy_QLzyoJnU" }] },
+{ id:700, slug:"danfoss-fzco", name:"Danfoss FZCO", logo:null, country:"United Arab Emirates",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list (UAE-listed). Real, genuinely major
+    // Danish company, founded 1933, 41,928 employees globally. CAUTION: real reviews are mixed —
+    // several positive (including a named team reference, "Sondex Team"), alongside a real
+    // unresponsiveness complaint ("They never pick the calls") — worth checking directly
+    // alongside the otherwise strong pattern (3.8 rating, 49 reviews).
+    desc:"Regional office of Danfoss — real global manufacturer of fluid control equipment, pumps, seals, valves, and climate/energy solutions (refrigeration, air conditioning, motor controllers).",
+    site:"",
+    cats:["instrumentation-and-automation"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"N602, Mina Jebel Ali, Jebel Ali Free Zone, Dubai, United Arab Emirates", city:"Dubai", lat:null, lng:null, placeId:"ChIJvyDK1lgSXz4R2PykB0x6sr0" }] },
+{ id:701, slug:"sumitomo-corporation-middle-east-fze", name:"Sumitomo Corporation Middle East FZE", logo:null, country:"United Arab Emirates",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list (UAE-listed). Real, confirmed genuine
+    // regional entity of Sumitomo Corporation, a real, massive Japanese integrated trading
+    // company. Real, specific business focus confirmed: import/export and industrial projects
+    // across energy infrastructure and chemicals, plus strategic regional partnerships.
+    desc:"Regional entity of Sumitomo Corporation — trading and investment in energy infrastructure and chemicals, managing import/export activities and industrial projects, with strategic partnerships to expand regional footprint.",
+    site:"https://www.sumitomocorp.com",
+    cats:["industrial-water-systems"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Level 2, The Offices 3, One Central, Dubai World Trade Centre, Dubai, United Arab Emirates", city:"Dubai", lat:null, lng:null, placeId:"ChIJfU7x3ZpDXz4R9MwPtmDXtoU" }] },
+{ id:702, slug:"weg-middle-east-fze", name:"WEG Middle East FZE", logo:null, country:"United Arab Emirates",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list (UAE-listed). Real, genuinely major
+    // Brazilian electric motors/generators manufacturer — a nice cross-connection to the Brazil
+    // batch added earlier this session. Real, significant recent M&A confirmed: WEG acquired the
+    // industrial electric motors and generators business of Regal Rexnord Corporation in 2024
+    // (Marathon, Cemp and Rotor brands), ~2,800 employees across 10 factories in 7 countries,
+    // ~$542M in acquired net operating revenue (2022). Real subsidiaries in 37 countries.
+    desc:"Regional office of WEG — real global manufacturer of electric motors, generators, transformers, drives and automation equipment.",
+    site:"",
+    cats:["heavy-engineering-and-fabrication"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Jafza One, Tower B, 1322, Jebel Ali Free Zone, Dubai, United Arab Emirates", city:"Dubai", lat:null, lng:null, placeId:"ChIJM3JQPIANXz4R4no_8XmzqSU" }] },
+{ id:703, slug:"clariant-gulf-fze", name:"Clariant (Gulf) FZE", logo:null, country:"United Arab Emirates",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list (UAE-listed). Real, confirmed genuine
+    // Clariant Oil Services regional entity — real, specific business focus: chemical
+    // technologies and services for the oil, pipeline and refinery industries, headquartered
+    // globally in Houston, Texas, with representation in all major oil and gas locations.
+    desc:"Regional entity of Clariant Oil Services — chemical technologies and services for the oil, pipeline and refinery industries.",
+    site:"",
+    cats:["catalysts-and-adsorbents"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Musaffah, MW5, Abu Dhabi, United Arab Emirates", city:"Abu Dhabi", lat:null, lng:null, placeId:"ChIJZVQAEm1AXj4RUMBB98QLP_w" }] },
+{ id:704, slug:"emsteel", name:"EMSTEEL", logo:null, country:"United Arab Emirates",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list (UAE-listed), where it appeared as
+    // "Emirates Steel Arkan" — CONFIRMED RENAMED: the current legal/brand name is "EMSTEEL,"
+    // formed via a 2021 merger of Emirates Steel Industries (est. 1998) and Arkan Building
+    // Materials (est. 2005). Real, publicly listed (ADX: EMSTEEL), majority-owned (87.5%) by ADQ
+    // via its industrial subsidiary Senaat. Real, genuinely massive — the UAE's largest steel and
+    // building materials manufacturer, real named use in the Burj Khalifa, Emirates Palace and
+    // Etihad Towers. Strongly reviewed (4.4 rating, 84 reviews). CAUTION: real, detailed
+    // complaints about truck driver waiting times (7-8 hours) at the gate — an operational
+    // friction point, not a business-legitimacy concern, worth being aware of.
+    desc:"UAE's largest steel and building materials manufacturer — real named products include Rebar, Wire Rod, Heavy Sections, Cement, Clinker, Concrete Blocks and Pipes, serving construction, engineering and energy sectors.",
+    site:"https://www.emsteel.com",
+    cats:["steel-manufacturers"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Industrial City of Abu Dhabi, ICAD 1, Abu Dhabi, United Arab Emirates", city:"Abu Dhabi", lat:null, lng:null, placeId:"ChIJfakKV39AXj4R14T-c_n3hHM" }] },
+{ id:705, slug:"ducab-dubai-cable-company", name:"Ducab (Dubai Cable Company)", logo:null, country:"United Arab Emirates",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list (UAE-listed). Real, founded 1979, jointly
+    // owned by Investment Corporation of Dubai and Senaat. Real, substantial JV structure — Ducab
+    // High Voltage (with DEWA and ADWEA), Ducab Aluminium Company (with Senaat), Ducab Metals. 6
+    // manufacturing facilities across 4 UAE sites, all production based within the country.
+    // Exceptionally strongly reviewed (4.6 rating, 158 reviews) — genuinely detailed positive
+    // feedback about factory tours, quality and hospitality.
+    desc:"Global leader in development, design, manufacture, marketing and distribution of copper and aluminium wire and cable products, including overhead conductors — real named served industries include oil, gas, marine and construction.",
+    site:"https://ducab.com",
+    cats:["cable-manufacturers"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Al Hesah Street, Hessyan First, Dubai, United Arab Emirates", city:"Dubai", lat:null, lng:null, placeId:"ChIJF9DGkTEPXz4R_4ljtKFfbXc" }] },
+{ id:706, slug:"wika-middle-east-fze", name:"WIKA Middle East FZE", logo:null, country:"United Arab Emirates",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list (UAE-listed). Real, established August
+    // 24, 1998, wholly-owned subsidiary of WIKA Alexander Wiegand SE & Co. KG (Germany, founded
+    // 1946, 11,200 employees, €1.3B revenue). Real ISO 9001:2015, ATEX/CSA certifications. CAUTION
+    // — SERIOUS, REPEATED PATTERN: 4 separate real reviews describe the company ignoring or
+    // mistreating smaller customers, with one specifically naming an individual (a Sales Manager)
+    // and alleging poor treatment even after 100% advance payment — a genuinely corroborated
+    // pattern, not an isolated complaint, worth taking seriously before relying on this contact
+    // channel, especially for smaller orders.
+    desc:"Regional office (serving GCC markets via Dubai, Abu Dhabi, Oman, Qatar, Saudi Arabia and Kuwait) of WIKA, a real global market leader in pressure, temperature, flow and level measurement and calibration technology.",
+    site:"https://www.wika.ae",
+    cats:["instrumentation-and-automation"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Warehouse RA08JB02, Jebel Ali Free Zone, Dubai, United Arab Emirates", city:"Dubai", lat:null, lng:null, placeId:"ChIJ18MKEPANXz4RP0c4wQhghZY" }] },
+{ id:707, slug:"pepperl-fuchs-me-fze", name:"Pepperl+Fuchs (ME) FZE", logo:null, country:"United Arab Emirates",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list (UAE-listed, as "Pepperl + Fuchs"). Real,
+    // confirmed genuine regional entity of Pepperl+Fuchs, a real global industrial automation and
+    // sensor technology company.
+    desc:"Regional office of Pepperl+Fuchs — industrial automation, sensor technology and explosion protection equipment.",
+    site:"",
+    cats:["instrumentation-and-automation"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Sheikh Zayed Road, Mina Jebel Ali, Jebel Ali Free Zone, Dubai, United Arab Emirates", city:"Dubai", lat:null, lng:null, placeId:"ChIJuVpP0_oNXz4RYtss416m860" }] },
+{ id:708, slug:"roxtec-middle-east-fze", name:"Roxtec Middle East FZE", logo:null, country:"United Arab Emirates",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list (UAE-listed). Real, confirmed genuine
+    // regional entity of Roxtec, a real global manufacturer of cable and pipe sealing solutions.
+    desc:"Regional office of Roxtec — cable and pipe sealing transits for fire, water and gas protection at penetrations through walls, decks and bulkheads.",
+    site:"",
+    cats:["hazardous-area-equipment"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Mena Jabal Ali, Jebel Ali Free Zone, Dubai, United Arab Emirates", city:"Dubai", lat:null, lng:null, placeId:"ChIJbchufu0NXz4R9ORoqR_ntr4" }] },
+{ id:709, slug:"amphenol-middle-east-enterprises-fze", name:"Amphenol Middle East Enterprises FZE", logo:null, country:"United Arab Emirates",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list (UAE-listed). Real, genuinely massive
+    // parent — Amphenol Corporation, publicly listed (NYSE: APH), $15.2B revenue (2024), ~125,000
+    // employees, S&P 500 component, founded 1932. Real, specific confirmation of a dedicated
+    // "EMEA Oil & Gas Business Development Manager" role at this regional entity — directly
+    // on-topic for TWI. Established 2008 to serve Middle East, India and Africa.
+    desc:"Manufacturer, supplier and service provider of connectors and interconnect systems — cylindrical, rectangular, standard miniature, fiber optic, EMI/EMP filter and special application connectors, cable assemblies, bus bars, junction boxes, circuit box assemblies, hermetic assemblies and glow plug assemblies.",
+    site:"https://amphenolmiddleeast.com",
+    cats:["cable-manufacturers"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Warehouse C1-16, Ajman Free Zone, Ajman, United Arab Emirates", city:"Ajman", lat:null, lng:null, placeId:"ChIJN48BNMtXXz4Rb6eWUz1vqOg" }] },
+{ id:710, slug:"helukabel-middle-east-dwc-llc", name:"HELUKABEL Middle East DWC LLC", logo:null, country:"United Arab Emirates",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list (UAE-listed, as "HELUKABEL GmbH"). Real,
+    // confirmed genuine regional entity. Real review directly confirms product line and quality:
+    // "Excellent company for Control Cables, Rubber Cables, Instrumentation Cables, and Power
+    // Cable solutions. The technical team is highly experienced." Strongly reviewed (4.5 rating,
+    // 8 reviews).
+    desc:"Regional supplier of control cables, rubber cables, instrumentation cables and power cable solutions.",
+    site:"",
+    cats:["cable-manufacturers"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Sheikh Mohammed Bin Zayed Road, Dubai South Logistics District, Dubai, United Arab Emirates", city:"Dubai", lat:null, lng:null, placeId:"ChIJGxsppC91Xz4RgX6g8L0IUZM" }] },
+{ id:711, slug:"weidmuller-middle-east-fze", name:"Weidmuller Middle East FZE", logo:null, country:"United Arab Emirates",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list (UAE-listed). Real, confirmed genuine
+    // regional entity of Weidmüller, a real global electrical connectivity and automation
+    // company.
+    desc:"Regional office of Weidmüller — electrical connectivity, industrial connectivity and automation products (terminal blocks, connectors, industrial networking).",
+    site:"",
+    cats:["electrical-contractors"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"11, 17th St, Umm Ramool, Dubai, United Arab Emirates", city:"Dubai", lat:null, lng:null, placeId:"ChIJuRNzg65YXz4ReR45BFhk0z8" }] },
+{ id:712, slug:"brady-middle-east-fze", name:"Brady Middle East FZE", logo:null, country:"United Arab Emirates",
+    // NOTE: sourced from the ADIPEC 2022 exhibitor list (UAE-listed, as "BRADY Corporation").
+    // Real, confirmed genuine regional entity of Brady Corporation, a real global identification
+    // and safety products company.
+    desc:"Regional office of Brady Corporation — identification solutions (labels, signage) and workplace safety products.",
+    site:"",
+    cats:["occupational-safety"],
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Deira City Centre, Level 1, Mina Jebel Ali, Jebel Ali Free Zone, Dubai, United Arab Emirates", city:"Dubai", lat:null, lng:null, placeId:"ChIJCSjJuZxDXz4RWGc2o5wbocc" }] }
 ];
 
 // Immutable copy of the in-page roster, taken BEFORE CompanyStore.load()
