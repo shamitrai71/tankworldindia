@@ -369,6 +369,43 @@ main{ flex:1; min-width:0; padding:20px 24px 60px; }
 }
 .rf-btn.active .rf-count{ background:rgba(255,255,255,.22); }
 
+/* Delivery-model chips. Deliberately a wrapping chip row rather than the
+   segmented .rf-buttons control: eight multi-value tags don't fit a
+   segmented bar, and a segmented look would wrongly imply the options are
+   mutually exclusive. Colours/typography match .rf-btn so the two filter
+   blocks still read as one family. */
+.df-chips{ display:flex; flex-wrap:wrap; gap:5px; }
+.df-chip{
+  display:flex; align-items:center; gap:5px; cursor:pointer;
+  padding:5px 8px; border:1px solid var(--line); border-radius:var(--radius);
+  background:var(--paper-raised); font-family:var(--font-body); font-size:11px;
+  color:var(--ink-muted); transition:background .15s, color .15s, border-color .15s;
+}
+.df-chip:hover{ background:var(--blue-soft); }
+.df-chip.active{ background:var(--blue); border-color:var(--blue); color:var(--paper-raised); font-weight:600; }
+.df-chip.active .rf-count{ background:rgba(255,255,255,.22); }
+
+/* Delivery-model badges on cards / profiles. Neutral slate rather than the
+   green used by .badge-msme or rust by .badge-admin — delivery model is a
+   descriptive attribute, not a status or a call to action, so it shouldn't
+   compete with those for attention. */
+.badge-delivery{
+  font-family:var(--font-mono); font-size:9px; font-weight:600; letter-spacing:0.3px;
+  background:var(--paper); color:var(--ink-muted); border:1px solid var(--line);
+  padding:2px 6px; border-radius:2px; white-space:nowrap;
+}
+.df-chip.sector.active{ background:var(--rust); border-color:var(--rust); }
+/* Sector badges: warm tint vs the neutral slate of .badge-delivery, so a
+   card carrying both axes reads as two distinct kinds of information
+   rather than one undifferentiated run of grey chips. */
+.badge-sector{
+  font-family:var(--font-mono); font-size:9px; font-weight:600; letter-spacing:0.3px;
+  background:var(--rust-soft); color:var(--rust); border:1px solid var(--rust-soft);
+  padding:2px 6px; border-radius:2px; white-space:nowrap;
+}
+.card-delivery-row{ display:flex; gap:4px; align-items:center; margin-top:6px; flex-wrap:wrap; }
+.cp-delivery-row{ display:flex; gap:6px; align-items:center; margin:10px 0; flex-wrap:wrap; }
+
 /* ── Corporate relationships ────────────────────────────────────────── */
 .cp-rel{ font-size:12.5px; color:var(--ink-muted); margin-top:5px; }
 .cp-rel a{ color:var(--blue); text-decoration:none; border-bottom:1px solid var(--line-blue); }
@@ -623,6 +660,8 @@ footer{
     </div>
     <input type="text" class="search-box" id="searchBox" placeholder="Search company or category…" oninput="renderAll()">
     <div class="region-filter" id="regionFilter"></div>
+    <div class="region-filter" id="deliveryFilter"></div>
+    <div class="region-filter" id="sectorFilter"></div>
     <div id="sheetList"></div>
     <button class="clear-filters" onclick="clearFilters()">Clear all filters</button>
   </aside>
@@ -676,6 +715,7 @@ function tankonomicsUrl(slug) {
 const CATEGORY_TREE = [
   { code:"EC", name:"Engineering & Construction", slug:"engineering-and-construction", items:[
     { code:"EC-01", name:"EPC Contractors", slug:"epc-contractors" },
+    { code:"EC-22", name:"EPCM Services", slug:"epcm-services" },
     { code:"EC-02", name:"Tank Construction", slug:"tank-construction" },
     { code:"EC-03", name:"Tank Engineering", slug:"tank-engineering" },
     { code:"EC-04", name:"Civil & Structural Engineering", slug:"civil-and-structural-engineering" },
@@ -693,11 +733,6 @@ const CATEGORY_TREE = [
     { code:"EC-16", name:"Heavy Engineering & Fabrication", slug:"heavy-engineering-and-fabrication" },
     { code:"EC-17", name:"Tank Maintenance", slug:"tank-maintenance" },
     { code:"EC-18", name:"Surface Preparation & Blasting", slug:"surface-preparation-and-blasting" },
-    { code:"EC-19", name:"Offshore Floating Systems (FPSO/FSRU/FLNG)", slug:"offshore-floating-systems", items:[
-      { code:"EC-19.1", name:"FPSO/FSO Design & Conversion", slug:"fpso-fso-design-and-conversion" },
-      { code:"EC-19.2", name:"FLNG Systems", slug:"flng-systems" },
-      { code:"EC-19.3", name:"FSRU & Regasification Systems", slug:"fsru-and-regasification-systems" },
-    ]},
     { code:"EC-20", name:"LNG Terminal Engineering (Liquefaction & Export)", slug:"lng-terminal-engineering" },
     { code:"EC-21", name:"Process Technology Licensors", slug:"process-technology-licensors", items:[
       { code:"EC-21.1", name:"Refining Process Technologies", slug:"refining-process-technologies" },
@@ -758,7 +793,17 @@ const CATEGORY_TREE = [
     { code:"FT-04", name:"Loading Pumps", slug:"loading-pumps" },
     { code:"FT-05", name:"Transfer Pumps", slug:"transfer-pumps" },
     { code:"FT-06", name:"Metering Pumps", slug:"metering-pumps" },
-    { code:"FT-07", name:"Valves", slug:"valves" },
+    { code:"FT-07", name:"Valves", slug:"valves", items:[
+      { code:"FT-07.1", name:"Ball Valves", slug:"ball-valves" },
+      { code:"FT-07.2", name:"Gate, Globe & Check Valves", slug:"gate-globe-and-check-valves" },
+      { code:"FT-07.3", name:"Butterfly Valves", slug:"butterfly-valves" },
+      { code:"FT-07.4", name:"Control Valves", slug:"control-valves" },
+      { code:"FT-07.5", name:"Safety & Pressure Relief Valves", slug:"safety-and-pressure-relief-valves" },
+      { code:"FT-07.6", name:"Severe Service Valves", slug:"severe-service-valves" },
+      { code:"FT-07.7", name:"Cryogenic Valves", slug:"cryogenic-valves" },
+      { code:"FT-07.8", name:"Double Block & Bleed Valves", slug:"double-block-and-bleed-valves" },
+      { code:"FT-07.9", name:"Instrumentation & Manifold Valves", slug:"instrumentation-and-manifold-valves" },
+    ]},
     { code:"FT-08", name:"Actuators", slug:"actuators" },
     { code:"FT-09", name:"Flow Meters", slug:"flow-meters" },
     { code:"FT-10", name:"Custody Transfer Metering", slug:"custody-transfer-metering" },
@@ -772,9 +817,19 @@ const CATEGORY_TREE = [
     { code:"FT-18", name:"Rail Loading Systems", slug:"rail-loading-systems" },
     { code:"FT-19", name:"Offshore Loading Systems (SPM/CALM)", slug:"offshore-loading-systems-spm-calm" },
     { code:"FT-20", name:"Cryogenic Loading Systems (LNG)", slug:"cryogenic-loading-systems-lng" },
-    { code:"FT-21", name:"Heat Exchangers", slug:"heat-exchangers" },
+    { code:"FT-21", name:"Heat Exchangers", slug:"heat-exchangers", items:[
+      { code:"FT-21.1", name:"Shell & Tube Heat Exchangers", slug:"shell-and-tube-heat-exchangers" },
+      { code:"FT-21.2", name:"Air-Cooled Heat Exchangers", slug:"air-cooled-heat-exchangers" },
+      { code:"FT-21.3", name:"Plate Heat Exchangers", slug:"plate-heat-exchangers" },
+      { code:"FT-21.4", name:"Waste Heat Recovery Units", slug:"waste-heat-recovery-units" },
+    ]},
     { code:"FT-22", name:"Filtration & Separation Technology", slug:"filtration-and-separation-technology" },
     { code:"FT-23", name:"Membrane Technologies", slug:"membrane-technologies" },
+    { code:"FT-24", name:"Rotating Equipment & Gearboxes", slug:"rotating-equipment-and-gearboxes" },
+    { code:"FT-25", name:"Steam Traps", slug:"steam-traps" },
+    { code:"FT-26", name:"Strainers & Line Protection", slug:"strainers-and-line-protection" },
+    { code:"FT-27", name:"Spectacle Blinds & Line Blinds", slug:"spectacle-blinds-and-line-blinds" },
+    { code:"FT-28", name:"Expansion Joints & Bellows", slug:"expansion-joints-and-bellows" },
   ]},
   { code:"IA", name:"Instrumentation & Automation", slug:"instrumentation-and-automation", items:[
     { code:"IA-01", name:"Terminal Automation", slug:"terminal-automation" },
@@ -817,6 +872,19 @@ const CATEGORY_TREE = [
       { code:"AX-18.1", name:"Hydrocarbon Recovery", slug:"hydrocarbon-recovery" },
     ]},
     { code:"AX-19", name:"Catalyst Handling", slug:"catalyst-handling" },
+    { code:"AX-20", name:"Turnaround & Shutdown Services", slug:"turnaround-and-shutdown-services" },
+    { code:"AX-21", name:"Chemical Cleaning & Hydrojetting", slug:"chemical-cleaning-and-hydrojetting" },
+    { code:"AX-22", name:"On-Site Machining", slug:"on-site-machining" },
+    { code:"AX-23", name:"Valve Overhaul & Testing", slug:"valve-overhaul-and-testing" },
+    { code:"AX-24", name:"Risk-Based Inspection (RBI)", slug:"risk-based-inspection" },
+    { code:"AX-25", name:"Fitness-for-Service & Remaining Life", slug:"fitness-for-service-and-remaining-life" },
+    { code:"AX-26", name:"Positive Material Identification (PMI)", slug:"positive-material-identification" },
+    { code:"AX-27", name:"Failure Analysis & Metallurgical Testing", slug:"failure-analysis-and-metallurgical-testing" },
+    // Online (live-plant) leak repair — genuinely distinct from Leak
+    // Detection (AX-17, which finds leaks) and from Gaskets, where PETROSEAL
+    // was parked for want of anywhere better.
+    { code:"AX-28", name:"Online Leak Sealing", slug:"online-leak-sealing" },
+    { code:"AX-29", name:"Pipeline Pigging & Intervention", slug:"pipeline-pigging-and-intervention" },
   ]},
   { code:"FS", name:"Fire, Safety & Environment", slug:"fire-safety-and-environment", items:[
     { code:"FS-01", name:"Fire Protection", slug:"fire-protection", items:[
@@ -861,6 +929,8 @@ const CATEGORY_TREE = [
     { code:"MR-01", name:"Industrial Safety Equipment", slug:"industrial-safety-equipment" },
     { code:"MR-02", name:"Gaskets", slug:"gaskets" },
     { code:"MR-03", name:"Welding Equipment & Consumables", slug:"welding-equipment-and-consumables" },
+    { code:"MR-04", name:"Fasteners & Bolting", slug:"fasteners-and-bolting" },
+    { code:"MR-05", name:"Pipe Supports & Hangers", slug:"pipe-supports-and-hangers" },
   ]},
   { code:"LT", name:"Logistics & Transportation", slug:"logistics-and-transportation", items:[
     { code:"LT-01", name:"Marine & Port Equipment", slug:"marine-and-port-equipment" },
@@ -908,6 +978,7 @@ const CATEGORY_TREE = [
     { code:"MM-17", name:"Insulation Materials", slug:"insulation-materials" },
     { code:"MM-18", name:"Secondary Metals & Recycling", slug:"secondary-metals-and-recycling" },
     { code:"MM-19", name:"Catalysts & Adsorbents", slug:"catalysts-and-adsorbents" },
+    { code:"MM-20", name:"Electrical Equipment & Transformers", slug:"electrical-equipment-and-transformers" },
   ]},
   { code:"UE", name:"Utilities & Energy", slug:"utilities-and-energy", items:[
     { code:"UE-01", name:"Industrial Water Systems", slug:"industrial-water-systems" },
@@ -968,6 +1039,105 @@ const CATEGORY_TREE = [
     // third-party verification services.
     { code:"TW-06", name:"Contractor Compliance", slug:"contractor-compliance" },
   ]},
+  // ── Offshore & Subsea ────────────────────────────────────────────────
+  // OS-01 is the former EC-19: migrated here so offshore capability lives in
+  // one section rather than being split between Engineering & Construction
+  // and a scatter of other sheets. Slugs are UNCHANGED, so every company
+  // already tagged offshore-floating-systems / fpso-fso-design-and-conversion
+  // / flng-systems / fsru-and-regasification-systems keeps its tag and its
+  // profile links — this re-parents the display hierarchy only.
+  { code:"OS", name:"Offshore & Subsea Systems", slug:"offshore-and-subsea-systems", items:[
+    { code:"OS-01", name:"Floating Production Systems (FPSO/FSRU/FLNG)", slug:"offshore-floating-systems", items:[
+      { code:"OS-01.1", name:"FPSO/FSO Design & Conversion", slug:"fpso-fso-design-and-conversion" },
+      { code:"OS-01.2", name:"FLNG Systems", slug:"flng-systems" },
+      { code:"OS-01.3", name:"FSRU & Regasification Systems", slug:"fsru-and-regasification-systems" },
+    ]},
+    { code:"OS-02", name:"Subsea Production Systems", slug:"subsea-production-systems", items:[
+      { code:"OS-02.1", name:"Subsea Trees & Wellheads", slug:"subsea-trees-and-wellheads" },
+      { code:"OS-02.2", name:"Subsea Manifolds & PLET/PLEM", slug:"subsea-manifolds-and-plet-plem" },
+      { code:"OS-02.3", name:"Subsea Control Systems", slug:"subsea-control-systems" },
+    ]},
+    { code:"OS-03", name:"SURF (Umbilicals, Risers & Flowlines)", slug:"surf-umbilicals-risers-flowlines", items:[
+      { code:"OS-03.1", name:"Umbilicals & Flying Leads", slug:"umbilicals-and-flying-leads" },
+      { code:"OS-03.2", name:"Flexible & Rigid Risers", slug:"flexible-and-rigid-risers" },
+      { code:"OS-03.3", name:"Subsea Flowlines", slug:"subsea-flowlines" },
+    ]},
+    { code:"OS-04", name:"Mooring Systems", slug:"mooring-systems", items:[
+      { code:"OS-04.1", name:"Turret Mooring Systems", slug:"turret-mooring-systems" },
+      { code:"OS-04.2", name:"Mooring Chains & Connectors", slug:"mooring-chains-and-connectors" },
+      { code:"OS-04.3", name:"Anchors & Mooring Hardware", slug:"anchors-and-mooring-hardware" },
+    ]},
+    { code:"OS-05", name:"Offshore Structures & Fabrication", slug:"offshore-structures-and-fabrication", items:[
+      { code:"OS-05.1", name:"Jackets & Substructures", slug:"jackets-and-substructures" },
+      { code:"OS-05.2", name:"Topsides & Modules", slug:"topsides-and-modules" },
+    ]},
+    { code:"OS-06", name:"Offshore Installation & EPCIC", slug:"offshore-installation-and-epcic" },
+    { code:"OS-07", name:"Subsea Services & Intervention", slug:"subsea-services-and-intervention", items:[
+      { code:"OS-07.1", name:"ROV Services", slug:"rov-services" },
+      { code:"OS-07.2", name:"Commercial Diving", slug:"commercial-diving" },
+    ]},
+    { code:"OS-08", name:"Offshore Support Vessels", slug:"offshore-support-vessels" },
+    { code:"OS-09", name:"Naval Architecture & Marine Engineering", slug:"naval-architecture-and-marine-engineering" },
+    { code:"OS-10", name:"Shipbuilding", slug:"shipbuilding" },
+    { code:"OS-11", name:"Ship Repair & Conversion", slug:"ship-repair-and-conversion" },
+  ]},
+  // ── Process Plant Equipment ──────────────────────────────────────────
+  // EC-21 covers process TECHNOLOGY LICENSORS (who owns the process); this
+  // section covers the HARDWARE that realises it. Previously there was
+  // nowhere for a reactor, column, fired heater or SRU vendor to sit, which
+  // is why so much of it silently accumulated in Heavy Engineering & Fab.
+  { code:"PE", name:"Process Plant Equipment", slug:"process-plant-equipment", items:[
+    { code:"PE-01", name:"Pressure Vessels & Reactors", slug:"pressure-vessels-and-reactors" },
+    { code:"PE-02", name:"Distillation Columns & Tower Internals", slug:"distillation-columns-and-tower-internals", items:[
+      { code:"PE-02.1", name:"Trays & Packing", slug:"trays-and-packing" },
+      { code:"PE-02.2", name:"Reactor Internals & FCC Cyclones", slug:"reactor-internals-and-fcc-cyclones" },
+    ]},
+    { code:"PE-03", name:"Fired Heaters & Process Furnaces", slug:"fired-heaters-and-process-furnaces", items:[
+      { code:"PE-03.1", name:"Burners & Low-NOx Combustion", slug:"burners-and-low-nox-combustion" },
+    ]},
+    { code:"PE-04", name:"Flare Systems", slug:"flare-systems", items:[
+      { code:"PE-04.1", name:"Flare Tips & Stacks", slug:"flare-tips-and-stacks" },
+      { code:"PE-04.2", name:"Flare Gas Recovery", slug:"flare-gas-recovery" },
+    ]},
+    { code:"PE-05", name:"Sulphur Recovery Units (SRU/TGT)", slug:"sulphur-recovery-units", items:[
+      { code:"PE-05.1", name:"Sulphur Degassing & Handling", slug:"sulphur-degassing-and-handling" },
+    ]},
+    { code:"PE-06", name:"Amine & Gas Treating Systems", slug:"amine-and-gas-treating-systems", items:[
+      { code:"PE-06.1", name:"Sour Water Stripping", slug:"sour-water-stripping" },
+    ]},
+    { code:"PE-07", name:"Hydrogen Generation", slug:"hydrogen-generation", items:[
+      { code:"PE-07.1", name:"SMR & Reformer Equipment", slug:"smr-and-reformer-equipment" },
+      { code:"PE-07.2", name:"PSA & Gas Purification", slug:"psa-and-gas-purification" },
+    ]},
+    { code:"PE-08", name:"Desalters & Electrostatic Separation", slug:"desalters-and-electrostatic-separation" },
+    { code:"PE-09", name:"Separators, Scrubbers & Coalescers", slug:"separators-scrubbers-and-coalescers" },
+    { code:"PE-10", name:"Coke Drums & Delayed Coking Equipment", slug:"coke-drums-and-delayed-coking-equipment" },
+    { code:"PE-11", name:"Incinerators & Thermal Oxidizers", slug:"incinerators-and-thermal-oxidizers" },
+    { code:"PE-12", name:"Package Units & Process Skids", slug:"package-units-and-process-skids" },
+  ]},
+  // ── Upstream & Drilling ──────────────────────────────────────────────
+  // Added on an explicit scope decision to extend T3 beyond downstream/
+  // midstream into the full oil & gas chain. Companies previously excluded
+  // as "upstream, out of scope" during research are now in scope and should
+  // be revisited — see the session notes for the ~17 already researched.
+  { code:"UP", name:"Upstream & Drilling", slug:"upstream-and-drilling", items:[
+    { code:"UP-01", name:"Drilling Contractors", slug:"drilling-contractors", items:[
+      { code:"UP-01.1", name:"Onshore Drilling", slug:"onshore-drilling" },
+      { code:"UP-01.2", name:"Offshore Drilling", slug:"offshore-drilling" },
+    ]},
+    { code:"UP-02", name:"Directional Drilling & MWD/LWD", slug:"directional-drilling-and-mwd-lwd" },
+    { code:"UP-03", name:"Drilling Fluids & Mud Systems", slug:"drilling-fluids-and-mud-systems" },
+    { code:"UP-04", name:"Mud Logging & Wellsite Geology", slug:"mud-logging-and-wellsite-geology" },
+    { code:"UP-05", name:"Well Completion & Intervention", slug:"well-completion-and-intervention" },
+    { code:"UP-06", name:"Cementing & Stimulation", slug:"cementing-and-stimulation" },
+    { code:"UP-07", name:"Wellheads & Surface Trees", slug:"wellheads-and-surface-trees" },
+    { code:"UP-08", name:"Drill Bits & Downhole Tools", slug:"drill-bits-and-downhole-tools" },
+    { code:"UP-09", name:"Seismic & Geophysical Services", slug:"seismic-and-geophysical-services" },
+    { code:"UP-10", name:"Core Analysis & Reservoir Services", slug:"core-analysis-and-reservoir-services" },
+    { code:"UP-11", name:"Workover & Well Servicing", slug:"workover-and-well-servicing" },
+    { code:"UP-12", name:"Coiled Tubing & Pressure Pumping", slug:"coiled-tubing-and-pressure-pumping" },
+    { code:"UP-13", name:"Production Chemicals (Upstream)", slug:"production-chemicals-upstream" },
+  ]},
   { code:"RT", name:"Rental", slug:"rental", items:[
     // Equipment rental (scaffolding, generators, cranes, pumps, temporary
     // storage) is a genuinely distinct business model from equipment
@@ -990,20 +1160,22 @@ const CATEGORY_TREE = [
 </script>
 <script>
 const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toubro Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Flarsen-and-toubro-limited.webp?alt=media&token=3572ebd3-829e-4091-923e-3907c740312a", country:"India",
-    cats:["epc-contractors","tank-construction","heavy-engineering-and-fabrication","valves","actuators","hydrogen-infrastructure"], desc:"Major Indian engineering and construction conglomerate — EPC for oil & gas and tankage through its Hydrocarbon Engineering business, industrial valves/actuators through its Valves business, and green hydrogen electrolyser manufacturing plus pipeline/ammonia EPC under its Lakshya 2026 strategy.", site:"https://www.larsentoubro.com",
+    delivery:["lstk-epc", "fabrication"],
+    cats:["epc-contractors","tank-construction","valves","actuators","hydrogen-infrastructure"], desc:"Major Indian engineering and construction conglomerate — EPC for oil & gas and tankage through its Hydrocarbon Engineering business, industrial valves/actuators through its Valves business, and green hydrogen electrolyser manufacturing plus pipeline/ammonia EPC under its Lakshya 2026 strategy.", site:"https://www.larsentoubro.com",
     locations:[
       { type:"registered-office", name:"Registered Office", address:"5th Floor, Tower B L&T Innovation Campus, Saki Vihar Rd, Krishna Nagar, Powai, Mumbai, Maharashtra 400072, India", city:"Mumbai, Maharashtra", lat:19.07, lng:72.88, placeId:"ChIJ7x7A4API5zsRU8F2HkzI6n0" },
       { type:"plant", name:"Hydrocarbon Engineering — Manufacturing Complex", address:"L&T Energy Hydrocarbon, Kattupalli, Tamil Nadu 600120, India", city:"Chennai, Tamil Nadu", lat:13.08, lng:80.27, placeId:"ChIJqbYCtu52UjoRBeiAsXZgElU" },
       { type:"plant", name:"L&T Valves — Manufacturing Plant", address:"L&T Valves, L&T Campus, L&T Bypass Road, Srinivasa Nagar, Malumichampatti, Tamil Nadu 641021, India", city:"Coimbatore, Tamil Nadu", lat:11.02, lng:76.97, placeId:"ChIJu1AAP2RaqDsRTnkpYF754Xs" }
     ] },
   { id:2, slug:"toyo-engineering-india-limited", name:"Toyo Engineering India Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Ftoyo-engineering-india-limited.gif?alt=media&token=0b8f4392-332a-4ed4-89b6-cf5f1c6a13c4", country:"India",
+    delivery:["lstk-epc", "feed-engineering"],
     cats:["epc-contractors","piping-contractors","process-technology-licensors","fertilizer-process-technologies"], desc:"Indian arm of Japan's Toyo Engineering Corporation, delivering EPC projects across refining and petrochemicals. Parent company is a proprietary licensor of ACES21 urea synthesis technology, used in fertilizer projects worldwide.", site:"https://www.toyo-eng.com",
     parent:{ name:"Toyo Engineering Corporation", slug:"", relationship:"subsidiary" },
     locations:[
       { type:"registered-office", name:"Registered Office", address:"71, Kanjur Village Rd, Datar Colony, Kanjurmarg East, Mumbai, Maharashtra 400042, India", city:"Mumbai, Maharashtra", lat:19.08, lng:72.88, placeId:"ChIJTb3NTonH5zsRBMI64Niy_uE" }
     ] },
   { id:3, slug:"bharat-heavy-electricals-limited", name:"Bharat Heavy Electricals Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fbharat-heavy-electricals-limited.webp?alt=media&token=bae21b89-5879-41ca-b747-6196df1e9154", country:"India",
-    cats:["heavy-engineering-and-fabrication","mechanical-contractors"], desc:"Major Indian PSU engineering and manufacturing company, with heavy fabrication capability for industrial equipment.", site:"https://www.bhel.com",
+    cats:["industrial-burners-and-boilers","mechanical-contractors","electrical-equipment-and-transformers"], desc:"Major Indian PSU engineering and manufacturing company, with heavy fabrication capability for industrial equipment.", site:"https://www.bhel.com",
     locations:[
       { type:"registered-office", name:"Registered Office", address:"Siri Institutional Area, Siri Fort, New Delhi, Delhi 110049, India", city:"New Delhi", lat:28.61, lng:77.21, placeId:"ChIJ3xdMmhTiDDkRtbkIdIfYNWI" },
       { type:"plant", name:"Tiruchirappalli Manufacturing Plant", address:"QQ6P+VPJ, Main Office Rd, Bhel Tiruchy, BHEL Tiruchirappali Complex area, Thiruverumbur, Navalpatu, Tamil Nadu 620014, India", city:"Tiruchirappalli, Tamil Nadu", lat:10.79, lng:78.7, placeId:"ChIJsWEnLdqMqjsRUY0AtvB7gyU" },
@@ -1042,7 +1214,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
       { type:"registered-office", name:"India Office", address:"Kägenstrasse 2, 4153 Reinach, Switzerland", city:"Mumbai, Maharashtra", lat:19.11, lng:72.87, placeId:"ChIJz12j1tzHkUcRTQlci_tVX9s" }
     ] },
   { id:10, slug:"godrej-and-boyce-mfg-co-ltd", name:"Godrej & Boyce Mfg. Co. Ltd.", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fgodrej-and-boyce-mfg-co-ltd.jpg?alt=media&token=73558f26-e59c-4887-83d8-9b935c31d39a", country:"India",
-    cats:["heavy-engineering-and-fabrication","tank-construction"], desc:"Godrej's heavy engineering division, fabricating process equipment and storage tanks for industrial clients.", site:"https://www.godrejprocessequipment.com",
+    cats:["tank-construction"], desc:"Godrej's heavy engineering division, fabricating process equipment and storage tanks for industrial clients.", site:"https://www.godrejprocessequipment.com",
     locations:[
       { type:"registered-office", name:"Registered Office", address:"Pirojshanagar, Vikhroli East, Mumbai, Maharashtra 400079, India", city:"Mumbai, Maharashtra", lat:19.13, lng:72.91, placeId:"ChIJNZure7jH5zsRrn1TJOG0sus" }
     ] },
@@ -1067,7 +1239,8 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
       { type:"registered-office", name:"Registered Office", address:"Elgi Industrial Complex, Trichy Rd, Vasanth Nagar, Singanallur, Coimbatore, Tamil Nadu 641005, India", city:"Coimbatore, Tamil Nadu", lat:11.0, lng:76.96, placeId:"ChIJSbArqWlXqDsRRxOZnyVYzoY" }
     ] },
   { id:15, slug:"ador-welding-limited", name:"Ador Welding Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fador-welding-limited.png?alt=media&token=ab63a271-bd76-4b24-9f86-fcd496aa0756", country:"India",
-    cats:["heavy-engineering-and-fabrication"], desc:"Established Indian welding and fabrication technology company, serving heavy industrial manufacturing.", site:"https://www.adorwelding.com",
+    delivery:["oem-manufacturer"],
+    cats:["welding-equipment-and-consumables"], desc:"Established Indian welding and fabrication technology company, serving heavy industrial manufacturing.", site:"https://www.adorwelding.com",
     locations:[
       { type:"registered-office", name:"Registered Office", address:"Ador House, 6, K Dubash Marg, Lion Gate, Fort, Mumbai, Maharashtra 400001, India", city:"Mumbai, Maharashtra", lat:19.12, lng:72.84, placeId:"ChIJdasc4kNmUjoRBegHMGsUbXQ" }
     ] },
@@ -1143,11 +1316,13 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
       { type:"registered-office", name:"India Office", address:"ERM India Private Limited, Building 10 3rd Floor, Tower B, DLF Cyber City, DLF Phase 2, Sector 24, Gurugram, Haryana 122002, India", city:"Gurugram, Haryana", lat:28.47, lng:77.05, placeId:"ChIJC_QrkzgZDTkRDMrZxkiYvak" }
     ] },
   { id:31, slug:"sharp-tanks-and-structurals-private-limited", name:"Sharp Tanks And Structurals Private Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fsharp-tanks-and-structurals-private-limited.webp?alt=media&token=36260f0a-bdca-491d-ac93-9ff4410aefbf", country:"India",
-    cats:["tank-construction","heavy-engineering-and-fabrication"], desc:"Mumbai EPC contractor with nearly four decades of experience constructing storage tanks — floating roof, cone roof, dome roof, Horton spheres, and cryogenic tanks — for the hydrocarbon, oil and gas, and petrochemical sectors.", site:"https://www.sharptanks.com",
+    delivery:["lstk-epc"],
+    cats:["tank-construction"], desc:"Mumbai EPC contractor with nearly four decades of experience constructing storage tanks — floating roof, cone roof, dome roof, Horton spheres, and cryogenic tanks — for the hydrocarbon, oil and gas, and petrochemical sectors.", site:"https://www.sharptanks.com",
     locations:[
       { type:"registered-office", name:"Registered Office", address:"Antariksh, 803, Makwana Rd, Gamdevi, Marol, Andheri East, Mumbai, Maharashtra 400059, India", city:"Andheri East, Mumbai, Maharashtra", lat:19.12, lng:72.87, placeId:"ChIJmTUQqBTI5zsRX6U3kWxK3B0" }
     ] },
   { id:32, slug:"bridge-and-roof-company-india-limited", name:"Bridge And Roof Company (India) Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fbridge-and-roof-company-india-limited.png?alt=media&token=d48358da-4905-4e4a-9527-cfa986c87c79", country:"India",
+    delivery:["lstk-epc"],
     cats:["epc-contractors","tank-construction","civil-and-structural-engineering"], desc:"Miniratna Category-I Public Sector Enterprise (Ministry of Heavy Industries) established 1920, providing EPC and turnkey construction across industrial infrastructure, including cryogenic LPG storage tanks built for BPCL at Uran.", site:"https://www.bridgeroof.co.in",
     locations:[
       { type:"registered-office", name:"Corporate Office", address:"2/1, Russel St, Park Street area, Kolkata, West Bengal 700071, India", city:"Kolkata, West Bengal", lat:22.56, lng:88.35, placeId:"ChIJxeMEKg53AjoRB6vc1uv4eNw" }
@@ -1158,19 +1333,22 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
       { type:"registered-office", name:"Registered Office", address:"Ranjit House, Plot No. D-28/15 MIDC, TTC Industrial Area, Turbhe, Navi Mumbai, Maharashtra 400703, India", city:"Mulund, Mumbai, Maharashtra", lat:19.17, lng:72.96, placeId:"ChIJwSdw4GXB5zsRJB14YwpYhLg" }
     ] },
   { id:34, slug:"prashanth-projects-limited", name:"Prashanth Projects Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fprashanth-projects-limited.gif?alt=media&token=7d06bbb3-4ad1-4621-8a49-c9c90fa5d3d3", country:"India",
+    delivery:["lstk-epc"],
     cats:["epc-contractors","tank-construction"], desc:"Indian international turnkey EPC contractor, established 1978, for the design and construction of petroleum oil and gas storage terminals, cryogenic tanks, Horton spheres, and mounded bullets.", site:"https://www.prashanthprojects.com",
     msme:{ category:null, udyamNumber:null },
     locations:[
       { type:"registered-office", name:"Registered Office", address:"Taloja, Panvel, Maharashtra 410208, India", city:"Navi Mumbai, Maharashtra", lat:19.03, lng:73.02, placeId:"ChIJuXEl2yDq5zsRo4DWs3vfcCQ" }
     ] },
   { id:35, slug:"vijay-tanks-and-vessels-private-limited", name:"Vijay Tanks And Vessels Private Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fvijay-tanks-and-vessels-private-limited.webp?alt=media&token=fda8cc8a-50a8-4616-96a9-6c0a7fce3486", country:"India",
-    cats:["tank-construction","heavy-engineering-and-fabrication"], desc:"Leading Indian EPC contractor for storage terminals since 1956 — designed and built roughly 70% of India's crude oil storage capacity, including one of the world's largest storage terminals at RIL Jamnagar, and India's first LNG storage tanks.", site:"https://www.vjtanks.com",
+    delivery:["lstk-epc", "fabrication"],
+    cats:["tank-construction"], desc:"Leading Indian EPC contractor for storage terminals since 1956 — designed and built roughly 70% of India's crude oil storage capacity, including one of the world's largest storage terminals at RIL Jamnagar, and India's first LNG storage tanks.", site:"https://www.vjtanks.com",
     msme:{ category:null, udyamNumber:null },
     locations:[
       { type:"registered-office", name:"Registered Office", address:"3rd Floor, Sears Towers, 304-308, Sevasi, Vadodara, Khanpur, Gujarat 391101, India", city:"Ranoli, Vadodara, Gujarat", lat:22.34, lng:73.19, placeId:"ChIJufyKGVjJXzkRV1slGOjPxwo" }
     ] },
   { id:36, slug:"artson-limited", name:"Artson Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fartson-limited.png?alt=media&token=b7106557-1f2e-48bd-895e-76806dac3a17", country:"India",
-    cats:["epc-contractors","tank-construction","heavy-engineering-and-fabrication"], desc:"Tata Enterprise (subsidiary of Tata Projects Limited since 2007), established 1978, providing EPC contracting, tank construction, and ASME-stamped pressure vessel and process equipment manufacturing for the oil, gas, and petrochemical sectors.", site:"https://artson.net",
+    delivery:["lstk-epc", "fabrication"],
+    cats:["epc-contractors","tank-construction"], desc:"Tata Enterprise (subsidiary of Tata Projects Limited since 2007), established 1978, providing EPC contracting, tank construction, and ASME-stamped pressure vessel and process equipment manufacturing for the oil, gas, and petrochemical sectors.", site:"https://artson.net",
     parent:{ name:"Tata Projects Limited", slug:"", relationship:"subsidiary" },
     locations:[
       { type:"registered-office", name:"Corporate Office", address:"Ground Floor, Mithona Towers 1-7, 80 to 87, PG Road, Ramgopalpet, Hyderabad, Telangana 500003, India", city:"Hyderabad, Telangana", lat:17.39, lng:78.49, placeId:"ChIJHTSi8w-ayzsR0o4NkeLRqNA" }
@@ -1294,6 +1472,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
   { id:63, slug:"verwater-group-bv", name:"Verwater Group B.V.", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fverwater-group-bv.webp?alt=media&token=04a72ee8-f27b-42b2-9933-5776829058c1", country:"Netherlands",
     desc:"Dutch tank & industrial services specialist — 'Verwater breathes Tank & Industrial Services.' Full spectrum of tank-related services: Tank Maintenance, Jacking, Civil works, Tank Construction, Engineering, Protective Coating, Piping & Mechanical, Valves Services, Turnarounds, Electrical & Instrumentation, Automation, Panelbuilding. Precisely on-topic for TWI's core scope.",
     site:"https://www.verwater.com",
+    delivery:["lstk-epc", "om-services"],
     cats:["epc-contractors", "tank-construction", "mechanical-contractors"],
     locations:[{ type:"registered-office", name:"Registered Office", address:"Droogdokweg 71, 3089 JN Rotterdam, Netherlands", city:"", lat:null, lng:null, placeId:"ChIJu9LSE_I1xEcRR4Gva_twHyo" }] },
   { id:64, slug:"voczero-ltd", name:"VOCZero Ltd", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fvoczero-ltd.webp?alt=media&token=689ecd99-4291-4c71-a392-640a90e0f621", country:"United Kingdom",
@@ -1357,7 +1536,8 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
   { id:76, slug:"kesari-engineering-and-construction", name:"Kesari Engineering & Construction", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fkesari-engineering-and-construction.png?alt=media&token=fbf19c56-420d-431d-a83c-30df4b37cbb7", country:"India",
     desc:"Indian storage tank construction and fabrication contractor.",
     site:"https://www.kesariengineering.com",
-    cats:["tank-construction", "heavy-engineering-and-fabrication"],
+    delivery:["fabrication", "site-erection"],
+    cats:["tank-construction"],
     locations:[{ type:"registered-office", name:"Registered Office", address:"D2/E/297, Industrial Estate 2, Galenda, Dahej, Gujarat 392130, India", city:"", lat:null, lng:null, placeId:"ChIJ75uLawx_XzkRO_cVatnkXt0" }] },
   { id:77, slug:"nuberg-engineering-limited", name:"Nuberg Engineering Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fnuberg-engineering-limited.png?alt=media&token=9c636c37-7020-4256-8939-7987c4601f53", country:"India",
     desc:"Indian EPC contractor for chemical, fertiliser and industrial process plants.",
@@ -1367,7 +1547,8 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
   { id:78, slug:"united-fabritech-and-erectors-private-limited", name:"United Fabritech & Erectors Private Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Funited-fabritech-and-erectors-private-limited.webp?alt=media&token=f65fa182-b07b-470e-981e-5206d1ac5826", country:"India",
     desc:"Indian storage tank fabrication and erection contractor.",
     site:"https://www.unitedfabritech.com",
-    cats:["tank-construction", "heavy-engineering-and-fabrication"],
+    delivery:["fabrication", "site-erection"],
+    cats:["tank-construction"],
     locations:[{ type:"registered-office", name:"Registered Office", address:"Nehru Rd, Dombivli East, Kalyan, Maharashtra 421201, India", city:"", lat:null, lng:null, placeId:"ChIJXXFhnlQzTqkREUN9WfmDHDY" }] },
   { id:79, slug:"consite-engineering-company-limited", name:"Consite Engineering Company Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fconsite-engineering-company-limited.png?alt=media&token=f9cb5720-cf3a-46c7-bd1c-1b2edc7054a4", country:"India",
     desc:"Indian storage tank construction contractor.",
@@ -1471,6 +1652,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // (per Global Energy Monitor). Worth a status check before treating this as an active vendor.
     desc:"Joint venture between Shapoorji Pallonji Oil and Gas Private Limited (51%) and Bumi Armada Netherlands B.V. (49%, a subsidiary of Bumi Armada Berhad, Malaysia), formed to develop floating storage and regasification unit (FSRU) infrastructure in India. CIN U45209MH2021PTC356852.",
     site:"http://www.bw-group.com",
+    sectors:["fpso-offshore"],
     cats:["offshore-floating-systems", "fsru-and-regasification-systems"],
     parent:{ name:"Bumi Armada Berhad", slug:"", relationship:"joint-venture-partner" },
     locations:[{ type:"registered-office", name:"Registered Office", address:"C/o SPOGL, Forbes Building, 2nd Floor, West Wing, Charanjit Rai Marg, Fort, Mumbai, Maharashtra 400001, India", city:"Mumbai", lat:null, lng:null, placeId:"ChIJMXrFHtzR5zsRHl918_N9N38" }] },
@@ -1492,7 +1674,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // NOTE: Part of the Indiana Group (holding company: Indiana Engineering Works (Bombay) Private Limited) — parent relationship not yet recorded.
     desc:"Manufacturer of steel gratings for industrial platforms and walkways; among the world's largest electroforged grating manufacturers.",
     site:"https://www.indianagratings.com",
-    cats:["industrial-gratings", "industrial-platforms", "heavy-engineering-and-fabrication"],
+    cats:["industrial-gratings", "industrial-platforms"],
     locations:[{ type:"registered-office", name:"Registered Office", address:"209, Makwana Rd, Marol, Andheri East, Mumbai, Maharashtra 400059, India", city:"", lat:null, lng:null, placeId:"ChIJcWyAlhTI5zsRr1hlojJnKT0" }] },
 { id:101, slug:"galfan-engineers-private-limited", name:"Galfan Engineers Private Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fgalfan-engineers-private-limited.png?alt=media&token=293b08e4-8143-4e7b-a1b2-be056516240c", country:"India",
     // NOTE: Registered entity name not independently confirmed beyond the source listing.
@@ -1504,7 +1686,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // NOTE: Some sources omit 'India' from the registered name — confirm exact registered form.
     desc:"Manufacturer of steel gratings and engineered industrial products.",
     site:"https://www.vinfabengineers.com",
-    cats:["industrial-gratings", "heavy-engineering-and-fabrication"],
+    cats:["industrial-gratings"],
     locations:[{ type:"registered-office", name:"Registered Office", address:"510, Swami Vivekanand Rd, Kandivali East, Mumbai, Maharashtra 400067, India", city:"", lat:null, lng:null, placeId:"ChIJf2cSDy625zsRSNNsk6CWKJw" }] },
 { id:103, slug:"patny-systems-private-limited", name:"Patny Systems Private Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fpatny-systems-private-limited.png?alt=media&token=59791eed-f635-459f-84f5-aa6203739ab1", country:"India",
     // NOTE: Confirm gratings remain within current scope of business.
@@ -1516,7 +1698,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // NOTE: Registered name and full scope not independently confirmed.
     desc:"Manufacturer of electro-forged gratings, handrails and cable trays with an in-house flat rolling mill.",
     site:"https://www.greatweld.com",
-    cats:["industrial-gratings", "heavy-engineering-and-fabrication"],
+    cats:["industrial-gratings"],
     locations:[{ type:"registered-office", name:"Registered Office", address:"Gat no 213,214/1, Markal Udyog Nagar, Tal:Khed, Markal, Maharashtra 412105, India", city:"", lat:null, lng:null, placeId:"ChIJv4_kUIrFwjsR-Nw-Y8C6P9s" }] },
 { id:105, slug:"omkar-gratings-private-limited", name:"Omkar Gratings Private Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fomkar-gratings-private-limited.png?alt=media&token=0cf83635-1061-4f35-88f5-168444733bdf", country:"India",
     // NOTE: A directory listing shows 'Omkar Grating Pvt. Ltd.' (singular) — confirm exact spelling before treating the slug as final.
@@ -1547,7 +1729,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // NOTE: Acquired Jan 2024 by Gainwell Group via Indocrest Defence Solutions Pvt Ltd (~43% stake); remains a separately listed entity, hence 'owned-by' rather than 'subsidiary'.
     desc:"Historic Indian crane manufacturer (formerly Coles Crane, UK); rough terrain, truck, industrial and pick-n-carry cranes, lattice boom crawler cranes, reach stackers.",
     site:"https://www.til.co.in",
-    cats:["cranes-and-lifting-equipment", "heavy-engineering-and-fabrication"],
+    cats:["cranes-and-lifting-equipment"],
     parent:{ name:"Gainwell Group", slug:"", relationship:"owned-by" },
     locations:[{ type:"registered-office", name:"Registered Office", address:"1, Taratala Rd, Garden Reach, Kolkata, West Bengal 700024, India", city:"", lat:null, lng:null, placeId:"ChIJXwp1MKN5AjoRQ1Jq208moJo" }] },
 { id:110, slug:"terex-india-private-limited", name:"Terex India Private Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fterex-india-private-limited.jpg?alt=media&token=4eabf1a8-ad1d-4abd-9349-6e7e63bb61dc", country:"India",
@@ -2137,6 +2319,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
 { id:205, slug:"ratnamani-metals-and-tubes-limited", name:"Ratnamani Metals & Tubes Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fratnamani-metals-and-tubes-limited.jpg?alt=media&token=fde00728-4b61-4a2e-8db0-607be98f0850", country:"India",
     desc:"Publicly listed (NSE: RATNAMANI, BSE: 520111) manufacturer of stainless steel, carbon steel and nickel alloy welded and seamless pipes and tubes, established 1983; serves oil & gas, refinery & petrochemical, LNG and desalination sectors.",
     site:"https://www.ratnamani.com",
+    delivery:["oem-manufacturer"],
     cats:["pipes-and-tubes"],
     locations:[{ type:"registered-office", name:"Registered Office", address:"17, Rajmugat Society, Naranpura Char Rasta, Ankur Road, Naranpura, Ahmedabad, Gujarat 380013, India", city:"Ahmedabad", lat:null, lng:null, placeId:"ChIJdW5d_oSEXjkRmrDkO-YwlqE" }] },
 { id:206, slug:"jindal-saw-limited", name:"Jindal SAW Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fjindal-saw-limited.jpg?alt=media&token=66ef3823-d5d5-4e8f-aa6e-f04fd562ece9", country:"India",
@@ -2529,6 +2712,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // floating roof tanks are tagged here to articulated-roof-drains specifically.
     desc:"Manufacturer and exporter of vapour control and safety systems for floating roof oil storage tanks, established 2017; submerged shunts, bypass conductors, primary and secondary rim seals, and articulated-type roof drain joint systems, exporting to Lebanon, Egypt, Bangladesh, Ecuador and Indonesia.",
     site:"https://www.agasticorporation.com",
+    delivery:["fabrication", "site-erection"],
     cats:["submerged-shunts", "rim-seals", "articulated-roof-drains"],
     msme:{ category:"Micro", udyamNumber:"UDYAM-MH-33-0036261" },
     locations:[{ type:"registered-office", name:"Registered Office", address:"R-2, 403, Panvelkar Regency, Khojgaon Netaji Bazar, Ambernath West, Thane, Maharashtra 421505, India", city:"Thane", lat:null, lng:null, placeId:"ChIJM59wiRWT5zsRV9DsS_DC0sA" }] },
@@ -2589,6 +2773,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // IRM Group, tracing roots to 1964 as Industrial Rubber Molders.
     desc:"Manufacturer of marine and offshore rubber engineering products; solid and pneumatic marine fenders for ports, harbours and jetties, plus platform protection systems, pile grippers, diaphragm closures and other offshore installation equipment, serving shipbuilding, maritime infrastructure and offshore oil drilling platforms.",
     site:"https://www.irmome.com",
+    sectors:["fpso-offshore"],
     cats:["marine-and-port-equipment"],
     locations:[{ type:"registered-office", name:"Registered Office", address:"C-9, Purneshwar Flat, Opp. Vasundhara Society, Gulbai Tekra, Ahmedabad, Gujarat 380015, India", city:"Ahmedabad", lat:null, lng:null, placeId:"ChIJpyWEflmFXjkRjevDCXTdb5Q" }] },
 { id:277, slug:"aegis-scaffolding-services-private-limited", name:"Aegis Scaffolding Services Private Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Faegis-scaffolding-services-private-limited.jpg?alt=media&token=c5fa0e00-69ae-4254-a470-bf3b8bc81454", country:"India",
@@ -2781,11 +2966,13 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // buoy mooring (SBM) systems, formerly IHC Caland N.V. prior to 2005.
     desc:"World's leading FPSO contractor (Euronext Amsterdam: SBMO), founded 1965 as Single Buoy Moorings Inc. — the pioneer and namesake of Single Point Mooring (SPM) technology; design, construction, installation, leasing, operation and life extension of Floating Production Storage and Offloading (FPSO) and FSO vessels, CALM buoys, Turret Mooring Systems and Tension Leg Platforms, with 40+ FPSOs delivered in deepwater and its standardized Fast4Ward® hull program.",
     site:"https://www.sbmoffshore.com",
+    sectors:["fpso-offshore"],
     cats:["fpso-fso-design-and-conversion", "offshore-loading-systems-spm-calm"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Evert van de Beekstraat 1-77, 1118 CL Schiphol, Netherlands", city:"Schiphol", lat:null, lng:null, placeId:"ChIJg95qINXgxUcR4b8cHsZoZks" }] },
 { id:303, slug:"modec-inc", name:"MODEC, Inc.", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fmodec-inc.png?alt=media&token=705c3707-b862-47fe-9322-892d25397219", country:"Japan",
     desc:"Publicly listed (TYO: 6269) global EPCI (Engineering, Procurement, Construction and Installation) contractor for floating production systems founded 1968; FPSO, FSO, FLNG, Tension Leg Platform (TLP) and Semi-Submersible units, a 50+ year specialist in the offshore floating oil & gas market with 4,000+ employees from 25+ countries.",
     site:"https://www.modec.com",
+    sectors:["fpso-offshore"],
     cats:["fpso-fso-design-and-conversion", "flng-systems"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Nihonbashi, Chuo-ku, Tokyo 103-0027, Japan", city:"Tokyo", lat:null, lng:null, placeId:"ChIJd-FBe_2LGGARLV26ZC4Ij74" }] },
 { id:304, slug:"bw-offshore-limited", name:"BW Offshore Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fbw-offshore-limited.png?alt=media&token=804f8b7d-6aca-44b1-a09c-011cd3a6f1c2", country:"Bermuda",
@@ -2793,11 +2980,13 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // Bermuda-incorporated with its main office in Hamilton.
     desc:"Global FPSO and FSO solutions provider spanning the full asset lifecycle from design and engineering through leasing and operation; part of the BW Group, with 10+ years of active FPSO operating experience across multiple continents.",
     site:"https://www.bwoffshore.com",
+    sectors:["fpso-offshore"],
     cats:["fpso-fso-design-and-conversion"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Washington Mall Phase 2, 4th Floor, Suite 400, 22 Church Street, Hamilton HM 1189, Bermuda", city:"Hamilton", lat:null, lng:null, placeId:" ChIJ-VBY0vO3IIYRtzW8XejgGiY" }] },
 { id:305, slug:"yinson-holdings-berhad", name:"Yinson Holdings Berhad", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fyinson-holdings-berhad.png?alt=media&token=2ddd5a08-1494-4559-a849-f9f3f92c0116", country:"Malaysia",
     desc:"Publicly listed (MYX: 7293) Malaysian energy infrastructure conglomerate founded 1984; FPSO ownership, operation, engineering and integrated services through its Yinson Production division, active in 15+ countries and territories including India, alongside offshore renewables through Yinson Renewables.",
     site:"https://www.yinson.com",
+    sectors:["fpso-offshore"],
     cats:["fpso-fso-design-and-conversion"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Kuala Lumpur, Malaysia", city:"Kuala Lumpur", lat:null, lng:null, placeId:"ChIJMVIfIYxJzDERIP4YaIi2oyU" }] },
 { id:306, slug:"golar-lng-limited", name:"Golar LNG Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fgolar-lng-limited.jpg?alt=media&token=2eea0707-bdec-4490-9a47-0e91df684c22", country:"Bermuda",
@@ -2807,6 +2996,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // offshore Mauritania and Senegal.
     desc:"Publicly listed (Nasdaq: GLNG) floating LNG infrastructure specialist, tracing roots to 1946; develops, owns and operates Floating LNG (FLNG) liquefaction vessels and Floating Storage and Regasification Units (FSRUs), delivering the world's first converted FLNG vessel (Hilli Episeyo) and building the broadest independent floating LNG asset base globally.",
     site:"https://www.golarlng.com",
+    sectors:["fpso-offshore"],
     cats:["flng-systems"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Hamilton, Bermuda", city:"Hamilton", lat:null, lng:null, placeId:"ChIJ4-b7thIULYoRvfqqxL6jv1s" }] },
 { id:307, slug:"surabhi-transport-private-limited", name:"Surabhi Transport Private Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fsurabhi-transport-private-limited.jpg?alt=media&token=70be045d-d342-42c0-9bc5-f5f0620bf7ea", country:"India",
@@ -3037,6 +3227,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // employees) remain self-reported, not independently audited.
     desc:"EPC (Engineering, Procurement, Construction) contractor specializing in bulk liquid/gas storage and terminals; atmospheric storage tanks (cone roof, dome roof, internal/external floating roof, open top, double wall), bulk liquid storage terminals, LPG bullets/Horton spheres, pipelines, and process plants (refineries, chemical, petrochemical). Flagship project: EPCC (Package I, II, III) of 154 atmospheric storage tanks (max. 92m dia. x 20m height, internal/external floating roof and cone roof types) totalling 3.5 million m³ capacity for the Dangote Refinery (650,000 BPD, the world's largest single-train refinery), Lekki Free Zone, Lagos, Nigeria, with Engineers India Limited (EIL) as Project Management Consultant. Other real named clients include Bharat Oman Refineries, Nuclear Power Corporation of India, and Quantum Terminals.",
     site:"https://www.chemietech.com",
+    delivery:["lstk-epc"],
     cats:["epc-contractors", "tank-construction"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"P.O. Box 29781, 502, Al Majaz Pearl Building, 44 Northern Park Street, Al Majaz Park, Sharjah, United Arab Emirates", city:"Sharjah", lat:null, lng:null, placeId:null }] },
 { id:336, slug:"nan-technical-trading-wll", name:"NAN Technical Trading W.L.L.", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fnan-technical-trading-wll.jpg?alt=media&token=fa2b18ac-1fca-4978-966f-578e27d9c5f0", country:"Bahrain",
@@ -3064,7 +3255,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // deliberately left null rather than guess between them.
     desc:"Publicly listed heavy engineering and construction conglomerate, established 1924, one of India's oldest construction companies; civil, structural and infrastructure construction for industrial, commercial and residential projects across India and abroad. Bridge & Roof's own Category I (highest tier) approved vendor for structure fabrication and erection.",
     site:"https://www.simplexinfra.com/",
-    cats:["heavy-engineering-and-fabrication"],
+    cats:["civil-and-structural-engineering"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Kolkata, West Bengal, India", city:"Kolkata", lat:null, lng:null, placeId:"ChIJ6SbkxQVb4jkRHJGDApyKwPs" }] },
 { id:338, slug:"kalpataru-projects-international-limited", name:"Kalpataru Projects International Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fkalpataru-projects-international-limited.jpg?alt=media&token=8840895c-6647-4f3d-916d-efe8badada9a", country:"India",
     // NOTE: sourced from Bridge & Roof's 2014 list, which listed "JMC Project (India) Ltd." —
@@ -3087,7 +3278,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // worth reconfirming which name is current before external use.
     desc:"Construction and civil engineering company (formerly Skanska Cementation, then ITD Cementation India Limited) with operations dating to 1931; heavy civil and EPC projects including marine structures, tunnels, power plants, dams, and — directly relevant to TWI — civil works for refinery, petrochemical, power, steel and fertilizer plants, plus design/construction/supply/installation/commissioning of pipelines. ₹18.3bn Q1 revenue (2023), growing. Real named clients include Port Trusts, NHAI, SAIL, ISRO.",
     site:"https://www.itdcem.co.in",
-    cats:["epc-contractors", "heavy-engineering-and-fabrication"],
+    cats:["epc-contractors","civil-and-structural-engineering"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Office-1, DP Block, Sector V, Bidhannagar, Kolkata, West Bengal 700091, India", city:"Kolkata", lat:null, lng:null, placeId:"ChIJkfv-q8t1AjoRRIdsSVlM6gA" }] },
 { id:341, slug:"gillanders-arbuthnot-and-co-ltd", name:"Gillanders Arbuthnot & Co Ltd", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fgillanders-arbuthnot-and-co-ltd.jpg?alt=media&token=febc4f1c-a5bc-4e6d-bf13-1cc9509b5ea9", country:"India",
     // NOTE: sourced from Bridge & Roof's 2014 list (Category I, Structure Fabrication & Erection).
@@ -3129,14 +3320,15 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // BHEL" (BHEL already independently verified elsewhere in this roster).
     desc:"Publicly listed (NSE: POWERMECH, BSE: 539302) engineering and construction company, 27 years operating; power and infrastructure EPC projects across India, real named major client BHEL. Bridge & Roof's own Category I (highest tier) approved vendor for boiler fabrication and erection.",
     site:"https://www.powermechprojects.com",
-    cats:["heavy-engineering-and-fabrication"],
+    delivery:["site-erection", "om-services"],
+    cats:["epc-contractors","mechanical-contractors"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Plot No 56/8,9,10,11, IT Building, Jubilee Enclave, Madhapur, Hyderabad, Telangana 500081, India", city:"Hyderabad", lat:null, lng:null, placeId:"ChIJedURQ8WTyzsRM9OMenj6Blw" }] },
 { id:346, slug:"vijay-m-mistry-construction-private-limited", name:"Vijay M. Mistry Construction Private Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fvijay-m-mistry-construction-private-limited.png?alt=media&token=4e03a40c-ab8f-41bd-b167-72f6e169b856", country:"India",
     // NOTE: sourced from Bridge & Roof's 2014 list (Category I, Structure Fabrication &
     // Erection). CIN-verified Active, healthy (33.96% networth growth).
     desc:"Infrastructure construction company, 60 years operating; bridges, flyovers, harbour works and ports across India. Bridge & Roof's own Category I (highest tier) approved vendor for structure fabrication and erection.",
     site:"https://www.vmmcl.com",
-    cats:["heavy-engineering-and-fabrication"],
+    cats:["civil-and-structural-engineering"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"'Mistry House', 9, Preyas Society, Gulbai Tekra, Ambawadi, Ahmedabad, Gujarat 380015, India", city:"Ahmedabad", lat:null, lng:null, placeId:"ChIJk4vixc-EXjkRyFqa9wzEZYE" }] },
 { id:347, slug:"jrp-infra-limited", name:"JRP Infra Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fjrp-infra-limited.jpg?alt=media&token=7e9c6225-6b34-4070-ba32-013690029f97", country:"India",
     // NOTE: sourced from Bridge & Roof's 2014 list (Category I in both Boiler Fabrication &
@@ -3149,7 +3341,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // misattribute a location.
     desc:"Power-plant erection services company with two decades of experience, per the company's own materials; Bridge & Roof's own Category I (highest tier) approved vendor for both boiler fabrication/erection and pipes fabrication/erection — the only company holding that top tier across two separate sections of Bridge & Roof's document.",
     site:"",
-    cats:["heavy-engineering-and-fabrication"],
+    cats:["mechanical-contractors"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"\"Kalyan Lakshmi\" II Floor, 6, First Main Road, Kasturba Nagar, Adyar, Chennai, Tamil Nadu 600020, India", city:"Chennai", lat:null, lng:null, placeId:null }] },
 { id:348, slug:"geo-miller-and-company-private-limited", name:"Geo Miller & Company Private Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fgeo-miller-and-company-private-limited.png?alt=media&token=771998eb-8b74-40b2-9fc5-078ce6d61134", country:"India",
     // NOTE: sourced from Bridge & Roof's 2014 list (Category I, Structure Fabrication &
@@ -3157,7 +3349,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // — an evident misclassification given the company's real construction/geotechnical business.
     desc:"Construction and geotechnical engineering company, established 1929 — 96 years operating; ₹100-500 Cr revenue, 85-95 employees. Bridge & Roof's own Category I (highest tier) approved vendor for structure fabrication and erection.",
     site:"https://www.geomiller.com",
-    cats:["heavy-engineering-and-fabrication"],
+    cats:["civil-and-structural-engineering","foundation-contractors"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"F-3/2, Pocket F, Okhla Industrial Estate, Phase I, New Delhi, Delhi 110020, India", city:"New Delhi", lat:null, lng:null, placeId:"ChIJ5QlVe1nhDDkRAg0ewiSusqk" }] },
 { id:349, slug:"bhagheeratha-engineering-ltd", name:"Bhagheeratha Engineering Ltd", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fbhagheeratha-engineering-ltd.jpg?alt=media&token=1c4cd269-cc73-4aa5-90d0-6c42563d2fd5", country:"India",
     // NOTE: sourced from Bridge & Roof's 2014 list, listed there as "Bhagheeratha Electricals &
@@ -3166,7 +3358,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // outward-facing use. CIN-verified Active.
     desc:"Civil engineering and construction company based in Kerala, established 1976 — 49 years operating. Bridge & Roof's own Category I (highest tier) approved vendor for structure fabrication and erection, listed there under a divisional name.",
     site:"https://www.bhagheeratha.co.in",
-    cats:["heavy-engineering-and-fabrication"],
+    cats:["civil-and-structural-engineering"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Bhagheeratha Residency, Banerji Road, RBI Junction, Kacheripady, Kochi, Kerala 682017, India", city:"Kochi", lat:null, lng:null, placeId:"ChIJ5yVLcUENCDsRZNCAFYgy9eQ" }] },
 { id:350, slug:"bsbk-private-limited", name:"BSBK Private Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fbsbk-private-limited.jpg?alt=media&token=79bbd001-ded8-409e-8755-c400fe4a568b", country:"India",
     // NOTE: sourced from Bridge & Roof's 2014 list (Category I, Structure Fabrication &
@@ -3177,7 +3369,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // condition" — a caution worth weighing alongside the otherwise-positive signals.
     desc:"Power plant, bridge, dam and water pipeline construction company, established 1978 — 47 years operating; ₹100-500 Cr revenue, 91 employees, real reviews describing thermal power plant mechanical construction work. Bridge & Roof's own Category I (highest tier) approved vendor for structure fabrication and erection.",
     site:"https://www.bsbkltd.com",
-    cats:["heavy-engineering-and-fabrication"],
+    cats:["civil-and-structural-engineering"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"4th Floor, Surya Treasure Island Mall, Junwani, Bhilai, Chhattisgarh 490020, India", city:"Bhilai", lat:null, lng:null, placeId:"ChIJo9XyvTw9KToRLhAtcjsI8j8" }] },
 { id:351, slug:"pcp-international-limited", name:"PCP International Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fpcp-international-limited.jpg?alt=media&token=fb28d124-a9f7-464c-89d3-017f3842bd4b", country:"India",
     // NOTE: sourced from Bridge & Roof's 2014 list (Category I, Structure Fabrication &
@@ -3185,7 +3377,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // Power Plant Mechanical Construction work."
     desc:"Civil construction, boiler piping, construction & commissioning, and turnkey projects company, established 1969 — 56 years operating. Bridge & Roof's own Category I (highest tier) approved vendor for structure fabrication and erection.",
     site:"https://www.pcpil.in",
-    cats:["heavy-engineering-and-fabrication"],
+    cats:["civil-and-structural-engineering","piping-contractors"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"SCO 66-67, Sector 34A, Chandigarh 160022, India", city:"Chandigarh", lat:null, lng:null, placeId:"ChIJ____z7XtDzkR7STYVqRwkJU" }] },
 { id:352, slug:"vasavi-power-services-private-limited", name:"Vasavi Power Services Private Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fvasavi-power-services-private-limited.jpg?alt=media&token=5e1a8ade-7257-4660-8533-a6411ef7689c", country:"India",
     // NOTE: sourced from Bridge & Roof's 2014 list (Category I, Boiler Fabrication & Erection).
@@ -3193,7 +3385,8 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // the registered office (Vijayawada per MCA records).
     desc:"Mechanical, electrical and instrumentation (MEI) erection, testing and commissioning company for tanks, piping and refineries, founded 1978 (proprietorship) and incorporated 2002; 800 employees, real projects across India, the Middle East and Africa including ADGAS Das Islands, Abu Dhabi. Bridge & Roof's own Category I (highest tier) approved vendor for boiler fabrication and erection.",
     site:"https://www.vasavipower.com",
-    cats:["heavy-engineering-and-fabrication"],
+    delivery:["site-erection", "om-services"],
+    cats:["mechanical-contractors","electrical-and-instrumentation"],
     locations:[{ type:"branch-office", name:"Sub-Office", address:"Plot No 21A, Indane Gas Plant Road, Kondapalli IDA, Kondapalli, Andhra Pradesh 521228, India", city:"Vijayawada", lat:null, lng:null, placeId:"ChIJGd6lERHpNToRpLvxjVFlxaA" }] },
 { id:353, slug:"harji-engineering-works-private-limited", name:"Harji Engineering Works Private Limited", logo:null, country:"India",
     // NOTE: sourced from Bridge & Roof's 2014 list (Category I, Structure Fabrication &
@@ -3203,7 +3396,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // of genuine fabrication work "for OEM." Genuine caution flag, not a clean pass.
     desc:"Registered construction/fabrication company since 1982 — 43 years operating; reviews describe fabrication work for OEM clients. Bridge & Roof's own Category I (highest tier) approved vendor for structure fabrication and erection. Business scope not independently confirmed beyond MCA registration — verify directly before relying on this listing.",
     site:"https://www.harji.in",
-    cats:["heavy-engineering-and-fabrication"],
+    cats:["mechanical-contractors"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"7, Aravali Shopping and Office Complex, Alaknanda, New Delhi, Delhi 110019, India", city:"New Delhi", lat:null, lng:null, placeId:"ChIJq6qqanvhDDkRXFZziT861vA" }] },
 { id:354, slug:"bhavani-erectors-private-limited", name:"Bhavani Erectors Private Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fbhavani-erectors-private-limited.jpg?alt=media&token=3e0d7dfc-af38-4d77-a0ce-3cb21e92b9c0", country:"India",
     // NOTE: sourced from Bridge & Roof's 2014 list (Category I, Boiler Fabrication & Erection).
@@ -3211,7 +3404,8 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // strongly independently corroborated entries in this batch.
     desc:"Boiler and turbo-generator fabrication, erection, testing and commissioning company for thermal power plants up to 600MW, founded as a contractor 1985, incorporated 2001; 15+ locations across India plus 1 overseas project. Real CRISIL credit rating (BBB-/Stable/A3). Bridge & Roof's own Category I (highest tier) approved vendor for boiler fabrication and erection.",
     site:"https://www.bhavanierectors.com",
-    cats:["heavy-engineering-and-fabrication"],
+    delivery:["site-erection"],
+    cats:["mechanical-contractors","industrial-burners-and-boilers"],
     locations:[{ type:"headquarters", name:"Head Office", address:"Bhavani Trade Centre, High School Junction, Karunagappally, Kollam, Kerala 690518, India", city:"Karunagappally", lat:null, lng:null, placeId:"ChIJbw5mopoDBjsR6G3l2HcVGRg" },
       { type:"registered-office", name:"Registered Office", address:"P.B. No. 002, Plot No. 103 & 104, Sri Sugureshwar Nagar, Shaktinagar, Raichur, Karnataka 584170, India", city:"Raichur", lat:null, lng:null, placeId:null }] },
 { id:355, slug:"sangha-erectors-private-limited", name:"Sangha Erectors Private Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fsangha-erectors-private-limited.jpg?alt=media&token=8ade77e5-18bb-4593-bdb4-efa49ad374d7", country:"India",
@@ -3223,7 +3417,8 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // — verify current operating status directly before relying on this listing.
     desc:"Civil engineering and construction company, established 2006 — 19 years operating. Bridge & Roof's own Category I (highest tier) approved vendor for pipes fabrication and erection. CAUTION: GST registration shown as cancelled by one source, and a negative review alleges unresolved vendor payments — verify current status before relying on this listing.",
     site:"https://www.sanghaerectors.com",
-    cats:["pipes-and-tubes", "heavy-engineering-and-fabrication"],
+    delivery:["site-erection"],
+    cats:["civil-and-structural-engineering","pipes-and-tubes"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Plot No. 1, Vasavi Nagar, Kakaguda Village, Secunderabad, Telangana 500003, India", city:"Secunderabad", lat:null, lng:null, placeId:"ChIJEycZBkOayzsRZRqE7tQHwD8" }] },
 { id:356, slug:"vitech-heavy-equipments-private-limited", name:"Vitech Heavy Equipments Private Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fvitech-heavy-equipments-private-limited.jpg?alt=media&token=e4b1a2a5-6f5a-4587-a9bc-6b8c2d5eb252", country:"India",
     // NOTE: from "TWI New Batch 1." CIN U29253MH2012PTC238912 confirmed. Google's business
@@ -3231,7 +3426,8 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // address — same company. Real reviews confirm genuine fabrication/design work.
     desc:"Manufacturer of heat exchangers, pressure vessels, columns, storage tanks, skid-mounted packages, reactors and piping spools, established 2012 (Vitech Group tracing to 2003); ISO 9001/14001/45001, ASME 'U' & U2 stamp, IBR certified; real named turnkey project history with Lloyd's, DNV, Mecon, TÜV Nord and Uhde India.",
     site:"https://vitechgroupindia.com",
-    cats:["tank-construction", "heavy-engineering-and-fabrication"],
+    delivery:["fabrication"],
+    cats:["heat-exchangers", "tank-construction"],
     locations:[{ type:"registered-office", name:"Registered Office", address:"R-495/2, M.I.D.C., T.T.C. Industrial Area, Rabale, Navi Mumbai, Maharashtra 400701, India", city:"Navi Mumbai", lat:null, lng:null, placeId:"ChIJt3MeWl-_5zsRr3LMJD_lyME" }] },
 { id:357, slug:"fleurdelis-technologies-private-limited", name:"Fleurdelis Technologies Private Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Ffleurdelis-technologies-private-limited.jpg?alt=media&token=81d43f57-48fb-44fd-8515-4a18b82a6bd0", country:"India",
     // NOTE: from "TWI New Batch 1." CIN U72200KA2006PTC046975 confirmed. Real Google review names
@@ -3239,7 +3435,8 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // confirming genuine defence-sector on-site machining work.
     desc:"Specialist on-site welding and precision machining service provider for large heavy mechanical components, founded 2006; serves steel, power (thermal/hydro/nuclear/wind), mining, shipbuilding, cement, petrochemicals, defence and heavy engineering sectors from 12+ countries; real named completed work includes the Indian Navy submarine INS Sindhukirti.",
     site:"https://www.ftpl.co.in",
-    cats:["heavy-engineering-and-fabrication"],
+    delivery:["site-erection", "om-services"],
+    cats:["mechanical-contractors","welding-equipment-and-consumables"],
     locations:[{ type:"registered-office", name:"Registered Office", address:"No. 440, 4th Phase, Peenya Industrial Area, Bangalore, Karnataka 560058, India", city:"Bangalore", lat:null, lng:null, placeId:"ChIJbTcGqPw8rjsRfHDL1Z5yfPQ" }] },
 { id:358, slug:"ramboll-india-private-limited", name:"Ramboll India Private Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Framboll-india-private-limited.png?alt=media&token=c0e73136-652e-4200-8de6-e46bca0d6a5f", country:"India",
     // NOTE: from "TWI New Batch 1." CIN U72200DL2006PTC276587 confirmed (registered office New
@@ -3367,7 +3564,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // Mitsubishi, Atlas Copco, Doosan.
     desc:"High-speed gearbox manufacturer since 1976, now a fully independent listed company (demerged from Triveni Engineering & Industries in 2026); 14,000+ installations across 80+ countries; approved supplier to Siemens, MAN Energy Solutions, Mitsubishi, Atlas Copco, Doosan; serves oil refineries, steel plants, naval vessels.",
     site:"https://www.trivenipowertransmission.com",
-    cats:["heavy-engineering-and-fabrication"],
+    cats:["rotating-equipment-and-gearboxes"],
     locations:[{ type:"headquarters", name:"Power Transmission Business", address:"No. 1-3 Belagola Industrial Area, KRS Rd, Metagalli, Mysuru, Karnataka 570016, India", city:"Mysuru", lat:null, lng:null, placeId:"ChIJ6T0WyD96rzsR0_KgS1IBfpI" }] },
 { id:373, slug:"turbotech-precision-engineering-private-limited", name:"TurboTech Precision Engineering Private Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fturbotech-precision-engineering-private-limited.jpg?alt=media&token=3156a7ed-cd5b-45f5-88a6-8335f2b11386", country:"India",
     // NOTE: CIN DISCREPANCY — a second, differently-numbered entity (CIN U29309TN1989PTC018078,
@@ -3385,7 +3582,8 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // legitimacy rather than used to exclude it.
     desc:"World's largest forging company (per its own materials); front axle assemblies, general engineering equipment, hydraulic & mechanical presses, couplings, material handling equipment; serves automotive, power, oil & gas, construction & mining, marine, aerospace, defence. ₹15,122 Cr revenue (2025), flagship of Kalyani Group. CAUTION: multiple reviews describe poor treatment of transport/logistics vendors — a real pattern worth knowing, separate from the company's genuine industrial standing.",
     site:"https://www.bharatforge.com",
-    cats:["heavy-engineering-and-fabrication"],
+    delivery:["fabrication"],
+    cats:["forgings"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"State Highway 5, Mundhwa Industrial Area, Mundhwa, Pune, Maharashtra 411036, India", city:"Pune", lat:null, lng:null, placeId:"ChIJAQAAAC3CwjsR-MiVOPdFdfI" }] },
 { id:375, slug:"amic-forging-limited", name:"AMIC Forging Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Famic-forging-limited.png?alt=media&token=aff18109-0d19-4eab-8cae-ee154845d726", country:"India",
     // NOTE: directly on-topic product line, but CAUTION: a real, detailed review alleges severe
@@ -3466,19 +3664,21 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // NOTE: Same upstream/offshore-oilfield-services mismatch flagged repeatedly this session — real, substantial, well-reviewed company (101 reviews, 4.5 rating), but the core business is offshore diving/subsea support, not downstream tank-terminal supply chain.
     desc:"India's largest offshore oilfield diving support vessel (DSV) operator; subsea maintenance, inspection, repair, light construction support for offshore oil production, plus bulk carrier operations and an EPC infrastructure JV.",
     site:"https://seamec.in",
-    cats:["heavy-engineering-and-fabrication"],
+    sectors:["fpso-offshore"],
+    cats:["offshore-floating-systems"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"9th Floor, A-901-905, 215 Atrium, Andheri Kurla Road, Andheri East, Mumbai, Maharashtra 400093, India", city:"Mumbai", lat:null, lng:null, placeId:"ChIJS2BDRzrI5zsR8baAG1Mfjfs" }] },
 { id:384, slug:"bharat-bijlee-limited", name:"Bharat Bijlee Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fbharat-bijlee-limited.jpg?alt=media&token=a1a70a68-8c48-4ad4-a293-55f6dc67fbd9", country:"India",
     // NOTE: Strong candidate — real named client is SAIL, already independently verified and in TWI.
     desc:"Publicly listed electrical engineering company since 1946; Power Transformers (up to 200MVA/200kV), Electric Motors (0.12kW-1250kW), Drives & Industrial Automation. Real named client: a 42-year-old transformer still running at SAIL's Durgapur Steel Plant.",
     site:"https://www.bharatbijlee.com",
-    cats:["heavy-engineering-and-fabrication"],
+    cats:["electrical-equipment-and-transformers"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Electric Mansion, 6th Floor, Appasaheb Marathe Marg, Prabhadevi, Mumbai, Maharashtra 400025, India", city:"Mumbai", lat:null, lng:null, placeId:"ChIJ8-R7yr_O5zsRlG2Eh88UqPY" }] },
 { id:385, slug:"the-anup-engineering-limited", name:"The Anup Engineering Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fthe-anup-engineering-limited.png?alt=media&token=519f2d12-0a01-4104-8290-0d6b7a10d88d", country:"India",
     // NOTE: Re-researched: earlier this session this company was checked against TS-11 Nozzles & Manways specifically and didn't fit (pressure-vessel fabrication is a different, broader scope than tank appurtenances). Genuinely fits EC-16 Heavy Engineering & Fabrication instead, alongside Vitech Heavy Equipments and other static-equipment fabricators already in TWI. CAUTION: one real review alleges project delays (6 months) and describes difficulty for independent contractors — worth checking alongside the otherwise strong signals (323 reviews, 4.2 rating).
     desc:"Established manufacturer of heat exchangers, pressure vessels, reactors, columns/towers; real reviews confirm 'Most Familiar Company in Fabrication of Pressure Vessels, Drums, Heat Exchangers in Ahmedabad.'",
     site:"https://www.anupengg.com",
-    cats:["heavy-engineering-and-fabrication"],
+    delivery:["fabrication", "oem-manufacturer"],
+    cats:["heat-exchangers"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Behind 66 KV Electric Sub Station, Odhav Road, GIDC Industrial Area, Odhav, Ahmedabad, Gujarat 382415, India", city:"Ahmedabad", lat:null, lng:null, placeId:"ChIJixpKcV-GXjkRBXw4c_nQCcM" }] },
 { id:386, slug:"diamond-power-infrastructure-limited", name:"Diamond Power Infrastructure Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fdiamond-power-infrastructure-limited.jpg?alt=media&token=fa9fea51-625b-4176-a73f-05b404d579dc", country:"India",
     // NOTE: Real, publicly listed (BSE: 522163). Note: acquired by The CKP Group in 2017 (implies a past restructuring event), but current filings (Dec 2025 earnings) show real, substantial revenue (₹15.5bn) — appears to be a genuine recovery, not ongoing distress.
@@ -3496,13 +3696,13 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // NOTE: Strong candidate, substantial and profitable (₹651.94 Cr revenue, ₹158.16 Cr profit, 2025-26). NOTE: MCA NIC classification in one source showed 'Dishwashers, manufacturing' — a clear data-entry error, not reflective of the company's real transformer business.
     desc:"One of India's prominent manufacturers of Electronics & Telecom and Power & Distribution transformers — inverter-duty transformers for solar, generator transformers for wind, hydel transformers, furnace transformers; 7,500 MVA annual capacity.",
     site:"https://www.shilchar.com",
-    cats:["heavy-engineering-and-fabrication"],
+    cats:["electrical-equipment-and-transformers"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Bill Road, Bill, Vadodara, Gujarat 391410, India", city:"Vadodara", lat:null, lng:null, placeId:"ChIJoVWksrLHXzkReuMnAL5_tL0" }] },
 { id:389, slug:"transformers-and-rectifiers-india-limited", name:"Transformers and Rectifiers (India) Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Ftransformers-and-rectifiers-india-limited.png?alt=media&token=41182fcd-5b7d-4a7b-984b-972d30b8dca0", country:"India",
     // NOTE: Strong candidate — publicly listed (BSE: 532928), well-reviewed (71 reviews, 4.5 rating). NOTE: multiple sources show incorrect NIC classifications ('measuring instruments', 'medical/precision/optical instruments') — same recurring data-quality issue seen elsewhere this session; the real business is clearly power transformers.
     desc:"Manufacturer of Furnace Transformers, Rectifier Transformers, Specialty Transformers, Reactors, Distribution Transformers, Power Transformers; trades as 'TARIL'; real named milestone of 150+ dynamic short-circuit-tested transformers over two decades.",
     site:"https://www.transformerindia.com",
-    cats:["heavy-engineering-and-fabrication"],
+    cats:["electrical-equipment-and-transformers"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Survey No. 427 P/3-4 & 431 P/1-2, Sarkhej-Bavla Highway, Village Moraiya, Ahmedabad, Gujarat 382213, India", city:"Ahmedabad", lat:null, lng:null, placeId:"ChIJI3-6KyiRXjkR_du3rj7m85o" }] },
 { id:390, slug:"apar-industries-limited", name:"Apar Industries Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fapar-industries-limited.jpg?alt=media&token=4c27d743-43af-48ff-be01-ac22d127ab5a", country:"India",
     // NOTE: Very strong candidate — major, well-documented, publicly listed (BSE: 532259, NSE: APARINDS) company with a genuinely long, relevant history in transformer oils specifically.
@@ -3514,7 +3714,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // NOTE: Solid, well-reviewed candidate (23 reviews, 4.2 rating) — BSE SME listed, genuinely specialized niche product.
     desc:"Niche manufacturer of condenser-graded High Voltage and High Current Transformer Bushings; formerly Yash Highvoltage Insulators Private Limited; over 2 decades in global power transmission/generation, 50+ countries, 30,000+ installations.",
     site:"https://www.yashhv.com",
-    cats:["heavy-engineering-and-fabrication"],
+    cats:["electrical-equipment-and-transformers"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Savli-Halol Road, Khakhariya, Vadodara, Gujarat 389330, India", city:"Vadodara", lat:null, lng:null, placeId:"ChIJzTvFNQMrXjkR16Fi2lKtqbg" }] },
 { id:392, slug:"rishabh-instruments-limited", name:"Rishabh Instruments Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Frishabh-instruments-limited.png?alt=media&token=77141530-9c13-431e-8be2-fec4e88ab85d", country:"India",
     // NOTE: Strong candidate — publicly listed, well-reviewed (64 reviews, 4.5 rating), genuinely relevant instrumentation/metering product line.
@@ -3526,7 +3726,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // NOTE: Solid candidate — real, well-reviewed (77 reviews, 4.0 rating), genuine Schneider Electric partnership confirmed.
     desc:"Motor and generator manufacturer, authorised channel partner of Schneider Electric for west-zone India; 35 years operating, recently converted from Private to Public Limited (Feb 2025) ahead of a planned IPO.",
     site:"",
-    cats:["heavy-engineering-and-fabrication"],
+    cats:["electrical-equipment-and-transformers"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Vivid House, A-173/7, TTC Industrial Area, Kopar Khairane, Navi Mumbai, Maharashtra 400710, India", city:"Navi Mumbai", lat:null, lng:null, placeId:"ChIJQzpU1R_B5zsRtRkXzh4m9v0" }] },
 { id:394, slug:"ravindra-energy-limited", name:"Ravindra Energy Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fravindra-energy-limited.jpg?alt=media&token=35c9c020-9b48-4552-8785-beaac8753286", country:"India",
     // NOTE: Publicly listed (BSE), real UAE subsidiary. CAUTION: the only Google review found is strongly negative — 'no planning,' 'poor quality erection,' 'lack of technical knowledge in site survey team.' Worth checking directly given no positive reviews to counterbalance it.
@@ -3562,7 +3762,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // NOTE: Strong candidate — real named client already independently verified in TWI.
     desc:"One of the world's largest integrated transmission tower manufacturers (top 3 in India, top 10 globally); also steel tubes, PVC pipes & fittings, fasteners, railway structures, EPC line construction. Real named client: Power Grid Corporation of India Limited (800kV order) — already in TWI.",
     site:"https://www.skipperlimited.com",
-    cats:["heavy-engineering-and-fabrication"],
+    cats:["pipes-and-tubes","steel-manufacturers"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"3A, Loudon Street, 1st Floor, Kolkata, West Bengal 700017, India", city:"Kolkata", lat:null, lng:null, placeId:"ChIJ97Qs9T13AjoR9IFB5OckfwE" }] },
 { id:400, slug:"walchandnagar-industries-limited", name:"Walchandnagar Industries Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fwalchandnagar-industries-limited.png?alt=media&token=491c172b-30c4-48f8-963b-3bb53f7016f6", country:"India",
     // NOTE: CIN could not be independently confirmed in this research pass despite searching — verify directly before use. Real, publicly listed (BSE:507410, NSE:WALCHANNAG) company; Google location has very few reviews (4, rating 3.3) — worth a closer look before relying on the address.
@@ -3580,19 +3780,19 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // NOTE: Real, publicly listed (NSE: MARINE) company, but core focus is naval/defence vessels — tangential to TWI's downstream tank-terminal scope. CAUTION: a real, detailed negative review alleges a small unpaid invoice (₹11,565) with unprofessional conduct once materials were delivered — worth checking alongside the scope question.
     desc:"Electrical equipment manufacturer with over four decades' expertise in naval operations — integrated electrical solutions for defence vessels, warships and submarines.",
     site:"https://www.marineelectricals.com",
-    cats:["heavy-engineering-and-fabrication"],
+    cats:["electrical-equipment-and-transformers"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Udyog Sadan-3, B-1, MIDC, Marol Industrial Area, Andheri East, Mumbai, Maharashtra 400093, India", city:"Mumbai", lat:null, lng:null, placeId:"ChIJH5DwwCHI5zsR7w766y3rqx4" }] },
 { id:403, slug:"mohindra-fasteners-limited", name:"Mohindra Fasteners Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fmohindra-fasteners-limited.jpg?alt=media&token=d665f61a-3afe-49da-9114-c5d19fa3d2b4", country:"India",
     // NOTE: Solid candidate — real, well-reviewed (19 reviews, 4.4 rating), directly relevant product category.
     desc:"Fasteners manufacturer established 1995; real reviews confirm 'Best fasteners manufacturer in NCR Rohtak as per Customer Requirements.'",
     site:"",
-    cats:["heavy-engineering-and-fabrication"],
+    cats:["fasteners-and-bolting"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"304, Gupta Arcade, Rohtak-Delhi Road, Inder Enclave, Paschim Vihar, Delhi 110087, India", city:"New Delhi", lat:null, lng:null, placeId:"ChIJCzrfSWsEDTkRDh7tYi89ECY" }] },
 { id:404, slug:"the-braithwaite-burn-and-jessop-construction-company-limited", name:"The Braithwaite Burn and Jessop Construction Company Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fthe-braithwaite-burn-and-jessop-construction-company-limited.jpg?alt=media&token=279751ef-9bd9-4def-96fb-c54817e7b249", country:"India",
     // NOTE: Strong candidate — genuinely historic PSU with 'Refinery piping works' explicitly in its own stated product list, real reviews confirm ('Big bridge building PSU in India').
     desc:"Central PSU (Dept. of Heavy Industries) established 1935 (90 years); best known for bridge building (Howrah Bridge, Vidyasagar Setu) — also Industrial Structural works, Civil Engineering works, and explicitly 'Refinery piping works,' plus PMC/EPC-basis industrial structural jobs.",
     site:"https://www.bbjconst.com",
-    cats:["epc-contractors", "heavy-engineering-and-fabrication"],
+    cats:["epc-contractors","civil-and-structural-engineering"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"27, R.N. Mukherjee Road, Modi Building, Kolkata, West Bengal 700001, India", city:"Kolkata", lat:null, lng:null, placeId:"ChIJ0Z4HnaR3AjoRg9ERT1eJ7uc" }] },
 { id:405, slug:"bechtel-corporation", name:"Bechtel Corporation", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fbechtel-corporation.jpg?alt=media&token=4e9473c2-b311-4e15-9756-02fdc0908165", country:"United States",
     // NOTE: Source: Projectmaterials 'Top 20 EPC Contractors in Oil & Gas 2026' (Jan 2026). Revenue trend: peaked $32.9B (2016), recovered to $20.6B (2024) with a $58.2B backlog — its highest in decades.
@@ -3610,12 +3810,14 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // NOTE: Source: Projectmaterials 'Top 20 EPC Contractors in Oil & Gas 2026' (Jan 2026). Dual-headquartered Houston & Paris; spun off Technip Energies in 2021.
     desc:"Global leader in subsea systems and offshore energy, formed by the 2017 merger of Technip (France) and FMC Technologies (USA). Only company that designs, builds, installs and services vertically-integrated subsea systems from wellhead to platform with its own fleet. $7.8B revenue (2024), 21,000 employees.",
     site:"https://www.technipfmc.com",
+    sectors:["fpso-offshore"],
     cats:["epc-contractors"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"11720 Katy Freeway, Houston, TX 77079, USA", city:"Houston", lat:null, lng:null, placeId:"ChIJO83SIkLJQIYRn29ilr2Th1k" }] },
 { id:408, slug:"saipem-spa", name:"Saipem SpA", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fsaipem-spa.png?alt=media&token=e017beec-692a-4e8b-b0b4-fd706823ec3f", country:"Italy",
     // NOTE: Source: Projectmaterials 'Top 20 EPC Contractors in Oil & Gas 2026' (Jan 2026). PENDING MERGER: Saipem is in the process of merging with Subsea 7 (also added here) to form 'Saipem7' (targeted H2 2026, EUR 21B combined revenue) — both remain separate legal entities as of this addition; verify current corporate status before relying on this listing if referenced after the merger completes.
     desc:"Italian EPC giant specializing in offshore and onshore engineering, construction and drilling; operates one of the world's largest deepwater construction fleets; 60+ years' experience in pipeline installations, FPSO/platform construction and LNG plant delivery across 70+ countries. EUR 14.6B revenue (2024), 30,000 employees.",
     site:"https://www.saipem.com",
+    sectors:["fpso-offshore"],
     cats:["epc-contractors"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Via Alcide de Gasperi, 16, 20097 San Donato Milanese, Milan, Italy", city:"Milan", lat:null, lng:null, placeId:"ChIJ6QeEN17PhkcRwxtTorjpAoY" }] },
 { id:409, slug:"kbr-inc", name:"KBR, Inc.", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fkbr-inc.jpg?alt=media&token=d204dfad-b28c-404a-b78f-7f83f5b15d70", country:"United States",
@@ -3628,12 +3830,14 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // NOTE: Source: Projectmaterials 'Top 20 EPC Contractors in Oil & Gas 2026' (Jan 2026). Energy transition and sustainability projects now represent 40%+ of revenue.
     desc:"Australian-headquartered professional services firm providing engineering, procurement and project delivery across energy, chemicals and resources; one of the world's largest energy engineering consultancies since acquiring Jacobs' ECR division ($3.3B) in 2019. AUD 10.8B revenue (2025), 51,000 employees.",
     site:"https://www.worley.com",
+    delivery:["epcm", "feed-engineering"],
     cats:["epc-contractors"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Level 19, 420 George Street, Sydney NSW 2000, Australia", city:"Sydney", lat:null, lng:null, placeId:"ChIJvwLZgO2uEmsRYe33r0Noisc" }] },
 { id:411, slug:"mcdermott-international", name:"McDermott International", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fmcdermott-international.jpg?alt=media&token=94c2986c-c281-4384-bc4a-6d69122c2cc3", country:"United States",
     // NOTE: Source: Projectmaterials 'Top 20 EPC Contractors in Oil & Gas 2026' (Jan 2026). The costly CB&I integration led to Chapter 11 bankruptcy in 2020; emerged leaner with a strong LNG project pipeline.
     desc:"Houston-based EPC contractor specializing in LNG, refining, petrochemicals and offshore/subsea; merged with CB&I in 2018 forming one of the largest integrated onshore-offshore EPC firms. $8B+ revenue, 30,000 employees.",
     site:"https://www.mcdermott.com",
+    sectors:["fpso-offshore"],
     cats:["epc-contractors"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"915 N Eldridge Parkway, Houston, TX 77079, USA", city:"Houston", lat:null, lng:null, placeId:"ChIJ66DSg5HbQIYR1RsXDbxEwtQ" }] },
 { id:412, slug:"wood-plc", name:"Wood PLC", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fwood-plc.jpg?alt=media&token=32524d4a-6e17-458c-a098-6762d342e589", country:"United Kingdom",
@@ -3682,6 +3886,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // NOTE: Source: Projectmaterials 'Top 20 EPC Contractors in Oil & Gas 2026' (Jan 2026). PENDING MERGER: in the process of merging with Saipem (also added here) to form 'Saipem7' (targeted H2 2026, EUR 43B combined backlog) — both remain separate legal entities as of this addition; verify current corporate status before relying on this listing if referenced after the merger completes.
     desc:"Luxembourg-based subsea engineering and construction company specializing in pipeline installation, subsea infrastructure and offshore wind; operates one of the most advanced deepwater construction fleets globally. $6.7B revenue (2024), $9B backlog.",
     site:"https://www.subsea7.com",
+    sectors:["fpso-offshore"],
     cats:["epc-contractors"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"38 Grand-Rue, 1660 Ville-Haute, Luxembourg", city:"Luxembourg", lat:null, lng:null, placeId:"ChIJbZsVPkJPlUcRbPiPZ1MvTPU" }] },
 { id:420, slug:"jacobs-solutions", name:"Jacobs Solutions", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fjacobs-solutions.jpg?alt=media&token=484db2f4-5621-4d04-9318-cf6ee52913e7", country:"United States",
@@ -3951,6 +4156,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // correct against multiple sources.
     desc:"Major PPE brand — gloves, protective garments, safety footwear — with real presence in 50+ countries and 500,000 sq ft of manufacturing across 7 sites. One unrelated review describes an apparent job-scam complaint, not connected to the core PPE business.",
     site:"https://www.mallcom.in",
+    delivery:["oem-manufacturer"],
     cats:["occupational-safety"],
     locations:[{ type:"registered-office", name:"Registered Office", address:"EN-12, Sector-V, Salt Lake City, Kolkata, West Bengal 700091, India", city:"Kolkata", lat:null, lng:null, placeId:"ChIJVVV5TK51AjoRTp3kfoIJqCo" }] },
 { id:447, slug:"venus-safety-and-health-private-limited", name:"Venus Safety & Health Private Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fvenus-safety-and-health-private-limited.jpg?alt=media&token=1081dd61-2c59-4a52-92fd-ef87608041d4", country:"India",
@@ -3968,6 +4174,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // confirmed via ZaubaCorp/NSE/BSE filings, is at Electronic City.
     desc:"Major PPE manufacturer — respirators, ear protection — part of the global 3M Company. Strongly reviewed (4.4 rating, 385 reviews).",
     site:"https://www.3mindia.in",
+    delivery:["oem-manufacturer"],
     cats:["occupational-safety"],
     locations:[{ type:"registered-office", name:"Registered Office", address:"Plot Nos. 48-51, Electronic City, Hosur Road, Bengaluru, Karnataka 560100, India", city:"Bengaluru", lat:null, lng:null, placeId:"ChIJRSQ0m4RsrjsRyM4uVvfvS3Q" }] },
 { id:449, slug:"liberty-shoes-limited", name:"Liberty Shoes Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fliberty-shoes-limited.jpg?alt=media&token=f73c0852-3671-4d43-b278-6a656724c252", country:"India",
@@ -4005,6 +4212,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // current address (Dadar West) is confirmed via the company's own materials.
     desc:"Manufactures PPE in-house AND represents international safety brands exclusively in India; real regional offices in Gujarat, Delhi, Kolkata and Chennai plus international agents in Bangladesh and the Middle East. Explicitly serves Oil & Gas, Petrochemical, Automotive and Pharmaceutical industries — directly on-topic for TWI. Strongly reviewed (4.7 rating, 15 reviews).",
     site:"https://www.josephleslie.com",
+    delivery:["oem-manufacturer", "distributor-supplier"],
     cats:["occupational-safety"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Off 87-C, 3rd Floor, Leslico House, Prof. VS Agashe Road, Dadar West, Mumbai, Maharashtra 400028, India", city:"Mumbai", lat:null, lng:null, placeId:"ChIJd82aN8PO5zsRNowPm5JvvnI" }] },
 { id:453, slug:"exide-energy-solutions-limited", name:"Exide Energy Solutions Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fexide-energy-solutions-limited.jpg?alt=media&token=29d5b91b-4b26-4b6b-a693-ad06bfefe17a", country:"India",
@@ -4461,7 +4669,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     desc:"Welding electrodes, MIG welding wire. Serves: Steel, cement, power, coal, oil & gas, railways, shipping, mining. BHEL (Trichy), IBR, RDSO, BIS approved.",
     site:"",
     msme:{ category:null, udyamNumber:null },
-    cats:["heavy-engineering-and-fabrication"],
+    cats:["welding-equipment-and-consumables"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Plot No.B-5, Sector-A5/6, Trans Delhi Signature City, Loni, Uttar Pradesh 201103, India", city:"India", lat:null, lng:null, placeId:"ChIJq6rqaBkDDTkRHRryAqu6x2w" }] },
 { id:510, slug:"weldcom-electrodes-private-limited", name:"Weldcom Electrodes Pvt. Ltd.", logo:null, country:"India",
     // NOTE: from "Oil & Gas MSME Vendor Directory — India" (compiled Aug 2026). Legal name:
@@ -4469,7 +4677,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     desc:"Manual metal arc electrodes, welding flux & wires, CO2 welding wires (brands NOVA, SUPERWELD-1). Serves: Steel, shipbuilding, construction, transport, offshore, energy sectors.",
     site:"https://weldcomelectrodes.com",
     msme:{ category:null, udyamNumber:null },
-    cats:["heavy-engineering-and-fabrication"],
+    cats:["welding-equipment-and-consumables"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"P.B. No.1107, Olpad-Sayan Rd, Olpad, Gujarat 394540, India", city:"India", lat:null, lng:null, placeId:"ChIJ98UiAH9K4DsRLniuBIISi2I" }] },
 { id:511, slug:"advani-electrodes-private-limited", name:"Advani Electrodes Pvt. Ltd.", logo:null, country:"India",
     // NOTE: from "Oil & Gas MSME Vendor Directory — India" (compiled Aug 2026). Legal name:
@@ -4477,7 +4685,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     desc:"Mild steel, low hydrogen, hard facing, cast iron, stainless steel electrodes; filler wires; CO2 MIG wire (ADVANI ARC brand). Serves: General industrial welding applications. ISO 9001:2008.",
     site:"https://www.advaniarc.com",
     msme:{ category:null, udyamNumber:null },
-    cats:["heavy-engineering-and-fabrication"],
+    cats:["welding-equipment-and-consumables"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"2-2-105 to 108/7, Mahatma Gandhi Rd, Bolaram Nagar, Ranigunj, Secunderabad, Telangana 500003, India", city:"Secunderabad, Telangana", lat:null, lng:null, placeId:"ChIJ8aILlp2byzsRsPQVulLsibw" }] },
 { id:512, slug:"rasi-electrodes", name:"Rasi Electrodes", logo:null, country:"India",
     // NOTE: from "Oil & Gas MSME Vendor Directory — India" (compiled Aug 2026). Legal name:
@@ -4485,7 +4693,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     desc:"Welding machines, rods, flux, wire & power tools. Serves: Heavy & light engineering applications. ISO 9001:2015.",
     site:"https://rasielectrodes.com",
     msme:{ category:null, udyamNumber:null },
-    cats:["heavy-engineering-and-fabrication"],
+    cats:["welding-equipment-and-consumables"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Raja Annamalai Building, Raja Annamalai Rd, Purasaiwakkam, Chennai, Tamil Nadu 600084, India", city:"Chennai, Tamil Nadu", lat:null, lng:null, placeId:"ChIJs1hsygpmUjoRxFDBHc_kF90" }] },
 { id:513, slug:"n-k-engineering", name:"N K Engineering", logo:null, country:"India",
     // NOTE: from "Oil & Gas MSME Vendor Directory — India" (compiled Aug 2026). Legal name:
@@ -4801,6 +5009,8 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // reviews) — "the best crane company in Middle East."
     desc:"Heavy lifting and heavy transport division of the Aertssen Group active in the Middle East (UAE, Qatar, Saudi Arabia, plus activities in Oman, Morocco, Iraq and Africa) — mobile telescopic cranes (Tadano, Liebherr), crawler cranes (Hitachi, Terex), SPMTs (Self Propelled Modular Trailers), plus a trading department for second-hand machinery. New warehouse/workshop openings confirmed in Abu Dhabi (2025) and Ras Laffan, Qatar (Dec 2025). ADIPEC 2026: Concourse, Stand #CN36.",
     site:"https://www.aertssen.ae",
+    delivery:["om-services"],
+    sectors:["fpso-offshore"],
     cats:["crane-and-lifting-equipment-rental"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Abu Dhabi Industrial City - ICAD III, Abu Dhabi, United Arab Emirates", city:"Abu Dhabi", lat:null, lng:null, placeId:"ChIJy73_27E_Xj4RdOEuy2qv9BQ" }] },
 { id:552, slug:"aerzen-uae", name:"AERZEN", logo:null, country:"United Arab Emirates",
@@ -4829,6 +5039,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // it") — an outlier worth being aware of, not disqualifying given the broader pattern.
     desc:"Major offshore contractor specializing in pipelay, subsea construction and heavy lift — real involvement in FPSO/subsea infrastructure and carbon capture/storage (CCS) offshore pipeline projects. ADIPEC 2026: Hall 11, Stand #11210.",
     site:"https://allseas.com",
+    sectors:["fpso-offshore"],
     cats:["offshore-floating-systems"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Poortweg 12, 2612 PA Delft, Netherlands", city:"Delft", lat:null, lng:null, placeId:"ChIJreVAffG1xUcRDxBJTM2YtjE" }] },
 { id:555, slug:"almas-group-iraq", name:"Almas Group", logo:null, country:"Iraq",
@@ -4877,6 +5088,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // strengthening its North America position).
     desc:"Premium distributor of steel pipes, tubes, pipe fittings, valves and accessories, including duplex, nickel alloy and titanium special materials, for energy, petrochemical, chemical, oil & gas, offshore, pipeline/plant engineering and shipbuilding. Consulting, project management and logistics services included. ADIPEC 2026: Hall 8, Stand #8717.",
     site:"https://buhlmann-group.com",
+    delivery:["distributor-supplier"],
     cats:["pipes-and-tubes"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Arberger Hafendamm 1, 28309 Bremen-Hemelingen, Germany", city:"Bremen", lat:null, lng:null, placeId:"ChIJqcYFgojYsEcRf-eQeUkOQLk" }] },
 { id:561, slug:"burckhardt-compression-middle-east-fze", name:"Burckhardt Compression (Middle East) FZE", logo:null, country:"Switzerland",
@@ -4887,6 +5099,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // massive, publicly listed (SIX: BCHN), founded 1844 (180+ years).
     desc:"Global market leader in reciprocating compressor technology — Laby (labyrinth piston), process gas and hyper compressors for chemical/petrochemical, refining, air separation, and gas transport/storage. CHF 1.095B revenue (2024), 3,336 employees. ADIPEC 2026: Concourse, Stand #CN100.",
     site:"https://www.burckhardtcompression.com",
+    delivery:["oem-manufacturer", "om-services"],
     cats:["compressors"],
     locations:[{ type:"headquarters", name:"Global Headquarters", address:"Franz Burckhardt-Strasse 5, 8404 Winterthur, Switzerland", city:"Winterthur", lat:null, lng:null, placeId:"ChIJRfeBJfGZmkcRVVkl5OPhpJ0" }] },
 { id:562, slug:"calico-metal-alloys-llp", name:"CALICO METAL ALLOYS LLP", logo:null, country:"India",
@@ -4894,6 +5107,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // (4.7 rating, 3 reviews) India-based specialty steel stockist/supplier.
     desc:"Supplier and stockist of Duplex Steel, Super Duplex Steel, SMO 254, AL6XN and Lean Duplex 2101 — plates, sheets, round bars, pipes, flanges, fittings, fasteners, coils, custom profiles and perforated sheets. ADIPEC 2026: Hall 13, Stand #13685.",
     site:"https://www.calicometal.com",
+    delivery:["distributor-supplier"],
     cats:["plates-and-sheets", "alloy-steel"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Office No. 811, 8th Floor, Prasad Chambers, Tata Road No 2, Opera House, Girgaon, Mumbai, Maharashtra 400004, India", city:"Mumbai", lat:null, lng:null, placeId:"ChIJAQAQPhDO5zsRivhMMnPZVhY" }] },
 { id:563, slug:"cenosco-bv", name:"Cenosco", logo:null, country:"Netherlands",
@@ -4903,6 +5117,8 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // reviews describe the office as "a truly proud workplace."
     desc:"Cloud-based asset integrity management software (IMS suite) for the oil, gas and chemical industries — reliability, functional safety and compliance across pressure equipment, pipelines and civil structures; real named modules include Flange Management (IMS FCM), Pipeline & Subsea Integrity (IMS PLSS), and Pressure Equipment Integrity (IMS PEI). Several hundred assets managed across 50+ countries. ADIPEC 2026: Hall 16, Stand #16257.",
     site:"https://cenosco.com",
+    delivery:["oem-manufacturer"],
+    sectors:["fpso-offshore"],
     cats:["integrity-management"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Bezuidenhoutseweg 12, 2594 AV Den Haag, Netherlands", city:"The Hague", lat:null, lng:null, placeId:"ChIJ8597IzO3xUcR-eXxA3E3Gig" }] },
 { id:564, slug:"cosco-lianyungang-liquid-loading-unloading-equipment", name:"COSCO (Lianyungang) Liquid Loading & Unloading Equipment Co., Ltd.", logo:null, country:"China",
@@ -4914,6 +5130,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // confident Google Places match found for this specific facility — placeId left null.
     desc:"Design, manufacturing, sales and maintenance of fluid loading & unloading equipment — Marine and Land Loading Arms, Automatic Loading Systems, Twin/Double-Sealed Guide Way Valves, Vapor Recovery Systems, LNG loading/unloading equipment, plus wharf equipment (gangways, quick release hooks, hose cranes). 30 years' experience, 117 patents, 88,000 m² facility. Real named awards for double-sealed guide valve technology and LNG land handling devices (Jiangsu Province, 1999-2011). ADIPEC 2026: Hall 13, Stand #13913.",
     site:"http://www.lygcosco.com.cn",
+    sectors:["fpso-offshore"],
     cats:["offshore-loading-systems-spm-calm"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"No. 33 Huanghai Road, Lianyun District, Lianyungang, Jiangsu 222047, China", city:"Lianyungang", lat:null, lng:null, placeId:null }] },
 { id:565, slug:"duechting-pumpen", name:"DÜCHTING PUMPEN", logo:null, country:"Germany",
@@ -4923,6 +5140,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // 1938, 3rd-generation family-owned. Strongly reviewed (4.9 rating, 16 reviews).
     desc:"Manufacturer of advanced, wear-resistant centrifugal pumps (single and multistage) for desalination reverse osmosis, flue gas desulphurization, mining, and chemical pigment industries. ~120 employees, global presence. ADIPEC 2026: Hall 13, Stand #13490.",
     site:"https://www.duechting.com",
+    delivery:["oem-manufacturer"],
     cats:["pumps"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Wilhelm-Düchting-Straße 22, 58453 Witten, Germany", city:"Witten", lat:null, lng:null, placeId:"ChIJoyd1rnIiuUcRtgDvp4R3po4" }] },
 { id:566, slug:"enerflex-ltd", name:"Enerflex Ltd", logo:null, country:"Canada",
@@ -5003,6 +5221,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // and custom technical skid fabrication for PhD-level mechanical engineering research).
     desc:"Leading UAE engineering company — Hydraulic Test Centre (testing open/closed type hydraulic pumps, high/low speed hydraulic motors, hydraulic cylinders/actuators, CETOP hydraulic valves, solenoid/relief valves, servo pumps & valves), plus filtration and separation solutions for upstream production and oil services (onshore and offshore). ADIPEC 2026: Hall 5, Stand #514.",
     site:"https://esmagroup.com",
+    sectors:["fpso-offshore"],
     cats:["filtration-and-separation-technology", "calibration-services"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Street 12A/11B, Al Khabaisi Area, Deira, Dubai, United Arab Emirates", city:"Dubai", lat:null, lng:null, placeId:"ChIJt39WVcJcXz4R263eAyoEsvQ" }] },
 { id:575, slug:"cc7-global-engineering-solutions-llc", name:"CC7 Global Engineering Solutions", logo:null, country:"United Arab Emirates",
@@ -5013,6 +5232,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // trace to 1964. Strongly reviewed (5.0 rating).
     desc:"UAE regional EPC platform delivering complex industrial projects across the Middle East and Africa. ADIPEC 2026: Hall 13, Stand #13580.",
     site:"https://cc7international.com",
+    delivery:["lstk-epc"],
     cats:["epc-contractors"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Burj Khalifa, Downtown Dubai, Dubai, United Arab Emirates", city:"Dubai", lat:null, lng:null, placeId:"ChIJ9Rg-VQBpXz4R96thlO4YSKw" }] },
 { id:576, slug:"gerab-national-enterprises-llc", name:"Gerab National Enterprises Llc", logo:null, country:"United Arab Emirates",
@@ -5023,6 +5243,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // reviews).
     desc:"Middle East's leading bulk supplier of seamless pipes and allied components — pipes, fittings, flanges, stud bolts, valves, gaskets and instrumentation accessories, in carbon steel, stainless steel, duplex, super duplex and special alloys — for oil & gas, power generation, water desalination, mining and construction. ADIPEC 2026: Hall 1, Stand #1111.",
     site:"https://www.gerabnationalenterprises.com",
+    delivery:["distributor-supplier"],
     cats:["pipes-and-tubes", "valves"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"P.O. Box 17719, Jebel Ali Free Zone, Dubai, United Arab Emirates", city:"Dubai", lat:null, lng:null, placeId:"ChIJ0437qIwNXz4Rggvuf5UXelc" }] },
 { id:577, slug:"hangzhou-zhongtai-cryogenic-technology", name:"Hangzhou Zhongtai Cryogenic Technology Corporation", logo:null, country:"China",
@@ -5038,6 +5259,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // substantial (265,000+ m² across 18 warehouses/offices).
     desc:"Spanish group of specialized companies supplying pipes, valves, fittings and miscellaneous items — real named served industries include chemicals/petrochemicals, oil & gas, nuclear power plants, metallurgical/iron & steel, shipbuilding, combined-cycle and renewable energy power plants, paper and food industry, water treatment plants, and gas processing plants. Real, substantial public footprint (142 reviews). ADIPEC 2026: Hall 5, Stand #5240.",
     site:"https://grupocunado.com",
+    delivery:["distributor-supplier"],
     cats:["pipes-and-tubes", "valves"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Camino el Olivar 2, 28806 Alcalá de Henares, Madrid, Spain", city:"Alcalá de Henares", lat:null, lng:null, placeId:"ChIJI1hvIYZJQg0RIIq0-pqM5Pk" }] },
 { id:579, slug:"hytorc", name:"HYTORC", logo:null, country:"United States",
@@ -5047,7 +5269,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // given the otherwise strong overall pattern (4.3 rating, 11 reviews).
     desc:"Manufacturer of hydraulic and mechanical industrial bolting/torque tools — real presence across energy and building/construction markets. ADIPEC 2026: Hall 7, Stand #7252.",
     site:"",
-    cats:["heavy-engineering-and-fabrication"],
+    cats:["fasteners-and-bolting"],
     locations:[{ type:"headquarters", name:"World Headquarters", address:"333 NJ-17, Mahwah, NJ 07430, USA", city:"Mahwah", lat:null, lng:null, placeId:"ChIJD7ablxnhwokRZIz_8_rRFH4" }] },
 { id:580, slug:"ingersoll-rand-italy", name:"Ingersoll Rand", logo:null, country:"Italy",
     // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list, which named the Italy
@@ -5125,6 +5347,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // (4.3 rating, 30 reviews — including "King of valves").
     desc:"Manufacturer of coaxial and high-pressure industrial valves — switches highest pressures with smallest forces; real named hydrogen valve product rated to 1,000 bar. Real global subsidiary network (USA, Spain, Sweden, Thailand, Turkey, Ukraine, China). ADIPEC 2026: Hall 13, Stand #13494.",
     site:"https://co-ax.com",
+    delivery:["oem-manufacturer"],
     cats:["valves"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Friedrich-Müller-Straße 1, 74670 Forchtenberg, Germany", city:"Forchtenberg", lat:null, lng:null, placeId:"ChIJ4c34AwNAmEcRjWXW_oY5XG8" }] },
 { id:588, slug:"peroni-pompe-spa", name:"PERONI POMPE SPA", logo:null, country:"Italy",
@@ -5135,6 +5358,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // genuinely relevant to this exhibitor category's Carbon Capture theme specifically.
     desc:"Global manufacturer of API-compliant reciprocating industrial pumps — plunger pumps, steam-driven pumps, process diaphragm pumps, metering pumps — for oil & gas, refining, petrochemical, steel, chemical, food, and energy transition markets. Real named recent delivery: an ammonia fuel pump to Alfa Laval for WinGD testing (zero emissions performance). ADIPEC 2026: Hall 2, Stand #2236.",
     site:"https://peronipompe.com",
+    delivery:["oem-manufacturer"],
     cats:["pumps"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Via Tacito 4, 20094 Corsico MI, Italy", city:"Corsico", lat:null, lng:null, placeId:"ChIJRc2sa2bChkcRoETg0kfO0xE" }] },
 { id:589, slug:"oms-saleri", name:"O.M.S. Saleri Spa", logo:null, country:"Italy",
@@ -5157,6 +5381,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // Gaskets as the closest fit given the bolted-flange-connection focus.
     desc:"Online industrial leak sealing without shutdown — steam, air, water, hydrocarbon, chemical and acid leaks, ASME-compliant procedures, serving oil & gas, petrochemical, power generation and manufacturing sectors. ADIPEC 2026: Hall 9, Stand #9354.",
     site:"https://leaksealing.com",
+    delivery:["om-services"],
     cats:["gaskets"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Parc d'Activités de l'Aérodrome, 76430 Saint-Romain-de-Colbosc, France", city:"Saint-Romain-de-Colbosc", lat:null, lng:null, placeId:"ChIJZ2a9LfxH4EcRQGnxQbPyTuw" }] },
 { id:591, slug:"phoenix-mecano-middle-east-fze", name:"PHOENIX MECANO MIDDLE EAST FZE", logo:null, country:"United Arab Emirates",
@@ -5168,7 +5393,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // entities in the same free zone — placeId deliberately left null rather than misattribute.
     desc:"Regional arm of Phoenix Mecano AG, a Swiss technology company — technical enclosures, electronic components, actuators, and system integrations for industrial applications. ADIPEC 2026: Hall 13, Stand #13492.",
     site:"https://www.phoenix-mecano.com",
-    cats:["heavy-engineering-and-fabrication"],
+    cats:["hazardous-area-equipment","electrical-equipment-and-transformers"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"(unconfirmed — Jebel Ali Free Zone, Dubai, UAE)", city:"Dubai", lat:null, lng:null, placeId:null }] },
 { id:592, slug:"petrofix-oil-and-gas-services-llc", name:"Petrofix Oil & Gas Services LLC", logo:null, country:"United Arab Emirates",
     // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, substantial —
@@ -5189,6 +5414,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // company's own official regional contact page. Strongly reviewed (4.7 rating, 7 reviews).
     desc:"Global manufacturer of industrial enclosure systems — power distribution, climate control, IT infrastructure, and software & services — used across electrical engineering/automation, renewable energy, information technology, infrastructure, mechanical engineering and transport applications. ADIPEC 2026: Hall 16, Stand #16268.",
     site:"https://www.rittal.com",
+    delivery:["oem-manufacturer"],
     cats:["hazardous-area-equipment", "electrical-contractors"],
     locations:[{ type:"regional-office", name:"Middle East Headquarters", address:"Offices 2421-2423, 24th Floor, Tower B, Jafza One, Jebel Ali Free Zone, Dubai, United Arab Emirates", city:"Dubai", lat:null, lng:null, placeId:"ChIJ7U-q3-xpXz4RVIAjMiKBWIU" }] },
 { id:594, slug:"spp-pumps-ltd", name:"SPP Pumps", logo:null, country:"United Kingdom",
@@ -5198,6 +5424,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // independently verified and in TWI. $200M revenue, ~500 employees.
     desc:"Manufacturer of centrifugal pumps and associated systems, real product heritage tracing to the 1875 Pulsometer steam pump. ADIPEC 2026: Hall 8, Stand #8432.",
     site:"https://www.spppumps.com",
+    delivery:["oem-manufacturer"],
     cats:["pumps"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"1420 Lakeview, Arlington Business Park, Theale, Reading RG7 4SA, UK", city:"Reading", lat:null, lng:null, placeId:"ChIJ3xhEoUCZdkgRkbSUtve_5Yk" }] },
 { id:595, slug:"trouvay-and-cauvin-group", name:"TROUVAY & CAUVIN GROUP", logo:null, country:"United Arab Emirates",
@@ -5206,6 +5433,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // Dubai facilities) — "one stop shop for piping materials."
     desc:"Global leader in piping solutions — pipes, valves, fittings, structural steel, special piping materials, gauges, equipment and related components — for large-scale energy projects. Real ESG program targeting reduced operational carbon footprint across global operations. ADIPEC 2026: Hall 9, Stand #9350.",
     site:"https://trouvaycauvin.com",
+    delivery:["distributor-supplier"],
     cats:["pipes-and-tubes", "valves"],
     locations:[{ type:"headquarters", name:"Head Office & Yard", address:"740th St, Mina Jebel Ali, Jebel Ali Free Zone, Dubai, United Arab Emirates", city:"Dubai", lat:null, lng:null, placeId:"ChIJyxa0DYASXz4R9tjpheYWVV4" }] },
 { id:596, slug:"strohm-bv", name:"Strohm bv", logo:null, country:"Netherlands",
@@ -5214,6 +5442,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // 2024, Private Equity stage). Strongly reviewed (4.8 rating, 12 reviews).
     desc:"Manufacturer of fully bonded, thermoplastic composite pipes — lightweight, high-strength, corrosion-resistant, for flowline, jumper and riser applications in both renewable energy and conventional offshore oil & gas industries. ADIPEC 2026: Hall 11, Stand #11200.",
     site:"",
+    sectors:["fpso-offshore"],
     cats:["pipes-and-tubes"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Monnickendamkade 1, 1976 EC IJmuiden, Netherlands", city:"IJmuiden", lat:null, lng:null, placeId:"ChIJe2rJJfTxxUcR8aeBHzqoj-0" }] },
 { id:597, slug:"teledyne-gas-and-flame-detection", name:"Teledyne Gas and Flame Detection", logo:null, country:"France",
@@ -5253,6 +5482,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // for TWI's scope. Part of the voestalpine Group, a real, major Austrian steel conglomerate.
     desc:"Manufacturer of tubular steel products — real confirmed API 5CT (casing/tubing) and API 5L (line pipe) grades — for the oil & gas industry. ADIPEC 2026: Hall 9, Stand #9536.",
     site:"",
+    delivery:["oem-manufacturer"],
     cats:["pipes-and-tubes"],
     locations:[{ type:"headquarters", name:"Mill", address:"Alpinestraße 17, 8652 Kindberg, Austria", city:"Kindberg", lat:null, lng:null, placeId:"ChIJvznIr8MabkcRy7p2oBExqpk" }] },
 { id:601, slug:"serimax", name:"Serimax", logo:null, country:"Saudi Arabia",
@@ -5265,6 +5495,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // matches TWI's Welding Equipment & Consumables category, added earlier this session.
     desc:"World's foremost pipeline welding partner — fully integrated manual and automatic welding and fabrication solutions for landline and sub-sea pipeline projects, plus real welder training school and welding technology development centre in Paris. Offices worldwide including USA, Brazil, France, UK, Norway, Kazakhstan, Australia, China, Singapore, Saudi Arabia and Malaysia. ADIPEC 2026: Hall 14, Stand #14416.",
     site:"https://serimax.com",
+    delivery:["om-services", "site-erection"],
     cats:["welding-equipment-and-consumables"],
     locations:[{ type:"regional-office", name:"Welding Technology Centre (WTC)", address:"346 Rue de la Belle Étoile, 95700 Roissy-en-France, France", city:"Roissy-en-France", lat:null, lng:null, placeId:"ChIJmYzMmf8U5kcRdmerwh-7WT4" }] },
 { id:602, slug:"siad-macchine-impianti", name:"SIAD MACCHINE IMPIANTI", logo:null, country:"Italy",
@@ -5295,7 +5526,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // rating, 41 reviews at the Turbo subsidiary specifically).
     desc:"Global technology group (energy, paper, raw materials and transport markets) — turbomachinery actuators, control systems and valve assemblies for steam and gas turbines, compressors and other driven machines, plus hydraulic valve technology (high dynamics, short response times). ADIPEC 2026: Hall 8, Stand #8835.",
     site:"https://www.voith.com",
-    cats:["heavy-engineering-and-fabrication"],
+    cats:["rotating-equipment-and-gearboxes","actuators"],
     locations:[{ type:"headquarters", name:"Voith Turbo GmbH & Co. KG", address:"Alexanderstraße 2, 89522 Heidenheim an der Brenz, Germany", city:"Heidenheim an der Brenz", lat:null, lng:null, placeId:"ChIJAfejIdwVmUcRYBvWkWgxrU4" }] },
 { id:605, slug:"schroeder-valves-gmbh", name:"Schroeder Valves", logo:null, country:"Germany",
     // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, strongly reviewed
@@ -5332,7 +5563,8 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // checking directly alongside the otherwise strong industrial pedigree.
     desc:"Manufacturer of high-performance steel wire ropes — real named applications for the oil & gas industry (offshore and onshore), plus mining, cableways, cranes, construction and material transportation. Digital continuous production monitoring (GLD) over the entire rope length; in-house test rig plus third-party testing organizations. Real Tier 1 supplier status to major crane/construction machinery OEMs. ADIPEC 2026: Hall 14, Stand #14680.",
     site:"https://www.teufelberger.com",
-    cats:["heavy-engineering-and-fabrication"],
+    sectors:["fpso-offshore"],
+    cats:["cranes-and-lifting-equipment"],
     locations:[{ type:"headquarters", name:"Teufelberger Holding", address:"Vogelweiderstraße 50, 4600 Wels, Austria", city:"Wels", lat:null, lng:null, placeId:"ChIJhU7v--nyc0cRHZCR9oI5L4U" }] },
 { id:609, slug:"thermo-cables-limited", name:"Thermo Cables Limited", logo:null, country:"India",
     // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, substantial —
@@ -5343,6 +5575,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // named long-term client relationships with Railways and the Navy.
     desc:"Cable manufacturer — real reviews confirm decades of serving diverse industries including Railways and Navy, with customization capability across cable sizes from 0.1mm to 200mm. World-class integrated manufacturing across two units. ADIPEC 2026: Hall 13, Stand #13172.",
     site:"",
+    delivery:["oem-manufacturer"],
     cats:["cable-manufacturers"],
     locations:[{ type:"headquarters", name:"Unit-I", address:"Plot No. D44-D45 & D48-D49, Phase-5, IDA, Shapur Nagar, Chinthal, Jeedimetla, Hyderabad, Telangana 500055, India", city:"Hyderabad", lat:null, lng:null, placeId:"ChIJb-G5Jh2QyzsR7Nv3cRA0Ufc" }] },
 { id:610, slug:"zalux", name:"ZALUX", logo:null, country:"Spain",
@@ -5361,7 +5594,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // Real, strongly reviewed (5.0 rating, 2 reviews).
     desc:"Specialist in turbo gears and related services — service, spare parts and upgrades for steam turbines and turbo compressors, delivered by experienced project managers, engineers and designers. ADIPEC 2026: Hall 8, Stand #8830.",
     site:"",
-    cats:["heavy-engineering-and-fabrication"],
+    cats:["rotating-equipment-and-gearboxes"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Heisinger Str. 17, 87437 Kempten (Allgäu)-Hub, Germany", city:"Kempten", lat:null, lng:null, placeId:"ChIJJZc8IO95nEcRFOrnCcNu2l4" }] },
 { id:612, slug:"tecnar-automation-ltee", name:"Tecnar Automation Ltee", logo:null, country:"Canada",
     // NOTE: sourced from the ADIPEC 2026 Carbon Capture exhibitor list. Real, founded 1989 (37
@@ -5381,6 +5614,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // Pressure 3-Piece Trunnion Mounted DBB Valve for water injection pump pressure upgrades.
     desc:"Supplier and stockist of Ball, Gate, Globe, Check and Butterfly valves plus exotic alloy and specialty valves, serving chemical, oilfield, petrochemical, refining, power and water treatment industries across the Middle East, Africa, UK, US, Asia and Russia. Also supplies pipes, fittings, flanges, studbolts and gaskets. Real reviews describe it as 'the most trusted supplier of industrial valves and piping materials.' ADIPEC 2026: Hall 14, Stand #14690.",
     site:"https://www.valmark.ae",
+    delivery:["distributor-supplier"],
     cats:["valves"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"DWC Business Center, Office 129, Block A3, Dubai South Business Park, Dubai, United Arab Emirates", city:"Dubai", lat:null, lng:null, placeId:"ChIJBejC1pQMXz4R997e87aiRak" }] },
 { id:614, slug:"qapqa-bv", name:"Qapqa", logo:null, country:"Netherlands",
@@ -5399,6 +5633,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // the distinction before treating all 4 references as equally verified.
     desc:"Petroleum and crude oil storage tank manufacturer and EPC contractor — API 650 EFR/IFR/DDFR and cone roof tanks for crude oil, diesel, petrol, naphtha, ATF, kerosene and furnace oil. Real named project: IOCL Barauni Refinery (Coker-B Revamp) — tankage support, piping, painting, civil, multi-discipline EPCC. Also real named delivery to IOCL's terminal at Amlekhgunj, Nepal. 33,000 sq.ft. fabrication workshop at Kalol, Gujarat.",
     site:"https://hail.ltd",
+    delivery:["lstk-epc", "fabrication"],
     cats:["tank-construction", "epc-contractors"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Kalpavruksh Complex, A-401, Gotri Road, Vadodara, Gujarat 390021, India", city:"Vadodara", lat:null, lng:null, placeId:"ChIJefaBXSXJXzkRGyGKFek32O0" }] },
 { id:616, slug:"pt-redeco-petrolin-utama", name:"PT Redeco Petrolin Utama", logo:null, country:"Indonesia",
@@ -5522,7 +5757,8 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // clients including Fortune 500 companies. Strongly reviewed (4.8 rating, 30 reviews).
     desc:"Engineering/supply company for critical equipment and turnkey solutions for the process industry — industrial agitators/mixers, pressure vessels, nutsche filters, twin shaft dispersers, storage tanks and shell & tube heat exchangers, designed to ASME Sec VIII Div. I and PED 2014/68/EU. Serves chemical, pharmaceutical, paints, dyes and allied process industries. ADIPEC 2022: Stall 13134.",
     site:"https://acmeprocess.net",
-    cats:["heat-exchangers", "heavy-engineering-and-fabrication"],
+    delivery:["fabrication", "oem-manufacturer"],
+    cats:["heat-exchangers"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Plot No. E-6, MIDC, Bhosari, Pune, Maharashtra 411026, India", city:"Pune", lat:null, lng:null, placeId:"ChIJlQEdcIrHwjsRQs2AKDhK0UQ" }] },
 { id:628, slug:"baumer-technologies-india-private-limited", name:"Baumer Technologies India Pvt Ltd", logo:null, country:"India",
     // NOTE: sourced from the ADIPEC 2022 exhibitor list. Real, CIN U29299MH1989PTC050808,
@@ -5542,6 +5778,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // prestigious Indian startup incubator). Strongly reviewed (4.7 rating, 62 reviews).
     desc:"Industrial AI and inspection technology company — real named platform 'Qualis' for drone and robot-based visual inspection of tanks, pipelines and industrial assets, with AI-driven defect detection and asset integrity analytics. ADIPEC 2022: Stall 13416.",
     site:"https://detecttechnologies.com",
+    delivery:["om-services"],
     cats:["digital-ai-and-robotics", "inspection-drones-and-crawlers"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Module No. 2A, 3rd Floor, Block-A, Phase-II, IIT Madras Research Park, Kanagam Road, Taramani, Chennai, Tamil Nadu 600113, India", city:"Chennai", lat:null, lng:null, placeId:"ChIJd_IxDX1dUjoR7QeaMU9RP_g" }] },
 { id:632, slug:"cords-cable-industries-limited", name:"Cords Cable Industries Limited", logo:null, country:"India",
@@ -5552,6 +5789,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // Strongly reviewed (4.4 rating, 66 reviews).
     desc:"India's largest instrumentation cable manufacturer — instrumentation, control, thermocouple extension/compensating, medium-tension power and control cables (up to 3.3kV), signal and data cables. Real named served industries include electric power, steel, cement, fertilizers, chemicals, and refinery/petroleum. ADIPEC 2022: Stall 13177.",
     site:"",
+    delivery:["oem-manufacturer"],
     cats:["cable-manufacturers"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"94, 1st Floor, Near Shambhu Dayal Bagh, Old Ishwar Nagar, Okhla Industrial Area Phase-III, Kalkaji, New Delhi, Delhi 110020, India", city:"New Delhi", lat:null, lng:null, placeId:"ChIJ8Xo3Uc_mDDkRPGTDyfBLrQA" }] },
 { id:633, slug:"flovel-valves-private-limited", name:"Flovel Valves Pvt. Ltd", logo:null, country:"India",
@@ -5597,6 +5835,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // related family entity given the shared name, but do not conflate the two.
     desc:"Manufacturer and exporter of valves for Oil & Gas Upstream, Midstream and Downstream, Chemical, Power, Marine, Mining and general industry — 4 manufacturing facilities, 2 of the most modern near Mumbai, in-house ERP for large/complex orders. ADIPEC 2022: Stall CN50.",
     site:"",
+    delivery:["oem-manufacturer"],
     cats:["valves"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"R-16/R-954, Sector 8, MIDC Industrial Area, TTC Industrial Area, Rabale, Navi Mumbai, Maharashtra 400701, India", city:"Navi Mumbai", lat:null, lng:null, placeId:"ChIJrao6caDA5zsRcMQ9QypBlaE" }] },
 { id:637, slug:"chw-forge-private-limited", name:"CHW Forge Pvt Ltd", logo:null, country:"India",
@@ -5608,6 +5847,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // rating, 66 reviews).
     desc:"South Asia's leading forging manufacturer — carbon steel, alloy steel, stainless steel and duplex steel forgings; real named product lines include material handling/earth moving equipment components, rings for slew bearings & gear rings, rolled & forged flanges, and tower flanges for wind turbines. Real served industries: Aerospace, Defence, Oil & Gas, Heavy Industrial Equipment. ADIPEC 2022: Stall 13286.",
     site:"",
+    delivery:["fabrication"],
     cats:["forgings"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Unit 1, Near Hapur Road Flyover, Maliwara, Nehru Nagar, Ghaziabad, Uttar Pradesh 201001, India", city:"Ghaziabad", lat:null, lng:null, placeId:"ChIJF9qFshLuDDkRnEwsnB4GuI4" }] },
 { id:638, slug:"kirloskar-ebara-pumps-limited", name:"Kirloskar Ebara Pumps Limited", logo:null, country:"India",
@@ -5620,6 +5860,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // office") — used the MCA-confirmed registered address instead of that specific listing.
     desc:"Manufacturer of API and Non-API process pumps, boiler feed water pumps, and steam turbines for mechanical drive and generation — real named critical applications include hydrocarbon processing and nuclear power plants, plus fertilizer, water treatment, oil & gas and power industries.",
     site:"",
+    delivery:["oem-manufacturer"],
     cats:["pumps"],
     locations:[{ type:"registered-office", name:"Registered Office", address:"KEPL Office, Pride Kumar Senate, Senapati Bapat Road, Shivajinagar, Pune, Maharashtra 411016, India", city:"Pune", lat:null, lng:null, placeId:"ChIJKYsUtKu_wjsRKGjzv_zWwQU" }] },
 { id:639, slug:"steelstrong-valves-india-private-limited", name:"Steel Strong Valves", logo:null, country:"India",
@@ -5628,6 +5869,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // confirm the product line and materials range.
     desc:"Valve manufacturer — design, material procurement, manufacturing, assembly and testing of Gate, Globe, Check, Ball and Cryogenic Valves to ASME-ANSI, API and BS standards, in Carbon Steel, Alloy Steel, Stainless Steel, Duplex and Monel materials. ADIPEC 2022: Stall 13010.",
     site:"",
+    delivery:["oem-manufacturer"],
     cats:["valves"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"R-241, MIDC Industrial Area, Rabale, Navi Mumbai, Maharashtra 400701, India", city:"Navi Mumbai", lat:null, lng:null, placeId:"ChIJ_____6rA5zsR6UEOzMGeI7A" }] },
 { id:640, slug:"rockwin-flowmeter-india-private-limited", name:"Rockwin Flowmeter India Pvt Ltd", logo:null, country:"India",
@@ -5662,6 +5904,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // but worth being aware of.
     desc:"Manufacturer of industrial valves and stainless steel tube fittings — Ball Valves, Double Block & Bleed Valves, Gate Valves, Globe Valves, Check Valves, Monoflange Valves, precision double compression tube fittings, instrumentation ball/needle valves and manifolds (INLOK brand). Real named served industries: Oil & Gas, LNG, Refineries, Marine, Chemicals, Petrochemicals, Atomic Energy, Cryogenic, Water. ADIPEC 2022: Stall 13187.",
     site:"https://bholaengineers.com",
+    delivery:["oem-manufacturer"],
     cats:["valves"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Plot No. 57, Apple Industrial Hub, NH No. 8, Pelhar Road, Wakanpada, Nalasopara East, Vasai-Virar, Maharashtra 401208, India", city:"Vasai-Virar", lat:null, lng:null, placeId:"ChIJcdU7_oyo5zsR6tviRegsgxY" }] },
 { id:643, slug:"beda-flow-systems-private-limited", name:"BEDA Flow Systems Pvt. Ltd.", logo:null, country:"India",
@@ -5672,6 +5915,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // site.
     desc:"Indian distribution and technical support partner for German fluid technology manufacturers — VSE precision flow meters, Beinlich performance/gear pumps, DST magnetic couplings, Suco pressure switches, plus hydraulic components and pressure monitoring systems. Real served industries: plastics, polyurethane, chemical, pharmaceutical, paint and varnish, hydraulic and automobile. ADIPEC 2022: Stall 13781.",
     site:"https://www.bedaflow.com",
+    delivery:["distributor-supplier"],
     cats:["flow-meters", "pumps"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"W-7, W Block, Sector 11, Noida, Uttar Pradesh 201301, India", city:"Noida", lat:null, lng:null, placeId:"ChIJAQAAwALlDDkR0HE-4jzzkCg" }] },
 { id:644, slug:"niton-valve-industries-private-limited", name:"Niton Valve Industries Private Limited", logo:null, country:"India",
@@ -5683,6 +5927,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // "One of the best Valve industry in India."
     desc:"Manufacturer of Gate, Globe, Check, Ball, Dual Plate Check, Through Conduit Gate and specialty valves for critical and non-critical applications — real specific products include Trunnion Mounted Ball Valves and Dual Plate Check Valves with sea-water resistant coating. ADIPEC 2022: Stall 8250.",
     site:"",
+    delivery:["oem-manufacturer"],
     cats:["valves"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"D-115, Road No 6, Amrut Nagar, Ghatkopar Industrial Estate, Lal Bahadur Shastri Marg, Ghatkopar West, Mumbai, Maharashtra 400086, India", city:"Mumbai", lat:null, lng:null, placeId:"ChIJq6qqqs_H5zsRHh9ffrwC9MI" }] },
 { id:645, slug:"pmt-valves-private-limited", name:"PMT Valves Pvt Ltd", logo:null, country:"India",
@@ -5697,6 +5942,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     desc:"Manufacturer of instrumentation valves — Needle Valves, Manifold Valves, Ball Valves, Check Valves, Pressure Relief Valves, Bleed Valves, Tube Fittings, plus accessories (Airheader, Condensate Pot, Thermowell, Syphon, Orifice Plate Assembly). ADIPEC 2022: Stall 13176.",
     site:"https://pmtvalvesfittings.com",
     msme:{ category:null, udyamNumber:"UDYAM-GJ-01-0051217" },
+    delivery:["oem-manufacturer"],
     cats:["valves"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"460/1, Near Shreeji Estate, Phase-1, GIDC Naroda, Ahmedabad, Gujarat 382330, India", city:"Ahmedabad", lat:null, lng:null, placeId:"ChIJA_Q1fveBXjkRN2WTuRCq9BE" }] },
 { id:646, slug:"suraj-limited", name:"Suraj Limited", logo:null, country:"India",
@@ -5710,6 +5956,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // exhibitor list's exact name. Strongly reviewed (4.5 rating, 38 reviews).
     desc:"Manufacturer of stainless steel seamless heat exchanger tubes, stainless steel flanges, seamless pipes, seamless buttweld fittings, instrumentation tubes and U-tubes — real named served industries include Nuclear Power Plants, Automotive, Aerospace, Medical and Pharmaceutical. ADIPEC 2022: Stall 13280.",
     site:"https://www.surajgroup.com",
+    delivery:["oem-manufacturer"],
     cats:["heat-exchangers", "pipes-and-tubes"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Suraj House, Ashram Road, Opp. Usmanpura Garden, Sattar Taluka Society, Usmanpura, Ahmedabad, Gujarat 380009, India", city:"Ahmedabad", lat:null, lng:null, placeId:"ChIJidxBcWKEXjkRX9e5S4m4fa0" }] },
 { id:648, slug:"pon-pure-chemical-india-private-limited", name:"Pon Pure Chemical India Pvt Ltd", logo:null, country:"India",
@@ -5737,6 +5984,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // branch offices across India plus a Paris office and Sharjah, UAE task force.
     desc:"Marine and industrial automation EPC company — control panels, alarm & monitoring systems, propulsion systems, boiler control, navigational systems, AMF systems, air-dryer pump control, power/building management systems. Real served sectors: Oil & Gas, Marine, Defense, Engineering, across 5 continents. ISO 9001:2008 certified. ADIPEC 2022: Stall 13154.",
     site:"https://www.smec.in",
+    delivery:["lstk-epc", "feed-engineering"],
     cats:["instrumentation-and-automation", "epc-contractors"],
     locations:[{ type:"headquarters", name:"Kochi Office", address:"2nd Floor, Kaloor Bus Stand Complex, Kaloor, Kochi, Kerala 682017, India", city:"Kochi", lat:null, lng:null, placeId:"ChIJV0PoQzwNCDsRaO4N08BP-qs" }] },
 { id:650, slug:"axis-solutions-limited", name:"Axis Solutions Limited", logo:null, country:"India",
@@ -5751,6 +5999,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // client by a named individual — worth checking alongside the otherwise strong pattern.
     desc:"BSE-listed engineering and manufacturing company — analytical instrumentation, process automation, industrial shelters, hazardous area HVAC, environmental monitoring; real named product lines include CEMS, SWAS, Gas Systems, Purge Panels, Analyzer Shelters, EQMS and AAQMS Analyzers. Real served industries: Oil & Gas, Petrochemical, Refineries, Power, Coal & Mining, Chemical, Water & Wastewater — across India, SAARC, Europe, Middle East and Africa. ADIPEC 2022: Stall 13185 (listed as Axis Solutions Private Limited).",
     site:"https://axisindia.in",
+    delivery:["oem-manufacturer", "feed-engineering"],
     cats:["instrumentation-and-automation", "hazardous-area-equipment"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Plot No. 107-112, Road Number 6, Khodal Dham Society, Kathwada GIDC, Odhav Industrial Estate, Ahmedabad, Gujarat 382430, India", city:"Ahmedabad", lat:null, lng:null, placeId:"ChIJ8_qnyIqEXjkRDja1d3J8L3s" }] },
 { id:651, slug:"tianmo-environmental-india-private-limited", name:"Tianmo Environmental India Pvt. Ltd.", logo:null, country:"India",
@@ -5763,6 +6012,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // ISO 9001:2015, ISO 14001:2015, OHSAS 18001:2007 certified.
     desc:"Design and construction of coded pressure vessels, shell and tube heat exchangers, distillation columns, Vapour Recovery Units (VRU) and pressurized filter vessels — real named applications in Oil & Gas refineries, Petrochemicals, Pharmaceuticals and Refrigeration. ADIPEC 2022: Stall 13143.",
     site:"https://tianmoindia.com",
+    delivery:["fabrication", "feed-engineering"],
     cats:["heat-exchangers"],
     locations:[{ type:"headquarters", name:"Headquarters (TEIPL)", address:"Plot No. 22, 809, Tower 2, Assotech Business Cresterra, Sector 135, Noida, Uttar Pradesh 201304, India", city:"Noida", lat:null, lng:null, placeId:"ChIJq6r6hSbmDDkRF4VL2UougqU" }] },
 { id:652, slug:"veer-o-metals-private-limited", name:"VEER-O-METALS PRIVATE LIMITED", logo:null, country:"India",
@@ -5775,7 +6025,8 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // aerospace).
     desc:"Metal engineering manufacturer — Stamped Parts, Precision Sheet Metal Fabrication, Busbar Critical Machining, Mechanical Assembly, and metal 3D printing/additive manufacturing. Real named served industries: medical, automotive, aerospace, oil & gas. 4 manufacturing units in Bengaluru, engaged in defence-related parts and assemblies. ADIPEC 2022: Stall 13273.",
     site:"https://www.veerometals.com",
-    cats:["heavy-engineering-and-fabrication"],
+    delivery:["fabrication"],
+    cats:["steel-manufacturers"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"No. A-02, BEL Industrial Estate, Sundara Nagar, Gokula Extension, Jalahalli, Bengaluru, Karnataka 560013, India", city:"Bengaluru", lat:null, lng:null, placeId:"ChIJS4SXS1g9rjsRak741wqtsAg" }] },
 { id:653, slug:"syno-pumps-i-private-limited", name:"SYNO PUMPS (I) PVT. LTD", logo:null, country:"India",
     // NOTE: sourced from the ADIPEC 2022 exhibitor list. Real, genuine history back to 1968
@@ -5786,6 +6037,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // 18 reviews) with detailed, genuine technical feedback.
     desc:"Manufacturer of Progressive Cavity Pumps, Cavity Pumps, Hygienic Pumps and Dosing Pumps — real named served industries directly include Waste Water, Oil, Power and Chemical Industries, alongside Pulp & Paper, Food, Sugar & Distillery, Pharmaceuticals and Fertilizer. Complete in-house manufacturing infrastructure (SPMs, CNCs, VMCs, HCP Plant, rubber mixing/formulation). ADIPEC 2022: Stall 13234.",
     site:"",
+    delivery:["oem-manufacturer"],
     cats:["pumps"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"E30, Site 3, Industrial Area, Panki, Kanpur, Uttar Pradesh 208022, India", city:"Kanpur", lat:null, lng:null, placeId:"ChIJAQAAAORHnDkRKOywakCTP6o" }] },
 { id:654, slug:"mallak-specialties-private-limited", name:"Mallak Specialities Pvt Ltd", logo:null, country:"India",
@@ -5809,6 +6061,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // reviewed (4.9 rating, 7 reviews).
     desc:"Safety industry manufacturer — Fall Protection, Fire Fighting, Search and Rescue Products, Environmental Health and Safety, and Face Protection equipment. Branch offices across India plus principal representations in Europe and the United States. ADIPEC 2022: Stall 13210.",
     site:"https://www.unicareemergency.com",
+    delivery:["oem-manufacturer"],
     cats:["occupational-safety", "fire-protection"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"2nd Floor, Leslico House, Prof. VS Agashe Road, Near Kabutar Khana, Dadar West, Mumbai, Maharashtra 400028, India", city:"Mumbai", lat:null, lng:null, placeId:"ChIJ____v8TO5zsRVSG0wkM560k" }] },
 { id:656, slug:"uniflow-controls-private-limited", name:"Uniflow Controls Pvt Ltd", logo:null, country:"India",
@@ -5829,6 +6082,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // Europe and North East Asia.
     desc:"Manufacturer of primary process control instruments — temperature gauges, pressure gauges, Resistance Temperature Detectors (RTDs), mineral insulated thermocouples, tube skin thermocouples, thermowells (including Vanstone and Helical types), level gauges, orifice plates, flow nozzles, Venturi tubes, differential pressure gauges, V-Cone flow elements and manifold valves. ADIPEC 2022: Stall 13133.",
     site:"https://thermalinstrument.net",
+    delivery:["oem-manufacturer"],
     cats:["instrumentation-and-automation", "flow-meters"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"B-1009, 10th Floor, Kohinoor Square, Plot No. 46, N.C. Kelkar Marg, Opp. Shivsena Bhavan, Dadar West, Mumbai, Maharashtra 400028, India", city:"Mumbai", lat:null, lng:null, placeId:"ChIJRaw68dHO5zsRkxQcimIlOEk" }] },
 { id:658, slug:"tubefit-engineers", name:"Tubefit Engineers", logo:null, country:"India",
@@ -5841,6 +6095,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // rating, 54 reviews).
     desc:"Design, engineering and manufacture of Tube Fittings (Double Ferrule, Single Ferrule, DIN-2353), Pipe Fittings, Instrumentation Valves, Air Headers, Condensate Pots, Manifolds and Chemical Injection Quills — real named product lines include hydrogen fittings, double block & bleed, cryogenic valves and sampling systems, serving worldwide customers across North/South America, Europe, Australia, Middle East and Far East Asia. ADIPEC 2022: Stall 416.",
     site:"https://www.tubefiteng.com",
+    delivery:["oem-manufacturer"],
     cats:["valves", "pipes-and-tubes"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Building No. 4, Sativali Road, Near Sai Baba Mandir, Sheetal Supreme Industrial Estate, Golani Naka, Vasai East, Vasai-Virar, Maharashtra 401208, India", city:"Vasai-Virar", lat:null, lng:null, placeId:"ChIJPdr-s9ao5zsR2jqXQKFGbwk" }] },
 { id:659, slug:"leak-proof-engineering-india-private-limited", name:"Leak Proof Engineering (India) Private Limited", logo:null, country:"India",
@@ -5863,7 +6118,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     desc:"Manufacturer of precision castings, machined components and industrial spare parts — Flexible Hose Products (gases, solids, fluids under high temperature/pressure/vacuum/vibration), Hydraulic Rotary Unions, Rotary Joints, Steam Tube Dryers, Air Shafts, Carbon/Graphite dynamic sealing products, and Precision Blades. Real named served industries span Chemical & Petrochemical Plants, Marine, Oil & Gas Rig Services, Ships & Ports, plus many others.",
     site:"",
     msme:{ category:"Micro", udyamNumber:"UDYAM-GJ-01-0034789" },
-    cats:["heavy-engineering-and-fabrication", "flexible-hoses"],
+    cats:["flexible-hoses"],
     locations:[{ type:"headquarters", name:"Registered Office", address:"1st Floor, Ashirwad Building, Opp. H.K. House, Ashram Road, Navrangpura, Ahmedabad, Gujarat 380009, India", city:"Ahmedabad", lat:null, lng:null, placeId:"ChIJLVp_EV-EXjkRKlptZfu6idU" }] },
 { id:661, slug:"marathon-heater-india-private-limited", name:"Marathon Heater (India) Pvt. Ltd.", logo:null, country:"India",
     // NOTE: sourced from the ADIPEC 2022 exhibitor list. Real, CIN U31909RJ2008PTC026148
@@ -5878,6 +6133,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // reviews — a real mixed pattern).
     desc:"Manufacturer of industrial heaters and temperature sensors — Cartridge Heaters, Silicone Rubber Heaters, Mica Band Heaters, Strip Heaters, Ceramic Band Heaters, Duct Heaters, Explosion-Proof Heaters, Skid Mounted Circulation Heaters, and thermocouples/RTDs. 160+ employees across a 12,000 sq ft India facility. ADIPEC 2022: Stall 13240.",
     site:"",
+    delivery:["oem-manufacturer"],
     cats:["heating-systems"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"B-188, B-189, Road No. 5, Mewar Industrial Area, Madri, Udaipur, Rajasthan 313003, India", city:"Udaipur", lat:null, lng:null, placeId:"ChIJCVr3VtLpZzkRKU0KTgED9dE" }] },
 { id:662, slug:"shrimaruti-precision-engineering-private-limited", name:"Shri Maruti Precision Engineering Pvt Ltd", logo:null, country:"India",
@@ -5890,6 +6146,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // reviews).
     desc:"Manufacturer and exporter of Internal Gear Pumps, Rotary Gear Pumps, Oil Pump Gears, Bitumen Pumps, Industrial Gear Pumps, Oil Transfer Pumps, Fuel Transfer Gear Pumps, Air Operated Diaphragm Pumps and Oil Burner Pumps — real applications for Boilers and Hydraulic Drives, sustaining high pressure with liquids up to 450 cSt. ADIPEC 2022: Stall 13246.",
     site:"https://www.marutipump.com",
+    delivery:["oem-manufacturer"],
     cats:["pumps"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"A/7, Mahadev Estate, Part-3, Near Ramol Police Station, CTM-Ramol Road, Ahmedabad, Gujarat 382449, India", city:"Ahmedabad", lat:null, lng:null, placeId:"ChIJJ_frKCOGXjkR3859OTJwT_I" }] },
 { id:663, slug:"enopeck-seals-industries-private-limited", name:"Enopeck Seals Industries", logo:null, country:"India",
@@ -5916,6 +6173,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // worth checking directly given the split pattern.
     desc:"Manufacturer and exporter of Instrumentation Valves & Fittings — Manifold Valves, Monoflange Valves, Needle Valves, Twin Ferrule Fittings, Pipe Fittings & Adapters, 37° JIC Flare Fittings, Hydraulic Adapters (BS5200), DIN 2353 Tube Fittings — in stainless steel and other exotic materials, regularly exported to USA, UK and European countries. ADIPEC 2022: Stall 13230.",
     site:"https://www.fluidfitengg.com",
+    delivery:["oem-manufacturer"],
     cats:["valves"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Unit 12, Supreme Estate, Lucky Compound, Kaman Bhiwandi Road, Chinchoti Phata, Vasai East, Vasai-Virar, Maharashtra 401208, India", city:"Vasai-Virar", lat:null, lng:null, placeId:"ChIJXZHva4ul5zsR2dJtTUm22x0" }] },
 { id:665, slug:"red-fort-ppe-industries-private-limited", name:"Red Fort PPE Industries Pvt Ltd", logo:null, country:"India",
@@ -5929,6 +6187,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // alongside a positive one — worth checking directly given the split pattern.
     desc:"Manufacturer of industrial safety workwear and advanced technical textiles — real named product lines include Coveralls, Fire Fighting Suits, Rain Wear, Boiler Suits and Turn Out Gear (brands: Red Fort Workwear, Red Star WorkWear, Prime Victor, Pro Blaze, Desert King Workwear). Real served industries: Oil & Gas, Pharma, Engineering, Chemical, Refineries, EPC. ADIPEC 2022: Stall 13135.",
     site:"",
+    delivery:["oem-manufacturer"],
     cats:["occupational-safety"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Building No. E-4 (Sutra), Asmeeta Texpa Phase 2, MIDC Plot No. 1, Additional Kalyan Bhiwandi Industrial Area, Kon, Bhiwandi, Maharashtra 421311, India", city:"Bhiwandi", lat:null, lng:null, placeId:"ChIJh8HwgCuW5zsRqDI0vNsjlXs" }] },
 { id:666, slug:"goodluck-engineering-co-forgings", name:"Goodluck Engineering Co. (Forgings)", logo:null, country:"India",
@@ -5956,6 +6215,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // the Puma Storage terminal (87,800 m³ capacity).
     desc:"Engineering, construction and turnkey solutions for liquid bulk storage terminals — alcohol, chemicals, petroleum and derivatives. Full scope from design/feasibility studies through procurement, construction, licensing, assembly and commissioning of storage bases and terminals.",
     site:"https://www.emypro.com.br",
+    delivery:["lstk-epc", "feed-engineering"],
     cats:["tank-construction", "epc-contractors"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"R. Eng. José Brandão Cavalcante, 117, Imbiribeira, Recife, PE 51170-135, Brazil", city:"Recife", lat:null, lng:null, placeId:"ChIJQSEmYvwfqwcRRXqoNYmeEpU" }] },
 { id:668, slug:"singular-industrial", name:"Singular Industrial", logo:null, country:"Brazil",
@@ -6118,6 +6378,8 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // one — worth checking directly.
     desc:"Global manufacturer and supplier of steel pipes and related services for the energy industry — real named local operations include the Rig Direct service model and One Line pipeline solutions, OCTG threading, and a fully equipped pipe service yard for storage, inspection and preparation of tubulars.",
     site:"https://www.tenaris.com",
+    delivery:["oem-manufacturer"],
+    sectors:["fpso-offshore"],
     cats:["pipes-and-tubes"],
     locations:[{ type:"headquarters", name:"Etihad Tubulars", address:"Abu Dhabi Industrial City, ICAD 3, Abu Dhabi, United Arab Emirates", city:"Abu Dhabi", lat:null, lng:null, placeId:"ChIJwdbSpos_Xj4RclBDGg92Sng" }] },
 { id:686, slug:"tuv-sud-middle-east-llc", name:"TUV SUD Middle East LLC", logo:null, country:"United Arab Emirates",
@@ -6127,6 +6389,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // minor logistics complaints about the facility's remote location.
     desc:"Testing, inspection, certification and training services — real Abu Dhabi Industrial City (ICAD III) facility offering technical training programs.",
     site:"",
+    delivery:["om-services"],
     cats:["inspection-and-certification", "certification-bodies"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Ahl Al Ilm St, Abu Dhabi Industrial City, ICAD III, Abu Dhabi, United Arab Emirates", city:"Abu Dhabi", lat:null, lng:null, placeId:"ChIJzfQD711mXj4R6vMGz6ZiUCg" }] },
 { id:687, slug:"intertek-inspec-abu-dhabi", name:"Intertek (Inspec)", logo:null, country:"United Arab Emirates",
@@ -6139,6 +6402,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // (4.6 rating, 22 reviews).
     desc:"NDT inspection services — real reviews confirm Mechanical Testing, PWHT (Post Weld Heat Treatment) and inspection assistance.",
     site:"",
+    delivery:["om-services"],
     cats:["non-destructive-testing-ndt", "inspection-and-certification"],
     locations:[{ type:"headquarters", name:"Inspec (International Inspection Services)", address:"Musaffah 26, Abu Dhabi, United Arab Emirates", city:"Abu Dhabi", lat:null, lng:null, placeId:"ChIJa8VwwIlBXj4RrYMQ1ZNp_t0" }] },
 { id:688, slug:"veolia-environmental-services-uae", name:"Veolia Environmental Services", logo:null, country:"United Arab Emirates",
@@ -6177,6 +6441,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // listing carries more uncertainty than most entries; verify before use.
     desc:"Heavy lift and transport services — real global company specializing in engineered heavy lifting and specialized transport for large-scale industrial projects.",
     site:"",
+    sectors:["fpso-offshore"],
     cats:["heavy-lift-and-transport"],
     locations:[{ type:"headquarters", name:"Abu Dhabi Office", address:"16th Street, Musaffah, M37, Abu Dhabi, United Arab Emirates", city:"Abu Dhabi", lat:null, lng:null, placeId:"ChIJWRgo7ARBXj4Ru1A3Fnpimww" }] },
 { id:692, slug:"ppg-industrial-coatings-middle-east", name:"PPG Industrial Coatings Middle East", logo:null, country:"United Arab Emirates",
@@ -6217,6 +6482,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // facility as "the best in class" after "almost 30 years in the business."
     desc:"Vallourec Tubular Services Abu Dhabi (VTSA) — real pipe yard offering OCTG storage, rig site service and related pipe services, operated in partnership with ADOS (Abu Dhabi Oilfield Services Company).",
     site:"https://middle-east.vallourec.com",
+    sectors:["fpso-offshore"],
     cats:["pipes-and-tubes"],
     locations:[{ type:"headquarters", name:"VTSA", address:"Al Athlah St, Abu Dhabi Industrial City, ICAD III, Abu Dhabi, United Arab Emirates", city:"Abu Dhabi", lat:null, lng:null, placeId:"ChIJVef3q00_Xj4RifWtTQWWFD4" }] },
 { id:695, slug:"ad-ports-group", name:"AD Ports Group", logo:null, country:"United Arab Emirates",
@@ -6295,7 +6561,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // ~$542M in acquired net operating revenue (2022). Real subsidiaries in 37 countries.
     desc:"Regional office of WEG — real global manufacturer of electric motors, generators, transformers, drives and automation equipment.",
     site:"",
-    cats:["heavy-engineering-and-fabrication"],
+    cats:["electrical-equipment-and-transformers"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Jafza One, Tower B, 1322, Jebel Ali Free Zone, Dubai, United Arab Emirates", city:"Dubai", lat:null, lng:null, placeId:"ChIJM3JQPIANXz4R4no_8XmzqSU" }] },
 { id:703, slug:"clariant-gulf-fze", name:"Clariant (Gulf) FZE", logo:null, country:"United Arab Emirates",
     // NOTE: sourced from the ADIPEC 2022 exhibitor list (UAE-listed). Real, confirmed genuine
@@ -6318,6 +6584,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // friction point, not a business-legitimacy concern, worth being aware of.
     desc:"UAE's largest steel and building materials manufacturer — real named products include Rebar, Wire Rod, Heavy Sections, Cement, Clinker, Concrete Blocks and Pipes, serving construction, engineering and energy sectors.",
     site:"https://www.emsteel.com",
+    delivery:["oem-manufacturer"],
     cats:["steel-manufacturers"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Industrial City of Abu Dhabi, ICAD 1, Abu Dhabi, United Arab Emirates", city:"Abu Dhabi", lat:null, lng:null, placeId:"ChIJfakKV39AXj4R14T-c_n3hHM" }] },
 { id:705, slug:"ducab-dubai-cable-company", name:"Ducab (Dubai Cable Company)", logo:null, country:"United Arab Emirates",
@@ -6329,6 +6596,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // feedback about factory tours, quality and hospitality.
     desc:"Global leader in development, design, manufacture, marketing and distribution of copper and aluminium wire and cable products, including overhead conductors — real named served industries include oil, gas, marine and construction.",
     site:"https://ducab.com",
+    delivery:["oem-manufacturer"],
     cats:["cable-manufacturers"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Al Hesah Street, Hessyan First, Dubai, United Arab Emirates", city:"Dubai", lat:null, lng:null, placeId:"ChIJF9DGkTEPXz4R_4ljtKFfbXc" }] },
 { id:706, slug:"wika-middle-east-fze", name:"WIKA Middle East FZE", logo:null, country:"United Arab Emirates",
@@ -6342,6 +6610,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // channel, especially for smaller orders.
     desc:"Regional office (serving GCC markets via Dubai, Abu Dhabi, Oman, Qatar, Saudi Arabia and Kuwait) of WIKA, a real global market leader in pressure, temperature, flow and level measurement and calibration technology.",
     site:"https://www.wika.ae",
+    delivery:["oem-manufacturer", "distributor-supplier"],
     cats:["instrumentation-and-automation"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Warehouse RA08JB02, Jebel Ali Free Zone, Dubai, United Arab Emirates", city:"Dubai", lat:null, lng:null, placeId:"ChIJ18MKEPANXz4RP0c4wQhghZY" }] },
 { id:707, slug:"pepperl-fuchs-me-fze", name:"Pepperl+Fuchs (ME) FZE", logo:null, country:"United Arab Emirates",
@@ -6601,6 +6870,66 @@ let activeCategory = null;   // single L2 slug filter, or null
 let activeRegion = 'all';
 function isIndian(c) { return (c.country || '').trim().toLowerCase() === 'india'; }
 
+// ── Delivery model: a SECOND, ORTHOGONAL axis to the category tree ──────
+// The category tree answers "what does this company make or build?".
+// Delivery model answers "how do they engage?" — and the two are genuinely
+// independent: a tank-construction company might be an LSTK turnkey
+// contractor, a shop fabricator, or an erection-only subcontractor, and
+// those are completely different businesses to a buyer.
+//
+// Keeping this separate is deliberate. Folding it into the category tree
+// (an "EPC Tank Construction" category alongside "Tank Construction") is
+// what produced the overloaded Heavy Engineering & Fabrication bucket and
+// the 400-category cross-multiplied proposal: sector/model × capability
+// explodes combinatorially and leaves every bucket too thin to be useful.
+// As an independent tag you can ask "tank builders who do turnkey" without
+// duplicating the capability tree once per model.
+//
+// A company may hold several (a firm that both manufactures and erects).
+const DELIVERY_MODELS = [
+  ['lstk-epc',              'LSTK / Turnkey EPC',      'Carries single-point turnkey responsibility — design through commissioning.'],
+  ['epcm',                  'EPCM',                    'Manages engineering, procurement and construction on the owner\u2019s behalf, without carrying construction risk.'],
+  ['feed-engineering',      'Engineering / FEED',      'Design-house work — concept, FEED, detailed engineering, consultancy.'],
+  ['fabrication',           'Fabrication (Shop)',      'Builds to drawing in its own shop or yard; not necessarily site-erecting.'],
+  ['site-erection',         'Site Erection & Commissioning', 'Erects, installs and commissions on site, typically under a main contractor.'],
+  ['oem-manufacturer',      'OEM / Product Manufacturer', 'Manufactures its own catalogue product line.'],
+  ['distributor-supplier',  'Distributor / Supplier',  'Stockist, trading house or authorised channel partner rather than the maker.'],
+  ['om-services',           'O&M / Maintenance Services', 'Ongoing operations, maintenance, turnaround and service contracts.'],
+];
+const DELIVERY_LABEL = Object.fromEntries(DELIVERY_MODELS.map(([k, l]) => [k, l]));
+// null = no filter applied; otherwise a single delivery-model key.
+let activeDelivery = null;
+
+// ── Sector served: a THIRD orthogonal axis ─────────────────────────────
+// Category = what they make. Delivery model = how they engage.
+// Sector = which end market they serve.
+//
+// This is the axis that makes cross-cutting questions answerable: "NDT
+// providers serving FPSO operators" or "coating contractors working
+// refineries" — queries that a single flat tree cannot express without
+// duplicating every capability once per sector (which is exactly how the
+// 400-category proposal ballooned).
+//
+// Deliberately coarse. These are end markets a buyer or analyst would
+// actually segment by, not a second taxonomy — if a sector here ever needs
+// sub-division, that is a signal it belongs in the capability tree instead.
+const SECTORS = [
+  ['fpso-offshore',      'FPSO / Offshore Production', 'Floating production, offshore platforms, subsea and marine production assets.'],
+  ['refinery',           'Refinery',                   'Crude refining and associated process units.'],
+  ['petrochemical',      'Petrochemical',              'Petrochemical and downstream chemical manufacturing.'],
+  ['terminals-storage',  'Terminals & Storage',        'Tank farms, bulk liquid terminals and storage depots.'],
+  ['gas-processing-lng', 'Gas Processing & LNG',       'Gas treatment, liquefaction, regasification and LNG value chain.'],
+  ['pipelines',          'Pipelines',                  'Cross-country and in-plant pipeline transmission systems.'],
+  ['upstream',           'Upstream E&P',               'Drilling, well services and hydrocarbon exploration/production.'],
+  ['power-generation',   'Power Generation',           'Thermal, nuclear and conventional power plants.'],
+  ['marine-shipping',    'Marine & Shipping',          'Vessels, shipyards, ports and marine logistics.'],
+  ['water-utilities',    'Water & Utilities',          'Water treatment, desalination and plant utility systems.'],
+  ['renewables',         'Renewables & Energy Transition', 'Solar, storage, hydrogen, biofuels and carbon capture.'],
+];
+const SECTOR_LABEL = Object.fromEntries(SECTORS.map(([k, l]) => [k, l]));
+// null = no filter applied; otherwise a single sector key.
+let activeSector = null;
+
 // Category tree is now up to three levels: sheet (L1) → category (L2) →
 // sub-category (L3, e.g. TS-01.1 Radar Level Gauges under TS-01 Tank Gauging).
 // L3 is OPTIONAL — most L2 entries have no `items` array at all, so every
@@ -6635,7 +6964,18 @@ function categoryWithDescendants(slug) {
 }
 
 function setRegion(r) {
-  location.hash = buildFilterHash(activeCategory, r);
+  location.hash = buildFilterHash(activeCategory, r, activeDelivery, activeSector);
+}
+
+// Same toggle-off-on-reclick behaviour as setDelivery/selectCategory.
+function setSector(sec) {
+  location.hash = buildFilterHash(activeCategory, activeRegion, activeDelivery, activeSector === sec ? null : sec);
+}
+
+// Toggles off when the active model is clicked again, matching how
+// selectCategory() behaves — one tap to filter, one to clear.
+function setDelivery(d) {
+  location.hash = buildFilterHash(activeCategory, activeRegion, activeDelivery === d ? null : d, activeSector);
 }
 
 // ── Filter/view state ↔ URL hash ────────────────────────────────────────
@@ -6646,20 +6986,25 @@ function setRegion(r) {
 // instead of returning to the previous filter/category. Encoding this state
 // into the hash — and driving it exclusively through handleRoute() — means
 // every meaningful navigation is a real, back-button-able history entry.
-function buildFilterHash(cat, region) {
+function buildFilterHash(cat, region, delivery, sector) {
   const params = [];
   if (cat) params.push('cat=' + encodeURIComponent(cat));
   if (region && region !== 'all') params.push('region=' + encodeURIComponent(region));
+  if (delivery) params.push('delivery=' + encodeURIComponent(delivery));
+  if (sector) params.push('sector=' + encodeURIComponent(sector));
   return '#/' + (params.length ? ('?' + params.join('&')) : '');
 }
 
 function parseFilterHash(hash) {
-  const out = { cat: null, region: 'all' };
+  const out = { cat: null, region: 'all', delivery: null, sector: null };
   const qIdx = hash.indexOf('?');
   if (qIdx === -1) return out;
   const qs = new URLSearchParams(hash.slice(qIdx + 1));
   if (qs.has('cat')) out.cat = qs.get('cat');
   if (qs.has('region')) out.region = qs.get('region');
+  // Guard against a hand-edited or stale hash naming a model we don't have.
+  if (qs.has('delivery') && DELIVERY_LABEL[qs.get('delivery')]) out.delivery = qs.get('delivery');
+  if (qs.has('sector') && SECTOR_LABEL[qs.get('sector')]) out.sector = qs.get('sector');
   return out;
 }
 
@@ -6679,6 +7024,51 @@ function renderRegionFilter() {
       ${opts.map(([k, label, n]) => `
         <button class="rf-btn ${activeRegion === k ? 'active' : ''}" onclick="setRegion('${k}')">
           ${label}<span class="rf-count">${n}</span>
+        </button>`).join('')}
+    </div>`;
+}
+
+// Rendered as a wrapping chip row rather than the segmented control used for
+// LOCATION: there are eight models (vs three regions) and they're a
+// multi-value tag, so a segmented control would be both too wide and
+// misleading about exclusivity. Models with no tagged companies are hidden
+// entirely — an unclickable zero chip is just noise while tagging is still
+// being rolled out across the roster.
+function renderDeliveryFilter() {
+  const el = document.getElementById('deliveryFilter');
+  if (!el) return;
+  const counts = {};
+  COMPANIES.forEach(c => (c.delivery || []).forEach(d => { counts[d] = (counts[d] || 0) + 1; }));
+  const shown = DELIVERY_MODELS.filter(([k]) => counts[k]);
+  if (!shown.length) { el.innerHTML = ''; return; }
+  el.innerHTML = `
+    <div class="rf-label">DELIVERY MODEL</div>
+    <div class="df-chips">
+      ${shown.map(([k, label, help]) => `
+        <button class="df-chip ${activeDelivery === k ? 'active' : ''}"
+                title="${help.replace(/"/g, '&quot;')}"
+                onclick="setDelivery('${k}')">
+          ${label}<span class="rf-count">${counts[k]}</span>
+        </button>`).join('')}
+    </div>`;
+}
+
+// Mirrors renderDeliveryFilter — same chip pattern, same hide-if-empty rule.
+function renderSectorFilter() {
+  const el = document.getElementById('sectorFilter');
+  if (!el) return;
+  const counts = {};
+  COMPANIES.forEach(c => (c.sectors || []).forEach(x => { counts[x] = (counts[x] || 0) + 1; }));
+  const shown = SECTORS.filter(([k]) => counts[k]);
+  if (!shown.length) { el.innerHTML = ''; return; }
+  el.innerHTML = `
+    <div class="rf-label">SECTOR SERVED</div>
+    <div class="df-chips">
+      ${shown.map(([k, label, help]) => `
+        <button class="df-chip sector ${activeSector === k ? 'active' : ''}"
+                title="${help.replace(/"/g, '&quot;')}"
+                onclick="setSector('${k}')">
+          ${label}<span class="rf-count">${counts[k]}</span>
         </button>`).join('')}
     </div>`;
 }
@@ -6718,12 +7108,12 @@ function toggleSheet(slug) {
 
 function selectCategory(slug) {
   const newCat = (activeCategory === slug) ? null : slug;
-  location.hash = buildFilterHash(newCat, activeRegion);
+  location.hash = buildFilterHash(newCat, activeRegion, activeDelivery, activeSector);
 }
 
 function clearFilters() {
   document.getElementById('searchBox').value = '';
-  location.hash = buildFilterHash(null, 'all');
+  location.hash = buildFilterHash(null, 'all', null, null);
 }
 
 // Registered office is always locations[0] by construction — used anywhere
@@ -6753,6 +7143,13 @@ function filteredCompanies() {
     }
     if (activeRegion === 'india' && !isIndian(c)) return false;
     if (activeRegion === 'international' && isIndian(c)) return false;
+    // Delivery model is a separate axis from category — a company matches
+    // only if it has been tagged. Untagged companies simply drop out of a
+    // delivery-filtered view rather than being assumed to fit any model.
+    if (activeDelivery && !(c.delivery || []).includes(activeDelivery)) return false;
+    // Sector served — same opt-in semantics as delivery: untagged companies
+    // drop out rather than being assumed to serve every market.
+    if (activeSector && !(c.sectors || []).includes(activeSector)) return false;
     if (q) {
       const loc = primaryLocation(c);
       const hay = (c.name + ' ' + loc.city + ' ' + c.desc + ' ' +
@@ -6785,6 +7182,8 @@ function renderCards() {
     }).join('');
     const more = c.cats.length > 3 ? `<span class="tag more">+${c.cats.length - 3}</span>` : '';
     const msmeRow = c.msme ? `<div class="card-msme-row">${msmeBadgeHtml(c, true)}${udyamCtaHtml(c)}</div>` : '';
+    const deliveryRow = ((c.delivery || []).length || (c.sectors || []).length)
+      ? `<div class="card-delivery-row">${deliveryBadgesHtml(c, true)}${sectorBadgesHtml(c, true)}</div>` : '';
     return `
       <a class="company-card" href="#/company/${c.slug}">
         <div class="card-header">
@@ -6797,6 +7196,7 @@ function renderCards() {
         <div class="card-desc">${c.desc}</div>
         <div class="card-tags">${tags}${more}</div>
         ${msmeRow}
+        ${deliveryRow}
       </a>`;
   }).join('');
 }
@@ -6864,6 +7264,33 @@ function udyamCtaHtml(c) {
   return `<span class="udyam-cta pending" onclick="event.preventDefault(); alert('Udyam number not yet added. Once company claiming is live (via TankWorld India or Tankonomics), verified owners will be able to add this directly from their listing.');" title="Click for status">UDYAM:</span>`;
 }
 
+// c.delivery = ["lstk-epc", "fabrication", ...] — the delivery-model axis.
+// Cards cap the list at two badges (a "+N" carries the rest) so a company
+// with four models doesn't push the card's tag row into a third line; the
+// profile page shows all of them. Unknown keys are skipped rather than
+// rendered raw, so a stale tag can't leak an ugly slug into the UI.
+// Sector badges use a distinct tint from delivery badges so a card showing
+// both doesn't read as one undifferentiated run of grey chips.
+function sectorBadgesHtml(c, compact) {
+  const secs = (c.sectors || []).filter(x => SECTOR_LABEL[x]);
+  if (!secs.length) return '';
+  const shown = compact ? secs.slice(0, 2) : secs;
+  const extra = compact && secs.length > 2 ? secs.length - 2 : 0;
+  return shown.map(x =>
+    `<span class="badge-sector" title="Serves: ${SECTOR_LABEL[x]}">${SECTOR_LABEL[x]}</span>`
+  ).join('') + (extra ? `<span class="badge-sector">+${extra}</span>` : '');
+}
+
+function deliveryBadgesHtml(c, compact) {
+  const models = (c.delivery || []).filter(d => DELIVERY_LABEL[d]);
+  if (!models.length) return '';
+  const shown = compact ? models.slice(0, 2) : models;
+  const extra = compact && models.length > 2 ? models.length - 2 : 0;
+  return shown.map(d =>
+    `<span class="badge-delivery" title="How this company engages: ${DELIVERY_LABEL[d]}">${DELIVERY_LABEL[d]}</span>`
+  ).join('') + (extra ? `<span class="badge-delivery">+${extra}</span>` : '');
+}
+
 // Reverse view: entities in the directory that name THIS company as parent.
 function subsidiariesHtml(c) {
   const kids = COMPANIES.filter(x => x.parent && x.parent.slug === c.slug);
@@ -6929,6 +7356,7 @@ function renderCompanyPage(slug) {
       </div>
     </div>
     ${c.msme ? `<div class="cp-msme-row">${msmeBadgeHtml(c, false)}${udyamCtaHtml(c)}</div>` : ''}
+    ${((c.delivery || []).length || (c.sectors || []).length) ? `<div class="cp-delivery-row">${deliveryBadgesHtml(c, false)}${sectorBadgesHtml(c, false)}</div>` : ''}
     <div class="cp-desc">${c.desc}</div>
     <a class="cp-site" href="${c.site}" target="_blank" rel="noopener">Visit Website ↗</a>
     <div class="cp-section-label">Locations (${c.locations.length})</div>
@@ -6980,6 +7408,8 @@ function handleRoute() {
     const parsed = parseFilterHash(hash);
     activeCategory = parsed.cat;
     activeRegion = parsed.region;
+    activeDelivery = parsed.delivery;
+    activeSector = parsed.sector;
 
     document.querySelectorAll('.sheet-item').forEach(el => {
       el.classList.toggle('active', el.dataset.slug === activeCategory);
@@ -6994,6 +7424,8 @@ function handleRoute() {
     }
 
     renderRegionFilter();
+    renderDeliveryFilter();
+    renderSectorFilter();
     renderAll();
   }
 }
@@ -7150,6 +7582,15 @@ async function seedCompanies() {
           // regardless of what the in-page array says — re-run Seed
           // Companies after deploying this fix to backfill all 538 records.
           msme: c.msme || null,
+          // Same reasoning as msme above: no admin editor writes delivery
+          // independently yet, so there is nothing in Firestore to clobber
+          // and it is safe to write straight from the in-page array.
+          // Including it HERE at the same time the field was introduced is
+          // deliberate — msme shipped without this line and the field
+          // silently never reached Firestore, so every company rendered
+          // without its badge until the seed payload was fixed and re-run.
+          delivery: c.delivery || [],
+          sectors: c.sectors || [],
           updatedAt: new Date(),
         });
         ok++;
@@ -7873,6 +8314,8 @@ async function startApp() {
   await CompanyStore.load();
   buildSidebar();
   renderRegionFilter();
+  renderDeliveryFilter();
+  renderSectorFilter();
   document.getElementById('statCompanies').textContent = COMPANIES.length;
   document.getElementById('statCategories').textContent = allL2Count();
   document.getElementById('statSheets').textContent = CATEGORY_TREE.length;
