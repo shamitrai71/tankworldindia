@@ -133,10 +133,23 @@ async function searchQuery(query) {
   if (!placesLib) throw new Error('API key not connected yet');
   const { places } = await placesLib.Place.searchByText({
     textQuery: query,
-    fields: ['id', 'displayName', 'formattedAddress', 'websiteURI', 'location'],
+    fields: ['id', 'displayName', 'formattedAddress', 'websiteURI', 'location', 'addressComponents'],
     maxResultCount: 6,
   });
   return places || [];
+}
+
+// Google returns address parts as typed components rather than a single
+// string. Pull "locality" (city) specifically — TWI stores city separately
+// from the full address, so re-parsing formattedAddress text would be a step
+// backwards from data we can get structured for free.
+function extractCity(place) {
+  const comps = place.addressComponents || [];
+  const locality = comps.find(c => (c.types || []).includes('locality'));
+  if (locality) return locality.longText || locality.long_name || '';
+  // Fall back to admin_area_2 (district/county) for places without a locality component.
+  const fallback = comps.find(c => (c.types || []).includes('administrative_area_level_2'));
+  return fallback ? (fallback.longText || fallback.long_name || '') : '';
 }
 
 function renderDetail() {
@@ -154,7 +167,7 @@ function renderDetail() {
     confirmedHtml = `<div class="confirmed-box">
       <div class="cb-label">✓ Confirmed</div>
       <div class="cb-name">${escapeHtml(existing.matchedName || '')}</div>
-      <div class="cb-addr">${escapeHtml(existing.address || '')}</div>
+      <div class="cb-addr">${escapeHtml(existing.address || '')}${existing.city ? ' · ' + escapeHtml(existing.city) : ''}</div>
       <div class="cb-id">${escapeHtml(existing.placeId)}</div>
     </div>`;
   }
@@ -245,7 +258,7 @@ function selectResultIdx(idx) {
   const p = currentResults[idx];
   if (!p) return;
   selectedIdx = idx;
-  selectedResult = { placeId: p.id, name: p.displayName || '', address: p.formattedAddress || '' };
+  selectedResult = { placeId: p.id, name: p.displayName || '', address: p.formattedAddress || '', city: extractCity(p) };
   document.querySelectorAll('.result-card').forEach((c, i) => c.classList.toggle('selected', i === idx));
   const confirmBtn = document.getElementById('confirmBtn');
   if (confirmBtn) confirmBtn.disabled = false;
@@ -306,6 +319,44 @@ async function runBatchFetch() {
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
+// ── Backfill city for already-confirmed companies ───────────────────────
+// Companies confirmed before city extraction was added have a placeId and
+// address saved, but no city. The Place ID is already correct — no need to
+// re-search or re-review, just fetch that one Place's structured address
+// components and fill in the gap.
+async function backfillMissingCity() {
+  if (!placesLib) { alert('Load your API key above first.'); return; }
+  const targets = Object.entries(progress).filter(([slug, p]) => p.status === 'done' && p.placeId && !p.city);
+  if (!targets.length) { alert('Nothing to backfill — every confirmed company already has a city on file.'); return; }
+  if (!confirm(`Backfill city for ${targets.length} already-confirmed companies? This won't change their Place ID or re-open them for review.`)) return;
+
+  const statusEl = document.getElementById('batchStatus');
+  let done = 0, failed = 0;
+  for (const [slug, p] of targets) {
+    const c = COMPANIES.find(x => x.slug === slug);
+    if (statusEl) statusEl.textContent = `Backfilling city: ${c ? c.name : slug} (${done + failed + 1}/${targets.length})`;
+    try {
+      const place = new placesLib.Place({ id: p.placeId });
+      await place.fetchFields({ fields: ['addressComponents', 'formattedAddress'] });
+      const city = extractCity(place);
+      if (city) {
+        progress[slug] = { ...p, city, address: p.address || place.formattedAddress || '' };
+        done++;
+      } else {
+        failed++; // place had no locality component — leave as-is, don't guess
+      }
+    } catch (err) {
+      failed++;
+      console.warn('City backfill failed for', slug, err);
+    }
+    await sleep(220);
+  }
+  saveProgress();
+  renderList();
+  if (activeSlug) renderDetail();
+  if (statusEl) statusEl.textContent = `City backfill complete — ${done} filled in${failed ? `, ${failed} had no city data available` : ''}.`;
+}
+
 // ── Keyboard shortcuts for fast review ──────────────────────────────────
 // 1–6 select a result, Enter confirms the current selection, S skips,
 // → advances without saving. Ignored while typing in a text input.
@@ -332,6 +383,7 @@ function confirmSelection() {
     placeId: selectedResult.placeId,
     matchedName: selectedResult.name,
     address: selectedResult.address,
+    city: selectedResult.city || '',
     status: 'done',
   };
   saveProgress();
@@ -365,13 +417,13 @@ function advanceTo(slug) {
 
 // ── CSV export ───────────────────────────────────────────────────────────
 function exportCsv() {
-  const rows = [['ID', 'Slug', 'Company Name', 'Country', 'Status', 'Google Place ID', 'Matched Name', 'Matched Address']];
+  const rows = [['ID', 'Slug', 'Company Name', 'Country', 'Had Address Before', 'Status', 'Google Place ID', 'Matched Name', 'Matched Address', 'Matched City']];
   COMPANIES.forEach(c => {
     const p = progress[c.slug];
     if (!p) return; // only export ones actually worked on
     rows.push([
-      c.id, c.slug, c.name, c.country,
-      p.status, p.placeId || '', p.matchedName || '', p.address || '',
+      c.id, c.slug, c.name, c.country, c.address ? 'yes' : 'no',
+      p.status, p.placeId || '', p.matchedName || '', p.address || '', p.city || '',
     ]);
   });
   if (rows.length === 1) {
@@ -446,6 +498,7 @@ function init() {
   document.getElementById('statusFilter').addEventListener('change', renderList);
   document.getElementById('exportBtn').addEventListener('click', exportCsv);
   document.getElementById('batchFetchBtn').addEventListener('click', runBatchFetch);
+  document.getElementById('backfillCityBtn').addEventListener('click', backfillMissingCity);
   document.addEventListener('keydown', handleKeydown);
 
   try {
