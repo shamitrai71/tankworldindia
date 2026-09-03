@@ -106,12 +106,24 @@ main{ display:flex; height:calc(100vh - 168px); }
 .company-row.done{ opacity:0.55; }
 .cr-name{ font-family:var(--font-display); font-weight:600; font-size:13.5px; margin-bottom:2px; }
 .cr-meta{ font-family:var(--font-mono); font-size:10.5px; color:var(--ink-faint); }
+.cr-addr{ font-size:11.5px; color:var(--ink-muted); margin-top:3px; line-height:1.4; }
 .cr-badge{
   display:inline-block; font-family:var(--font-mono); font-size:9px; font-weight:600;
   padding:1px 6px; border-radius:3px; margin-left:6px; vertical-align:middle;
 }
 .cr-badge.done{ background:var(--green-soft); color:var(--green); }
 .cr-badge.skip{ background:var(--ink-faint); color:var(--paper-raised); }
+.cr-badge.fetched{ background:var(--blue-soft); color:var(--blue); }
+.shortcut-hint{
+  padding:6px 28px; font-family:var(--font-mono); font-size:10.5px; color:var(--ink-faint);
+  border-bottom:1px solid var(--line); background:var(--paper-raised);
+}
+.shortcut-hint b{ color:var(--ink-muted); }
+.rc-num{
+  display:inline-block; width:16px; height:16px; line-height:16px; text-align:center;
+  background:var(--blue); color:var(--paper-raised); border-radius:3px; font-family:var(--font-mono);
+  font-size:10px; font-weight:600; margin-right:6px; vertical-align:middle;
+}
 
 .detail-panel{ flex:1; overflow-y:auto; padding:28px 36px; }
 .empty-state{ text-align:center; padding:80px 20px; color:var(--ink-faint); }
@@ -121,10 +133,15 @@ main{ display:flex; height:calc(100vh - 168px); }
 .dp-meta-row{ display:flex; gap:16px; flex-wrap:wrap; font-family:var(--font-mono); font-size:11.5px; color:var(--ink-muted); margin-bottom:18px; }
 .dp-meta-row a{ color:var(--blue); }
 .dp-address-box{
-  background:var(--paper-raised); border:1px solid var(--line); border-radius:var(--radius);
-  padding:12px 14px; margin-bottom:20px; font-size:13.5px; color:var(--ink-muted);
+  background:var(--amber-soft); border:1px solid var(--amber); border-radius:var(--radius);
+  padding:12px 14px; margin-bottom:20px; font-size:14px; color:var(--ink); font-weight:500;
+  position:sticky; top:-1px; z-index:5;
 }
-.dp-address-box .addr-label{ font-family:var(--font-mono); font-size:10px; letter-spacing:1px; text-transform:uppercase; color:var(--ink-faint); margin-bottom:4px; }
+.dp-address-box .addr-label{ font-family:var(--font-mono); font-size:10px; letter-spacing:1px; text-transform:uppercase; color:var(--amber); margin-bottom:4px; font-weight:600; }
+.dp-address-box.dp-address-empty{
+  background:var(--paper-raised); border-color:var(--line); color:var(--ink-faint); font-weight:400; font-style:italic;
+}
+.dp-address-box.dp-address-empty .addr-label{ color:var(--ink-faint); }
 
 .search-row{ display:flex; gap:10px; margin-bottom:20px; }
 .search-input{
@@ -202,10 +219,13 @@ main{ display:flex; height:calc(100vh - 168px); }
     <option value="all">All</option>
   </select>
   <div class="spacer"></div>
+  <span class="key-help" id="batchStatus"></span>
+  <button class="btn primary" id="batchFetchBtn">Auto-fetch all pending</button>
   <div class="progress-label" id="progressLabel">0 / 0</div>
   <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
   <button class="btn primary" id="exportBtn">Export CSV ↓</button>
 </div>
+<div class="shortcut-hint">Shortcuts: <b>1–6</b> select a result · <b>Enter</b> confirm · <b>S</b> skip · <b>→</b> next</div>
 
 <main>
   <div class="list-panel" id="listPanel"></div>

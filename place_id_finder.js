@@ -11,6 +11,13 @@ let apiKey = '';
 let placesLib = null;
 let currentResults = [];
 let selectedResult = null;
+let selectedIdx = -1;
+
+// Pre-fetched search results, cached per slug — populated by "Auto-fetch all"
+// so reviewing a company doesn't require clicking Search first.
+const resultCache = {};
+let batchRunning = false;
+let batchCancelled = false;
 
 function loadProgress() {
   try {
@@ -82,10 +89,12 @@ function renderList() {
     const st = getStatus(c.slug);
     const isActive = c.slug === activeSlug;
     const badge = st === 'done' ? '<span class="cr-badge done">✓ DONE</span>'
-                : st === 'skipped' ? '<span class="cr-badge skip">SKIPPED</span>' : '';
+                : st === 'skipped' ? '<span class="cr-badge skip">SKIPPED</span>'
+                : resultCache[c.slug] ? '<span class="cr-badge fetched">READY</span>' : '';
     return `<div class="company-row ${isActive ? 'active' : ''} ${st !== 'pending' ? 'done' : ''}" data-slug="${c.slug}">
       <div class="cr-name">${escapeHtml(c.name)}${badge}</div>
       <div class="cr-meta">${escapeHtml(c.country)}${c.city ? ' · ' + escapeHtml(c.city) : ''}</div>
+      ${c.address ? `<div class="cr-addr">📍 ${escapeHtml(c.address)}</div>` : ''}
     </div>`;
   }).join('') || '<div style="padding:24px;font-family:var(--font-mono);font-size:12px;color:var(--ink-faint);">No companies match this filter.</div>';
 
@@ -103,10 +112,31 @@ function escapeHtml(s) {
 // ── Detail panel ─────────────────────────────────────────────────────────
 function selectCompany(slug) {
   activeSlug = slug;
-  currentResults = [];
   selectedResult = null;
+  selectedIdx = -1;
+  currentResults = resultCache[slug] || [];
   renderList();
   renderDetail();
+  // If nothing cached yet for this company, search it on the fly.
+  if (!resultCache[slug] && placesLib) {
+    doSearch();
+  } else if (currentResults.length) {
+    renderResults();
+  }
+}
+
+function defaultQueryFor(c) {
+  return [c.name, c.city, c.country].filter(Boolean).join(', ');
+}
+
+async function searchQuery(query) {
+  if (!placesLib) throw new Error('API key not connected yet');
+  const { places } = await placesLib.Place.searchByText({
+    textQuery: query,
+    fields: ['id', 'displayName', 'formattedAddress', 'websiteURI', 'location'],
+    maxResultCount: 6,
+  });
+  return places || [];
 }
 
 function renderDetail() {
@@ -138,7 +168,9 @@ function renderDetail() {
       <div>${escapeHtml(c.country)}</div>
       ${c.site ? `<a href="${escapeHtml(c.site)}" target="_blank" rel="noopener">${escapeHtml(c.site)} ↗</a>` : ''}
     </div>
-    ${c.address ? `<div class="dp-address-box"><div class="addr-label">Known Address</div>${escapeHtml(c.address)}</div>` : ''}
+    ${c.address
+      ? `<div class="dp-address-box"><div class="addr-label">Known Address</div>${escapeHtml(c.address)}</div>`
+      : `<div class="dp-address-box dp-address-empty"><div class="addr-label">Known Address</div>No address on file — search by name, city and country only.</div>`}
     ${confirmedHtml}
     <div class="search-row">
       <input type="text" class="search-input" id="placeSearchInput" value="${escapeHtml(defaultQuery)}" placeholder="Search query...">
@@ -169,52 +201,54 @@ function renderDetail() {
 
 // ── Places API (New) search ─────────────────────────────────────────────
 async function doSearch() {
-  const query = document.getElementById('placeSearchInput').value.trim();
+  const input = document.getElementById('placeSearchInput');
+  const query = input ? input.value.trim() : defaultQueryFor(COMPANIES.find(c => c.slug === activeSlug));
   const resultsArea = document.getElementById('resultsArea');
   if (!query) return;
   if (!placesLib) {
-    resultsArea.innerHTML = `<div class="error-box">Load your API key above first.</div>`;
+    if (resultsArea) resultsArea.innerHTML = `<div class="error-box">Load your API key above first.</div>`;
     return;
   }
-  resultsArea.innerHTML = `<div class="loading-spin">Searching…</div>`;
+  if (resultsArea) resultsArea.innerHTML = `<div class="loading-spin">Searching…</div>`;
 
   try {
-    const { places } = await placesLib.Place.searchByText({
-      textQuery: query,
-      fields: ['id', 'displayName', 'formattedAddress', 'websiteURI', 'location'],
-      maxResultCount: 6,
-    });
-    currentResults = places || [];
+    const places = await searchQuery(query);
+    currentResults = places;
+    resultCache[activeSlug] = places;
     renderResults();
   } catch (err) {
-    resultsArea.innerHTML = `<div class="error-box">Search failed: ${escapeHtml(err.message || String(err))}</div>`;
+    if (resultsArea) resultsArea.innerHTML = `<div class="error-box">Search failed: ${escapeHtml(err.message || String(err))}</div>`;
   }
 }
 
 function renderResults() {
   const resultsArea = document.getElementById('resultsArea');
+  if (!resultsArea) return;
   if (!currentResults.length) {
     resultsArea.innerHTML = `<div class="loading-spin">No results. Try adjusting the search query, or use manual entry below.</div>`;
     return;
   }
-  resultsArea.innerHTML = `<div class="results-label">Results — click to select</div>` +
+  resultsArea.innerHTML = `<div class="results-label">Results — click, or press 1–${Math.min(currentResults.length,6)}</div>` +
     currentResults.map((p, i) => `
-      <div class="result-card" data-idx="${i}">
-        <div class="rc-name">${escapeHtml(p.displayName || '')}</div>
+      <div class="result-card ${i === selectedIdx ? 'selected' : ''}" data-idx="${i}">
+        <div class="rc-name"><span class="rc-num">${i + 1}</span> ${escapeHtml(p.displayName || '')}</div>
         <div class="rc-addr">${escapeHtml(p.formattedAddress || '')}</div>
         <div class="rc-id">${escapeHtml(p.id || '')}</div>
       </div>`).join('');
 
   resultsArea.querySelectorAll('.result-card').forEach(card => {
-    card.addEventListener('click', () => {
-      const idx = parseInt(card.dataset.idx, 10);
-      const p = currentResults[idx];
-      selectedResult = { placeId: p.id, name: p.displayName || '', address: p.formattedAddress || '' };
-      resultsArea.querySelectorAll('.result-card').forEach(c => c.classList.remove('selected'));
-      card.classList.add('selected');
-      document.getElementById('confirmBtn').disabled = false;
-    });
+    card.addEventListener('click', () => selectResultIdx(parseInt(card.dataset.idx, 10)));
   });
+}
+
+function selectResultIdx(idx) {
+  const p = currentResults[idx];
+  if (!p) return;
+  selectedIdx = idx;
+  selectedResult = { placeId: p.id, name: p.displayName || '', address: p.formattedAddress || '' };
+  document.querySelectorAll('.result-card').forEach((c, i) => c.classList.toggle('selected', i === idx));
+  const confirmBtn = document.getElementById('confirmBtn');
+  if (confirmBtn) confirmBtn.disabled = false;
 }
 
 function useManualId() {
@@ -225,7 +259,72 @@ function useManualId() {
   confirmSelection();
 }
 
-// ── Confirm / skip / navigate ───────────────────────────────────────────
+// ── Batch pre-fetch ──────────────────────────────────────────────────────
+// Runs a search for every pending company in the current filter, one at a
+// time with a short delay between calls (Places API has per-second quotas —
+// this keeps well under them). Results are cached so selecting a company
+// afterwards shows results instantly, no per-company Search click needed.
+async function runBatchFetch() {
+  if (!placesLib) { alert('Load your API key above first.'); return; }
+  if (batchRunning) { batchCancelled = true; return; }
+
+  const targets = filteredCompanies().filter(c => getStatus(c.slug) === 'pending' && !resultCache[c.slug]);
+  if (!targets.length) { alert('Nothing to pre-fetch — every company in this filter is already cached, done, or skipped.'); return; }
+
+  batchRunning = true;
+  batchCancelled = false;
+  const btn = document.getElementById('batchFetchBtn');
+  const statusEl = document.getElementById('batchStatus');
+
+  for (let i = 0; i < targets.length; i++) {
+    if (batchCancelled) break;
+    const c = targets[i];
+    if (btn) btn.textContent = `Stop (${i + 1}/${targets.length})`;
+    if (statusEl) statusEl.textContent = `Pre-fetching: ${c.name}`;
+    try {
+      const places = await searchQuery(defaultQueryFor(c));
+      resultCache[c.slug] = places;
+    } catch (err) {
+      resultCache[c.slug] = []; // mark as attempted, empty on failure
+      console.warn('Pre-fetch failed for', c.slug, err);
+    }
+    // Refresh the currently open company if it was just fetched.
+    if (c.slug === activeSlug) {
+      currentResults = resultCache[c.slug];
+      renderResults();
+    }
+    renderList(); // shows the "fetched" dot as it progresses
+    await sleep(220); // stay comfortably under Places API QPS limits
+  }
+
+  batchRunning = false;
+  if (btn) btn.textContent = 'Auto-fetch all pending';
+  if (statusEl) statusEl.textContent = batchCancelled
+    ? 'Pre-fetch stopped.'
+    : `Pre-fetch complete — ${targets.length} companies ready to review.`;
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ── Keyboard shortcuts for fast review ──────────────────────────────────
+// 1–6 select a result, Enter confirms the current selection, S skips,
+// → advances without saving. Ignored while typing in a text input.
+function handleKeydown(e) {
+  const tag = (e.target.tagName || '').toLowerCase();
+  if (tag === 'input') return;
+  if (!activeSlug) return;
+
+  if (e.key >= '1' && e.key <= '6') {
+    const idx = parseInt(e.key, 10) - 1;
+    if (currentResults[idx]) selectResultIdx(idx);
+  } else if (e.key === 'Enter') {
+    if (selectedResult) confirmSelection();
+  } else if (e.key.toLowerCase() === 's') {
+    skipCompany();
+  } else if (e.key === 'ArrowRight') {
+    advanceTo(nextSlug());
+  }
+}
 function confirmSelection() {
   if (!activeSlug || !selectedResult) return;
   const c = COMPANIES.find(x => x.slug === activeSlug);
@@ -346,6 +445,8 @@ function init() {
   document.getElementById('countryFilter').addEventListener('change', renderList);
   document.getElementById('statusFilter').addEventListener('change', renderList);
   document.getElementById('exportBtn').addEventListener('click', exportCsv);
+  document.getElementById('batchFetchBtn').addEventListener('click', runBatchFetch);
+  document.addEventListener('keydown', handleKeydown);
 
   try {
     const savedKey = localStorage.getItem(API_KEY_STORAGE);
