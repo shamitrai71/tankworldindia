@@ -15749,6 +15749,15 @@ async function seedCompanies() {
           // without its badge until the seed payload was fixed and re-run.
           delivery: c.delivery || [],
           sectors: c.sectors || [],
+          // BUG FIX: email and phone were missing entirely from the seed
+          // payload, same class of bug as msme and delivery above — a field
+          // gets added to the in-page company data but this hardcoded write
+          // list isn't updated to match, so it silently never reaches
+          // Firestore no matter what the in-page array says. Every company
+          // seeded before this fix has no email/phone in Firestore even
+          // though the data is right there in SEED_COMPANIES — re-run Seed
+          // Companies after deploying this fix to backfill all records.
+          email: c.email || '', phone: c.phone || '',
           updatedAt: new Date(),
         });
         ok++;
