@@ -15919,29 +15919,49 @@ function handleBatchLogoFiles() {
   renderBatchLogoRows();
 }
 
+// The per-row assignment dropdown lists every company — with 2,000+
+// companies, rebuilding that <option> list (sorted, mapped, joined) for
+// EVERY row on EVERY render was the real cost here, not the upload network
+// calls. Built once and reused as a DOM template cloned per row instead of
+// re-stringified per row; invalidated only when COMPANIES itself changes.
+let _companyOptionsHtmlCache = null;
+let _companyOptionsHtmlCacheLen = -1;
+function sharedCompanyOptionsHtml() {
+  if (_companyOptionsHtmlCache && _companyOptionsHtmlCacheLen === COMPANIES.length) {
+    return _companyOptionsHtmlCache;
+  }
+  _companyOptionsHtmlCache = COMPANIES.slice().sort((a, b) => a.name.localeCompare(b.name))
+    .map(c => `<option value="${c.slug}">${c.name}</option>`).join('');
+  _companyOptionsHtmlCacheLen = COMPANIES.length;
+  return _companyOptionsHtmlCache;
+}
+
 function renderBatchLogoRows() {
   const matched = batchLogoRows.filter(r => r.matchedSlug && r.status === 'pending').length;
   const unmatched = batchLogoRows.filter(r => !r.matchedSlug && r.status === 'pending').length;
-  const companyOptions = COMPANIES.slice().sort((a, b) => a.name.localeCompare(b.name))
-    .map(c => `<option value="${c.slug}">${c.name}</option>`).join('');
+  const optionsHtml = sharedCompanyOptionsHtml();
 
+  // NOTE: no per-row string mutation of optionsHtml (previously a
+  // .replace() call per row — on a ~2,000-option string that's real cost
+  // multiplied by row count). The "selected" value is set as a DOM property
+  // after insertion instead, which is O(1) per row regardless of dropdown size.
   const rowsHtml = batchLogoRows.map((r, i) => {
     const c = r.matchedSlug ? COMPANIES.find(x => x.slug === r.matchedSlug) : null;
     return `
-      <div class="bl-row ${r.status}">
+      <div class="bl-row ${r.status}" data-row-index="${i}">
         <img src="${r.objectUrl}" class="bl-thumb" alt="">
         <div class="bl-file">
           <div class="bl-filename">${r.file.name}</div>
-          ${r.status === 'done' ? `<div class="bl-status ok">Uploaded to ${c ? c.name : r.matchedSlug}</div>`
-            : r.status === 'failed' ? `<div class="bl-status err">Failed — see log below</div>`
-            : r.status === 'skipped' ? `<div class="bl-status">Skipped</div>`
-            : c ? `<div class="bl-status ok">Matched: ${c.name}</div>`
-            : `<div class="bl-status warn">No automatic match</div>`}
+          <div class="bl-status-line">${r.status === 'done' ? `<span class="bl-status ok">Uploaded to ${c ? c.name : r.matchedSlug}</span>`
+            : r.status === 'failed' ? `<span class="bl-status err">Failed — see log below</span>`
+            : r.status === 'skipped' ? `<span class="bl-status">Skipped</span>`
+            : c ? `<span class="bl-status ok">Matched: ${c.name}</span>`
+            : `<span class="bl-status warn">No automatic match</span>`}</div>
         </div>
         ${r.status === 'pending' ? `
-          <select onchange="reassignBatchRow(${i}, this.value)">
+          <select class="bl-select" onchange="reassignBatchRow(${i}, this.value)">
             <option value="">— assign a company —</option>
-            ${companyOptions.replace(`value="${r.matchedSlug}"`, `value="${r.matchedSlug}" selected`)}
+            ${optionsHtml}
           </select>
           <button class="btn-mini rust" onclick="removeBatchLogoRow(${i})">Remove</button>
         ` : ''}
@@ -15958,6 +15978,45 @@ function renderBatchLogoRows() {
       <div class="bl-rows">${rowsHtml}</div>
       <div class="admin-log" id="batchLogoLog"></div>
     ` : ''}`;
+
+  // Set each pending row's selected option via the DOM (not string
+  // replacement) — matches the cached-HTML approach above.
+  batchLogoRows.forEach((r, i) => {
+    if (r.status !== 'pending') return;
+    const sel = document.querySelector(`.bl-row[data-row-index="${i}"] .bl-select`);
+    if (sel && r.matchedSlug) sel.value = r.matchedSlug;
+  });
+}
+
+// Lightweight per-row status update used during the upload loop — touches
+// only the one row that just finished, not the other 245 rows and not their
+// dropdowns. This is what actually fixes the freeze: the loop no longer
+// rebuilds ~2,000 options × up to 246 rows on every iteration.
+function updateBatchLogoRowStatus(i, r) {
+  const rowEl = document.querySelector(`.bl-row[data-row-index="${i}"]`);
+  if (!rowEl) return;
+  rowEl.className = `bl-row ${r.status}`;
+  const c = r.matchedSlug ? COMPANIES.find(x => x.slug === r.matchedSlug) : null;
+  const statusLine = rowEl.querySelector('.bl-status-line');
+  if (statusLine) {
+    statusLine.innerHTML = r.status === 'done' ? `<span class="bl-status ok">Uploaded to ${c ? c.name : r.matchedSlug}</span>`
+      : r.status === 'failed' ? `<span class="bl-status err">Failed — see log below</span>`
+      : `<span class="bl-status">${r.status}</span>`;
+  }
+  // Completed/failed rows no longer need their dropdown — remove it rather
+  // than leave a stale 2,000-option <select> sitting in the DOM unused.
+  const sel = rowEl.querySelector('.bl-select');
+  if (sel && r.status !== 'pending') sel.remove();
+  const removeBtn = rowEl.querySelector('.btn-mini.rust');
+  if (removeBtn && r.status !== 'pending') removeBtn.remove();
+  // Summary line at the top (matched/unmatched/total counts) — cheap to
+  // recompute and update in place, no full re-render needed.
+  const summaryEl = document.querySelector('.bl-summary');
+  if (summaryEl) {
+    const matched = batchLogoRows.filter(x => x.matchedSlug && x.status === 'pending').length;
+    const unmatched = batchLogoRows.filter(x => !x.matchedSlug && x.status === 'pending').length;
+    summaryEl.textContent = `${matched} matched · ${unmatched} need assignment · ${batchLogoRows.length} total`;
+  }
 }
 
 function reassignBatchRow(i, slug) {
@@ -15985,14 +16044,19 @@ async function runBatchLogoUpload() {
   let ok = 0, failed = 0;
   for (const r of assignable) {
     const label = COMPANIES.find(c => c.slug === r.matchedSlug)?.name || r.matchedSlug;
+    // Index in the FULL batchLogoRows array (not `assignable`, which is a
+    // filtered subset) — the DOM rows are keyed by that original index.
+    const rowIdx = batchLogoRows.indexOf(r);
     if (r.file.size > 2 * 1024 * 1024) {
       r.status = 'failed'; failed++;
       batchLogoLog(`✗ ${r.file.name} → ${label} — too large (2 MB max)`);
+      updateBatchLogoRowStatus(rowIdx, r);
       continue;
     }
     if (!r.file.type.startsWith('image/')) {
       r.status = 'failed'; failed++;
       batchLogoLog(`✗ ${r.file.name} → ${label} — not an image`);
+      updateBatchLogoRowStatus(rowIdx, r);
       continue;
     }
     try {
@@ -16009,7 +16073,10 @@ async function runBatchLogoUpload() {
       r.status = 'failed'; failed++;
       batchLogoLog(`✗ ${r.file.name} → ${label} — ${err.message}`);
     }
-    renderBatchLogoRows();
+    // Targeted update of just this one row — see updateBatchLogoRowStatus
+    // comment above for why the full renderBatchLogoRows() was the actual
+    // cause of the page freezing on large batches.
+    updateBatchLogoRowStatus(rowIdx, r);
   }
   batchLogoLog(`\nDone — ${ok} uploaded, ${failed} failed.`);
   renderAll();
