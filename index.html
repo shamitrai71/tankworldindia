@@ -556,6 +556,18 @@ main{ flex:1; min-width:0; padding:20px 24px 60px; }
 .gate h3{ font-family:var(--font-display); font-size:22px; margin:10px 0 6px; }
 .gate p{ font-size:13px; color:var(--ink-muted); margin-bottom:16px; }
 
+.full-gate{
+  min-height:70vh; display:flex; align-items:center; justify-content:center; padding:40px 20px;
+}
+.full-gate .fg-card{
+  max-width:440px; width:100%; text-align:center; padding:48px 36px; background:var(--paper-raised);
+  border:1px solid var(--line); border-radius:var(--radius);
+}
+.full-gate .g-mark{ font-family:var(--font-mono); font-size:11px; color:var(--ink-faint); letter-spacing:2px; margin-bottom:14px; }
+.full-gate h2{ font-family:var(--font-display); font-size:24px; margin:0 0 10px; }
+.full-gate p{ font-size:14px; color:var(--ink-muted); line-height:1.6; margin-bottom:22px; }
+.full-gate .fg-email{ font-family:var(--font-mono); font-size:12px; color:var(--ink); background:var(--paper); padding:6px 10px; border-radius:3px; display:inline-block; margin-bottom:18px; }
+
 .product-tile .tile-name{ font-family:var(--font-display); font-weight:600; font-size:13px; line-height:1.3; }
 .product-tile .tile-sheet{ font-family:var(--font-mono); font-size:9.5px; color:var(--ink-faint); }
 .product-tile .tile-code-row{ display:flex; align-items:center; gap:5px; flex-wrap:wrap; }
@@ -603,6 +615,11 @@ footer{
   <div class="auth-area" id="authArea"></div>
 </header>
 
+<!-- ── Access gate — shown instead of app-body while REQUIRE_APPROVAL_TO_VIEW
+     is on and the visitor isn't signed in + approved. See the
+     REQUIRE_APPROVAL_TO_VIEW comment in the script for how to turn this off. ── -->
+<div id="accessGateView" style="display:none;"></div>
+
 <!-- ── Sign-in modal ─────────────────────────────────────────────────── -->
 <div class="modal-backdrop" id="authModal" onclick="if(event.target===this) closeAuthModal()">
   <div class="modal">
@@ -613,7 +630,7 @@ footer{
       </div>
       <button class="modal-x" onclick="closeAuthModal()">&times;</button>
     </div>
-    <p class="modal-note">Sign in to manage your company listing. Browsing the
+    <p class="modal-note" id="authModalNote">Sign in to manage your company listing. Browsing the
       directory doesn't require an account.</p>
     <button class="btn-google" onclick="signInWithGoogle()">
       <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.65l-3.57-2.77c-.99.66-2.26 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.84 14.11a6.6 6.6 0 0 1 0-4.22V7.05H2.18a11 11 0 0 0 0 9.9l3.66-2.84z"/><path fill="#EA4335" d="M12 4.75c1.61 0 3.06.55 4.2 1.64l3.15-3.15C17.45 1.46 14.97.5 12 .5A11 11 0 0 0 2.18 7.05l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
@@ -812,7 +829,13 @@ const CATEGORY_TREE = [
       { code:"FT-07.9", name:"Instrumentation & Manifold Valves", slug:"instrumentation-and-manifold-valves" },
     ]},
     { code:"FT-08", name:"Actuators", slug:"actuators" },
-    { code:"FT-09", name:"Flow Meters", slug:"flow-meters" },
+    { code:"FT-09", name:"Flow Meters", slug:"flow-meters", items:[
+      { code:"FT-09.1", name:"Coriolis Meters", slug:"coriolis-meters" },
+      { code:"FT-09.2", name:"Turbine Flow Meters", slug:"turbine-flow-meters" },
+      { code:"FT-09.3", name:"Ultrasonic Flow Meters", slug:"ultrasonic-flow-meters" },
+      { code:"FT-09.4", name:"Positive Displacement Meters", slug:"positive-displacement-meters" },
+      { code:"FT-09.5", name:"Cone & Orifice Meters", slug:"cone-and-orifice-meters" },
+    ]},
     { code:"FT-10", name:"Custody Transfer Metering", slug:"custody-transfer-metering" },
     { code:"FT-11", name:"Pigging Systems", slug:"pigging-systems" },
     { code:"FT-12", name:"Strainers", slug:"strainers" },
@@ -847,6 +870,20 @@ const CATEGORY_TREE = [
     { code:"IA-06", name:"Industrial Networking", slug:"industrial-networking" },
     { code:"IA-07", name:"Electrical & Instrumentation", slug:"electrical-and-instrumentation" },
     { code:"IA-08", name:"Site Communication Systems", slug:"site-communication-systems" },
+    // IA-09 through IA-14 added after a side-by-side review against
+    // controlssupplychain.com (a pure field-instrumentation parts catalog).
+    // The gap: IA-01 through IA-08 above are all systems/software layer
+    // (SCADA, PLC/DCS, networking) — none of them are a home for the
+    // physical field devices that feed data INTO those systems. Before this
+    // addition, TWI had zero categories anywhere containing the words
+    // "transmitter," "indicator," "switch" (as an instrument), "chart
+    // recorder," or "regulator" — confirmed by grepping the full tree.
+    { code:"IA-09", name:"Pressure Transmitters", slug:"pressure-transmitters" },
+    { code:"IA-10", name:"Temperature Transmitters", slug:"temperature-transmitters" },
+    { code:"IA-11", name:"DP Transmitters & Instruments", slug:"dp-transmitters-and-instruments" },
+    { code:"IA-12", name:"Pressure & Temperature Switches", slug:"pressure-and-temperature-switches" },
+    { code:"IA-13", name:"Indicators & Chart Recorders", slug:"indicators-and-chart-recorders" },
+    { code:"IA-14", name:"Regulators", slug:"regulators" },
   ]},
   { code:"DR", name:"Digital, AI & Robotics", slug:"digital-ai-and-robotics", items:[
     { code:"DR-01", name:"Drone & Robotic Inspection", slug:"drone-and-robotic-inspection" },
@@ -6463,7 +6500,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // range.
     desc:"Manufacturer of flow measurement equipment — real reviews confirm supply of Turbine Meters, Mass Flow Meters, Magnetic Flow Meters, plus pressure reduction and metering skids, serving the oil & gas sector. ADIPEC 2022: Stall 13272.",
     site:"",
-    cats:["flow-meters"],
+    cats:["flow-meters", "turbine-flow-meters"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"PIR Colony, B-24/IV, Sahibabad, Ghaziabad, Uttar Pradesh 201010, India", city:"Ghaziabad", lat:null, lng:null, placeId:"ChIJAQAAMJv6DDkRHNRYvNBpW04" }] },
 { id:641, slug:"orient-ceratech-limited", name:"Orient Ceratech Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Forient-ceratech-limited.jpg?alt=media&token=847041bc-3a4f-430c-a1dd-1f41da3d4d47", country:"India",
     // NOTE: sourced from the ADIPEC 2022 exhibitor list, where it appeared as "Orient Abrasives
@@ -6501,7 +6538,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     desc:"Indian distribution and technical support partner for German fluid technology manufacturers — VSE precision flow meters, Beinlich performance/gear pumps, DST magnetic couplings, Suco pressure switches, plus hydraulic components and pressure monitoring systems. Real served industries: plastics, polyurethane, chemical, pharmaceutical, paint and varnish, hydraulic and automobile. ADIPEC 2022: Stall 13781.",
     site:"https://www.bedaflow.com",
     delivery:["distributor-supplier"],
-    cats:["flow-meters", "pumps"],
+    cats:["flow-meters", "pumps", "pressure-and-temperature-switches"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"W-7, W Block, Sector 11, Noida, Uttar Pradesh 201301, India", city:"Noida", lat:null, lng:null, placeId:"ChIJAQAAwALlDDkR0HE-4jzzkCg" }] },
 { id:644, slug:"niton-valve-industries-private-limited", name:"Niton Valve Industries Private Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Fniton-valve-industries-private-limited.png?alt=media&token=573a9568-41aa-412d-b61e-86fc6a644228", country:"India",
     // NOTE: sourced from the ADIPEC 2022 exhibitor list. Real, CIN U27300MH1985PTC037156,
@@ -9667,7 +9704,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // NOTE: Real — IMI plc subsidiary, real global pneumatics, motion and fluid control.
     desc:"Pneumatics and motion control manufacturer — real pneumatic actuators, solenoid valves, regulators, filters, cylinders and fluid control systems for oil & gas, process and industrial automation (IMI plc subsidiary).",
     site:"https://www.norgren.com", delivery:["oem-manufacturer"],
-    cats:["compressors","instrumentation-and-automation","valves"],
+    cats:["compressors", "instrumentation-and-automation", "valves", "regulators"],
     sectors:["fpso-offshore"],
     locations:[{ type:"headquarters", name:"Headquarters", address:"Unit A3/Brookside Business Park/Greengate, Middleton, Manchester M24 1GS, UK", city:"Middleton", lat:null, lng:null, placeId:"ChIJB3crSKmwe0gRFF9R32N-ooQ" }] },
 { id:1044, slug:"oceaneering-international-uk", name:"Oceaneering International", logo:null, country:"United Kingdom",
@@ -10179,12 +10216,12 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
 { id:1136, slug:"rheonik-messtechnik-gmbh", name:"Rheonik Messtechnik GmbH", logo:null, country:"Germany",
     // NOTE: Real — real Coriolis flow meters for oil & gas custody transfer and process.
     desc:"Coriolis flow meter manufacturer — real high-pressure and high-flow Coriolis mass flow meters for crude oil, gas and chemical process measurement.",
-    site:"https://www.rheonik.com", delivery:["oem-manufacturer"], cats:["flow-meters","instrumentation-and-automation"],
+    site:"https://www.rheonik.com", delivery:["oem-manufacturer"], cats:["flow-meters", "instrumentation-and-automation", "coriolis-meters"],
     locations:[{ type:"headquarters", name:"HQ", address:"Rudolf-Diesel-Straße 5, 85235 Odelzhausen, Germany", city:"Odelzhausen", lat:null, lng:null, placeId:"ChIJnzWzrnGGnkcRN3F4MYOZXHE" }] },
 { id:1137, slug:"rmg-messtechnik-gmbh", name:"RMG Messtechnik GmbH", logo:null, country:"Germany",
     // NOTE: Real — real gas flow measurement and regulation equipment for natural gas.
     desc:"Gas measurement and regulation equipment manufacturer — real gas turbine meters, rotary displacement meters, pressure regulators and control valves for natural gas measurement and distribution.",
-    site:"https://www.rmg.com", delivery:["oem-manufacturer"], cats:["flow-meters","instrumentation-and-automation","valves"],
+    site:"https://www.rmg.com", delivery:["oem-manufacturer"], cats:["flow-meters", "instrumentation-and-automation", "valves", "regulators", "turbine-flow-meters"],
     locations:[{ type:"headquarters", name:"HQ", address:"Otto-Hahn-Straße 5, 35510 Butzbach, Germany", city:"Butzbach", lat:null, lng:null, placeId:"ChIJ_fExeEr_vEcRbaOiJeypzWU" }] },
 { id:1138, slug:"rolls-royce-solutions-gmbh", name:"Rolls-Royce Solutions GmbH", logo:null, country:"Germany",
     // NOTE: Real — Rolls-Royce Power Systems (MTU brand), real diesel and gas engines for power.
@@ -10411,7 +10448,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // NOTE: Real — SEKO Group, real dosing pumps and fluid handling equipment. Exakta is
     // their flow measurement division.
     desc:"Flow measurement and dosing equipment — real Coriolis and electromagnetic flow meters, dosing pumps and chemical injection systems for industrial and oil & gas applications (SEKO Group).",
-    site:"https://www.seko.com", delivery:["oem-manufacturer"], cats:["flow-meters","pumps"],
+    site:"https://www.seko.com", delivery:["oem-manufacturer"], cats:["flow-meters", "pumps", "coriolis-meters"],
     locations:[{ type:"headquarters", name:"HQ", address:"Via Giuseppe Di Vittorio, 25, 20068 Bettola-Zeloforamagno MI, Italy", city:"Bettola-Zeloforamagno", lat:null, lng:null, placeId:"ChIJ8USNpWrPhkcR2O5q_CDzjKM" }] },
 { id:1186, slug:"fluiten-srl", name:"FLUITEN", logo:null, country:"Italy",
     // NOTE: Real — real mechanical seal manufacturer for pumps and agitators.
@@ -10549,7 +10586,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
 { id:1215, slug:"pietro-fiorentini-spa", name:"PIETRO FIORENTINI SPA", logo:null, country:"Italy",
     // NOTE: Real — real gas pressure regulators, metering systems and safety devices for gas distribution.
     desc:"Gas regulation and metering manufacturer — real gas pressure regulators, safety shutoff valves, flow computers and metering skids for natural gas distribution, transmission and industrial applications.",
-    site:"https://www.fiorentini.com", delivery:["oem-manufacturer"], cats:["flow-meters","instrumentation-and-automation","safety-and-pressure-relief-valves","valves"],
+    site:"https://www.fiorentini.com", delivery:["oem-manufacturer"], cats:["flow-meters", "instrumentation-and-automation", "safety-and-pressure-relief-valves", "valves", "regulators"],
     locations:[{ type:"headquarters", name:"HQ", address:"Via E. Fermi, 8/10, 36057 Arcugnano VI, Italy", city:"Arcugnano", lat:null, lng:null, placeId:"ChIJY-15Qs-VgUcRDYowveOyWsE" }] },
 { id:1216, slug:"piusi-spa", name:"PIUSI SPA", logo:null, country:"Italy",
     // NOTE: Real — real fluid transfer pumps, meters and dispense systems for fuels and lubricants.
@@ -10761,7 +10798,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
 { id:1261, slug:"dk-lok-corporation", name:"DK-LOK CORPORATION", logo:null, country:"South Korea",
     // NOTE: Real — real global Korean manufacturer of tube fittings, valves and regulators.
     desc:"Tube fittings and valves manufacturer — real compression tube fittings, ball valves, needle valves and pressure regulators for instrumentation and process connections in oil & gas.",
-    site:"https://www.dklok.com", delivery:["oem-manufacturer"], cats:["instrumentation-and-automation","pipes-and-tubes","valves"],
+    site:"https://www.dklok.com", delivery:["oem-manufacturer"], cats:["instrumentation-and-automation", "pipes-and-tubes", "valves", "regulators"],
     sectors:["fpso-offshore"],
     locations:[{ type:"headquarters", name:"HQ", address:"7 Nongso-ri, Juchon-myeon, Gimhae, Gyeongsangnam-do, South Korea", city:"Gimhae", lat:null, lng:null, placeId:"ChIJxwo8yYLIaDURzlo8hwlVfTk" }] },
 { id:1262, slug:"dong-a-bestech-co-ltd", name:"Dong - A Bestech Co., Ltd.", logo:null, country:"South Korea",
@@ -11309,7 +11346,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     // NOTE: Real — Brooks Instrument (IMI plc), real mass flow meters, flow controllers and
     // pressure controllers for gas measurement and control.
     desc:"Mass flow measurement and control instruments — real thermal mass flow meters, Coriolis flow meters and pressure controllers for gas and liquid measurement in process and oil & gas applications (Brooks Instrument, IMI plc).",
-    site:"https://www.brooksinstrument.com", delivery:["oem-manufacturer"], cats:["flow-meters","instrumentation-and-automation"],
+    site:"https://www.brooksinstrument.com", delivery:["oem-manufacturer"], cats:["flow-meters", "instrumentation-and-automation", "coriolis-meters"],
     locations:[{ type:"headquarters", name:"HQ", address:"Inductorstraat 55-04, 3903 KA Veenendaal, Netherlands", city:"Veenendaal", lat:null, lng:null, placeId:"ChIJtepcTo5SxkcR6wGvonSD2p0" }] },
 { id:1372, slug:"conpipe-international-bv", name:"CONPIPE Int.l BV", logo:null, country:"Netherlands",
     desc:"Pipe connections and fittings company — ADIPEC 2022 exhibitor.",
@@ -17920,7 +17957,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     desc:"Inspection / Integrity / NDT / Engineering Specialist — Asset integrity, NDT, inspection and engineering services; tank and pressure-equipment inspection support; digital asset integrity and subsea/industrial inspection",
     site:"https://www.fugro.com/en-au",
     delivery:["oem-manufacturer"],
-    cats:["engineering-consultants", "non-destructive-testing-ndt", "integrity-management", "tank-inspection", "corrosion-monitoring"],
+    cats:["engineering-consultants", "non-destructive-testing-ndt", "integrity-management", "tank-inspection", "corrosion-monitoring", "laser-scanning-and-lidar"],
     sectors:["refinery", "fpso-offshore"],
     locations:[{ type:"headquarters", name:"HQ", address:"Australia", city:"", lat:null, lng:null, placeId:null }] },
 { id:2416, slug:"rcr-mining-technologies", name:"RCR Mining Technologies", logo:null, country:"Australia",
@@ -17960,7 +17997,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     desc:"Engineering Consultant / Project & Process Engineering — Front-end engineering, detailed engineering, project management, asset advisory and process/industrial engineering; tank, terminal and process-facility design",
     site:"https://www.aurecongroup.com/",
     delivery:["oem-manufacturer"],
-    cats:["lng-terminal-engineering", "tank-systems-and-equipment", "tank-engineering", "engineering-consultants"],
+    cats:["lng-terminal-engineering", "tank-systems-and-equipment", "tank-engineering", "engineering-consultants", "laser-scanning-and-lidar"],
     sectors:["refinery"],
     locations:[{ type:"headquarters", name:"HQ", address:"Australia", city:"", lat:null, lng:null, placeId:null }] },
 { id:2421, slug:"lloyds-energy-group", name:"Lloyds Energy Group", logo:null, country:"Australia",
@@ -18067,7 +18104,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     email:"sales@cebeco.com.au",
     phone:"02 9651 4220",
     delivery:["oem-manufacturer"],
-    cats:["valves"],
+    cats:["valves", "pressure-transmitters"],
     sectors:["refinery"],
     locations:[{ type:"headquarters", name:"HQ", address:"4-6 Gould Street, Strathfield NSW 2136, Australia", city:"", lat:null, lng:null, placeId:null }] },
 { id:2432, slug:"just-valves", name:"Just Valves", logo:null, country:"Australia",
@@ -18115,7 +18152,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     email:"info@tanktel.com",
     phone:"07 4893 3005",
     delivery:["oem-manufacturer"],
-    cats:["instrumentation-and-automation"],
+    cats:["instrumentation-and-automation", "remote-monitoring"],
     sectors:["refinery"],
     locations:[{ type:"headquarters", name:"HQ", address:"3 Houdewind Street, Eimeo QLD 4740, Australia", city:"", lat:null, lng:null, placeId:"ChIJp8JSAO9p1wERU2kGeHK1pMw" }] },
 { id:2437, slug:"fuelgear", name:"Fuelgear", logo:null, country:"Australia",
@@ -18392,7 +18429,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     email:"sales@equipco.com.au",
     phone:"1800 813 182",
     delivery:["oem-manufacturer"],
-    cats:["nozzles-and-manways"],
+    cats:["nozzles-and-manways", "remote-monitoring"],
     sectors:["refinery"],
     locations:[{ type:"headquarters", name:"HQ", address:"Australia", city:"", lat:null, lng:null, placeId:null }] },
 { id:2466, slug:"atm-tank-builders", name:"ATM Tank Builders", logo:null, country:"Australia",
@@ -18776,7 +18813,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     email:"support@diamondkey.com",
     phone:"+61 3 9730 8888",
     delivery:["oem-manufacturer"],
-    cats:["terminal-automation"],
+    cats:["terminal-automation", "scada-systems"],
     sectors:["refinery"],
     locations:[{ type:"headquarters", name:"HQ", address:"110 Henderson Road, Rowville VIC 3178, Australia", city:"", lat:null, lng:null, placeId:null }] },
 { id:2507, slug:"yokogawa-australia-pty-ltd", name:"Yokogawa Australia Pty Ltd", logo:null, country:"Australia",
@@ -18786,7 +18823,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     email:"au.enquiries@yokogawa.com",
     phone:"+1300 558 965",
     delivery:["oem-manufacturer"],
-    cats:["terminal-automation"],
+    cats:["terminal-automation", "scada-systems"],
     sectors:["refinery"],
     locations:[{ type:"headquarters", name:"HQ", address:"Level 3, 66 Waterloo Road, Macquarie Park NSW 2113, Australia", city:"", lat:null, lng:null, placeId:null }] },
 { id:2508, slug:"qge-group", name:"QGE Group", logo:null, country:"Australia",
@@ -18795,7 +18832,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     site:"https://qge.com.au/",
     phone:"08 9330 4444",
     delivery:["oem-manufacturer"],
-    cats:["terminal-automation"],
+    cats:["terminal-automation", "scada-systems"],
     sectors:["refinery"],
     locations:[{ type:"headquarters", name:"HQ", address:"Perth, Western Australia, Australia", city:"", lat:null, lng:null, placeId:null }] },
 { id:2509, slug:"precision-logic-control", name:"Precision Logic & Control", logo:null, country:"Australia",
@@ -18804,7 +18841,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     site:"https://www.plc-group.com.au/",
     email:"info@plc-group.com.au",
     delivery:["oem-manufacturer"],
-    cats:["terminal-automation"],
+    cats:["terminal-automation", "scada-systems"],
     sectors:["refinery"],
     locations:[{ type:"headquarters", name:"HQ", address:"Australia", city:"", lat:null, lng:null, placeId:null }] },
 { id:2510, slug:"pastech-pty-ltd", name:"PAStech Pty Ltd", logo:null, country:"Australia",
@@ -18812,7 +18849,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     desc:"Industrial Control Systems Integrator / Automation Engineering — PLC; SCADA; DCS; RTU; SIS; HMI; industrial communications; instrumentation; VSD; control-system design, implementation and support",
     site:"https://pastech.com.au/",
     delivery:["oem-manufacturer"],
-    cats:["terminal-automation"],
+    cats:["terminal-automation", "scada-systems"],
     sectors:["refinery"],
     locations:[{ type:"headquarters", name:"HQ", address:"Australia", city:"", lat:null, lng:null, placeId:null }] },
 { id:2511, slug:"cgi-australia-pty-ltd", name:"CGI Australia Pty Ltd", logo:null, country:"Australia",
@@ -18849,7 +18886,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     site:"https://indratel.com.au/",
     phone:"08 9444 6666",
     delivery:["oem-manufacturer"],
-    cats:["scada-systems"],
+    cats:["scada-systems", "remote-monitoring", "site-communication-systems", "electrical-and-instrumentation"],
     sectors:["refinery"],
     locations:[{ type:"headquarters", name:"HQ", address:"Perth WA, Australia", city:"", lat:null, lng:null, placeId:null }] },
 { id:2515, slug:"icon-technologies-pty-ltd", name:"ICON Technologies Pty Ltd", logo:null, country:"Australia",
@@ -18867,7 +18904,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     site:"https://www.acectrl.com/",
     email:"https://www.acectrl.com/smart-utilities-solutions/utility-scada-hmi-expert/",
     delivery:["oem-manufacturer"],
-    cats:["scada-systems"],
+    cats:["scada-systems", "remote-monitoring"],
     sectors:["refinery"],
     locations:[{ type:"headquarters", name:"HQ", address:"Australia", city:"", lat:null, lng:null, placeId:null }] },
 { id:2517, slug:"powerloop-automation-pty-ltd", name:"PowerLoop Automation Pty Ltd", logo:null, country:"Australia",
@@ -18894,7 +18931,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     site:"https://www.jpr.com.au/",
     phone:"07 3271 2911",
     delivery:["oem-manufacturer"],
-    cats:["plc-and-dcs"],
+    cats:["plc-and-dcs", "electrical-and-instrumentation"],
     sectors:["refinery"],
     locations:[{ type:"headquarters", name:"HQ", address:"Brisbane QLD, Australia", city:"", lat:null, lng:null, placeId:null }] },
 { id:2520, slug:"orana-engineering", name:"Orana Engineering", logo:null, country:"Australia",
@@ -18935,7 +18972,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     site:"https://www.ior.com.au/digital-fuel-management-solutions/hydip-fuel-management-system/",
     phone:"1300 457 467",
     delivery:["oem-manufacturer"],
-    cats:["tank-inventory-systems"],
+    cats:["tank-inventory-systems", "remote-monitoring"],
     sectors:["refinery"],
     locations:[{ type:"headquarters", name:"HQ", address:"Australia", city:"", lat:null, lng:null, placeId:null }] },
 { id:2525, slug:"smithtek-pty-ltd", name:"Smithtek Pty Ltd", logo:null, country:"Australia",
@@ -19179,7 +19216,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     site:"https://www.blackwoods.com.au/",
     phone:"1300 168 915",
     delivery:["oem-manufacturer"],
-    cats:["industrial-safety-equipment"],
+    cats:["industrial-safety-equipment", "fasteners-and-bolting", "welding-equipment-and-consumables"],
     sectors:["refinery"],
     locations:[{ type:"headquarters", name:"HQ", address:"Australia", city:"", lat:null, lng:null, placeId:null }] },
 { id:2553, slug:"rsea-safety", name:"RSEA Safety", logo:null, country:"Australia",
@@ -19220,7 +19257,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     desc:"Specialty Fasteners, Gaskets & Engineered Components Supplier/Manufacturer — Critical fasteners and bolting; gaskets and seals; carbon/alloy/exotic materials; coatings; engineered components",
     site:"https://www.lonestaraustralia.com/",
     delivery:["oem-manufacturer"],
-    cats:["gaskets"],
+    cats:["gaskets", "fasteners-and-bolting"],
     sectors:["refinery", "fpso-offshore"],
     locations:[{ type:"headquarters", name:"HQ", address:"Australia", city:"", lat:null, lng:null, placeId:null }] },
 { id:2558, slug:"welding-industries-of-australia", name:"Welding Industries of Australia", logo:null, country:"Australia",
@@ -19323,7 +19360,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     email:"enquiries@epcmsolutions.com.au",
     phone:"+61 8 6111 9777",
     delivery:["oem-manufacturer"],
-    cats:["project-consultants"],
+    cats:["project-consultants", "owner-s-engineers"],
     sectors:["refinery"],
     locations:[{ type:"headquarters", name:"HQ", address:"Perth WA / Sydney NSW, Australia", city:"", lat:null, lng:null, placeId:null }] },
 { id:2570, slug:"ghd", name:"GHD", logo:null, country:"Australia",
@@ -19331,7 +19368,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     desc:"Multidisciplinary Engineering & Professional Services Consultancy — Concept studies; FEED; detailed design; project management; EPCM; process safety; integrity; environment; asset management",
     site:"https://www.ghd.com/en-au/",
     delivery:["oem-manufacturer"],
-    cats:["engineering-consultants"],
+    cats:["engineering-consultants", "owner-s-engineers"],
     sectors:["refinery"],
     locations:[{ type:"headquarters", name:"HQ", address:"Australia", city:"", lat:null, lng:null, placeId:null }] },
 { id:2571, slug:"jacobs", name:"Jacobs", logo:null, country:"Australia",
@@ -19350,7 +19387,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     email:"SharedServices.NSW@stantec.com",
     phone:"+61 2 9493 9700",
     delivery:["oem-manufacturer"],
-    cats:["engineering-consultants"],
+    cats:["engineering-consultants", "owner-s-engineers"],
     sectors:["refinery"],
     locations:[{ type:"headquarters", name:"HQ", address:"Sydney NSW; Australia-wide", city:"", lat:null, lng:null, placeId:null }] },
 { id:2573, slug:"smec", name:"SMEC", logo:null, country:"Australia",
@@ -19373,7 +19410,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     desc:"Environmental, Sustainability & Risk Consultancy — Environmental approvals; environmental management; contaminated sites; sustainability; risk; social; compliance; ESG",
     site:"https://www.erm.com/about/locations/australia/",
     delivery:["oem-manufacturer"],
-    cats:["environmental-consultants"],
+    cats:["environmental-consultants", "consultancy-services"],
     sectors:["refinery"],
     locations:[{ type:"headquarters", name:"HQ", address:"Australia", city:"", lat:null, lng:null, placeId:null }] },
 { id:2576, slug:"emm-consulting", name:"EMM Consulting", logo:null, country:"Australia",
@@ -19382,7 +19419,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     site:"https://www.emmconsulting.com.au/",
     phone:"02 9493 9500",
     delivery:["oem-manufacturer"],
-    cats:["environmental-consultants"],
+    cats:["environmental-consultants", "consultancy-services"],
     sectors:["refinery"],
     locations:[{ type:"headquarters", name:"HQ", address:"Sydney NSW / Brisbane QLD; Australia-wide", city:"", lat:null, lng:null, placeId:null }] },
 { id:2577, slug:"geosyntec", name:"Geosyntec", logo:null, country:"Australia",
@@ -19398,7 +19435,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     desc:"Inspection, Testing, Certification & Integrity Services — NDT; pressure equipment inspection; tank inspection; pipeline integrity; corrosion; QA/QC; certification; inspection engineering",
     site:"https://www.bureauveritas.com.au/inspection-ndt-services",
     delivery:["oem-manufacturer"],
-    cats:["inspection-and-certification"],
+    cats:["inspection-and-certification", "consultancy-services"],
     sectors:["refinery"],
     locations:[{ type:"headquarters", name:"HQ", address:"Australia", city:"", lat:null, lng:null, placeId:null }] },
 { id:2579, slug:"applus-australia", name:"Applus+ Australia", logo:null, country:"Australia",
@@ -19406,7 +19443,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     desc:"Inspection, NDT & Certification Services — NDT; inspection; certification; inspection engineering; QA/QC; advanced NDT; rope-access inspection; tank inspection",
     site:"https://www.applus.com/au/en/what-we-do/market/oil-and-gas",
     delivery:["oem-manufacturer"],
-    cats:["inspection-and-certification"],
+    cats:["inspection-and-certification", "consultancy-services"],
     sectors:["refinery"],
     locations:[{ type:"headquarters", name:"HQ", address:"Australia", city:"", lat:null, lng:null, placeId:null }] },
 { id:2580, slug:"sgs-australia", name:"SGS Australia", logo:null, country:"Australia",
@@ -19415,7 +19452,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     site:"https://www.sgs.com/en-au/",
     phone:"+61 1300 781 744",
     delivery:["oem-manufacturer"],
-    cats:["inspection-and-certification"],
+    cats:["inspection-and-certification", "consultancy-services"],
     sectors:["refinery"],
     locations:[{ type:"headquarters", name:"HQ", address:"Perth WA; Australia-wide", city:"", lat:null, lng:null, placeId:null }] },
 { id:2581, slug:"darwin-inspection-testing-services", name:"Darwin Inspection & Testing Services", logo:null, country:"Australia",
@@ -23950,7 +23987,86 @@ const FS_REST = {
     } while (pageToken);
     return out;
   },
+  // Authenticated single-document read, used for the caller's own user doc
+  // (approval status) and, for admins, other users' docs. Returns null on
+  // 404 (doc doesn't exist yet) rather than throwing, since "not signed up
+  // yet" is an expected first-visit state, not an error.
+  async getDoc(collection, docId) {
+    const token = await FS_REST.token();
+    const res = await fetch(`${FS_REST.base()}/${collection}/${docId}`, {
+      headers: token ? { 'Authorization': 'Bearer ' + token } : {},
+    });
+    if (res.status === 404) return null;
+    if (!res.ok) throw new Error('REST ' + res.status + ': ' + (await res.text()).slice(0, 160));
+    const data = await res.json();
+    const obj = FS_REST.fromFields(data.fields);
+    obj.id = data.name.split('/').pop();
+    return obj;
+  },
+  // Authenticated list — same pagination as listPublic, but sends the
+  // caller's ID token. Used for the admin "Pending Sign-ups" queue; the
+  // users collection is not publicly listable (see firestore.rules).
+  async listAuth(collection) {
+    const token = await FS_REST.token();
+    const out = [];
+    let pageToken = '';
+    do {
+      const url = `${FS_REST.base()}/${collection}?pageSize=300` +
+                  (pageToken ? `&pageToken=${encodeURIComponent(pageToken)}` : '');
+      const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + token } });
+      if (!res.ok) throw new Error('REST ' + res.status + ': ' + (await res.text()).slice(0, 160));
+      const data = await res.json();
+      (data.documents || []).forEach(d => {
+        const obj = FS_REST.fromFields(d.fields);
+        obj.id = obj.id || d.name.split('/').pop();
+        out.push(obj);
+      });
+      pageToken = data.nextPageToken || '';
+    } while (pageToken);
+    return out;
+  },
 };
+
+// ══════════════════════════════════════════════════════════════════════
+// ACCESS GATE — pre-launch only. Set to false to open the directory back
+// up to the public once ready for market; that's the ONLY code change
+// needed on this side. This flag controls the UI only — it does NOT by
+// itself protect the underlying data. The matching Firestore rule (see
+// firestore.rules, `companies` collection) must independently require
+// `isApprovedUser()` for reads, or anyone can still fetch the full roster
+// directly from the Firestore REST API without ever loading this page.
+// ══════════════════════════════════════════════════════════════════════
+const REQUIRE_APPROVAL_TO_VIEW = true;
+
+let currentUserStatus = null; // null | 'pending' | 'approved' | 'rejected'
+
+// Checks (and if needed, creates) the signed-in user's approval doc.
+// Admins bypass approval entirely — they're identified by ADMIN_EMAILS,
+// same as every other admin check in this file. A first-time visitor gets
+// a 'pending' doc created automatically; nothing here can set a doc to
+// 'approved' — only an admin action (approveSignup, below) does that, and
+// the Firestore rule enforces that server-side too.
+async function checkUserApproval(user) {
+  if (!user) return null;
+  if (isAdminUser(user)) return 'approved';
+  try {
+    let doc = await FS_REST.getDoc('users', user.uid);
+    if (!doc) {
+      await FS_REST.setMerge('users', user.uid, {
+        email: user.email || '',
+        displayName: user.displayName || '',
+        status: 'pending',
+        requestedAt: new Date(),
+      });
+      return 'pending';
+    }
+    return doc.status || 'pending';
+  } catch (err) {
+    console.warn('[TANKWORLDINDIA] Could not check approval status:', err.message);
+    // Fail closed: if we can't confirm approval, don't show the data.
+    return 'pending';
+  }
+}
 
 // Live-if-available, seed-array-if-not. Same philosophy as TankBazaar's
 // TerminalStore: the directory must still render if Firestore is empty,
@@ -24607,6 +24723,100 @@ function avatarHtml(u, cls) {
     : `<div class="avatar-fallback ${cls || ''}">${initials(u.displayName || u.email)}</div>`;
 }
 
+// ── Access gate rendering ────────────────────────────────────────────
+// Renders one of three full-page states into #accessGateView and toggles
+// it against .app-body. Only called while REQUIRE_APPROVAL_TO_VIEW is on;
+// see checkAccessAndRender() for where that decision is made.
+function renderAccessGate(state) {
+  const gateEl = document.getElementById('accessGateView');
+  const appBody = document.querySelector('.app-body');
+  if (!gateEl) return;
+
+  if (state === 'signin') {
+    gateEl.innerHTML = `
+      <div class="full-gate">
+        <div class="fg-card">
+          <div class="g-mark">ACCESS · GATE-01</div>
+          <h2>Sign in to continue</h2>
+          <p>TankWorld India is in a private build phase ahead of launch.
+             Sign in with Google — new accounts are reviewed by an admin
+             before the directory becomes visible.</p>
+          <button class="btn-google" onclick="signInWithGoogle()" style="margin:0 auto;">
+            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.65l-3.57-2.77c-.99.66-2.26 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.84 14.11a6.6 6.6 0 0 1 0-4.22V7.05H2.18a11 11 0 0 0 0 9.9l3.66-2.84z"/><path fill="#EA4335" d="M12 4.75c1.61 0 3.06.55 4.2 1.64l3.15-3.15C17.45 1.46 14.97.5 12 .5A11 11 0 0 0 2.18 7.05l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+            Continue with Google
+          </button>
+          <div id="authError" class="auth-error"></div>
+        </div>
+      </div>`;
+  } else if (state === 'pending') {
+    gateEl.innerHTML = `
+      <div class="full-gate">
+        <div class="fg-card">
+          <div class="g-mark">ACCESS · GATE-02</div>
+          <h2>Awaiting approval</h2>
+          <p>You're signed in, but this account hasn't been approved yet.
+             An admin needs to review it before you can see the directory.</p>
+          <div class="fg-email">${currentUser ? currentUser.email : ''}</div>
+          <p style="margin-bottom:14px;">Already been approved? Check again below.</p>
+          <button class="btn-action" onclick="checkAccessAndRender()">Check again</button>
+          <button class="btn-action ghost" onclick="fbAuth.signOut()">Sign out</button>
+        </div>
+      </div>`;
+  } else if (state === 'rejected') {
+    gateEl.innerHTML = `
+      <div class="full-gate">
+        <div class="fg-card">
+          <div class="g-mark">ACCESS · GATE-03</div>
+          <h2>Access denied</h2>
+          <p>This account's access request was not approved. If you think
+             that's a mistake, contact the team directly.</p>
+          <div class="fg-email">${currentUser ? currentUser.email : ''}</div>
+          <button class="btn-action ghost" onclick="fbAuth.signOut()">Sign out</button>
+        </div>
+      </div>`;
+  }
+
+  const showGate = state !== null;
+  gateEl.style.display = showGate ? '' : 'none';
+  if (appBody) appBody.style.display = showGate ? 'none' : '';
+}
+
+// Single entry point that decides whether to show the gate or the real
+// app, re-runnable from the "Check again" button on the pending screen
+// without a full page reload. Safe to call repeatedly — it's just a
+// status check plus a render, no side effects beyond the first-visit
+// user-doc creation already guarded inside checkUserApproval().
+async function checkAccessAndRender() {
+  if (!REQUIRE_APPROVAL_TO_VIEW) {
+    renderAccessGate(null);
+    return;
+  }
+  if (!currentUser) {
+    renderAccessGate('signin');
+    return;
+  }
+  currentUserStatus = await checkUserApproval(currentUser);
+  if (currentUserStatus === 'approved') {
+    renderAccessGate(null);
+    // The directory data + sidebar are only loaded once we know the
+    // visitor is allowed to see them.
+    await CompanyStore.load();
+    buildSidebar();
+    renderRegionFilter();
+    renderDeliveryFilter();
+    renderSectorFilter();
+    document.getElementById('statCompanies').textContent = COMPANIES.length;
+    document.getElementById('statCategories').textContent = allL2Count();
+    document.getElementById('statSheets').textContent = CATEGORY_TREE.length;
+    renderAll();
+    handleRoute();
+  } else if (currentUserStatus === 'rejected') {
+    renderAccessGate('rejected');
+  } else {
+    renderAccessGate('pending');
+  }
+}
+
 function renderAuthArea() {
   const el = document.getElementById('authArea');
   if (!el) return;
@@ -24806,6 +25016,15 @@ function renderAdminPage() {
     </div>
 
     <div class="panel-head" style="margin-top:26px;">
+      <div class="p-code">ACCESS · ADM-00b</div>
+      <h2 style="font-size:20px;">Pending sign-ups</h2>
+      <p>${REQUIRE_APPROVAL_TO_VIEW
+          ? 'The directory is currently gated — new sign-ins land here until approved or rejected.'
+          : 'The gate is currently off (REQUIRE_APPROVAL_TO_VIEW = false) — this list still tracks requests, but everyone can already see the directory regardless of status.'}</p>
+    </div>
+    <div id="pendingSignupsWrap"><div class="admin-log">Loading…</div></div>
+
+    <div class="panel-head" style="margin-top:26px;">
       <div class="p-code">ROSTER · ADM-02</div>
       <h2 style="font-size:20px;">Companies</h2>
       <p>Edit details, upload logos, and add Google Place IDs per location.</p>
@@ -24823,6 +25042,78 @@ function renderAdminPage() {
         <tbody id="adminList">${adminCompanyRows()}</tbody>
       </table>
     </div>`;
+  loadPendingSignups();
+}
+
+// ── Pending sign-ups ─────────────────────────────────────────────────
+// Lists everyone in the `users` collection with status 'pending', with
+// Approve/Reject actions. Only reachable from within renderAdminPage(),
+// which has already gated on isAdminUser() above — but the real
+// enforcement is the Firestore rule requiring isAdmin() to list or write
+// the `users` collection at all (see firestore.rules); this function
+// would simply fail to fetch anything for a non-admin caller regardless.
+async function loadPendingSignups() {
+  const wrap = document.getElementById('pendingSignupsWrap');
+  if (!wrap) return;
+  try {
+    const users = await FS_REST.listAuth('users');
+    const pending = users.filter(u => (u.status || 'pending') === 'pending');
+    if (!pending.length) {
+      wrap.innerHTML = `<div class="admin-note">No pending sign-ups right now.</div>`;
+      return;
+    }
+    wrap.innerHTML = `
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <tbody>
+            ${pending.map(u => `
+              <tr>
+                <td>
+                  <div style="font-weight:600;">${escapeHtmlAdmin(u.displayName || '(no name)')}</div>
+                  <div class="ed-hint" style="margin:0;">${escapeHtmlAdmin(u.email || '')}</div>
+                </td>
+                <td class="ed-hint">${u.requestedAt ? new Date(u.requestedAt).toLocaleString() : ''}</td>
+                <td style="text-align:right; white-space:nowrap;">
+                  <button class="btn-mini" onclick="approveSignup('${u.id}')">Approve</button>
+                  <button class="btn-mini rust" onclick="rejectSignup('${u.id}')">Reject</button>
+                </td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>`;
+  } catch (err) {
+    wrap.innerHTML = `<div class="admin-note" style="color:var(--rust);">
+      Couldn't load pending sign-ups: ${err.message}</div>`;
+  }
+}
+
+function escapeHtmlAdmin(s) {
+  const d = document.createElement('div');
+  d.textContent = s || '';
+  return d.innerHTML;
+}
+
+async function approveSignup(uid) {
+  try {
+    await FS_REST.setMerge('users', uid, {
+      status: 'approved', respondedAt: new Date(), respondedBy: currentUser.email,
+    });
+    loadPendingSignups();
+  } catch (err) {
+    alert('Could not approve: ' + err.message);
+  }
+}
+
+async function rejectSignup(uid) {
+  if (!confirm('Reject this sign-up? They will not be able to view the directory.')) return;
+  try {
+    await FS_REST.setMerge('users', uid, {
+      status: 'rejected', respondedAt: new Date(), respondedBy: currentUser.email,
+    });
+    loadPendingSignups();
+  } catch (err) {
+    alert('Could not reject: ' + err.message);
+  }
 }
 
 // ── Batch logo upload ────────────────────────────────────────────────
@@ -25511,35 +25802,49 @@ async function reloadFromFirestore() {
 }
 
 async function startApp() {
-  await CompanyStore.load();
-  buildSidebar();
-  renderRegionFilter();
-  renderDeliveryFilter();
-  renderSectorFilter();
-  document.getElementById('statCompanies').textContent = COMPANIES.length;
-  document.getElementById('statCategories').textContent = allL2Count();
-  document.getElementById('statSheets').textContent = CATEGORY_TREE.length;
-  renderAll();
   window.addEventListener('hashchange', handleRoute);
-  handleRoute();
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeAuthModal();
+  });
+
+  if (!REQUIRE_APPROVAL_TO_VIEW) {
+    // Original open-access behaviour, unchanged: load and render
+    // immediately, no gate. This is the path a launch flips back to.
+    await CompanyStore.load();
+    buildSidebar();
+    renderRegionFilter();
+    renderDeliveryFilter();
+    renderSectorFilter();
+    document.getElementById('statCompanies').textContent = COMPANIES.length;
+    document.getElementById('statCategories').textContent = allL2Count();
+    document.getElementById('statSheets').textContent = CATEGORY_TREE.length;
+    renderAll();
+    handleRoute();
+  }
 
   // onAuthStateChanged is the single source of truth for who's signed in — it
   // fires on load, after popup sign-in, and after a redirect returns, so all
   // three paths converge here rather than each updating the UI themselves.
+  // While the gate is on, it's also what decides whether the directory ever
+  // loads at all, via checkAccessAndRender().
   renderAuthArea();
   if (firebaseReady) {
-    fbAuth.onAuthStateChanged(user => {
+    fbAuth.onAuthStateChanged(async user => {
       currentUser = user;
       renderAuthArea();
       closeAuthModal();
+      if (REQUIRE_APPROVAL_TO_VIEW) {
+        await checkAccessAndRender();
+      }
       const h = location.hash;
       if (h === '#/profile') renderProfilePage();
       if (h === '#/admin') renderAdminPage();
     });
+  } else if (REQUIRE_APPROVAL_TO_VIEW) {
+    // Can't verify anyone without Firebase — fail closed rather than show
+    // the directory to an unverifiable visitor.
+    renderAccessGate('signin');
   }
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') closeAuthModal();
-  });
 }
 document.addEventListener('DOMContentLoaded', startApp);
 </script>

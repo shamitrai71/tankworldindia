@@ -13,13 +13,43 @@ service cloud.firestore {
       );
     }
 
+    // ── Pre-launch access gate ───────────────────────────────────────────
+    // Matches REQUIRE_APPROVAL_TO_VIEW in index.html. An account is
+    // approved if it's an admin (always exempt), or its users/{uid} doc
+    // has status == 'approved', or it has NO status field at all — the
+    // grandfather clause for any account that existed before this gate was
+    // introduced, so this migration doesn't lock out anyone already using
+    // the app. Only accounts created after this change land with
+    // status == 'pending' and are actually held for review (see the
+    // users/{uid} create rule below, which is what makes that stick).
+    // To require re-approval of existing accounts too, delete the
+    // `!('status' in ...)` branch.
+    // Split into two functions rather than using a `let` binding inside
+    // isApprovedUser() — a parameterized helper is unambiguous, standard
+    // Firestore Rules syntax; a `let`-chain achieving the same single-fetch
+    // goal is harder to get exactly right without a live emulator to test
+    // against, so this is the safer of two functionally-equivalent options.
+    function isApprovedStatus(userData) {
+      return userData.status == 'approved' || !('status' in userData);
+    }
+    function isApprovedUser() {
+      return isAdmin() || (
+        isSignedIn() &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        isApprovedStatus(get(/databases/$(database)/documents/users/$(request.auth.uid)).data)
+      );
+    }
+
     // ── Companies ──────────────────────────────────────────────────────
-    // TankWorldIndia is a PUBLIC directory — unlike TankBazaar's terminals,
-    // which are sign-in + approval gated. Anyone (signed out included) can
-    // read; only admin writes. Once claims exist, a listing's owner may
-    // update their own record.
+    // Pre-launch: gated to approved sign-ins only (see isApprovedUser()
+    // above) while there's still considerable work left before going to
+    // market. To reopen public browsing at launch, change this one line
+    // back to `allow read: if true;` and flip REQUIRE_APPROVAL_TO_VIEW to
+    // false in index.html — the two are meant to be toggled together.
+    // Only admin writes. Once claims exist, a listing's owner may update
+    // their own record.
     match /companies/{doc} {
-      allow read:   if true;
+      allow read:   if isApprovedUser();
       allow create: if isAdmin();
       allow delete: if isAdmin();
       allow update: if isAdmin()
@@ -28,17 +58,39 @@ service cloud.firestore {
 
     // ── Categories ─────────────────────────────────────────────────────
     // Only needed if the 92-category taxonomy ever moves out of the HTML
-    // and into Firestore. Harmless to keep either way.
+    // and into Firestore. Gated the same as companies for now, for the
+    // same pre-launch reason — see the note above.
     match /categories/{doc} {
-      allow read:  if true;
+      allow read:  if isApprovedUser();
       allow write: if isAdmin();
     }
 
     // ── User profiles ──────────────────────────────────────────────────
+    // get: a user can read their own doc (this is what lets their own app
+    // discover its own pending/approved/rejected status in the first
+    // place — isApprovedUser() itself depends on this being readable, so
+    // don't gate this behind isApprovedUser() or you get a deadlock: can't
+    // read your own status to find out if you're approved, if reading
+    // requires being approved).
+    // list: admin only — this is what powers the "Pending Sign-ups" queue
+    // in the admin panel (FS_REST.listAuth('users')).
+    // create: allowed for a user creating their OWN doc, but ONLY with
+    // status == 'pending' — this is the actual enforcement that stops
+    // someone from signing up and immediately marking themselves approved;
+    // the previous version of this rule had no field restriction at all,
+    // which would have let a user create their own doc with
+    // status: 'approved' directly.
+    // update: an approved/rejected decision can only be made by an admin —
+    // a non-admin owner may update their own doc, but never touch the
+    // status field on it (self-approval via update, closed the same way
+    // as it's closed on create).
     match /users/{uid} {
-      allow read:   if isOwner(uid) || isAdmin();
-      allow create: if isOwner(uid);
-      allow update: if isOwner(uid) || isAdmin();
+      allow get:    if isOwner(uid) || isAdmin();
+      allow list:   if isAdmin();
+      allow create: if isOwner(uid) && request.resource.data.status == 'pending';
+      allow update: if isAdmin()
+                    || (isOwner(uid)
+                        && !('status' in request.resource.data.diff(resource.data).affectedKeys()));
       allow delete: if isOwner(uid) || isAdmin();
     }
 
