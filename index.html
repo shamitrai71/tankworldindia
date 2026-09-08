@@ -37372,6 +37372,72 @@ async function seedCompanies() {
   }
 }
 
+// ── Orphaned records ─────────────────────────────────────────────────
+// seedCompanies() only upserts — by design (see its confirm() text) it never
+// deletes a Firestore document whose slug fell out of SEED_COMPANIES, so a
+// company removed from the build (e.g. an operator pulled for crossing the
+// TWI/TankBazaar boundary) stays live in Firestore indefinitely unless
+// pruned on purpose. This is a separate, explicit, review-before-delete
+// flow rather than folding a silent delete into the Seed button itself —
+// same reasoning as the rest of this admin panel: never trust a bulk
+// operation's own success report, always show what will change first.
+let _lastOrphanScan = null; // slugs found by the most recent scan, so Delete can't run stale
+
+async function findOrphanedCompanies() {
+  const wrap = document.getElementById('orphanWrap');
+  wrap.innerHTML = `<div class="admin-log">Scanning Firestore…</div>`;
+  try {
+    const liveDocs = await FS_REST.listAuth('companies');
+    const buildSlugs = new Set(SEED_COMPANIES.map(c => c.slug));
+    const orphans = liveDocs.filter(d => d.slug && !buildSlugs.has(d.slug));
+    _lastOrphanScan = orphans.map(o => o.slug);
+    if (!orphans.length) {
+      wrap.innerHTML = `<div class="admin-note">No orphaned records — every company live in Firestore is also in this build.</div>`;
+      return;
+    }
+    wrap.innerHTML = `
+      <div class="admin-note" style="border-color:var(--rust);">
+        <b>${orphans.length} record${orphans.length === 1 ? '' : 's'} live in Firestore but not in this build:</b>
+        <ul style="margin:10px 0 0 20px;">
+          ${orphans.map(o => `<li>${o.name || '(no name)'} — <code>${o.slug}</code></li>`).join('')}
+        </ul>
+      </div>
+      <button class="btn-action" style="background:var(--rust);" onclick="deleteOrphanedCompanies()">
+        Delete these ${orphans.length} record${orphans.length === 1 ? '' : 's'} from Firestore
+      </button>`;
+  } catch (err) {
+    wrap.innerHTML = `<div class="admin-note" style="border-color:var(--rust);">Scan failed: ${err.message}</div>`;
+  }
+}
+
+async function deleteOrphanedCompanies() {
+  if (!_lastOrphanScan || !_lastOrphanScan.length) return;
+  const slugs = _lastOrphanScan;
+  if (!confirm(`Permanently delete ${slugs.length} record${slugs.length === 1 ? '' : 's'} from Firestore?\n\n` +
+               `This only removes documents already listed above from the most recent scan — ` +
+               `re-run "Find orphaned records" first if the build or Firestore may have changed ` +
+               `since. This cannot be undone.`)) return;
+  const wrap = document.getElementById('orphanWrap');
+  let ok = 0; const failures = [];
+  for (const slug of slugs) {
+    try { await FS_REST.deleteDoc('companies', slug); ok++; }
+    catch (err) { failures.push({ slug, msg: err.message }); }
+  }
+  _lastOrphanScan = null;
+  const summary = `Deleted ${ok} record${ok === 1 ? '' : 's'}.` +
+    (failures.length ? ` ${failures.length} failed: ` + failures.map(f => `${f.slug} (${f.msg})`).join(', ') : '');
+  wrap.innerHTML = `<div class="admin-note">${summary}</div>`;
+  // alert() blocks until dismissed, guaranteeing the result is actually seen —
+  // renderAdminPage() below rebuilds the whole panel (including a fresh, empty
+  // orphanWrap), which would otherwise silently wipe the message above before
+  // anyone reads it. Same risk exists in seedCompanies()'s adminLog output,
+  // not something introduced here — worth fixing there too at some point.
+  alert(summary);
+  await CompanyStore.load();
+  renderAll();
+  renderAdminPage();
+}
+
 function renderAdminPage() {
   const el = document.getElementById('admin-view');
   if (!currentUser) {
@@ -37411,17 +37477,26 @@ function renderAdminPage() {
            compan${SEED_COMPANIES.length - COMPANIES.length === 1 ? 'y is' : 'ies are'} in this
            build but not yet in Firestore.</b> Run the seed below to write them.</span>`
         : ``}
+      ${CompanyStore.isLive && COMPANIES.length > SEED_COMPANIES.length
+        ? `<br><span style="color:var(--rust);"><b>${COMPANIES.length - SEED_COMPANIES.length}
+           more compan${COMPANIES.length - SEED_COMPANIES.length === 1 ? 'y is' : 'ies are'} live
+           in Firestore than in this build.</b> Seeding never deletes — a company removed from
+           the build stays in Firestore until pruned on purpose. Use "Find orphaned records"
+           below to review and remove them.</span>`
+        : ``}
     </div>
     <div class="admin-actions">
       <button class="btn-action" id="btnSeed" onclick="seedCompanies()">
         Seed ${SEED_COMPANIES.length} companies → Firestore
       </button>
       <button class="btn-action ghost" onclick="reloadFromFirestore()">Reload from Firestore</button>
+      <button class="btn-action ghost" onclick="findOrphanedCompanies()" title="Lists companies live in Firestore but no longer in this build — nothing is deleted until you review the list and confirm">Find orphaned records</button>
       <button class="btn-action ghost" onclick="openBatchLogoModal()">Batch upload logos</button>
       <button class="btn-action ghost" onclick="relinkLogosFromStorage()" title="Repairs logos wiped by a re-seed — no re-upload needed">Relink logos from Storage</button>
       <button class="btn-action ghost" onclick="location.hash='#/'">Back to directory</button>
     </div>
     <div class="admin-log" id="adminLog"></div>
+    <div id="orphanWrap"></div>
     <div class="admin-note">
       Writes go through the Firestore REST API with your ID token. If a write is
       rejected, check that your email is in the <code>isAdmin()</code> list in
