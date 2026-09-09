@@ -174,6 +174,62 @@ main{ flex:1; min-width:0; padding:20px 24px 60px; }
 .empty-state .em-mark{ font-family:var(--font-mono); font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--ink-faint); margin-bottom:8px; }
 .empty-state h3{ font-family:var(--font-display); font-size:18px; margin-bottom:6px; }
 
+/* ── Landing page ─────────────────────────────────────────────────── */
+#landing-view{ width:100%; }
+.landing-wrap{ max-width:1080px; margin:0 auto; padding:48px 24px 80px; }
+.landing-hero{ text-align:center; margin-bottom:48px; }
+.landing-hero .em-mark{ font-family:var(--font-mono); font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--ink-faint); margin-bottom:14px; }
+.landing-hero h1{ font-family:var(--font-display); font-weight:600; font-size:clamp(28px,4vw,42px); line-height:1.15; margin-bottom:12px; color:var(--ink); }
+.landing-sub{ font-size:14px; color:var(--ink-muted); margin-bottom:28px; }
+.landing-search-form{ display:flex; gap:0; max-width:560px; margin:0 auto; }
+.landing-search-input{
+  flex:1; padding:15px 18px; font-size:14px; font-family:var(--font-body);
+  border:1.5px solid var(--ink); border-right:none; border-radius:var(--radius) 0 0 var(--radius);
+  background:var(--paper-raised); color:var(--ink); outline:none;
+}
+.landing-search-input:focus{ background:#fff; }
+.landing-search-btn{
+  padding:15px 28px; font-family:var(--font-display); font-weight:600; font-size:14px;
+  background:var(--ink); color:var(--paper-raised); border:1.5px solid var(--ink);
+  border-radius:0 var(--radius) var(--radius) 0; cursor:pointer; transition:background 0.12s;
+}
+.landing-search-btn:hover{ background:var(--blue); border-color:var(--blue); }
+
+.landing-region-row{ display:grid; grid-template-columns:2fr 1fr; gap:16px; margin-bottom:56px; }
+.landing-region-block{
+  display:block; text-decoration:none; border:1.5px solid var(--ink); border-radius:var(--radius);
+  padding:28px 24px; transition:transform 0.12s, box-shadow 0.12s;
+}
+.landing-region-block:hover{ transform:translate(-2px,-2px); box-shadow:4px 4px 0 var(--line-blue); }
+.landing-region-india{ background:var(--blue); color:#fff; }
+.landing-region-other{ background:var(--paper-raised); color:var(--ink); }
+.lr-label{ font-family:var(--font-mono); font-size:11px; letter-spacing:2px; margin-bottom:10px; opacity:0.85; }
+.lr-count{ font-family:var(--font-display); font-weight:700; font-size:clamp(32px,5vw,52px); line-height:1; margin-bottom:6px; }
+.lr-sub{ font-size:12.5px; opacity:0.8; }
+.landing-region-india .lr-sub{ color:var(--blue-soft); }
+.landing-region-other .lr-sub{ color:var(--ink-muted); }
+
+.landing-cats-head{ margin-bottom:20px; }
+.landing-cats-head .em-mark{ font-family:var(--font-mono); font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--ink-faint); margin-bottom:6px; }
+.landing-cats-head h2{ font-family:var(--font-display); font-weight:600; font-size:22px; color:var(--ink); }
+.landing-cat-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:12px; }
+.landing-cat-tile{
+  display:block; text-decoration:none; color:inherit;
+  background:var(--paper-raised); border:1.5px solid var(--ink); border-radius:var(--radius);
+  padding:16px; transition:transform 0.12s, box-shadow 0.12s;
+}
+.landing-cat-tile:hover{ transform:translate(-2px,-2px); box-shadow:4px 4px 0 var(--rust-soft); }
+.lct-code{ font-family:var(--font-mono); font-size:11px; font-weight:700; color:var(--rust); letter-spacing:1px; margin-bottom:8px; }
+.lct-name{ font-family:var(--font-display); font-weight:600; font-size:14.5px; line-height:1.3; margin-bottom:10px; min-height:38px; }
+.lct-count{ font-family:var(--font-mono); font-size:11px; color:var(--ink-faint); }
+
+@media (max-width: 640px){
+  .landing-region-row{ grid-template-columns:1fr; }
+  .landing-search-form{ flex-direction:column; }
+  .landing-search-input{ border-right:1.5px solid var(--ink); border-radius:var(--radius) var(--radius) 0 0; }
+  .landing-search-btn{ border-radius:0 0 var(--radius) var(--radius); }
+}
+
 /* ── MAP VIEW ── */
 .map-pin-label{ font-family:var(--font-mono); font-size:9px; }
 
@@ -677,6 +733,7 @@ footer{
 </div>
 
 <div class="app-body">
+  <div id="landing-view" style="display:none;"></div>
   <aside class="sidebar">
     <div class="sidebar-title">
       <span>Category Index</span>
@@ -40523,12 +40580,33 @@ function allL2Count() {
 }
 
 function categoryLabel(slug) {
+  // Section-level (l1) slugs aren't in allCategoryNodes() -- that function
+  // deliberately only enumerates items 2+ levels deep, since companies are
+  // always tagged with a specific leaf category, never a bare section slug.
+  // The new landing-page category grid links to whole sections though
+  // (#/?cat=engineering-and-construction), so this needs to recognize that
+  // case too or the active-filter chip throws trying to read .code off null.
+  const l1 = CATEGORY_TREE.find(s => s.slug === slug);
+  if (l1) return { code: l1.code, name: l1.name };
   const hit = allCategoryNodes().find(n => n.slug === slug);
   return hit ? { code: hit.code, name: hit.name } : null;
 }
 
-/** slug → [slug, ...all descendant slugs]. Used for inclusive filtering. */
+/** slug → [slug, ...all descendant slugs]. Used for inclusive filtering.
+ *  Handles three cases: a whole top-level section (landing page's category
+ *  grid), a mid-level category with direct children, or a plain leaf with
+ *  none — each falls through to the next check in order. */
 function categoryWithDescendants(slug) {
+  const l1 = CATEGORY_TREE.find(s => s.slug === slug);
+  if (l1) {
+    const out = [];
+    const walk = (node) => {
+      if (node.slug) out.push(node.slug);
+      (node.items || []).forEach(walk);
+    };
+    (l1.items || []).forEach(walk);
+    return out;
+  }
   const hit = allCategoryNodes().find(n => n.slug === slug);
   if (!hit) return [slug];
   return [slug, ...(hit.items || []).map(s => s.slug)];
@@ -40557,17 +40635,18 @@ function setDelivery(d) {
 // instead of returning to the previous filter/category. Encoding this state
 // into the hash — and driving it exclusively through handleRoute() — means
 // every meaningful navigation is a real, back-button-able history entry.
-function buildFilterHash(cat, region, delivery, sector) {
+function buildFilterHash(cat, region, delivery, sector, q) {
   const params = [];
   if (cat) params.push('cat=' + encodeURIComponent(cat));
   if (region && region !== 'all') params.push('region=' + encodeURIComponent(region));
   if (delivery) params.push('delivery=' + encodeURIComponent(delivery));
   if (sector) params.push('sector=' + encodeURIComponent(sector));
+  if (q) params.push('q=' + encodeURIComponent(q));
   return '#/' + (params.length ? ('?' + params.join('&')) : '');
 }
 
 function parseFilterHash(hash) {
-  const out = { cat: null, region: 'all', delivery: null, sector: null };
+  const out = { cat: null, region: 'all', delivery: null, sector: null, q: '' };
   const qIdx = hash.indexOf('?');
   if (qIdx === -1) return out;
   const qs = new URLSearchParams(hash.slice(qIdx + 1));
@@ -40576,6 +40655,7 @@ function parseFilterHash(hash) {
   // Guard against a hand-edited or stale hash naming a model we don't have.
   if (qs.has('delivery') && DELIVERY_LABEL[qs.get('delivery')]) out.delivery = qs.get('delivery');
   if (qs.has('sector') && SECTOR_LABEL[qs.get('sector')]) out.sector = qs.get('sector');
+  if (qs.has('q')) out.q = qs.get('q');
   return out;
 }
 
@@ -40770,6 +40850,81 @@ function renderCards() {
         ${deliveryRow}
       </a>`;
   }).join('');
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// LANDING PAGE
+// ══════════════════════════════════════════════════════════════════════
+// Companies no longer appear by default anywhere in the app -- the flat
+// "all 5,502 companies" grid this replaced was the actual front page
+// before this redesign. Now a company only ever appears as the result of
+// an explicit search or category/region selection, starting here.
+
+/** Total companies tagged anywhere under a top-level CATEGORY_TREE section
+ *  (recursively, since some sections nest a third level under their items). */
+function sectionCompanyCount(l1) {
+  const slugs = new Set(categoryWithDescendants(l1.slug));
+  return COMPANIES.reduce((n, c) => n + (c.cats.some(s => slugs.has(s)) ? 1 : 0), 0);
+}
+
+function submitLandingSearch(event) {
+  if (event) event.preventDefault();
+  const term = document.getElementById('landingSearchBox').value.trim();
+  location.hash = buildFilterHash(null, 'all', null, null, term);
+}
+
+function renderLandingPage() {
+  const el = document.getElementById('landing-view');
+  const nIndia = COMPANIES.filter(isIndian).length;
+  const nOther = COMPANIES.length - nIndia;
+
+  const sectionTiles = CATEGORY_TREE.map(l1 => {
+    const n = sectionCompanyCount(l1);
+    return { l1, n };
+  }).sort((a, b) => b.n - a.n); // busiest sections first -- a rough proxy for
+                                  // "most developed part of the roster" until
+                                  // there's a reason to hand-order this.
+
+  el.innerHTML = `
+    <div class="landing-wrap">
+      <div class="landing-hero">
+        <div class="em-mark">TANKWORLD INDIA · ENGINEERING &amp; EQUIPMENT DIRECTORY</div>
+        <h1>Find the right supplier across ${COMPANIES.length.toLocaleString()} companies.</h1>
+        <p class="landing-sub">${CATEGORY_TREE.length} categories, ${COMPANIES.length.toLocaleString()} companies —
+          search by name, product, or category to get started.</p>
+        <form class="landing-search-form" onsubmit="submitLandingSearch(event)">
+          <input type="text" id="landingSearchBox" class="landing-search-input"
+                 placeholder="Search company, product, or category…" autocomplete="off">
+          <button type="submit" class="landing-search-btn">Search</button>
+        </form>
+      </div>
+
+      <div class="landing-region-row">
+        <a href="#/?region=india" class="landing-region-block landing-region-india">
+          <div class="lr-label">INDIA</div>
+          <div class="lr-count">${nIndia.toLocaleString()}</div>
+          <div class="lr-sub">companies — the core of this directory</div>
+        </a>
+        <a href="#/?region=international" class="landing-region-block landing-region-other">
+          <div class="lr-label">OTHER COUNTRIES</div>
+          <div class="lr-count">${nOther.toLocaleString()}</div>
+          <div class="lr-sub">companies, worldwide</div>
+        </a>
+      </div>
+
+      <div class="landing-cats-head">
+        <div class="em-mark">BROWSE BY CATEGORY</div>
+        <h2>${CATEGORY_TREE.length} sections</h2>
+      </div>
+      <div class="landing-cat-grid">
+        ${sectionTiles.map(({ l1, n }) => `
+          <a href="#/?cat=${l1.slug}" class="landing-cat-tile" ${n === 0 ? 'style="opacity:.4;pointer-events:none;"' : ''}>
+            <div class="lct-code">${l1.code}</div>
+            <div class="lct-name">${l1.name}</div>
+            <div class="lct-count">${n.toLocaleString()} ${n === 1 ? 'company' : 'companies'}</div>
+          </a>`).join('')}
+      </div>
+    </div>`;
 }
 
 function renderAll() {
@@ -41000,11 +41155,24 @@ function handleRoute() {
     listPanel.style.display = 'none';
     companyPanel.classList.add('active');
     sidebar.style.display = 'none';
+    document.getElementById('landing-view').style.display = 'none';
+  } else if (hash === '#/') {
+    // Bare "#/" with no query string at all is the landing page -- the flat
+    // "every company, unfiltered" grid was the thing this redesign removed.
+    // Any query string at all (even just "?q=" from an empty landing search)
+    // routes to the existing results view instead.
+    document.title = 'TankWorld India — Engineering & Equipment Directory';
+    companyPanel.classList.remove('active');
+    sidebar.style.display = 'none';
+    listPanel.style.display = 'none';
+    document.getElementById('landing-view').style.display = 'block';
+    renderLandingPage();
   } else {
     document.title = 'TankWorld India — Engineering & Equipment Directory';
     companyPanel.classList.remove('active');
     sidebar.style.display = '';
     listPanel.style.display = 'block';
+    document.getElementById('landing-view').style.display = 'none';
 
     // Single source of truth for filter state: whatever's in the hash
     // wins, whether we just navigated there or the user hit back/forward.
@@ -41013,6 +41181,10 @@ function handleRoute() {
     activeRegion = parsed.region;
     activeDelivery = parsed.delivery;
     activeSector = parsed.sector;
+    // Search term arriving via the hash (from the landing page's search bar)
+    // -- filteredCompanies() reads this box's live DOM value, so setting it
+    // here is what actually makes a landing-page search show results.
+    document.getElementById('searchBox').value = parsed.q || '';
 
     document.querySelectorAll('.sheet-item').forEach(el => {
       el.classList.toggle('active', el.dataset.slug === activeCategory);
