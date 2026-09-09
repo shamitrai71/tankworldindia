@@ -176,6 +176,7 @@ main{ flex:1; min-width:0; padding:20px 24px 60px; }
 
 /* ── Landing page ─────────────────────────────────────────────────── */
 #landing-view{ width:100%; }
+#section-view{ width:100%; }
 .landing-wrap{ max-width:1080px; margin:0 auto; padding:48px 24px 80px; }
 .landing-hero{ text-align:center; margin-bottom:48px; }
 .landing-hero .em-mark{ font-family:var(--font-mono); font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--ink-faint); margin-bottom:14px; }
@@ -223,11 +224,51 @@ main{ flex:1; min-width:0; padding:20px 24px 60px; }
 .lct-name{ font-family:var(--font-display); font-weight:600; font-size:14.5px; line-height:1.3; margin-bottom:10px; min-height:38px; }
 .lct-count{ font-family:var(--font-mono); font-size:11px; color:var(--ink-faint); }
 
+/* ── Section page (category infographics + sub-cat tiles) ───────────── */
+.sticky-back-btn{
+  display:inline-flex; align-items:center; gap:6px; position:sticky; top:12px; z-index:5;
+  font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.3px;
+  color:var(--ink); text-decoration:none; background:var(--paper-raised);
+  border:1.5px solid var(--ink); border-radius:var(--radius); padding:8px 14px;
+  margin-bottom:20px; transition:background 0.12s;
+}
+.sticky-back-btn:hover{ background:var(--blue); color:#fff; border-color:var(--blue); }
+
+.section-hero{ margin-bottom:28px; }
+.section-hero h1{ font-family:var(--font-display); font-weight:600; font-size:clamp(24px,3.5vw,34px); margin:6px 0 8px; color:var(--ink); }
+
+.section-stats-row{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:40px; }
+.section-stat-card{
+  background:var(--paper-raised); border:1.5px solid var(--line); border-radius:var(--radius); padding:18px 20px;
+}
+.section-stat-card .lr-label{ font-family:var(--font-mono); font-size:10.5px; letter-spacing:1.5px; margin-bottom:12px; }
+.stat-split-bar{ display:flex; height:10px; border-radius:5px; overflow:hidden; margin-bottom:8px; border:1px solid var(--ink); }
+.ssb-india{ background:var(--blue); }
+.ssb-other{ background:var(--line); }
+.stat-split-labels{ display:flex; justify-content:space-between; font-size:12px; color:var(--ink-muted); }
+.stat-split-labels b{ color:var(--ink); font-family:var(--font-display); }
+.stat-chip-row{ display:flex; flex-wrap:wrap; gap:6px; }
+.stat-chip{
+  font-family:var(--font-mono); font-size:11px; padding:4px 9px; border-radius:2px;
+  background:var(--blue-soft); color:var(--blue); font-weight:600;
+}
+.stat-chip b{ margin-left:2px; }
+.stat-chip-empty{ font-size:12px; color:var(--ink-faint); font-style:italic; }
+
+/* ── Sub-category results (scoped sidebar page) back bar ────────────── */
+.back-bar{ display:flex; align-items:center; gap:14px; margin-bottom:16px; flex-wrap:wrap; }
+.back-bar .sticky-back-btn{ margin-bottom:0; }
+.back-link-secondary{
+  font-family:var(--font-mono); font-size:12px; color:var(--ink-muted); text-decoration:none;
+}
+.back-link-secondary:hover{ color:var(--ink); text-decoration:underline; }
+
 @media (max-width: 640px){
   .landing-region-row{ grid-template-columns:1fr; }
   .landing-search-form{ flex-direction:column; }
   .landing-search-input{ border-right:1.5px solid var(--ink); border-radius:var(--radius) var(--radius) 0 0; }
   .landing-search-btn{ border-radius:0 0 var(--radius) var(--radius); }
+  .section-stats-row{ grid-template-columns:1fr; }
 }
 
 /* ── MAP VIEW ── */
@@ -734,6 +775,7 @@ footer{
 
 <div class="app-body">
   <div id="landing-view" style="display:none;"></div>
+  <div id="section-view" style="display:none;"></div>
   <aside class="sidebar">
     <div class="sidebar-title">
       <span>Category Index</span>
@@ -749,6 +791,7 @@ footer{
 
   <main>
     <div id="list-view">
+      <div id="backBar"></div>
       <div class="results-bar">
         <div class="results-count"><b id="resultCount">0</b> companies</div>
         <div class="active-filters" id="activeFilters"></div>
@@ -40724,10 +40767,17 @@ function renderSectorFilter() {
     </div>`;
 }
 
-function buildSidebar() {
+// scopedSlug, when passed, renders ONLY that one top-level section (open,
+// with its items) instead of the full 20-section tree — used by the
+// sub-category results page reached from a category page's sub-cat tiles.
+// Calling this again with no argument (e.g. on navigating to search or the
+// landing page) restores the full tree, so the sidebar doesn't stay stuck
+// in scoped mode once the user leaves that context.
+function buildSidebar(scopedSlug) {
   const wrap = document.getElementById('sheetList');
-  wrap.innerHTML = CATEGORY_TREE.map((l1, i) => `
-    <div class="sheet-group" data-l1="${l1.slug}">
+  const sections = scopedSlug ? CATEGORY_TREE.filter(l1 => l1.slug === scopedSlug) : CATEGORY_TREE;
+  wrap.innerHTML = sections.map((l1, i) => `
+    <div class="sheet-group${scopedSlug ? ' open' : ''}" data-l1="${l1.slug}">
       <div class="sheet-head" onclick="toggleSheet('${l1.slug}')">
         <span class="sheet-code">${l1.code}</span>
         <span>${l1.name}</span>
@@ -40918,13 +40968,129 @@ function renderLandingPage() {
       </div>
       <div class="landing-cat-grid">
         ${sectionTiles.map(({ l1, n }) => `
-          <a href="#/?cat=${l1.slug}" class="landing-cat-tile" ${n === 0 ? 'style="opacity:.4;pointer-events:none;"' : ''}>
+          <a href="#/section/${l1.slug}" class="landing-cat-tile" ${n === 0 ? 'style="opacity:.4;pointer-events:none;"' : ''}>
             <div class="lct-code">${l1.code}</div>
             <div class="lct-name">${l1.name}</div>
             <div class="lct-count">${n.toLocaleString()} ${n === 1 ? 'company' : 'companies'}</div>
           </a>`).join('')}
       </div>
     </div>`;
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// SECTION PAGE — reached from a landing-page category tile.
+// Infographics (sub-category breakdown as the dominant element, plus a
+// compact India/International split and delivery-model mix within this
+// section specifically) + a sub-category tile grid. No company list here —
+// clicking a sub-category tile is the deliberate second action that leads
+// to one, on a separate page (renderSubCategoryResults below).
+// ══════════════════════════════════════════════════════════════════════
+function renderSectionPage(sectionSlug) {
+  const l1 = CATEGORY_TREE.find(s => s.slug === sectionSlug);
+  const el = document.getElementById('section-view');
+  if (!l1) {
+    el.innerHTML = `<div class="landing-wrap"><a href="#/" class="back-link">← Back to dashboard</a>
+      <div class="empty-state"><div class="em-mark">Section Not Found</div><h3>No such category</h3></div></div>`;
+    return;
+  }
+
+  const sectionSlugs = new Set(categoryWithDescendants(sectionSlug));
+  const inSection = COMPANIES.filter(c => c.cats.some(s => sectionSlugs.has(s)));
+  const nIndia = inSection.filter(isIndian).length;
+  const nOther = inSection.length - nIndia;
+
+  const deliveryCounts = {};
+  inSection.forEach(c => (c.delivery || []).forEach(d => { deliveryCounts[d] = (deliveryCounts[d] || 0) + 1; }));
+  const deliveryTop = DELIVERY_MODELS
+    .map(([k, label]) => ({ k, label, n: deliveryCounts[k] || 0 }))
+    .filter(d => d.n > 0)
+    .sort((a, b) => b.n - a.n)
+    .slice(0, 5); // top 5 keeps this a compact secondary element, not a competing centerpiece
+
+  // Direct sub-categories only (this section's immediate items) — each
+  // tile's own count is still inclusive of ITS descendants via
+  // categoryWithDescendants, same as the landing page's section tiles.
+  const subTiles = l1.items.map(it => {
+    const slugs = new Set(categoryWithDescendants(it.slug));
+    const n = COMPANIES.reduce((acc, c) => acc + (c.cats.some(s => slugs.has(s)) ? 1 : 0), 0);
+    return { it, n };
+  }).sort((a, b) => b.n - a.n);
+
+  el.innerHTML = `
+    <div class="landing-wrap">
+      <a href="#/" class="sticky-back-btn">← Back to dashboard</a>
+
+      <div class="section-hero">
+        <div class="lct-code" style="font-size:13px;">${l1.code}</div>
+        <h1>${l1.name}</h1>
+        <p class="landing-sub">${inSection.length.toLocaleString()} companies across ${l1.items.length}
+          sub-categor${l1.items.length === 1 ? 'y' : 'ies'}.</p>
+      </div>
+
+      <div class="section-stats-row">
+        <div class="section-stat-card">
+          <div class="lr-label" style="color:var(--ink-faint);">INDIA / INTERNATIONAL</div>
+          <div class="stat-split-bar">
+            <div class="ssb-india" style="flex:${nIndia || 1}"></div>
+            <div class="ssb-other" style="flex:${nOther || 1}"></div>
+          </div>
+          <div class="stat-split-labels">
+            <span><b>${nIndia.toLocaleString()}</b> India</span>
+            <span><b>${nOther.toLocaleString()}</b> Other</span>
+          </div>
+        </div>
+        <div class="section-stat-card">
+          <div class="lr-label" style="color:var(--ink-faint);">DELIVERY MODEL MIX</div>
+          <div class="stat-chip-row">
+            ${deliveryTop.length ? deliveryTop.map(d => `
+              <span class="stat-chip">${d.label} <b>${d.n}</b></span>`).join('')
+              : `<span class="stat-chip-empty">Not yet tagged for this section</span>`}
+          </div>
+        </div>
+      </div>
+
+      <div class="landing-cats-head">
+        <div class="em-mark">SUB-CATEGORIES — SELECT ONE TO SEE COMPANIES</div>
+        <h2>${l1.items.length} in ${l1.name}</h2>
+      </div>
+      <div class="landing-cat-grid">
+        ${subTiles.map(({ it, n }) => `
+          <a href="#/section/${l1.slug}/${it.slug}" class="landing-cat-tile" ${n === 0 ? 'style="opacity:.4;pointer-events:none;"' : ''}>
+            <div class="lct-code">${it.code}</div>
+            <div class="lct-name">${it.name}</div>
+            <div class="lct-count">${n.toLocaleString()} ${n === 1 ? 'company' : 'companies'}</div>
+          </a>`).join('')}
+      </div>
+    </div>`;
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// SUB-CATEGORY RESULTS — the second, deliberate action. Reuses the exact
+// same filteredCompanies()/renderCards() pipeline as the general results
+// view (nothing about that logic changes), just wrapped in a scoped
+// sidebar and a two-level back bar instead of the full sidebar.
+// ══════════════════════════════════════════════════════════════════════
+function renderSubCategoryResults(sectionSlug, subSlug) {
+  const l1 = CATEGORY_TREE.find(s => s.slug === sectionSlug);
+  const backBar = document.getElementById('backBar');
+  backBar.innerHTML = `
+    <div class="back-bar">
+      <a href="#/" class="sticky-back-btn">← Back to dashboard</a>
+      ${l1 ? `<a href="#/section/${l1.slug}" class="back-link-secondary">← Back to ${l1.name}</a>` : ''}
+    </div>`;
+  buildSidebar(sectionSlug);
+  activeCategory = subSlug;
+  activeRegion = 'all';
+  activeDelivery = null;
+  activeSector = null;
+  document.getElementById('searchBox').value = '';
+  document.querySelectorAll('.sheet-item').forEach(elm => {
+    elm.classList.toggle('active', elm.dataset.slug === activeCategory);
+  });
+  renderRegionFilter();
+  renderDeliveryFilter();
+  renderSectorFilter();
+  renderAll();
 }
 
 function renderAll() {
@@ -41128,10 +41294,13 @@ function renderCompanyPage(slug) {
 function handleRoute() {
   const hash = location.hash || '#/';
   const m = hash.match(/^#\/company\/([a-z0-9-]+)$/);
+  const mSubCat = hash.match(/^#\/section\/([a-z0-9-]+)\/([a-z0-9-]+)$/);
+  const mSection = hash.match(/^#\/section\/([a-z0-9-]+)$/);
   const listPanel = document.getElementById('list-view');
   const companyPanel = document.getElementById('company-view');
   const profilePanel = document.getElementById('profile-view');
   const adminPanel = document.getElementById('admin-view');
+  const sectionPanel = document.getElementById('section-view');
   const sidebar = document.querySelector('.sidebar');
 
   // Reset the two account panels on every route change; whichever branch
@@ -41146,6 +41315,7 @@ function handleRoute() {
     document.title = (isAdminRoute ? 'Admin' : 'Profile') + ' — TankWorld India';
     listPanel.style.display = 'none';
     companyPanel.classList.remove('active');
+    sectionPanel.style.display = 'none';
     sidebar.style.display = 'none';
     return;
   }
@@ -41154,8 +41324,29 @@ function handleRoute() {
     renderCompanyPage(m[1]);
     listPanel.style.display = 'none';
     companyPanel.classList.add('active');
+    sectionPanel.style.display = 'none';
     sidebar.style.display = 'none';
     document.getElementById('landing-view').style.display = 'none';
+  } else if (mSubCat) {
+    // Sub-category results — the deliberate "second action." Scoped
+    // sidebar, two-level back bar, otherwise the exact same card-rendering
+    // pipeline as the general results view.
+    document.title = 'TankWorld India — Engineering & Equipment Directory';
+    companyPanel.classList.remove('active');
+    document.getElementById('landing-view').style.display = 'none';
+    sectionPanel.style.display = 'none';
+    sidebar.style.display = '';
+    listPanel.style.display = 'block';
+    renderSubCategoryResults(mSubCat[1], mSubCat[2]);
+  } else if (mSection) {
+    document.title = 'TankWorld India — Engineering & Equipment Directory';
+    companyPanel.classList.remove('active');
+    document.getElementById('landing-view').style.display = 'none';
+    sidebar.style.display = 'none';
+    listPanel.style.display = 'none';
+    document.getElementById('backBar').innerHTML = ''; // no stale back bar from a prior sub-category visit
+    sectionPanel.style.display = 'block';
+    renderSectionPage(mSection[1]);
   } else if (hash === '#/') {
     // Bare "#/" with no query string at all is the landing page -- the flat
     // "every company, unfiltered" grid was the thing this redesign removed.
@@ -41163,6 +41354,7 @@ function handleRoute() {
     // routes to the existing results view instead.
     document.title = 'TankWorld India — Engineering & Equipment Directory';
     companyPanel.classList.remove('active');
+    sectionPanel.style.display = 'none';
     sidebar.style.display = 'none';
     listPanel.style.display = 'none';
     document.getElementById('landing-view').style.display = 'block';
@@ -41170,9 +41362,16 @@ function handleRoute() {
   } else {
     document.title = 'TankWorld India — Engineering & Equipment Directory';
     companyPanel.classList.remove('active');
+    sectionPanel.style.display = 'none';
     sidebar.style.display = '';
     listPanel.style.display = 'block';
     document.getElementById('landing-view').style.display = 'none';
+    document.getElementById('backBar').innerHTML = ''; // ditto -- clear any leftover sub-category back bar
+    // Search/general filtering has no single section context, so this is
+    // also where the sidebar gets explicitly restored to the full tree --
+    // otherwise a visit to a scoped sub-category page earlier in the
+    // session would leave it stuck narrow.
+    buildSidebar();
 
     // Single source of truth for filter state: whatever's in the hash
     // wins, whether we just navigated there or the user hit back/forward.
