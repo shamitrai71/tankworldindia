@@ -237,23 +237,21 @@ main{ flex:1; min-width:0; padding:20px 24px 60px; }
 .section-hero{ margin-bottom:28px; }
 .section-hero h1{ font-family:var(--font-display); font-weight:600; font-size:clamp(24px,3.5vw,34px); margin:6px 0 8px; color:var(--ink); }
 
-.section-stats-row{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:40px; }
-.section-stat-card{
+.donut-grid{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:40px; }
+.donut-card{
   background:var(--paper-raised); border:1.5px solid var(--line); border-radius:var(--radius); padding:18px 20px;
 }
-.section-stat-card .lr-label{ font-family:var(--font-mono); font-size:10.5px; letter-spacing:1.5px; margin-bottom:12px; }
-.stat-split-bar{ display:flex; height:10px; border-radius:5px; overflow:hidden; margin-bottom:8px; border:1px solid var(--ink); }
-.ssb-india{ background:var(--blue); }
-.ssb-other{ background:var(--line); }
-.stat-split-labels{ display:flex; justify-content:space-between; font-size:12px; color:var(--ink-muted); }
-.stat-split-labels b{ color:var(--ink); font-family:var(--font-display); }
-.stat-chip-row{ display:flex; flex-wrap:wrap; gap:6px; }
-.stat-chip{
-  font-family:var(--font-mono); font-size:11px; padding:4px 9px; border-radius:2px;
-  background:var(--blue-soft); color:var(--blue); font-weight:600;
-}
-.stat-chip b{ margin-left:2px; }
-.stat-chip-empty{ font-size:12px; color:var(--ink-faint); font-style:italic; }
+.donut-title{ font-family:var(--font-mono); font-size:10.5px; letter-spacing:1.5px; text-transform:uppercase; color:var(--ink-faint); margin-bottom:14px; }
+.donut-body{ display:flex; align-items:center; gap:20px; }
+.donut-svg{ width:120px; height:120px; flex-shrink:0; }
+.donut-center-num{ font-family:var(--font-display); font-weight:700; font-size:20px; fill:var(--ink); }
+.donut-center-lbl{ font-family:var(--font-mono); font-size:8px; letter-spacing:1px; fill:var(--ink-faint); text-transform:uppercase; }
+.donut-legend{ flex:1; min-width:0; display:flex; flex-direction:column; gap:7px; }
+.donut-leg-row{ display:flex; align-items:center; gap:8px; font-size:12px; }
+.donut-swatch{ width:11px; height:11px; border-radius:2px; flex-shrink:0; border:1px solid rgba(0,0,0,0.15); }
+.donut-leg-label{ flex:1; color:var(--ink-muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.donut-leg-n{ font-family:var(--font-display); font-weight:600; color:var(--ink); }
+.donut-empty{ font-size:12.5px; color:var(--ink-faint); font-style:italic; line-height:1.5; padding:16px 0; }
 
 /* ── Sub-category results (scoped sidebar page) back bar ────────────── */
 .back-bar{ display:flex; align-items:center; gap:14px; margin-bottom:16px; flex-wrap:wrap; }
@@ -269,6 +267,7 @@ main{ flex:1; min-width:0; padding:20px 24px 60px; }
   .landing-search-input{ border-right:1.5px solid var(--ink); border-radius:var(--radius) var(--radius) 0 0; }
   .landing-search-btn{ border-radius:0 0 var(--radius) var(--radius); }
   .section-stats-row{ grid-template-columns:1fr; }
+  .donut-grid{ grid-template-columns:1fr; }
 }
 
 /* ── MAP VIEW ── */
@@ -40985,6 +40984,59 @@ function renderLandingPage() {
 // clicking a sub-category tile is the deliberate second action that leads
 // to one, on a separate page (renderSubCategoryResults below).
 // ══════════════════════════════════════════════════════════════════════
+
+// Palette-derived chart colors (option A): tints/shades of the app's own
+// blue / rust / green, plus neutrals — noticeable and multi-colour, but
+// still visibly "part of" this app rather than a separate visual language.
+const CHART_COLORS = ['#1B4B7A', '#C0602A', '#3E7A4F', '#4A82B0', '#D98A4E', '#6BA17A', '#8B93A0'];
+const CHART_EMPTY_COLOR = '#D8CFB8'; // --line, for the "untagged/other" slice
+
+/** Pure-SVG donut. segments: [{label, n, color}]. Renders a legend beside it.
+ *  emptyNote, when the data is too sparse to be meaningful, replaces the ring
+ *  with an honest message instead of a misleading near-empty circle. */
+function donutChart(title, segments, total, emptyNote) {
+  if (emptyNote) {
+    return `
+      <div class="donut-card">
+        <div class="donut-title">${title}</div>
+        <div class="donut-empty">${emptyNote}</div>
+      </div>`;
+  }
+  const R = 52, C = 2 * Math.PI * R, cx = 60, cy = 60, sw = 16;
+  let offset = 0;
+  const arcs = segments.map(s => {
+    const frac = total > 0 ? s.n / total : 0;
+    const len = frac * C;
+    const dash = `${len} ${C - len}`;
+    const arc = `<circle cx="${cx}" cy="${cy}" r="${R}" fill="none"
+      stroke="${s.color}" stroke-width="${sw}"
+      stroke-dasharray="${dash}" stroke-dashoffset="${-offset}"
+      transform="rotate(-90 ${cx} ${cy})"><title>${s.label}: ${s.n}</title></circle>`;
+    offset += len;
+    return arc;
+  }).join('');
+  return `
+    <div class="donut-card">
+      <div class="donut-title">${title}</div>
+      <div class="donut-body">
+        <svg viewBox="0 0 120 120" class="donut-svg" role="img" aria-label="${title}">
+          <circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="var(--line)" stroke-width="${sw}" opacity="0.35"/>
+          ${arcs}
+          <text x="${cx}" y="${cy - 4}" text-anchor="middle" class="donut-center-num">${total.toLocaleString()}</text>
+          <text x="${cx}" y="${cy + 12}" text-anchor="middle" class="donut-center-lbl">total</text>
+        </svg>
+        <div class="donut-legend">
+          ${segments.map(s => `
+            <div class="donut-leg-row">
+              <span class="donut-swatch" style="background:${s.color};"></span>
+              <span class="donut-leg-label">${s.label}</span>
+              <span class="donut-leg-n">${s.n.toLocaleString()}</span>
+            </div>`).join('')}
+        </div>
+      </div>
+    </div>`;
+}
+
 function renderSectionPage(sectionSlug) {
   const l1 = CATEGORY_TREE.find(s => s.slug === sectionSlug);
   const el = document.getElementById('section-view');
@@ -40996,25 +41048,56 @@ function renderSectionPage(sectionSlug) {
 
   const sectionSlugs = new Set(categoryWithDescendants(sectionSlug));
   const inSection = COMPANIES.filter(c => c.cats.some(s => sectionSlugs.has(s)));
+  const total = inSection.length;
   const nIndia = inSection.filter(isIndian).length;
-  const nOther = inSection.length - nIndia;
+  const nOther = total - nIndia;
 
+  // Delivery mix
   const deliveryCounts = {};
   inSection.forEach(c => (c.delivery || []).forEach(d => { deliveryCounts[d] = (deliveryCounts[d] || 0) + 1; }));
   const deliveryTop = DELIVERY_MODELS
-    .map(([k, label]) => ({ k, label, n: deliveryCounts[k] || 0 }))
+    .map(([k, label]) => ({ label, n: deliveryCounts[k] || 0 }))
     .filter(d => d.n > 0)
     .sort((a, b) => b.n - a.n)
-    .slice(0, 5); // top 5 keeps this a compact secondary element, not a competing centerpiece
+    .slice(0, 6)
+    .map((d, i) => ({ ...d, color: CHART_COLORS[i % CHART_COLORS.length] }));
 
-  // Direct sub-categories only (this section's immediate items) — each
-  // tile's own count is still inclusive of ITS descendants via
-  // categoryWithDescendants, same as the landing page's section tiles.
-  const subTiles = l1.items.map(it => {
+  // Sector served — honest sparse handling: this axis is thinly tagged
+  // across the whole roster, so below a coverage threshold we show a note
+  // rather than a donut that's almost entirely one "untagged" slice. As
+  // tagging fills in over time, the same code starts drawing the real ring
+  // automatically once coverage crosses the threshold.
+  const sectorCounts = {};
+  inSection.forEach(c => (c.sectors || []).forEach(s => { sectorCounts[s] = (sectorCounts[s] || 0) + 1; }));
+  const sectorTagged = inSection.filter(c => (c.sectors || []).length > 0).length;
+  const sectorSegs = Object.entries(sectorCounts)
+    .sort((a, b) => b[1] - a[1])
+    .map(([k, n], i) => ({ label: (SECTOR_LABEL[k] || k), n, color: CHART_COLORS[i % CHART_COLORS.length] }));
+  const sectorCoverage = total > 0 ? sectorTagged / total : 0;
+  const sectorEmptyNote = sectorCoverage < 0.15
+    ? `Sector tagging in progress — ${sectorTagged.toLocaleString()} of ${total.toLocaleString()} companies tagged so far. This chart fills in as coverage grows.`
+    : null;
+
+  // Sub-category distribution — top 6 + "others" rolled into one slice, so
+  // the ring shows concentration at a glance without fragmenting into 20
+  // slivers.
+  const subCounts = l1.items.map(it => {
     const slugs = new Set(categoryWithDescendants(it.slug));
     const n = COMPANIES.reduce((acc, c) => acc + (c.cats.some(s => slugs.has(s)) ? 1 : 0), 0);
     return { it, n };
   }).sort((a, b) => b.n - a.n);
+  const subTop = subCounts.slice(0, 6);
+  const subRest = subCounts.slice(6);
+  const subRestTotal = subRest.reduce((acc, s) => acc + s.n, 0);
+  const subDistSegs = subTop.map((s, i) => ({ label: s.it.name, n: s.n, color: CHART_COLORS[i % CHART_COLORS.length] }));
+  if (subRestTotal > 0) subDistSegs.push({ label: `Other ${subRest.length} sub-categories`, n: subRestTotal, color: CHART_EMPTY_COLOR });
+  // NB the distribution donut uses sum-of-sub-counts as its total, not the
+  // section total, since a company tagged in two sub-categories legitimately
+  // counts toward both slices here (this ring is "how the tags distribute",
+  // not "how many unique companies").
+  const subDistTotal = subDistSegs.reduce((acc, s) => acc + s.n, 0);
+
+  const subTiles = subCounts; // tiles reuse the same computed counts
 
   el.innerHTML = `
     <div class="landing-wrap">
@@ -41023,30 +41106,20 @@ function renderSectionPage(sectionSlug) {
       <div class="section-hero">
         <div class="lct-code" style="font-size:13px;">${l1.code}</div>
         <h1>${l1.name}</h1>
-        <p class="landing-sub">${inSection.length.toLocaleString()} companies across ${l1.items.length}
+        <p class="landing-sub">${total.toLocaleString()} companies across ${l1.items.length}
           sub-categor${l1.items.length === 1 ? 'y' : 'ies'}.</p>
       </div>
 
-      <div class="section-stats-row">
-        <div class="section-stat-card">
-          <div class="lr-label" style="color:var(--ink-faint);">INDIA / INTERNATIONAL</div>
-          <div class="stat-split-bar">
-            <div class="ssb-india" style="flex:${nIndia || 1}"></div>
-            <div class="ssb-other" style="flex:${nOther || 1}"></div>
-          </div>
-          <div class="stat-split-labels">
-            <span><b>${nIndia.toLocaleString()}</b> India</span>
-            <span><b>${nOther.toLocaleString()}</b> Other</span>
-          </div>
-        </div>
-        <div class="section-stat-card">
-          <div class="lr-label" style="color:var(--ink-faint);">DELIVERY MODEL MIX</div>
-          <div class="stat-chip-row">
-            ${deliveryTop.length ? deliveryTop.map(d => `
-              <span class="stat-chip">${d.label} <b>${d.n}</b></span>`).join('')
-              : `<span class="stat-chip-empty">Not yet tagged for this section</span>`}
-          </div>
-        </div>
+      <div class="donut-grid">
+        ${donutChart('India / International', [
+          { label: 'India', n: nIndia, color: '#1B4B7A' },
+          { label: 'Other countries', n: nOther, color: '#C0602A' },
+        ], total, total === 0 ? 'No companies in this section yet.' : null)}
+        ${donutChart('Delivery Model Mix', deliveryTop, deliveryTop.reduce((a, d) => a + d.n, 0),
+          deliveryTop.length === 0 ? 'No delivery models tagged for this section yet.' : null)}
+        ${donutChart('Sector Served', sectorSegs, sectorTagged, sectorEmptyNote)}
+        ${donutChart('Sub-category Distribution', subDistSegs, subDistTotal,
+          subDistTotal === 0 ? 'No sub-category data yet.' : null)}
       </div>
 
       <div class="landing-cats-head">
