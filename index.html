@@ -804,7 +804,7 @@ footer{
 <div class="app-body">
   <div id="landing-view" style="display:none;"></div>
   <div id="section-view" style="display:none;"></div>
-  <aside class="sidebar">
+  <aside class="sidebar" style="display:none;">
     <div class="sidebar-title">
       <span>Category Index</span>
       <span id="filterCount"></span>
@@ -818,7 +818,7 @@ footer{
   </aside>
 
   <main>
-    <div id="list-view">
+    <div id="list-view" style="display:none;">
       <div id="backBar"></div>
       <div class="results-bar">
         <div class="results-count"><b id="resultCount">0</b> companies</div>
@@ -72509,6 +72509,80 @@ async function findOrphanedCompanies() {
   }
 }
 
+// ── Missing records (the mirror of orphaned records) ────────────────────
+// Answers "which N companies from this build never actually made it into
+// Firestore" without re-running the full seed -- one read of the live
+// collection, diffed against SEED_COMPANIES locally. seedCompanies()'s own
+// per-record error log already reports failures live during a seed run,
+// but that's only useful if you're watching the log at the time; this is
+// the after-the-fact equivalent, safe to run any time.
+let _lastMissingScan = null; // slugs found missing by the most recent scan
+
+async function findMissingCompanies() {
+  const wrap = document.getElementById('missingWrap');
+  wrap.innerHTML = `<div class="admin-log">Scanning Firestore…</div>`;
+  try {
+    const liveDocs = await FS_REST.listAuth('companies');
+    const liveSlugs = new Set(liveDocs.map(d => d.slug).filter(Boolean));
+    const missing = SEED_COMPANIES.filter(c => !liveSlugs.has(c.slug));
+    _lastMissingScan = missing.map(c => c.slug);
+    if (!missing.length) {
+      wrap.innerHTML = `<div class="admin-note">No missing records — every company in this build is also live in Firestore.</div>`;
+      return;
+    }
+    wrap.innerHTML = `
+      <div class="admin-note" style="border-color:var(--rust);">
+        <b>${missing.length} compan${missing.length === 1 ? 'y is' : 'ies are'} in this build but never made it into Firestore:</b>
+        <ul style="margin:10px 0 0 20px;">
+          ${missing.map(c => `<li>${c.name || '(no name)'} — <code>${c.slug}</code></li>`).join('')}
+        </ul>
+      </div>
+      <button class="btn-action" onclick="seedMissingCompanies()">
+        Seed just these ${missing.length} record${missing.length === 1 ? '' : 's'}
+      </button>`;
+  } catch (err) {
+    wrap.innerHTML = `<div class="admin-note" style="border-color:var(--rust);">Scan failed: ${err.message}</div>`;
+  }
+}
+
+async function seedMissingCompanies() {
+  if (!_lastMissingScan || !_lastMissingScan.length) return;
+  const slugs = new Set(_lastMissingScan);
+  const targets = SEED_COMPANIES.filter(c => slugs.has(c.slug));
+  const wrap = document.getElementById('missingWrap');
+  let ok = 0; const failures = [];
+  for (const c of targets) {
+    try {
+      await FS_REST.setMerge('companies', c.slug, {
+        id: c.id, slug: c.slug, name: c.name,
+        desc: c.desc || '', site: c.site || '',
+        country: c.country || '', ...(c.logo ? { logo: c.logo } : {}),
+        cats: c.cats || [], locations: c.locations || [],
+        parent: (c.parent && c.parent.name) ? c.parent : null,
+        msme: c.msme || null,
+        delivery: c.delivery || [],
+        sectors: c.sectors || [],
+        email: c.email || '', phone: c.phone || '',
+        ...(c.certifications && c.certifications.length ? { certifications: c.certifications } : {}),
+        ...(c.capacity && (c.capacity.employeeCountRange || c.capacity.foundedYear || c.capacity.capacityNote)
+            ? { capacity: c.capacity } : {}),
+        ...(c.spotlight ? { spotlight: c.spotlight } : {}),
+        updatedAt: new Date(),
+      });
+      ok++;
+    } catch (err) { failures.push({ slug: c.slug, msg: err.message }); }
+  }
+  _lastMissingScan = null;
+  const summary = `Seeded ${ok} record${ok === 1 ? '' : 's'}.` +
+    (failures.length ? ` ${failures.length} failed: ` + failures.map(f => `${f.slug} (${f.msg})`).join(', ') : '');
+  wrap.innerHTML = `<div class="admin-note">${summary}</div>`;
+  alert(summary); // guaranteed-visible, same reasoning as deleteOrphanedCompanies -- the
+                   // renderAdminPage() refresh below would otherwise wipe this message unread
+  await CompanyStore.load();
+  renderAll();
+  renderAdminPage();
+}
+
 async function deleteOrphanedCompanies() {
   if (!_lastOrphanScan || !_lastOrphanScan.length) return;
   const slugs = _lastOrphanScan;
@@ -72590,12 +72664,14 @@ function renderAdminPage() {
       </button>
       <button class="btn-action ghost" onclick="reloadFromFirestore()">Reload from Firestore</button>
       <button class="btn-action ghost" onclick="findOrphanedCompanies()" title="Lists companies live in Firestore but no longer in this build — nothing is deleted until you review the list and confirm">Find orphaned records</button>
+      <button class="btn-action ghost" onclick="findMissingCompanies()" title="Lists companies in this build that never made it into Firestore — e.g. after a seed run reports some failures — without re-running the full seed">Find missing records</button>
       <button class="btn-action ghost" onclick="openBatchLogoModal()">Batch upload logos</button>
       <button class="btn-action ghost" onclick="relinkLogosFromStorage()" title="Repairs logos wiped by a re-seed — no re-upload needed">Relink logos from Storage</button>
       <button class="btn-action ghost" onclick="location.hash='#/'">Back to directory</button>
     </div>
     <div class="admin-log" id="adminLog"></div>
     <div id="orphanWrap"></div>
+    <div id="missingWrap"></div>
     <div class="admin-note">
       Writes go through the Firestore REST API with your ID token. If a write is
       rejected, check that your email is in the <code>isAdmin()</code> list in
