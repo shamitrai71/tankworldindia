@@ -4151,15 +4151,15 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     phone:"+91 89800 18741",
     cats:["industrial-staffing"],
     locations:[{ type:"registered-office", name:"Registered Office", address:"81, National Park, Lajpat Nagar, South Delhi, New Delhi, Delhi 110024, India", city:"New Delhi", lat:null, lng:null, placeId:"ChIJ7V39_2mFXjkR5n_f8W6Z_8w" }] },
-{ id:369, slug:"oilexec-international", name:"OilExec International", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Foilexec-international.jpg?alt=media&token=ecdc9803-2b31-4eb9-8860-2ccd8fc05bcc", country:"Unconfirmed",
-    // NOTE: from "TWI New Batch 1." Jurisdiction/registration details not independently
-    // confirmed beyond the company's own website — held at Medium confidence. No Google Places
-    // listing could be confirmed — placeId left null. Country field is a placeholder pending
-    // confirmation of actual jurisdiction.
+{ id:369, slug:"oilexec-international", name:"OilExec W.L.L.", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Foilexec-international.jpg?alt=media&token=ecdc9803-2b31-4eb9-8860-2ccd8fc05bcc", country:"Qatar",
+    // NOTE: from "TWI New Batch 1." Confirmed as OilExec W.L.L., Qatar (W.L.L. is the standard
+    // Qatari/Gulf limited-liability corporate suffix) — held at Medium confidence for other
+    // jurisdiction/registration details not independently confirmed beyond the company's own
+    // website. No Google Places listing could be confirmed — placeId left null.
     desc:"Specialist recruitment and HR services provider explicitly focused on the global oil, gas and petrochemical industry, per the company's own site. Registered legal entity name and headquarters address not independently confirmed beyond the company's own website.",
     site:"https://www.oilexec.com",
     cats:["industrial-staffing"],
-    locations:[{ type:"headquarters", name:"Headquarters", address:"(unconfirmed)", city:"", lat:null, lng:null, placeId:null }] },
+    locations:[{ type:"headquarters", name:"Headquarters", address:"Qatar", city:"", lat:null, lng:null, placeId:null }] },
 { id:370, slug:"triveni-engineering-and-industries-limited", name:"Triveni Engineering & Industries Limited", logo:"https://firebasestorage.googleapis.com/v0/b/tankworldindia-t5.firebasestorage.app/o/logos%2Ftriveni-engineering-and-industries-limited.png?alt=media&token=66055e6b-5447-4cbd-a6f1-e0db88201140", country:"India",
     // NOTE: diversified conglomerate — sugar/alcohol/ethanol is the PRIMARY business, not
     // industrial equipment. The relevant division for TWI is Water & Wastewater Treatment
@@ -33121,12 +33121,6 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     delivery:["oem-manufacturer"],
     cats:["ball-valves"],
     locations:[{ type:"headquarters", name:"HQ", address:"France", city:"", lat:null, lng:null, placeId:null }] },
-{ id:4639, slug:"two-piece---specify-seal-welding-for-threaded-body-design", name:"Two Piece - Specify Seal Welding for Threaded Body Design", logo:null, country:"Unknown",
-    desc:"Two Piece - Specify Seal Welding for Threaded Body Design — SAMREF-approved manufacturer.",
-    site:"",
-    delivery:["oem-manufacturer"],
-    cats:["ball-valves"],
-    locations:[{ type:"headquarters", name:"HQ", address:"Unknown", city:"", lat:null, lng:null, placeId:null }] },
 { id:4640, slug:"contromatices", name:"CONTROMATICES", logo:null, country:"Taiwan",
     desc:"CONTROMATICES — SAMREF-approved manufacturer.",
     site:"",
@@ -33163,12 +33157,6 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     delivery:["oem-manufacturer"],
     cats:["ball-valves"],
     locations:[{ type:"headquarters", name:"HQ", address:"Japan", city:"", lat:null, lng:null, placeId:null }] },
-{ id:4646, slug:"three-piece-bolted-body", name:"Three Piece ( Bolted Body)", logo:null, country:"Unknown",
-    desc:"Three Piece ( Bolted Body) — SAMREF-approved manufacturer.",
-    site:"",
-    delivery:["oem-manufacturer"],
-    cats:["ball-valves"],
-    locations:[{ type:"headquarters", name:"HQ", address:"Unknown", city:"", lat:null, lng:null, placeId:null }] },
 { id:4647, slug:"cameron", name:"CAMERON", logo:null, country:"Canada",
     desc:"CAMERON — SAMREF-approved manufacturer.",
     site:"",
@@ -33541,18 +33529,6 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     delivery:["oem-manufacturer"],
     cats:["valves"],
     locations:[{ type:"headquarters", name:"HQ", address:"Germany", city:"", lat:null, lng:null, placeId:null }] },
-{ id:4710, slug:"forged-type", name:"FORGED TYPE", logo:null, country:"Unknown",
-    desc:"FORGED TYPE — SAMREF-approved manufacturer.",
-    site:"",
-    delivery:["oem-manufacturer"],
-    cats:["valves"],
-    locations:[{ type:"headquarters", name:"HQ", address:"Unknown", city:"", lat:null, lng:null, placeId:null }] },
-{ id:4711, slug:"casted-type", name:"CASTED TYPE", logo:null, country:"Unknown",
-    desc:"CASTED TYPE — SAMREF-approved manufacturer.",
-    site:"",
-    delivery:["oem-manufacturer"],
-    cats:["valves"],
-    locations:[{ type:"headquarters", name:"HQ", address:"Unknown", city:"", lat:null, lng:null, placeId:null }] },
 { id:4712, slug:"descote-tyco", name:"DESCOTE (TYCO)", logo:null, country:"France",
     desc:"DESCOTE (TYCO) — SAMREF-approved manufacturer.",
     site:"",
@@ -33583,12 +33559,6 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     delivery:["oem-manufacturer"],
     cats:["valves"],
     locations:[{ type:"headquarters", name:"HQ", address:"Germany", city:"", lat:null, lng:null, placeId:null }] },
-{ id:4717, slug:"plug-type", name:"PLUG TYPE", logo:null, country:"Unknown",
-    desc:"PLUG TYPE — SAMREF-approved manufacturer.",
-    site:"",
-    delivery:["oem-manufacturer"],
-    cats:["valves"],
-    locations:[{ type:"headquarters", name:"HQ", address:"Unknown", city:"", lat:null, lng:null, placeId:null }] },
 { id:4718, slug:"ekk-eagle-america-eagle", name:"EKK EAGLE AMERICA EAGLE", logo:null, country:"United States of America",
     desc:"EKK EAGLE AMERICA EAGLE — SAMREF-approved manufacturer.",
     site:"",
@@ -41226,7 +41196,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     delivery:["oem-manufacturer","om-services"],
     cats:["valve-overhaul-and-testing", "online-leak-sealing"],
     locations:[{ type:"headquarters", name:"HQ", address:"19/9 Muangmai-Maptaphut Sai 6 Road, Huaypong, Mueang Rayong", city:"Rayong", lat:null, lng:null, placeId:null }] },
-{ id:5854, slug:"", name:"บริษัท โคลเวอร์เทค จำกัด", logo:null, country:"Thailand",
+{ id:5854, slug:"clovertech", name:"บริษัท โคลเวอร์เทค จำกัด", logo:null, country:"Thailand",
     desc:"Industrial/tank cleaning, sludge removal, vacuum truck, confined-space cleaning and catalyst loading/unloading",
     site:"https://www.clovertech-se.com/",
     email:"salerep1@clovertech.co.th",
@@ -42925,7 +42895,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     delivery:["oem-manufacturer"],
     cats:["pipes-and-tubes"],
     locations:[{ type:"headquarters", name:"HQ", address:"India", city:"", lat:null, lng:null, placeId:null }] },
-{ id:6111, slug:"vilmar-sa", name:"VILMAR SA", logo:null, country:"Unknown",
+{ id:6111, slug:"vilmar-sa", name:"VILMAR SA", logo:null, country:"Romania",
     desc:"FLANGES — Oil India Limited (CBUS project) EIL-approved vendor.",
     site:"",
     delivery:["oem-manufacturer"],
@@ -43233,7 +43203,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     delivery:["oem-manufacturer"],
     cats:["butterfly-valves", "valves"],
     locations:[{ type:"headquarters", name:"HQ", address:"India", city:"", lat:null, lng:null, placeId:null }] },
-{ id:6162, slug:"lazaro-ituarte-internationalsa", name:"LAZARO ITUARTE INTERNATIONAL,SA", logo:null, country:"Unknown",
+{ id:6162, slug:"lazaro-ituarte-internationalsa", name:"LAZARO ITUARTE INTERNATIONAL,SA", logo:null, country:"Spain",
     desc:"VALVES — Oil India Limited (CBUS project) EIL-approved vendor.",
     site:"",
     delivery:["oem-manufacturer"],
@@ -44233,7 +44203,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     delivery:["oem-manufacturer"],
     cats:["valves"],
     locations:[{ type:"headquarters", name:"HQ", address:"India", city:"", lat:null, lng:null, placeId:null }] },
-{ id:6328, slug:"kitz-corporation-of-europe-sa", name:"KITZ CORPORATION OF EUROPE S.A", logo:null, country:"Unknown",
+{ id:6328, slug:"kitz-corporation-of-europe-sa", name:"KITZ CORPORATION OF EUROPE S.A", logo:null, country:"Spain",
     desc:"ON/OFF VALVES — Oil India Limited (CBUS project) EIL-approved vendor.",
     site:"",
     delivery:["oem-manufacturer"],
@@ -47606,7 +47576,7 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     delivery:["oem-manufacturer","om-services"],
     cats:["industrial-water-systems", "wastewater-treatment"],
     locations:[{ type:"headquarters", name:"HQ", address:"77/401 Moo 6, Bueng Kham Phroi, Lamlukka", city:"Lam Luk Ka", lat:null, lng:null, placeId:"ChIJ1VG7rnd5HTER4zuuHIevOKs" }] },
-{ id:6806, slug:"", name:"ห้างหุ้นส่วนจำกัด ไฮโดร ซิสเท็ม ซัพพลาย", logo:null, country:"Thailand",
+{ id:6806, slug:"hydro-system-supply", name:"ห้างหุ้นส่วนจำกัด ไฮโดร ซิสเท็ม ซัพพลาย", logo:null, country:"Thailand",
     desc:"Industrial wastewater treatment equipment manufacturer/distributor and engineering service provider",
     site:"https://www.hydrosys.co.th/en/",
     email:"info@hydrosys.co.th; hydrosys@hydrosys.co.th",
@@ -71024,6 +70994,7 @@ const COUNTRY_META = {
   'Lithuania':['LT','Europe'], 'Serbia':['RS','Europe'], 'New Zealand':['NZ','Oceania'],
   'Brunei':['BN','SE Asia'], 'Chile':['CL','Americas'], 'Greece':['GR','Europe'],
   'Vietnam':['VN','SE Asia'], 'Cameroon':['CM','Africa'],
+  'Venezuela':['VE','Americas'], 'Colombia':['CO','Americas'], 'Nigeria':['NG','Africa'],
 };
 const COUNTRY_ALIASES = {
   'united states':'United States of America', 'texas':'United States of America',
@@ -71035,6 +71006,7 @@ const COUNTRY_ALIASES = {
   'finlands':'Finland', 'sapin':'Spain', 'solovakia':'Slovakia', 'luxemberg':'Luxembourg',
   'england':'United Kingdom', 'n. ireland':'United Kingdom', 'arab emir':'United Arab Emirates',
   'arab emirates':'United Arab Emirates', 'yinchuan ningxia':'China',
+  'u.k':'United Kingdom', 'u.k.':'United Kingdom',
 };
 function canonCountry(raw) {
   raw = (raw || '').trim();
@@ -72389,6 +72361,16 @@ async function seedCompanies() {
   try {
     for (let i = 0; i < SEED_COMPANIES.length; i++) {
       const c = SEED_COMPANIES[i];
+      // Guard against an empty slug up front -- Firestore's own error for this
+      // ("Document name ... lacks '/'") is a cryptic REST error, not obviously
+      // a data problem. Caught live: two Thai-named companies (non-ASCII names
+      // with no Latin fallback in the slug generator) shipped with slug:"" and
+      // silently failed every seed attempt until traced back here.
+      if (!c.slug) {
+        failures.push({ slug: '(empty)', msg: `${c.name || '(no name)'} has no slug — fix the record, don't re-seed` });
+        adminLog(`✗ ${i + 1}/${SEED_COMPANIES.length} ${c.name || '(no name)'} — empty slug, skipped`);
+        continue;
+      }
       try {
         await FS_REST.setMerge('companies', c.slug, {
           id: c.id, slug: c.slug, name: c.name, desc: c.desc || '',
@@ -72552,6 +72534,10 @@ async function seedMissingCompanies() {
   const wrap = document.getElementById('missingWrap');
   let ok = 0; const failures = [];
   for (const c of targets) {
+    if (!c.slug) {
+      failures.push({ slug: '(empty)', msg: `${c.name || '(no name)'} has no slug — fix the record, don't re-seed` });
+      continue;
+    }
     try {
       await FS_REST.setMerge('companies', c.slug, {
         id: c.id, slug: c.slug, name: c.name,
