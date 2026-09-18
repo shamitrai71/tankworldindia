@@ -72852,8 +72852,21 @@ function renderBatchLogoRows() {
   // .replace() call per row — on a ~2,000-option string that's real cost
   // multiplied by row count). The "selected" value is set as a DOM property
   // after insertion instead, which is O(1) per row regardless of dropdown size.
+  //
+  // SCALE FIX: the above optimization was reasoned about at "up to 246 rows"
+  // and still eagerly embedded a ~2,000-option <select> for every pending
+  // row, matched or not. At real batch sizes (thousands of slug-named files,
+  // nearly all auto-matched) that's millions of <option> tags in one
+  // innerHTML write — the tab hangs well before any upload logic runs.
+  // Confirmed live: froze past ~70 files. Fix: a correctly-matched row has
+  // nothing to decide, so it renders as plain text with a lazy "change"
+  // link; the dropdown for that one row is only built the moment someone
+  // clicks it. Only genuinely UNMATCHED rows — normally a small fraction of
+  // a large batch — get an eager dropdown, since those need a decision
+  // before upload can proceed anyway.
   const rowsHtml = batchLogoRows.map((r, i) => {
     const c = r.matchedSlug ? COMPANIES.find(x => x.slug === r.matchedSlug) : null;
+    const needsDropdown = r.status === 'pending' && !r.matchedSlug;
     return `
       <div class="bl-row ${r.status}" data-row-index="${i}">
         <img src="${r.objectUrl}" class="bl-thumb" alt="">
@@ -72865,7 +72878,11 @@ function renderBatchLogoRows() {
             : c ? `<span class="bl-status ok">Matched: ${c.name}</span>`
             : `<span class="bl-status warn">No automatic match</span>`}</div>
         </div>
-        ${r.status === 'pending' ? `
+        ${r.status === 'pending' && !needsDropdown ? `
+          <button class="btn-mini" onclick="lazyOpenBatchRowSelect(${i})">Change</button>
+          <button class="btn-mini rust" onclick="removeBatchLogoRow(${i})">Remove</button>
+        ` : ''}
+        ${needsDropdown ? `
           <select class="bl-select" onchange="reassignBatchRow(${i}, this.value)">
             <option value="">— assign a company —</option>
             ${optionsHtml}
@@ -72886,13 +72903,42 @@ function renderBatchLogoRows() {
       <div class="admin-log" id="batchLogoLog"></div>
     ` : ''}`;
 
-  // Set each pending row's selected option via the DOM (not string
-  // replacement) — matches the cached-HTML approach above.
+  // Set each unmatched row's selected option via the DOM (not string
+  // replacement) — matches the cached-HTML approach above. Matched rows
+  // don't have a <select> at all until "Change" is clicked (see
+  // lazyOpenBatchRowSelect), so there's nothing to set here for those.
   batchLogoRows.forEach((r, i) => {
-    if (r.status !== 'pending') return;
+    if (r.status !== 'pending' || r.matchedSlug) return;
     const sel = document.querySelector(`.bl-row[data-row-index="${i}"] .bl-select`);
     if (sel && r.matchedSlug) sel.value = r.matchedSlug;
   });
+}
+
+// Builds the (expensive, ~2,000-option) dropdown for exactly one row, only
+// when the person clicks "Change" on it — this is what keeps a batch of
+// thousands of already-matched rows cheap to render up front.
+function lazyOpenBatchRowSelect(i) {
+  const r = batchLogoRows[i];
+  const rowEl = document.querySelector(`.bl-row[data-row-index="${i}"]`);
+  if (!r || !rowEl) return;
+  const actionsHtml = `
+    <select class="bl-select" onchange="reassignBatchRow(${i}, this.value)">
+      <option value="">— assign a company —</option>
+      ${sharedCompanyOptionsHtml()}
+    </select>
+    <button class="btn-mini rust" onclick="removeBatchLogoRow(${i})">Remove</button>`;
+  // Replace just the trailing action buttons (Change/Remove) with the
+  // dropdown — everything else in the row (thumbnail, filename, status
+  // line) stays untouched.
+  const btns = rowEl.querySelectorAll('.btn-mini');
+  if (btns.length) {
+    const holder = document.createElement('div');
+    holder.innerHTML = actionsHtml;
+    btns.forEach(b => b.remove());
+    while (holder.firstChild) rowEl.appendChild(holder.firstChild);
+  }
+  const sel = rowEl.querySelector('.bl-select');
+  if (sel && r.matchedSlug) sel.value = r.matchedSlug;
 }
 
 // Lightweight per-row status update used during the upload loop — touches
@@ -72910,12 +72956,15 @@ function updateBatchLogoRowStatus(i, r) {
       : r.status === 'failed' ? `<span class="bl-status err">Failed — see log below</span>`
       : `<span class="bl-status">${r.status}</span>`;
   }
-  // Completed/failed rows no longer need their dropdown — remove it rather
-  // than leave a stale 2,000-option <select> sitting in the DOM unused.
+  // Completed/failed rows no longer need their dropdown, "Change" button,
+  // or "Remove" button — clear all three rather than leave stale controls
+  // (including a still-clickable "Change" that would try to open a
+  // dropdown on a row that's already been uploaded) sitting in the DOM.
   const sel = rowEl.querySelector('.bl-select');
   if (sel && r.status !== 'pending') sel.remove();
-  const removeBtn = rowEl.querySelector('.btn-mini.rust');
-  if (removeBtn && r.status !== 'pending') removeBtn.remove();
+  if (r.status !== 'pending') {
+    rowEl.querySelectorAll('.btn-mini').forEach(b => b.remove());
+  }
   // Summary line at the top (matched/unmatched/total counts) — cheap to
   // recompute and update in place, no full re-render needed.
   const summaryEl = document.querySelector('.bl-summary');
