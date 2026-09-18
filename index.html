@@ -71110,15 +71110,27 @@ function canonCountry(raw) {
   return null;
 }
 /** ISO2 → Unicode regional-indicator flag emoji (🇮🇳). Native, no external assets. */
-function flagEmoji(iso2) {
+// Flags: real images, not Unicode emoji. Windows' default emoji font
+// (Segoe UI Emoji) doesn't compose the regional-indicator code points that
+// build a flag emoji into an actual flag glyph on many configurations — it
+// falls back to showing the raw two-letter code instead, which is exactly
+// what surfaced live. flagcdn.com (flagpedia.net's free CDN, Cloudflare-
+// hosted) serves real flag images by ISO2 code, which render identically
+// regardless of OS/browser emoji-font support.
+function flagImgHtml(iso2, size = '20x15') {
   if (!iso2 || iso2.length !== 2) return '';
-  return String.fromCodePoint(...[...iso2.toUpperCase()].map(ch => 0x1F1E6 + ch.charCodeAt(0) - 65));
+  const code = iso2.toLowerCase();
+  // onerror quietly removes the element rather than showing a broken-image
+  // icon if a specific flag or the CDN itself is ever unreachable.
+  return `<img src="https://flagcdn.com/${size}/${code}.png" class="flag-icon" ` +
+         `style="width:20px;height:15px;vertical-align:middle;border-radius:2px;" ` +
+         `alt="" loading="lazy" onerror="this.remove()">`;
 }
-/** Company → flag emoji (or '' if country unresolvable). */
-function companyFlag(c) {
+/** Company → flag <img> HTML (or '' if country unresolvable). */
+function companyFlag(c, size) {
   const canon = canonCountry(c.country);
   const meta = canon && COUNTRY_META[canon];
-  return meta ? flagEmoji(meta[0]) : '';
+  return meta ? flagImgHtml(meta[0], size) : '';
 }
 
 // ── Delivery model: a SECOND, ORTHOGONAL axis to the category tree ──────
@@ -71467,7 +71479,8 @@ function renderCards() {
       ? `<div class="card-delivery-row">${deliveryBadgesHtml(c, true)}${sectorBadgesHtml(c, true)}</div>` : '';
     const loc = primaryLocation(c);
     const flag = companyFlag(c);
-    const locText = loc.city || c.country || '';
+    const cleanCountry = canonCountry(c.country) || c.country || '';
+    const locText = loc.city ? `${loc.city}, ${cleanCountry}` : cleanCountry;
     return `
       <a class="company-card" href="#/company/${c.slug}">
         <div class="card-header">
@@ -71806,7 +71819,7 @@ function renderRegionPage(region) {
     const countryTop = Object.entries(countryCounts).sort((a, b) => b[1] - a[1]).slice(0, 15)
       .map(([canon, n]) => {
         const meta = COUNTRY_META[canon];
-        return { label: (meta ? flagEmoji(meta[0]) + ' ' : '') + canon, n };
+        return { label: (meta ? flagImgHtml(meta[0]) + ' ' : '') + canon, n };
       });
     const countryResolved = Object.values(countryCounts).reduce((a, n) => a + n, 0);
     const regionSegs = Object.entries(regionCounts).sort((a, b) => b[1] - a[1])
