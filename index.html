@@ -72817,12 +72817,17 @@ function matchCompanyForFile(filename) {
 function handleBatchLogoFiles() {
   const input = document.getElementById('batchLogoFiles');
   const files = Array.from(input.files || []);
-  batchLogoRows = files.map(file => ({
-    file,
-    objectUrl: URL.createObjectURL(file),
-    matchedSlug: matchCompanyForFile(file.name),
-    status: 'pending', // pending | done | failed | skipped
-  }));
+  batchLogoRows = files.map(file => {
+    const matchedSlug = matchCompanyForFile(file.name);
+    const matchedCompany = matchedSlug ? COMPANIES.find(c => c.slug === matchedSlug) : null;
+    return {
+      file,
+      objectUrl: URL.createObjectURL(file),
+      matchedSlug,
+      alreadyHasLogo: !!(matchedCompany && matchedCompany.logo),
+      status: 'pending', // pending | done | failed | skipped
+    };
+  });
   renderBatchLogoRows();
 }
 
@@ -72874,8 +72879,8 @@ function renderBatchLogoRows() {
           <div class="bl-filename">${r.file.name}</div>
           <div class="bl-status-line">${r.status === 'done' ? `<span class="bl-status ok">Uploaded to ${c ? c.name : r.matchedSlug}</span>`
             : r.status === 'failed' ? `<span class="bl-status err">Failed — see log below</span>`
-            : r.status === 'skipped' ? `<span class="bl-status">Skipped</span>`
-            : c ? `<span class="bl-status ok">Matched: ${c.name}</span>`
+            : r.status === 'skipped' ? `<span class="bl-status">Skipped — already has a logo</span>`
+            : c ? `<span class="bl-status ok">Matched: ${c.name}${r.alreadyHasLogo ? ' <em>(already has a logo)</em>' : ''}</span>`
             : `<span class="bl-status warn">No automatic match</span>`}</div>
         </div>
         ${r.status === 'pending' && !needsDropdown ? `
@@ -72892,6 +72897,8 @@ function renderBatchLogoRows() {
       </div>`;
   }).join('');
 
+  const alreadyHasCount = batchLogoRows.filter(r => r.status === 'pending' && r.alreadyHasLogo).length;
+
   document.getElementById('batchLogoBody').innerHTML = `
     <p class="ed-hint">Choose several logo files at once. Each is matched to a company by
      filename — name files after the company's slug or its full name for the best match rate.
@@ -72899,6 +72906,10 @@ function renderBatchLogoRows() {
     <input type="file" id="batchLogoFiles" accept="image/*" multiple onchange="handleBatchLogoFiles()">
     ${batchLogoRows.length > 0 ? `
       <div class="bl-summary">${matched} matched · ${unmatched} need assignment · ${batchLogoRows.length} total</div>
+      <label class="ed-hint" style="display:block;margin:6px 0;">
+        <input type="checkbox" id="blSkipExisting" ${alreadyHasCount > 0 ? 'checked' : ''}>
+        Skip companies that already have a logo${alreadyHasCount > 0 ? ` (${alreadyHasCount} of these do — safe to re-run this same folder any time; already-uploaded ones won't be touched)` : ''}
+      </label>
       <div class="bl-rows">${rowsHtml}</div>
       <div class="admin-log" id="batchLogoLog"></div>
     ` : ''}`;
@@ -72954,6 +72965,7 @@ function updateBatchLogoRowStatus(i, r) {
   if (statusLine) {
     statusLine.innerHTML = r.status === 'done' ? `<span class="bl-status ok">Uploaded to ${c ? c.name : r.matchedSlug}</span>`
       : r.status === 'failed' ? `<span class="bl-status err">Failed — see log below</span>`
+      : r.status === 'skipped' ? `<span class="bl-status">Skipped — already has a logo</span>`
       : `<span class="bl-status">${r.status}</span>`;
   }
   // Completed/failed rows no longer need their dropdown, "Change" button,
@@ -72991,10 +73003,32 @@ function batchLogoLog(msg) {
 
 async function runBatchLogoUpload() {
   if (!isAdminUser(currentUser)) { alert('Admin only.'); return; }
-  const assignable = batchLogoRows.filter(r => r.status === 'pending' && r.matchedSlug);
+  const skipExisting = document.getElementById('blSkipExisting')?.checked ?? true;
+  let assignable = batchLogoRows.filter(r => r.status === 'pending' && r.matchedSlug);
   if (assignable.length === 0) { alert('Nothing assigned to upload yet.'); return; }
+
+  // Mark (and visually update) already-logo'd rows as skipped up front when
+  // the checkbox is on — this is what makes re-running the exact same
+  // folder safe and fast after an interrupted run: whatever succeeded last
+  // time gets skipped near-instantly instead of re-uploaded and overwritten.
+  if (skipExisting) {
+    for (const r of assignable) {
+      if (r.alreadyHasLogo) {
+        r.status = 'skipped';
+        updateBatchLogoRowStatus(batchLogoRows.indexOf(r), r);
+      }
+    }
+    assignable = assignable.filter(r => r.status === 'pending');
+    if (assignable.length === 0) {
+      alert('Nothing to upload — every matched company already has a logo. ' +
+            'Uncheck "Skip companies that already have a logo" to force a re-upload.');
+      return;
+    }
+  }
+
   if (!confirm(`Upload ${assignable.length} logo${assignable.length === 1 ? '' : 's'}? ` +
-               `Each replaces that company's current logo, if any.`)) return;
+               (skipExisting ? `Companies that already have a logo are being skipped. `
+                              : `Each replaces that company's current logo, if any. `))) return;
   if (!fbStorage) { alert('Storage SDK not loaded.'); return; }
 
   let ok = 0, failed = 0;
@@ -73034,7 +73068,8 @@ async function runBatchLogoUpload() {
     // cause of the page freezing on large batches.
     updateBatchLogoRowStatus(rowIdx, r);
   }
-  batchLogoLog(`\nDone — ${ok} uploaded, ${failed} failed.`);
+  const skippedCount = batchLogoRows.filter(r => r.status === 'skipped').length;
+  batchLogoLog(`\nDone — ${ok} uploaded, ${failed} failed${skippedCount ? `, ${skippedCount} skipped (already had a logo)` : ''}.`);
   renderAll();
   renderAdminList();
 }
