@@ -71465,13 +71465,16 @@ function renderCards() {
     const msmeRow = c.msme ? `<div class="card-msme-row">${msmeBadgeHtml(c, true)}${udyamCtaHtml(c)}</div>` : '';
     const deliveryRow = ((c.delivery || []).length || (c.sectors || []).length)
       ? `<div class="card-delivery-row">${deliveryBadgesHtml(c, true)}${sectorBadgesHtml(c, true)}</div>` : '';
+    const loc = primaryLocation(c);
+    const flag = companyFlag(c);
+    const locText = loc.city || c.country || '';
     return `
       <a class="company-card" href="#/company/${c.slug}">
         <div class="card-header">
           <div class="card-logo">${logoHtml(c)}</div>
           <div class="card-title-block">
             <div class="card-name">${c.name}</div>
-            <div class="card-loc">📍 ${primaryLocation(c).city}</div>
+            <div class="card-loc">${flag ? flag + ' ' : ''}📍 ${locText}</div>
           </div>
         </div>
         <div class="card-desc">${c.desc}</div>
@@ -71575,7 +71578,7 @@ const CHART_EMPTY_COLOR = '#D8CFB8'; // --line, for the "untagged/other" slice
 /** Pure-SVG donut. segments: [{label, n, color}]. Renders a legend beside it.
  *  emptyNote, when the data is too sparse to be meaningful, replaces the ring
  *  with an honest message instead of a misleading near-empty circle. */
-function donutChart(title, segments, total, emptyNote) {
+function donutChart(title, segments, total, emptyNote, centerLabel = 'total') {
   if (emptyNote) {
     return `
       <div class="donut-card">
@@ -71604,7 +71607,7 @@ function donutChart(title, segments, total, emptyNote) {
           <circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="var(--line)" stroke-width="${sw}" opacity="0.35"/>
           ${arcs}
           <text x="${cx}" y="${cy - 4}" text-anchor="middle" class="donut-center-num">${total.toLocaleString()}</text>
-          <text x="${cx}" y="${cy + 12}" text-anchor="middle" class="donut-center-lbl">total</text>
+          <text x="${cx}" y="${cy + 12}" text-anchor="middle" class="donut-center-lbl">${centerLabel}</text>
         </svg>
         <div class="donut-legend">
           ${segments.map(s => `
@@ -71654,6 +71657,12 @@ function renderSectionPage(sectionSlug) {
   const sectorSegs = Object.entries(sectorCounts)
     .sort((a, b) => b[1] - a[1])
     .map(([k, n], i) => ({ label: (SECTOR_LABEL[k] || k), n, color: CHART_COLORS[i % CHART_COLORS.length] }));
+  // sectorTagged (unique companies) is right for the coverage-ratio check
+  // just below, but NOT for the donut's own arc math — a company tagged
+  // with two sectors correctly adds to both segments, so the segments can
+  // legitimately sum past sectorTagged. Use that sum, not sectorTagged,
+  // for the ring itself (see the Companies-by-Category fix, same reasoning).
+  const sectorSegsSum = sectorSegs.reduce((a, s) => a + s.n, 0);
   const sectorCoverage = total > 0 ? sectorTagged / total : 0;
   const sectorEmptyNote = sectorCoverage < 0.15
     ? `Sector tagging in progress — ${sectorTagged.toLocaleString()} of ${total.toLocaleString()} companies tagged so far. This chart fills in as coverage grows.`
@@ -71697,10 +71706,10 @@ function renderSectionPage(sectionSlug) {
           { label: 'Other countries', n: nOther, color: '#C0602A' },
         ], total, total === 0 ? 'No companies in this section yet.' : null)}
         ${donutChart('Delivery Model Mix', deliveryTop, deliveryTop.reduce((a, d) => a + d.n, 0),
-          deliveryTop.length === 0 ? 'No delivery models tagged for this section yet.' : null)}
-        ${donutChart('Sector Served', sectorSegs, sectorTagged, sectorEmptyNote)}
+          deliveryTop.length === 0 ? 'No delivery models tagged for this section yet.' : null, 'delivery tags')}
+        ${donutChart('Sector Served', sectorSegs, sectorSegsSum, sectorEmptyNote, 'sector tags')}
         ${donutChart('Sub-category Distribution', subDistSegs, subDistTotal,
-          subDistTotal === 0 ? 'No sub-category data yet.' : null)}
+          subDistTotal === 0 ? 'No sub-category data yet.' : null, 'category tags')}
       </div>
 
       <div class="landing-cats-head">
@@ -71770,14 +71779,18 @@ function renderRegionPage(region) {
     const secTagged = pool.filter(c => (c.sectors || []).length > 0).length;
     const secSegs = Object.entries(secCounts).sort((a, b) => b[1] - a[1])
       .map(([k, n], i) => ({ label: SECTOR_LABEL[k] || k, n, color: CHART_COLORS[i % CHART_COLORS.length] }));
+    // secTagged (unique companies) is right for the "X of Y tagged" note
+    // below, but not for the donut's own arc math — see the same fix in
+    // the section-page version above.
+    const secSegsSum = secSegs.reduce((a, s) => a + s.n, 0);
     const secNote = (total > 0 && secTagged / total < 0.15)
       ? `Sector tagging in progress — ${secTagged} of ${total} tagged so far.` : null;
 
     graphics = [
-      donutChart('Companies by Category', catSegs, catTotal, catTotal === 0 ? 'No data yet.' : null),
-      donutChart('Delivery Model Mix', delSegs, delTagged, delSegs.length === 0 ? 'No delivery data yet.' : null),
+      donutChart('Companies by Category', catSegs, catTotal, catTotal === 0 ? 'No data yet.' : null, 'category tags'),
+      donutChart('Delivery Model Mix', delSegs, delTagged, delSegs.length === 0 ? 'No delivery data yet.' : null, 'delivery tags'),
       barChart('Companies by City', cityTop, `of ${withCity.toLocaleString()} companies with a city on file`),
-      donutChart('Sector Served', secSegs, secTagged, secNote),
+      donutChart('Sector Served', secSegs, secSegsSum, secNote, 'sector tags'),
     ];
   } else {
     // ── ROW-specific: by Country (bar) + by Region (donut) ──
@@ -71802,9 +71815,9 @@ function renderRegionPage(region) {
 
     graphics = [
       barChart('Company Count by Country', countryTop, `top 15 of ${countryResolved.toLocaleString()} companies with a resolved country`),
-      donutChart('Companies by Category', catSegs, catTotal, catTotal === 0 ? 'No data yet.' : null),
+      donutChart('Companies by Category', catSegs, catTotal, catTotal === 0 ? 'No data yet.' : null, 'category tags'),
       donutChart('Companies by Region', regionSegs, regionTotal, regionTotal === 0 ? 'No region data yet.' : null),
-      donutChart('Delivery Model Mix', delSegs, delTagged, delSegs.length === 0 ? 'No delivery data yet.' : null),
+      donutChart('Delivery Model Mix', delSegs, delTagged, delSegs.length === 0 ? 'No delivery data yet.' : null, 'delivery tags'),
     ];
   }
 
