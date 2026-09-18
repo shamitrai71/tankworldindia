@@ -70852,7 +70852,7 @@ const FS_REST = {
     const out = [];
     let pageToken = '';
     do {
-      const url = `${FS_REST.base()}/${collection}?pageSize=300` +
+      const url = `${FS_REST.base()}/${collection}?pageSize=1000` +
                   (pageToken ? `&pageToken=${encodeURIComponent(pageToken)}` : '');
       const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + token } });
       if (!res.ok) throw new Error('REST ' + res.status + ': ' + (await res.text()).slice(0, 160));
@@ -70913,6 +70913,67 @@ async function checkUserApproval(user) {
 // TerminalStore: the directory must still render if Firestore is empty,
 // unreachable, or blocked — the site degrades to the built-in roster
 // rather than showing an empty page.
+// ── Company data cache (IndexedDB) ───────────────────────────────────────
+// Why IndexedDB and not localStorage: the full company roster serializes to
+// ~15.8 MB at current size, comfortably past the 5-10 MB quota most browsers
+// enforce for localStorage — a naive localStorage cache would just throw
+// QuotaExceededError on every write and never actually help. IndexedDB's
+// quota is much larger (a share of available disk space) and handles this
+// size without issue.
+//
+// This ONLY caches company data, never approval/auth status — a user whose
+// access was revoked must always be re-checked live against Firestore, so
+// checkAccessAndRender() still calls checkUserApproval() fresh every time.
+// What this fixes is specifically the slow part: listAuth('companies')
+// needs ~34 sequential paginated round-trips at current size (Firestore's
+// cursor-based pagination can't be parallelized), which is what actually
+// makes the dashboard's first paint slow. A cache hit lets the page render
+// immediately with last-known data while a real fetch refreshes it quietly
+// in the background.
+const CompanyCache = {
+  DB_NAME: 'twi-cache', STORE: 'companies', KEY: 'roster',
+
+  _openDb() {
+    return new Promise((resolve, reject) => {
+      const req = indexedDB.open(this.DB_NAME, 1);
+      req.onupgradeneeded = () => req.result.createObjectStore(this.STORE);
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  },
+
+  async read() {
+    try {
+      const db = await this._openDb();
+      return await new Promise((resolve, reject) => {
+        const tx = db.transaction(this.STORE, 'readonly');
+        const req = tx.objectStore(this.STORE).get(this.KEY);
+        req.onsuccess = () => resolve(req.result || null);
+        req.onerror = () => reject(req.error);
+      });
+    } catch (err) {
+      console.warn('[TANKWORLDINDIA] Cache read failed, falling back to live load:', err.message);
+      return null;
+    }
+  },
+
+  async write(companies) {
+    try {
+      const db = await this._openDb();
+      await new Promise((resolve, reject) => {
+        const tx = db.transaction(this.STORE, 'readwrite');
+        tx.objectStore(this.STORE).put({ companies, savedAt: Date.now() }, this.KEY);
+        tx.oncomplete = resolve;
+        tx.onerror = () => reject(tx.error);
+      });
+    } catch (err) {
+      // Cache write failing (quota, private-browsing mode, etc.) should
+      // never break the app — the live load already succeeded regardless.
+      console.warn('[TANKWORLDINDIA] Cache write failed (non-fatal):', err.message);
+    }
+  },
+};
+
 const CompanyStore = {
   isLive: false,
   async load() {
@@ -70939,6 +71000,10 @@ const CompanyStore = {
         console.log('%c[TANKWORLDINDIA] Firestore · ' + docs.length + ' companies · project=' +
                     firebaseConfig.projectId + ' · db=' + FIRESTORE_DB_ID,
                     'color:#1B4B7A;font-weight:bold');
+        // Fire-and-forget — never block the live load waiting on a cache
+        // write, and never let a cache failure surface as if the real load
+        // failed.
+        CompanyCache.write(docs.filter(Boolean));
       } else {
         console.log('%c[TANKWORLDINDIA] Firestore reachable but empty — using seed roster (' +
                     COMPANIES.length + ')', 'color:#C0602A');
@@ -70947,7 +71012,25 @@ const CompanyStore = {
       console.warn('[TANKWORLDINDIA] Firestore unavailable, using seed roster:', err.message);
     }
     return COMPANIES;
-  }
+  },
+
+  // Fast path for first paint: populate COMPANIES from the IndexedDB cache
+  // synchronously-fast (no network) if one exists. Returns true on a cache
+  // hit, false otherwise — the caller still runs a real load() afterward
+  // regardless, this just avoids the visitor staring at a blank/loading
+  // dashboard while that real load's ~34 sequential round-trips complete.
+  async loadFromCache() {
+    const cached = await CompanyCache.read();
+    if (!cached || !cached.companies || !cached.companies.length) return false;
+    COMPANIES.length = 0;
+    COMPANIES.push(...cached.companies);
+    this.isLive = true;
+    const ageMin = Math.round((Date.now() - cached.savedAt) / 60000);
+    console.log('%c[TANKWORLDINDIA] Loaded ' + cached.companies.length +
+                ' companies from cache (' + ageMin + ' min old) — refreshing in background',
+                'color:#8A8A8A');
+    return true;
+  },
 };
 </script>
 <script>
@@ -72037,6 +72120,7 @@ function handleRoute() {
     if (isAdminRoute) { renderAdminPage(); adminPanel.classList.add('active'); }
     else { renderProfilePage(); profilePanel.classList.add('active'); }
     document.title = (isAdminRoute ? 'Admin' : 'Profile') + ' — TankWorld India';
+    document.getElementById('landing-view').style.display = 'none';
     listPanel.style.display = 'none';
     companyPanel.classList.remove('active');
     sectionPanel.style.display = 'none';
@@ -72265,6 +72349,38 @@ async function checkAccessAndRender() {
   currentUserStatus = await checkUserApproval(currentUser);
   if (currentUserStatus === 'approved') {
     renderAccessGate(null);
+    // Fast path: if a cached roster exists, render with it immediately —
+    // then refresh from Firestore in the background and silently re-render
+    // once that completes. This is what actually fixes the dashboard's
+    // slow first paint: the ~34 sequential round-trips a full live load
+    // needs at current company count no longer block anything the visitor
+    // can see. A cache miss (first-ever visit, or a cleared cache) falls
+    // straight through to the original behavior below, unchanged.
+    const hadCache = await CompanyStore.loadFromCache();
+    if (hadCache) {
+      buildSidebar();
+      renderRegionFilter();
+      renderDeliveryFilter();
+      renderSectorFilter();
+      document.getElementById('statCompanies').textContent = COMPANIES.length;
+      document.getElementById('statCategories').textContent = allL2Count();
+      document.getElementById('statSheets').textContent = CATEGORY_TREE.length;
+      renderAll();
+      handleRoute();
+      // Background refresh — not awaited, and errors here are already
+      // handled inside CompanyStore.load() itself (falls back to whatever
+      // COMPANIES already holds), so nothing further to catch here.
+      CompanyStore.load().then(() => {
+        buildSidebar();
+        renderRegionFilter();
+        renderDeliveryFilter();
+        renderSectorFilter();
+        document.getElementById('statCompanies').textContent = COMPANIES.length;
+        document.getElementById('statCategories').textContent = allL2Count();
+        renderAll();
+      });
+      return;
+    }
     // The directory data + sidebar are only loaded once we know the
     // visitor is allowed to see them.
     await CompanyStore.load();
