@@ -1382,6 +1382,19 @@ const CATEGORY_TREE = [
     { code:"RT-04", name:"Pump & Compressor Rental", slug:"pump-and-compressor-rental" },
   ]},
 ];
+
+// Immutable copy of the in-page roster, taken BEFORE CompanyStore.load()
+// can replace COMPANIES with Firestore's contents.
+//
+// Why this exists: load() overwrites COMPANIES with whatever Firestore
+// returns. Without this snapshot, any company newly added to the array above
+// would be silently discarded on load, and the seed button — which iterates
+// COMPANIES — would only ever re-write what Firestore already had. New
+// companies could never reach the database. Seeding reads from here instead.
+// .filter(Boolean) guards against array elisions — a stray double comma in
+// the literal above creates a hole, which JSON.stringify turns into null,
+// and any consumer reading .slug then throws mid-run. Cheap insurance.
+const SEED_COMPANIES = JSON.parse(JSON.stringify(COMPANIES)).filter(Boolean);
 </script>
 <script>
 // ══════════════════════════════════════════════════════════════════════
