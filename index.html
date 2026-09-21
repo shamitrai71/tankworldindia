@@ -707,70 +707,6 @@ main{ flex:1; min-width:0; padding:20px 24px 60px; }
 }
 .xlink-hub{ color:var(--blue); background:var(--blue-soft); border-color:var(--line-blue); }
 .xlink-hub:hover{ background:#D6E4F0; }
-
-/* ── Product showcase (distinct from category .product-tile above) ────── */
-/* Option A: shares the Tankonomics tile silhouette — image on top, name,
-   description, a footer action row — but TWI's footer carries Enquire +
-   Catalogue CTAs where Tankonomics carries Recommend/endorsements. */
-.showcase-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(240px,1fr)); gap:14px; }
-.showcase-tile{
-  display:flex; flex-direction:column; background:var(--paper); border:1px solid var(--line);
-  border-radius:8px; overflow:hidden; text-decoration:none; color:inherit;
-  transition:border-color .15s, box-shadow .15s;
-}
-.showcase-tile:hover{ border-color:var(--ink-faint); box-shadow:0 2px 10px rgba(0,0,0,.05); }
-.showcase-imgwrap{ height:150px; background:var(--wash); overflow:hidden; position:relative; }
-.showcase-imgwrap img{ width:100%; height:100%; object-fit:cover; display:block; }
-.showcase-imgwrap .showcase-noimg{
-  width:100%; height:100%; display:flex; align-items:center; justify-content:center;
-  font-family:var(--font-mono); font-size:10px; color:var(--ink-faint); letter-spacing:.5px;
-}
-.showcase-body{ padding:12px 13px; display:flex; flex-direction:column; gap:7px; flex:1; }
-.showcase-cat{
-  font-family:var(--font-mono); font-size:9px; letter-spacing:.4px; text-transform:uppercase;
-  color:var(--blue); display:inline-flex; align-items:center; gap:4px; align-self:flex-start;
-  text-decoration:none; padding:2px 5px; background:var(--blue-soft); border-radius:2px;
-}
-.showcase-cat:hover{ background:#D6E4F0; }
-.showcase-name{ font-family:var(--font-display); font-weight:600; font-size:15px; line-height:1.25; }
-.showcase-desc{ font-size:12px; color:var(--ink-soft); line-height:1.5; }
-.showcase-ctas{
-  display:flex; gap:7px; margin-top:auto; padding-top:10px; border-top:1px dashed var(--line);
-}
-.showcase-cta{
-  flex:1; text-align:center; font-family:var(--font-mono); font-size:10px; letter-spacing:.3px;
-  text-decoration:none; padding:6px 8px; border-radius:3px; transition:background .15s, border-color .15s;
-}
-.showcase-cta.enquire{ color:#fff; background:var(--blue); }
-.showcase-cta.enquire:hover{ background:#153A5E; }
-.showcase-cta.catalogue{ color:var(--blue); background:transparent; border:1px solid var(--line-blue); }
-.showcase-cta.catalogue:hover{ background:var(--blue-soft); }
-.showcase-cta.disabled{ color:var(--ink-faint); border:1px solid var(--line); pointer-events:none; opacity:.55; }
-.showcase-empty{
-  font-size:12.5px; color:var(--ink-faint); font-style:italic;
-  padding:14px 0; border-top:1px dashed var(--line);
-}
-/* Lean per-product page */
-.pp-back{ margin-bottom:14px; display:inline-block; }
-.pp-hero{ display:grid; grid-template-columns:minmax(0,320px) 1fr; gap:22px; align-items:start; }
-@media (max-width:640px){ .pp-hero{ grid-template-columns:1fr; } }
-.pp-imgwrap{ border:1px solid var(--line); border-radius:8px; overflow:hidden; background:var(--wash); aspect-ratio:4/3; }
-.pp-imgwrap img{ width:100%; height:100%; object-fit:cover; display:block; }
-.pp-imgwrap .showcase-noimg{ height:100%; }
-.pp-company-link{ font-family:var(--font-mono); font-size:11px; color:var(--ink-soft); text-decoration:none; }
-.pp-company-link:hover{ color:var(--blue); }
-.pp-name{ font-family:var(--font-display); font-weight:700; font-size:26px; line-height:1.15; margin:6px 0 10px; }
-.pp-desc{ font-size:14px; line-height:1.6; color:var(--ink); margin:14px 0; }
-.pp-ctas{ display:flex; gap:10px; margin-top:16px; flex-wrap:wrap; }
-.pp-cta{
-  font-family:var(--font-mono); font-size:12px; letter-spacing:.3px; text-decoration:none;
-  padding:10px 18px; border-radius:4px; transition:background .15s, border-color .15s;
-}
-.pp-cta.enquire{ color:#fff; background:var(--blue); }
-.pp-cta.enquire:hover{ background:#153A5E; }
-.pp-cta.catalogue{ color:var(--blue); background:transparent; border:1px solid var(--line-blue); }
-.pp-cta.catalogue:hover{ background:var(--blue-soft); }
-.pp-cta.disabled{ color:var(--ink-faint); border:1px solid var(--line); pointer-events:none; opacity:.55; }
 footer{
   text-align:center; padding:20px; font-family:var(--font-mono); font-size:10px;
   color:var(--ink-faint); letter-spacing:0.5px; border-top:1px solid var(--line);
@@ -926,40 +862,6 @@ const TANKONOMICS_BASE = 'https://tankonomics.web.app';
 /** Hub directory, filtered to this category. */
 function tankonomicsUrl(slug) {
   return `${TANKONOMICS_BASE}/directory?category=${encodeURIComponent(slug)}`;
-}
-
-// ── Products: shared slug + URL contract ─────────────────────────────────
-// TWI is the system of record for products (they're authored here and read
-// by Tankonomics). Every product needs a STABLE slug, unique within its
-// company — this is the load-bearing piece: it's what Tankonomics' "View on
-// TankWorldIndia" button links to, and what a future lead form attributes
-// leads by. Backfilling slugs across two apps later is painful, so products
-// carry one from creation.
-function productSlugify(name) {
-  return String(name || '').toLowerCase()
-    .normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
-    .replace(/&/g, 'and')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 60) || 'product';
-}
-// Ensures a name-derived slug is unique among the company's existing
-// products (appends -2, -3, … on collision), mirroring how company slugs
-// already dedupe. Pass the products already assigned so far.
-function uniqueProductSlug(name, existingProducts) {
-  const base = productSlugify(name);
-  const taken = new Set((existingProducts || []).map(p => p.slug).filter(Boolean));
-  if (!taken.has(base)) return base;
-  let n = 2;
-  while (taken.has(`${base}-${n}`)) n++;
-  return `${base}-${n}`;
-}
-// The canonical per-product URL. This IS the cross-link contract with
-// Tankonomics — its product tiles' "View on TankWorldIndia" button points
-// here. Company-scoped so a product is addressable even if two companies
-// ship a same-named product.
-function productUrl(companySlug, productSlug) {
-  return `#/product/${companySlug}/${productSlug}`;
 }
 
 const CATEGORY_TREE = [
@@ -74865,5 +74767,3137 @@ const COMPANIES = [{ id:1, slug:"larsen-and-toubro-limited", name:"Larsen & Toub
     site:"http://www.turck.in/",
     delivery:["oem-manufacturer"],
     cats:["instrumentation-and-automation"],
-    locations:[{ type:"headquarters", name:"HQ", address:"Level 4, Link road, Baner - Balewadi Rd, near Cummins Complex, Baner, Pune, Maharashtra 411045, India", city:"Pune", lat:null, lng:null, placeId:"ChIJ6c05jm-_wjsRCJJ7bcCY2Jo" }] },
+    locations:[{ type:"headquarters", name:"HQ", address:"Level 4, Link road, Baner - Balewadi Rd, near Cummins Complex, Baner, Pune, Maharashtra 411045, India", city:"Pune", lat:null, lng:null, placeId:"ChIJ6c05jm-_wjsRCJJ7bcCY2Jo" }] }
+];
+</script>
 
+<script>
+// ══════════════════════════════════════════════════════════════════════
+// FIREBASE — live config for project `tankworldindia-t5`.
+//
+// The apiKey is PUBLIC BY DESIGN: it identifies the project and is meant
+// to ship in client code. Security comes from firestore.rules /
+// storage.rules and the Authentication → Authorized domains list, not
+// from hiding this value.
+//
+// Reads go through the REST layer below; the app falls back to the
+// COMPANIES seed array if Firestore is empty or unreachable, so the
+// directory always renders.
+//
+// Still to add when admin editing is built: Firebase Auth (Google) for
+// sign-in, and authenticated PATCH/DELETE writes (see TankBazaar's
+// FS_REST.setMerge / delete for the pattern).
+// ══════════════════════════════════════════════════════════════════════
+const firebaseConfig = {
+  apiKey: "AIzaSyANNEPtOo9aQIp9v5J978Xd0RrZf56MS24",
+  authDomain: "tankworldindia-t5.firebaseapp.com",
+  projectId: "tankworldindia-t5",
+  storageBucket: "tankworldindia-t5.firebasestorage.app",
+  messagingSenderId: "539894263955",
+  appId: "1:539894263955:web:c2835de786d86a3b35dd66"
+};
+
+// Firestore database id. "(default)" is the standard single database.
+// If you named the database when creating it (TankBazaar, for instance,
+// uses a named DB "tankbazaar"), put that name here instead — reading the
+// wrong database returns an empty result rather than an error, which is a
+// quiet failure worth knowing about.
+const FIRESTORE_DB_ID = "(default)";
+
+// ══════════════════════════════════════════════════════════════════════
+// FIRESTORE REST LAYER
+// Deliberately REST rather than the Firebase JS SDK, mirroring TankBazaar:
+// the SDK's streaming/WebChannel transport is blocked on some corporate
+// networks (requests hang rather than fail), whereas plain HTTPS GET works
+// wherever HTTPS works. It also keeps this a true single-file app with no
+// SDK bundle or module-loading order to manage.
+//
+// `companies` is public-read per firestore.rules, so no auth token is
+// needed for the directory to load.
+// ══════════════════════════════════════════════════════════════════════
+// Auth uses the Firebase SDK (plain HTTPS, no WebChannel), data uses REST.
+let firebaseReady = false, fbAuth = null, fbStorage = null;
+(function initFirebase() {
+  if (typeof firebase === 'undefined') {
+    console.warn('[TANKWORLDINDIA] Firebase SDK not loaded — sign-in disabled, directory still works.');
+    return;
+  }
+  try {
+    firebase.initializeApp(firebaseConfig);
+    fbAuth = firebase.auth();
+    if (firebase.storage) fbStorage = firebase.storage();
+    firebaseReady = true;
+    console.log('%c[TANKWORLDINDIA] Firebase ready · project=' + firebaseConfig.projectId +
+                ' · db=' + FIRESTORE_DB_ID, 'color:#1B4B7A;font-weight:bold');
+  } catch (e) {
+    console.error('[TANKWORLDINDIA] Firebase init failed:', e);
+  }
+})();
+
+// Admin emails — must match the isAdmin() list in firestore.rules. This
+// controls UI visibility only; the rules are what actually enforce writes.
+const ADMIN_EMAILS = ['esraigroup@gmail.com', 'petrodeksystems@gmail.com'];
+function isAdminUser(u) {
+  return !!u && ADMIN_EMAILS.includes((u.email || '').toLowerCase());
+}
+
+const FS_REST = {
+  base() {
+    return `https://firestore.googleapis.com/v1/projects/${firebaseConfig.projectId}` +
+           `/databases/${FIRESTORE_DB_ID}/documents`;
+  },
+  async token() {
+    return fbAuth && fbAuth.currentUser ? await fbAuth.currentUser.getIdToken() : null;
+  },
+  toFields(obj) {
+    const fields = {};
+    for (const [k, v] of Object.entries(obj)) fields[k] = FS_REST.toValue(v);
+    return fields;
+  },
+  toValue(v) {
+    if (v === null || v === undefined) return { nullValue: null };
+    if (typeof v === 'boolean') return { booleanValue: v };
+    if (typeof v === 'number') return Number.isInteger(v) ? { integerValue: String(v) } : { doubleValue: v };
+    if (typeof v === 'string') return { stringValue: v };
+    if (v instanceof Date) return { timestampValue: v.toISOString() };
+    if (Array.isArray(v)) return { arrayValue: { values: v.map(FS_REST.toValue) } };
+    if (typeof v === 'object') return { mapValue: { fields: FS_REST.toFields(v) } };
+    return { stringValue: String(v) };
+  },
+  // PATCH with an updateMask = merge semantics: only the listed fields are
+  // written, anything else on the document is preserved.
+  async setMerge(collection, docId, data) {
+    const token = await FS_REST.token();
+    const mask = Object.keys(data).map(k => `updateMask.fieldPaths=${encodeURIComponent(k)}`).join('&');
+    const res = await fetch(`${FS_REST.base()}/${collection}/${docId}?${mask}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ fields: FS_REST.toFields(data) }),
+    });
+    if (!res.ok) throw new Error('REST ' + res.status + ': ' + (await res.text()).slice(0, 200));
+    return res.json();
+  },
+  async deleteDoc(collection, docId) {
+    const token = await FS_REST.token();
+    const res = await fetch(`${FS_REST.base()}/${collection}/${docId}`, {
+      method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token },
+    });
+    if (!res.ok && res.status !== 404) throw new Error('REST ' + res.status);
+  },
+  fromFields(fields) {
+    const obj = {};
+    if (!fields) return obj;
+    for (const [k, v] of Object.entries(fields)) obj[k] = FS_REST.fromValue(v);
+    return obj;
+  },
+  fromValue(v) {
+    if ('nullValue' in v) return null;
+    if ('booleanValue' in v) return v.booleanValue;
+    if ('integerValue' in v) return parseInt(v.integerValue, 10);
+    if ('doubleValue' in v) return v.doubleValue;
+    if ('stringValue' in v) return v.stringValue;
+    if ('timestampValue' in v) return v.timestampValue;
+    if ('arrayValue' in v) return (v.arrayValue.values || []).map(FS_REST.fromValue);
+    if ('mapValue' in v) return FS_REST.fromFields(v.mapValue.fields);
+    return null;
+  },
+  // Public read — no auth token. Paginates so a roster larger than one
+  // page still loads completely.
+  async listPublic(collection) {
+    const out = [];
+    let pageToken = '';
+    do {
+      const url = `${FS_REST.base()}/${collection}?pageSize=300` +
+                  (pageToken ? `&pageToken=${encodeURIComponent(pageToken)}` : '');
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('REST ' + res.status + ': ' + (await res.text()).slice(0, 160));
+      const data = await res.json();
+      (data.documents || []).forEach(d => {
+        const obj = FS_REST.fromFields(d.fields);
+        obj.slug = obj.slug || d.name.split('/').pop();
+        out.push(obj);
+      });
+      pageToken = data.nextPageToken || '';
+    } while (pageToken);
+    return out;
+  },
+  // Authenticated single-document read, used for the caller's own user doc
+  // (approval status) and, for admins, other users' docs. Returns null on
+  // 404 (doc doesn't exist yet) rather than throwing, since "not signed up
+  // yet" is an expected first-visit state, not an error.
+  async getDoc(collection, docId) {
+    const token = await FS_REST.token();
+    const res = await fetch(`${FS_REST.base()}/${collection}/${docId}`, {
+      headers: token ? { 'Authorization': 'Bearer ' + token } : {},
+    });
+    if (res.status === 404) return null;
+    if (!res.ok) throw new Error('REST ' + res.status + ': ' + (await res.text()).slice(0, 160));
+    const data = await res.json();
+    const obj = FS_REST.fromFields(data.fields);
+    obj.id = data.name.split('/').pop();
+    return obj;
+  },
+  // Authenticated list — same pagination as listPublic, but sends the
+  // caller's ID token. Used for the admin "Pending Sign-ups" queue; the
+  // users collection is not publicly listable (see firestore.rules).
+  async listAuth(collection) {
+    const token = await FS_REST.token();
+    const out = [];
+    let pageToken = '';
+    do {
+      const url = `${FS_REST.base()}/${collection}?pageSize=1000` +
+                  (pageToken ? `&pageToken=${encodeURIComponent(pageToken)}` : '');
+      const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + token } });
+      if (!res.ok) throw new Error('REST ' + res.status + ': ' + (await res.text()).slice(0, 160));
+      const data = await res.json();
+      (data.documents || []).forEach(d => {
+        const obj = FS_REST.fromFields(d.fields);
+        obj.id = obj.id || d.name.split('/').pop();
+        out.push(obj);
+      });
+      pageToken = data.nextPageToken || '';
+    } while (pageToken);
+    return out;
+  },
+};
+
+// ══════════════════════════════════════════════════════════════════════
+// ACCESS GATE — pre-launch only. Set to false to open the directory back
+// up to the public once ready for market; that's the ONLY code change
+// needed on this side. This flag controls the UI only — it does NOT by
+// itself protect the underlying data. The matching Firestore rule (see
+// firestore.rules, `companies` collection) must independently require
+// `isApprovedUser()` for reads, or anyone can still fetch the full roster
+// directly from the Firestore REST API without ever loading this page.
+// ══════════════════════════════════════════════════════════════════════
+const REQUIRE_APPROVAL_TO_VIEW = true;
+
+let currentUserStatus = null; // null | 'pending' | 'approved' | 'rejected'
+
+// Checks (and if needed, creates) the signed-in user's approval doc.
+// Admins bypass approval entirely — they're identified by ADMIN_EMAILS,
+// same as every other admin check in this file. A first-time visitor gets
+// a 'pending' doc created automatically; nothing here can set a doc to
+// 'approved' — only an admin action (approveSignup, below) does that, and
+// the Firestore rule enforces that server-side too.
+async function checkUserApproval(user) {
+  if (!user) return null;
+  if (isAdminUser(user)) return 'approved';
+  try {
+    let doc = await FS_REST.getDoc('users', user.uid);
+    if (!doc) {
+      await FS_REST.setMerge('users', user.uid, {
+        email: user.email || '',
+        displayName: user.displayName || '',
+        status: 'pending',
+        requestedAt: new Date(),
+      });
+      return 'pending';
+    }
+    return doc.status || 'pending';
+  } catch (err) {
+    console.warn('[TANKWORLDINDIA] Could not check approval status:', err.message);
+    // Fail closed: if we can't confirm approval, don't show the data.
+    return 'pending';
+  }
+}
+
+// Live-if-available, seed-array-if-not. Same philosophy as TankBazaar's
+// TerminalStore: the directory must still render if Firestore is empty,
+// unreachable, or blocked — the site degrades to the built-in roster
+// rather than showing an empty page.
+// ── Company data cache (IndexedDB) ───────────────────────────────────────
+// Why IndexedDB and not localStorage: the full company roster serializes to
+// ~15.8 MB at current size, comfortably past the 5-10 MB quota most browsers
+// enforce for localStorage — a naive localStorage cache would just throw
+// QuotaExceededError on every write and never actually help. IndexedDB's
+// quota is much larger (a share of available disk space) and handles this
+// size without issue.
+//
+// This ONLY caches company data, never approval/auth status — a user whose
+// access was revoked must always be re-checked live against Firestore, so
+// checkAccessAndRender() still calls checkUserApproval() fresh every time.
+// What this fixes is specifically the slow part: listAuth('companies')
+// needs ~34 sequential paginated round-trips at current size (Firestore's
+// cursor-based pagination can't be parallelized), which is what actually
+// makes the dashboard's first paint slow. A cache hit lets the page render
+// immediately with last-known data while a real fetch refreshes it quietly
+// in the background.
+const CompanyCache = {
+  DB_NAME: 'twi-cache', STORE: 'companies', KEY: 'roster',
+
+  _openDb() {
+    return new Promise((resolve, reject) => {
+      const req = indexedDB.open(this.DB_NAME, 1);
+      req.onupgradeneeded = () => req.result.createObjectStore(this.STORE);
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  },
+
+  async read() {
+    try {
+      const db = await this._openDb();
+      return await new Promise((resolve, reject) => {
+        const tx = db.transaction(this.STORE, 'readonly');
+        const req = tx.objectStore(this.STORE).get(this.KEY);
+        req.onsuccess = () => resolve(req.result || null);
+        req.onerror = () => reject(req.error);
+      });
+    } catch (err) {
+      console.warn('[TANKWORLDINDIA] Cache read failed, falling back to live load:', err.message);
+      return null;
+    }
+  },
+
+  async write(companies) {
+    try {
+      const db = await this._openDb();
+      await new Promise((resolve, reject) => {
+        const tx = db.transaction(this.STORE, 'readwrite');
+        tx.objectStore(this.STORE).put({ companies, savedAt: Date.now() }, this.KEY);
+        tx.oncomplete = resolve;
+        tx.onerror = () => reject(tx.error);
+      });
+    } catch (err) {
+      // Cache write failing (quota, private-browsing mode, etc.) should
+      // never break the app — the live load already succeeded regardless.
+      console.warn('[TANKWORLDINDIA] Cache write failed (non-fatal):', err.message);
+    }
+  },
+};
+
+const CompanyStore = {
+  isLive: false,
+  async load() {
+    try {
+      // FIX: this used to call FS_REST.listPublic('companies') — a genuinely
+      // unauthenticated request with no ID token attached. That was correct
+      // when companies were publicly readable (`allow read: if true`), but
+      // once the access gate changed the rule to require isApprovedUser()
+      // (see firestore.rules), an unauthenticated read is rejected with
+      // 403 PERMISSION_DENIED every time, regardless of whether the current
+      // browser session is actually signed in and approved — listPublic
+      // never sends the credentials that would prove that. listAuth sends
+      // the caller's ID token, which is what isApprovedUser() actually
+      // needs to evaluate. Safe for the eventual public-launch flip too:
+      // once REQUIRE_APPROVAL_TO_VIEW is set back to false and the rule
+      // reverts to `allow read: if true`, an anonymous visitor's missing
+      // token just evaluates as request.auth == null, which that rule
+      // doesn't require anyway.
+      const docs = await FS_REST.listAuth('companies');
+      if (docs && docs.length) {
+        COMPANIES.length = 0;
+        COMPANIES.push(...docs.filter(Boolean));
+        this.isLive = true;
+        console.log('%c[TANKWORLDINDIA] Firestore · ' + docs.length + ' companies · project=' +
+                    firebaseConfig.projectId + ' · db=' + FIRESTORE_DB_ID,
+                    'color:#1B4B7A;font-weight:bold');
+        // Fire-and-forget — never block the live load waiting on a cache
+        // write, and never let a cache failure surface as if the real load
+        // failed.
+        CompanyCache.write(docs.filter(Boolean));
+      } else {
+        console.log('%c[TANKWORLDINDIA] Firestore reachable but empty — using seed roster (' +
+                    COMPANIES.length + ')', 'color:#C0602A');
+      }
+    } catch (err) {
+      console.warn('[TANKWORLDINDIA] Firestore unavailable, using seed roster:', err.message);
+    }
+    return COMPANIES;
+  },
+
+  // Fast path for first paint: populate COMPANIES from the IndexedDB cache
+  // synchronously-fast (no network) if one exists. Returns true on a cache
+  // hit, false otherwise — the caller still runs a real load() afterward
+  // regardless, this just avoids the visitor staring at a blank/loading
+  // dashboard while that real load's ~34 sequential round-trips complete.
+  async loadFromCache() {
+    const cached = await CompanyCache.read();
+    if (!cached || !cached.companies || !cached.companies.length) return false;
+    COMPANIES.length = 0;
+    COMPANIES.push(...cached.companies);
+    this.isLive = true;
+    const ageMin = Math.round((Date.now() - cached.savedAt) / 60000);
+    console.log('%c[TANKWORLDINDIA] Loaded ' + cached.companies.length +
+                ' companies from cache (' + ageMin + ' min old) — refreshing in background',
+                'color:#8A8A8A');
+    return true;
+  },
+};
+</script>
+<script>
+// ══════════════════════════════════════════════════════════════════════
+// APP LOGIC
+// ══════════════════════════════════════════════════════════════════════
+let activeCategory = null;   // single L2 slug filter, or null
+// Region filter: 'all' | 'india' | 'international'. Derived from each
+// company's country field rather than stored separately, so there's one
+// source of truth and no risk of the two drifting apart.
+let activeRegion = 'all';
+function isIndian(c) { return (c.country || '').trim().toLowerCase() === 'india'; }
+
+// ── Country normalization ─────────────────────────────────────────────
+// The raw `country` field is messy: 193 distinct strings across the roster,
+// including city-prefixed forms ("Tokyo, Japan"), typos ("Netehrlands"),
+// and variants ("S. Korea" / "S.Korea" / "Republic of Korea"). Both the
+// per-tile flags and the by-country / by-region graphics need a single
+// canonical country per company, so everything routes through
+// canonCountry() below. Tested against all 193 real strings: 5,704 of 5,714
+// companies resolve cleanly; only the ~6 genuinely "Unknown"/"Unconfirmed"
+// rows fall through to null (correctly).
+const COUNTRY_META = {
+  // canonical name : [ISO2 (for flag), region]
+  'India':['IN','South Asia'], 'United States of America':['US','Americas'],
+  'United Arab Emirates':['AE','Middle East'], 'Italy':['IT','Europe'], 'Malaysia':['MY','SE Asia'],
+  'Australia':['AU','Oceania'], 'Indonesia':['ID','SE Asia'], 'Thailand':['TH','SE Asia'],
+  'United Kingdom':['GB','Europe'], 'Brazil':['BR','Americas'], 'Germany':['DE','Europe'],
+  'Saudi Arabia':['SA','Middle East'], 'China':['CN','East Asia'], 'Canada':['CA','Americas'],
+  'Japan':['JP','East Asia'], 'France':['FR','Europe'], 'Netherlands':['NL','Europe'],
+  'South Korea':['KR','East Asia'], 'Spain':['ES','Europe'], 'Norway':['NO','Europe'],
+  'Belgium':['BE','Europe'], 'Singapore':['SG','SE Asia'], 'South Africa':['ZA','Africa'],
+  'Turkey':['TR','Middle East'], 'Mexico':['MX','Americas'], 'Austria':['AT','Europe'],
+  'Switzerland':['CH','Europe'], 'Denmark':['DK','Europe'], 'Bahrain':['BH','Middle East'],
+  'Taiwan':['TW','East Asia'], 'Sweden':['SE','Europe'], 'Czech Republic':['CZ','Europe'],
+  'Oman':['OM','Middle East'], 'Finland':['FI','Europe'], 'Russia':['RU','Europe'],
+  'Argentina':['AR','Americas'], 'Egypt':['EG','Africa'], 'Croatia':['HR','Europe'],
+  'Ireland':['IE','Europe'], 'Luxembourg':['LU','Europe'], 'Qatar':['QA','Middle East'],
+  'Romania':['RO','Europe'], 'Kuwait':['KW','Middle East'], 'Portugal':['PT','Europe'],
+  'Iraq':['IQ','Middle East'], 'Israel':['IL','Middle East'], 'Kazakhstan':['KZ','Central Asia'],
+  'Slovakia':['SK','Europe'], 'Ukraine':['UA','Europe'], 'Monaco':['MC','Europe'],
+  'Jordan':['JO','Middle East'], 'Lebanon':['LB','Middle East'], 'Tunisia':['TN','Africa'],
+  'Pakistan':['PK','South Asia'], 'Morocco':['MA','Africa'], 'Poland':['PL','Europe'],
+  'Lithuania':['LT','Europe'], 'Serbia':['RS','Europe'], 'New Zealand':['NZ','Oceania'],
+  'Brunei':['BN','SE Asia'], 'Chile':['CL','Americas'], 'Greece':['GR','Europe'],
+  'Vietnam':['VN','SE Asia'], 'Cameroon':['CM','Africa'],
+  'Venezuela':['VE','Americas'], 'Colombia':['CO','Americas'], 'Nigeria':['NG','Africa'],
+};
+const COUNTRY_ALIASES = {
+  'united states':'United States of America', 'texas':'United States of America',
+  'tulsa':'United States of America', 'cameron':'United States of America',
+  's. korea':'South Korea', 's.korea':'South Korea', 's korea':'South Korea', 'korea':'South Korea',
+  'republic of korea':'South Korea', 'turkiye':'Turkey', 'russian federation':'Russia',
+  'russian':'Russia', 'czech rep':'Czech Republic', 'czechia':'Czech Republic',
+  'netherland':'Netherlands', 'netehrlands':'Netherlands', 'capelle ad ijssel':'Netherlands',
+  'finlands':'Finland', 'sapin':'Spain', 'solovakia':'Slovakia', 'luxemberg':'Luxembourg',
+  'england':'United Kingdom', 'n. ireland':'United Kingdom', 'arab emir':'United Arab Emirates',
+  'arab emirates':'United Arab Emirates', 'yinchuan ningxia':'China',
+  'u.k':'United Kingdom', 'u.k.':'United Kingdom',
+};
+function canonCountry(raw) {
+  raw = (raw || '').trim();
+  if (!raw || raw.toLowerCase() === 'unknown' || raw.toLowerCase() === 'unconfirmed') return null;
+  if (COUNTRY_META[raw]) return raw;
+  const low = raw.toLowerCase();
+  if (COUNTRY_ALIASES[low]) return COUNTRY_ALIASES[low];
+  // strip parentheticals and take the segment after the last comma (city prefixes)
+  let cleaned = raw.replace(/\([^)]*\)/g, '').trim().replace(/^[.,]+|[.,]+$/g, '');
+  if (cleaned.includes(',')) cleaned = cleaned.split(',').pop().trim();
+  if (COUNTRY_META[cleaned]) return cleaned;
+  const cl = cleaned.toLowerCase();
+  if (COUNTRY_ALIASES[cl]) return COUNTRY_ALIASES[cl];
+  for (const canon in COUNTRY_META) if (low.includes(canon.toLowerCase())) return canon;
+  for (const alias in COUNTRY_ALIASES) if (low.includes(alias)) return COUNTRY_ALIASES[alias];
+  if (/\buk\b/.test(low)) return 'United Kingdom';
+  if (low.includes('brasil')) return 'Brazil';
+  return null;
+}
+/** ISO2 → Unicode regional-indicator flag emoji (🇮🇳). Native, no external assets. */
+// Flags: real images, not Unicode emoji. Windows' default emoji font
+// (Segoe UI Emoji) doesn't compose the regional-indicator code points that
+// build a flag emoji into an actual flag glyph on many configurations — it
+// falls back to showing the raw two-letter code instead, which is exactly
+// what surfaced live. flagcdn.com (flagpedia.net's free CDN, Cloudflare-
+// hosted) serves real flag images by ISO2 code, which render identically
+// regardless of OS/browser emoji-font support.
+function flagImgHtml(iso2, size = '20x15') {
+  if (!iso2 || iso2.length !== 2) return '';
+  const code = iso2.toLowerCase();
+  // onerror quietly removes the element rather than showing a broken-image
+  // icon if a specific flag or the CDN itself is ever unreachable.
+  return `<img src="https://flagcdn.com/${size}/${code}.png" class="flag-icon" ` +
+         `style="width:20px;height:15px;vertical-align:middle;border-radius:2px;" ` +
+         `alt="" loading="lazy" onerror="this.remove()">`;
+}
+/** Company → flag <img> HTML (or '' if country unresolvable). */
+function companyFlag(c, size) {
+  const canon = canonCountry(c.country);
+  const meta = canon && COUNTRY_META[canon];
+  return meta ? flagImgHtml(meta[0], size) : '';
+}
+
+// ── Delivery model: a SECOND, ORTHOGONAL axis to the category tree ──────
+// The category tree answers "what does this company make or build?".
+// Delivery model answers "how do they engage?" — and the two are genuinely
+// independent: a tank-construction company might be an LSTK turnkey
+// contractor, a shop fabricator, or an erection-only subcontractor, and
+// those are completely different businesses to a buyer.
+//
+// Keeping this separate is deliberate. Folding it into the category tree
+// (an "EPC Tank Construction" category alongside "Tank Construction") is
+// what produced the overloaded Heavy Engineering & Fabrication bucket and
+// the 400-category cross-multiplied proposal: sector/model × capability
+// explodes combinatorially and leaves every bucket too thin to be useful.
+// As an independent tag you can ask "tank builders who do turnkey" without
+// duplicating the capability tree once per model.
+//
+// A company may hold several (a firm that both manufactures and erects).
+const DELIVERY_MODELS = [
+  ['lstk-epc',              'LSTK / Turnkey EPC',      'Carries single-point turnkey responsibility — design through commissioning.'],
+  ['epcm',                  'EPCM',                    'Manages engineering, procurement and construction on the owner\u2019s behalf, without carrying construction risk.'],
+  ['feed-engineering',      'Engineering / FEED',      'Design-house work — concept, FEED, detailed engineering, consultancy.'],
+  ['fabrication',           'Fabrication (Shop)',      'Builds to drawing in its own shop or yard; not necessarily site-erecting.'],
+  ['site-erection',         'Site Erection & Commissioning', 'Erects, installs and commissions on site, typically under a main contractor.'],
+  ['oem-manufacturer',      'OEM / Product Manufacturer', 'Manufactures its own catalogue product line.'],
+  ['distributor-supplier',  'Distributor / Supplier',  'Stockist, trading house or authorised channel partner rather than the maker.'],
+  ['om-services',           'O&M / Maintenance Services', 'Ongoing operations, maintenance, turnaround and service contracts.'],
+];
+const DELIVERY_LABEL = Object.fromEntries(DELIVERY_MODELS.map(([k, l]) => [k, l]));
+// null = no filter applied; otherwise a single delivery-model key.
+let activeDelivery = null;
+
+// ── Sector served: a THIRD orthogonal axis ─────────────────────────────
+// Category = what they make. Delivery model = how they engage.
+// Sector = which end market they serve.
+//
+// This is the axis that makes cross-cutting questions answerable: "NDT
+// providers serving FPSO operators" or "coating contractors working
+// refineries" — queries that a single flat tree cannot express without
+// duplicating every capability once per sector (which is exactly how the
+// 400-category proposal ballooned).
+//
+// Deliberately coarse. These are end markets a buyer or analyst would
+// actually segment by, not a second taxonomy — if a sector here ever needs
+// sub-division, that is a signal it belongs in the capability tree instead.
+const SECTORS = [
+  ['fpso-offshore',      'FPSO / Offshore Production', 'Floating production, offshore platforms, subsea and marine production assets.'],
+  ['refinery',           'Refinery',                   'Crude refining and associated process units.'],
+  ['petrochemical',      'Petrochemical',              'Petrochemical and downstream chemical manufacturing.'],
+  ['terminals-storage',  'Terminals & Storage',        'Tank farms, bulk liquid terminals and storage depots.'],
+  ['gas-processing-lng', 'Gas Processing & LNG',       'Gas treatment, liquefaction, regasification and LNG value chain.'],
+  ['pipelines',          'Pipelines',                  'Cross-country and in-plant pipeline transmission systems.'],
+  ['upstream',           'Upstream E&P',               'Drilling, well services and hydrocarbon exploration/production.'],
+  ['power-generation',   'Power Generation',           'Thermal, nuclear and conventional power plants.'],
+  ['marine-shipping',    'Marine & Shipping',          'Vessels, shipyards, ports and marine logistics.'],
+  ['water-utilities',    'Water & Utilities',          'Water treatment, desalination and plant utility systems.'],
+  ['renewables',         'Renewables & Energy Transition', 'Solar, storage, hydrogen, biofuels and carbon capture.'],
+];
+const SECTOR_LABEL = Object.fromEntries(SECTORS.map(([k, l]) => [k, l]));
+// null = no filter applied; otherwise a single sector key.
+let activeSector = null;
+
+// Category tree is now up to three levels: sheet (L1) → category (L2) →
+// sub-category (L3, e.g. TS-01.1 Radar Level Gauges under TS-01 Tank Gauging).
+// L3 is OPTIONAL — most L2 entries have no `items` array at all, so every
+// walker below has to tolerate its absence rather than assume it.
+
+/** Every category node below the sheet level, flattened (L2 + L3). */
+function allCategoryNodes() {
+  const out = [];
+  for (const l1 of CATEGORY_TREE) {
+    for (const it of (l1.items || [])) {
+      out.push({ ...it, l1 });
+      for (const sub of (it.items || [])) out.push({ ...sub, l1, parent: it });
+    }
+  }
+  return out;
+}
+
+function allL2Count() {
+  return allCategoryNodes().length;
+}
+
+function categoryLabel(slug) {
+  // Section-level (l1) slugs aren't in allCategoryNodes() -- that function
+  // deliberately only enumerates items 2+ levels deep, since companies are
+  // always tagged with a specific leaf category, never a bare section slug.
+  // The new landing-page category grid links to whole sections though
+  // (#/?cat=engineering-and-construction), so this needs to recognize that
+  // case too or the active-filter chip throws trying to read .code off null.
+  const l1 = CATEGORY_TREE.find(s => s.slug === slug);
+  if (l1) return { code: l1.code, name: l1.name };
+  const hit = allCategoryNodes().find(n => n.slug === slug);
+  return hit ? { code: hit.code, name: hit.name } : null;
+}
+
+/** slug → [slug, ...all descendant slugs]. Used for inclusive filtering.
+ *  Handles three cases: a whole top-level section (landing page's category
+ *  grid), a mid-level category with direct children, or a plain leaf with
+ *  none — each falls through to the next check in order. */
+function categoryWithDescendants(slug) {
+  const l1 = CATEGORY_TREE.find(s => s.slug === slug);
+  if (l1) {
+    const out = [];
+    const walk = (node) => {
+      if (node.slug) out.push(node.slug);
+      (node.items || []).forEach(walk);
+    };
+    (l1.items || []).forEach(walk);
+    return out;
+  }
+  const hit = allCategoryNodes().find(n => n.slug === slug);
+  if (!hit) return [slug];
+  return [slug, ...(hit.items || []).map(s => s.slug)];
+}
+
+function setRegion(r) {
+  location.hash = buildFilterHash(activeCategory, r, activeDelivery, activeSector);
+}
+
+// Same toggle-off-on-reclick behaviour as setDelivery/selectCategory.
+function setSector(sec) {
+  location.hash = buildFilterHash(activeCategory, activeRegion, activeDelivery, activeSector === sec ? null : sec);
+}
+
+// Toggles off when the active model is clicked again, matching how
+// selectCategory() behaves — one tap to filter, one to clear.
+function setDelivery(d) {
+  location.hash = buildFilterHash(activeCategory, activeRegion, activeDelivery === d ? null : d, activeSector);
+}
+
+// ── Filter/view state ↔ URL hash ────────────────────────────────────────
+// Category, region and list/map view were previously plain in-memory state:
+// clicking around never touched the URL, so none of it left a mark on
+// browser history. On mobile that meant one tap of the back button could
+// jump clean out of the app (nothing of substance to step back through)
+// instead of returning to the previous filter/category. Encoding this state
+// into the hash — and driving it exclusively through handleRoute() — means
+// every meaningful navigation is a real, back-button-able history entry.
+function buildFilterHash(cat, region, delivery, sector, q) {
+  const params = [];
+  if (cat) params.push('cat=' + encodeURIComponent(cat));
+  if (region && region !== 'all') params.push('region=' + encodeURIComponent(region));
+  if (delivery) params.push('delivery=' + encodeURIComponent(delivery));
+  if (sector) params.push('sector=' + encodeURIComponent(sector));
+  if (q) params.push('q=' + encodeURIComponent(q));
+  return '#/' + (params.length ? ('?' + params.join('&')) : '');
+}
+
+function parseFilterHash(hash) {
+  const out = { cat: null, region: 'all', delivery: null, sector: null, q: '' };
+  const qIdx = hash.indexOf('?');
+  if (qIdx === -1) return out;
+  const qs = new URLSearchParams(hash.slice(qIdx + 1));
+  if (qs.has('cat')) out.cat = qs.get('cat');
+  if (qs.has('region')) out.region = qs.get('region');
+  // Guard against a hand-edited or stale hash naming a model we don't have.
+  if (qs.has('delivery') && DELIVERY_LABEL[qs.get('delivery')]) out.delivery = qs.get('delivery');
+  if (qs.has('sector') && SECTOR_LABEL[qs.get('sector')]) out.sector = qs.get('sector');
+  if (qs.has('q')) out.q = qs.get('q');
+  return out;
+}
+
+function renderRegionFilter() {
+  const el = document.getElementById('regionFilter');
+  if (!el) return;
+  const nIndia = COMPANIES.filter(isIndian).length;
+  const nIntl  = COMPANIES.length - nIndia;
+  const opts = [
+    ['all',           'All',           COMPANIES.length],
+    ['india',         'India',         nIndia],
+    ['international', 'International', nIntl],
+  ];
+  el.innerHTML = `
+    <div class="rf-label">LOCATION</div>
+    <div class="rf-buttons">
+      ${opts.map(([k, label, n]) => `
+        <button class="rf-btn ${activeRegion === k ? 'active' : ''}" onclick="setRegion('${k}')">
+          ${label}<span class="rf-count">${n}</span>
+        </button>`).join('')}
+    </div>`;
+}
+
+// Rendered as a wrapping chip row rather than the segmented control used for
+// LOCATION: there are eight models (vs three regions) and they're a
+// multi-value tag, so a segmented control would be both too wide and
+// misleading about exclusivity. Models with no tagged companies are hidden
+// entirely — an unclickable zero chip is just noise while tagging is still
+// being rolled out across the roster.
+function renderDeliveryFilter() {
+  const el = document.getElementById('deliveryFilter');
+  if (!el) return;
+  const counts = {};
+  COMPANIES.forEach(c => (c.delivery || []).forEach(d => { counts[d] = (counts[d] || 0) + 1; }));
+  const shown = DELIVERY_MODELS.filter(([k]) => counts[k]);
+  if (!shown.length) { el.innerHTML = ''; return; }
+  el.innerHTML = `
+    <div class="rf-label">DELIVERY MODEL</div>
+    <div class="df-chips">
+      ${shown.map(([k, label, help]) => `
+        <button class="df-chip ${activeDelivery === k ? 'active' : ''}"
+                title="${help.replace(/"/g, '&quot;')}"
+                onclick="setDelivery('${k}')">
+          ${label}<span class="rf-count">${counts[k]}</span>
+        </button>`).join('')}
+    </div>`;
+}
+
+// Mirrors renderDeliveryFilter — same chip pattern, same hide-if-empty rule.
+function renderSectorFilter() {
+  const el = document.getElementById('sectorFilter');
+  if (!el) return;
+  const counts = {};
+  COMPANIES.forEach(c => (c.sectors || []).forEach(x => { counts[x] = (counts[x] || 0) + 1; }));
+  const shown = SECTORS.filter(([k]) => counts[k]);
+  if (!shown.length) { el.innerHTML = ''; return; }
+  el.innerHTML = `
+    <div class="rf-label">SECTOR SERVED</div>
+    <div class="df-chips">
+      ${shown.map(([k, label, help]) => `
+        <button class="df-chip sector ${activeSector === k ? 'active' : ''}"
+                title="${help.replace(/"/g, '&quot;')}"
+                onclick="setSector('${k}')">
+          ${label}<span class="rf-count">${counts[k]}</span>
+        </button>`).join('')}
+    </div>`;
+}
+
+// scopedSlug, when passed, renders ONLY that one top-level section (open,
+// with its items) instead of the full 20-section tree — used by the
+// sub-category results page reached from a category page's sub-cat tiles.
+// Calling this again with no argument (e.g. on navigating to search or the
+// landing page) restores the full tree, so the sidebar doesn't stay stuck
+// in scoped mode once the user leaves that context.
+function buildSidebar(scopedSlug) {
+  const wrap = document.getElementById('sheetList');
+  const sections = scopedSlug ? CATEGORY_TREE.filter(l1 => l1.slug === scopedSlug) : CATEGORY_TREE;
+  wrap.innerHTML = sections.map((l1, i) => `
+    <div class="sheet-group${scopedSlug ? ' open' : ''}" data-l1="${l1.slug}">
+      <div class="sheet-head" onclick="toggleSheet('${l1.slug}')">
+        <span class="sheet-code">${l1.code}</span>
+        <span>${l1.name}</span>
+        <span class="sheet-caret">▶</span>
+      </div>
+      <div class="sheet-items">
+        ${l1.items.map(it => `
+          <div class="sheet-item" data-slug="${it.slug}" onclick="selectCategory('${it.slug}')">
+            <span class="item-code">${it.code}</span><span>${it.name}</span>
+          </div>
+          ${(it.items && it.items.length) ? `
+            <div class="sheet-subitems" data-parent="${it.slug}">
+              ${it.items.map(sub => `
+                <div class="sheet-item sheet-subitem" data-slug="${sub.slug}" onclick="selectCategory('${sub.slug}')">
+                  <span class="item-code">${sub.code}</span><span>${sub.name}</span>
+                </div>
+              `).join('')}
+            </div>` : ''}
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleSheet(slug) {
+  const el = document.querySelector('.sheet-group[data-l1="' + slug + '"]');
+  if (el) el.classList.toggle('open');
+}
+
+function selectCategory(slug) {
+  const newCat = (activeCategory === slug) ? null : slug;
+  location.hash = buildFilterHash(newCat, activeRegion, activeDelivery, activeSector);
+}
+
+function clearFilters() {
+  document.getElementById('searchBox').value = '';
+  location.hash = buildFilterHash(null, 'all', null, null);
+}
+
+// Registered office is always locations[0] by construction — used anywhere
+// a single "the company's location" is needed (search, card, map pin).
+function primaryLocation(c) { return c.locations[0]; }
+
+function locTypeLabel(t) {
+  return { 'registered-office': 'Registered Office', 'plant': 'Plant', 'facility': 'Facility', 'branch': 'Branch Office' }[t] || t;
+}
+
+function logoHtml(c) {
+  if (c.logo) return `<img src="${c.logo}" alt="${c.name} logo">`;
+  const initials = c.name.split(/\s+/).filter(w => /^[A-Z]/.test(w)).slice(0, 2).map(w => w[0]).join('') || c.name[0];
+  return `<span class="cp-logo-fallback">${initials}</span>`;
+}
+
+function filteredCompanies() {
+  const q = document.getElementById('searchBox').value.trim().toLowerCase();
+  return COMPANIES.filter(c => {
+    // Inclusive of descendants: selecting an L2 like "Tank Gauging" must still
+    // match a company tagged only with its L3 child "Radar Level Gauges".
+    // Without this a company tagged at L3 would vanish from its own parent's
+    // filter — the same confusing empty-result class of bug as before.
+    if (activeCategory) {
+      const wanted = categoryWithDescendants(activeCategory);
+      if (!wanted.some(s => c.cats.includes(s))) return false;
+    }
+    if (activeRegion === 'india' && !isIndian(c)) return false;
+    if (activeRegion === 'international' && isIndian(c)) return false;
+    // Delivery model is a separate axis from category — a company matches
+    // only if it has been tagged. Untagged companies simply drop out of a
+    // delivery-filtered view rather than being assumed to fit any model.
+    if (activeDelivery && !(c.delivery || []).includes(activeDelivery)) return false;
+    // Sector served — same opt-in semantics as delivery: untagged companies
+    // drop out rather than being assumed to serve every market.
+    if (activeSector && !(c.sectors || []).includes(activeSector)) return false;
+    if (q) {
+      const loc = primaryLocation(c);
+      const hay = (c.name + ' ' + loc.city + ' ' + c.desc + ' ' +
+        c.cats.map(s => (categoryLabel(s)||{}).name || '').join(' ')).toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+}
+
+function renderActiveFilters() {
+  const wrap = document.getElementById('activeFilters');
+  if (!activeCategory) { wrap.innerHTML = ''; return; }
+  const lbl = categoryLabel(activeCategory);
+  wrap.innerHTML = `<span class="filter-chip">${lbl.code} · ${lbl.name} <button onclick="selectCategory('${activeCategory}')">×</button></span>`;
+}
+
+function renderCards() {
+  const list = filteredCompanies();
+  const grid = document.getElementById('companyGrid');
+  const empty = document.getElementById('emptyState');
+  document.getElementById('resultCount').textContent = list.length;
+  renderActiveFilters();
+  if (!list.length) { grid.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+  grid.innerHTML = list.map(c => {
+    const tags = c.cats.slice(0, 3).map(s => {
+      const l = categoryLabel(s);
+      return l ? `<span class="tag">${l.code}</span>` : '';
+    }).join('');
+    const more = c.cats.length > 3 ? `<span class="tag more">+${c.cats.length - 3}</span>` : '';
+    const msmeRow = c.msme ? `<div class="card-msme-row">${msmeBadgeHtml(c, true)}${udyamCtaHtml(c)}</div>` : '';
+    const deliveryRow = ((c.delivery || []).length || (c.sectors || []).length)
+      ? `<div class="card-delivery-row">${deliveryBadgesHtml(c, true)}${sectorBadgesHtml(c, true)}</div>` : '';
+    const loc = primaryLocation(c);
+    const flag = companyFlag(c);
+    const cleanCountry = canonCountry(c.country) || c.country || '';
+    const locText = loc.city ? `${loc.city}, ${cleanCountry}` : cleanCountry;
+    return `
+      <a class="company-card" href="#/company/${c.slug}">
+        <div class="card-header">
+          <div class="card-logo">${logoHtml(c)}</div>
+          <div class="card-title-block">
+            <div class="card-name">${c.name}</div>
+            <div class="card-loc">${flag ? flag + ' ' : ''}📍 ${locText}</div>
+          </div>
+        </div>
+        <div class="card-desc">${c.desc}</div>
+        <div class="card-tags">${tags}${more}</div>
+        ${msmeRow}
+        ${deliveryRow}
+      </a>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// LANDING PAGE
+// ══════════════════════════════════════════════════════════════════════
+// Companies no longer appear by default anywhere in the app -- the flat
+// "all 5,502 companies" grid this replaced was the actual front page
+// before this redesign. Now a company only ever appears as the result of
+// an explicit search or category/region selection, starting here.
+
+/** Total companies tagged anywhere under a top-level CATEGORY_TREE section
+ *  (recursively, since some sections nest a third level under their items). */
+function sectionCompanyCount(l1) {
+  const slugs = new Set(categoryWithDescendants(l1.slug));
+  return COMPANIES.reduce((n, c) => n + (c.cats.some(s => slugs.has(s)) ? 1 : 0), 0);
+}
+
+function submitLandingSearch(event) {
+  if (event) event.preventDefault();
+  const term = document.getElementById('landingSearchBox').value.trim();
+  location.hash = buildFilterHash(null, 'all', null, null, term);
+}
+
+function renderLandingPage() {
+  const el = document.getElementById('landing-view');
+  const nIndia = COMPANIES.filter(isIndian).length;
+  const nOther = COMPANIES.length - nIndia;
+
+  const sectionTiles = CATEGORY_TREE.map(l1 => {
+    const n = sectionCompanyCount(l1);
+    return { l1, n };
+  }).sort((a, b) => b.n - a.n); // busiest sections first -- a rough proxy for
+                                  // "most developed part of the roster" until
+                                  // there's a reason to hand-order this.
+
+  el.innerHTML = `
+    <div class="landing-wrap">
+      <div class="landing-hero">
+        <div class="em-mark">TANKWORLD INDIA · ENGINEERING &amp; EQUIPMENT DIRECTORY</div>
+        <h1>Find the right supplier across ${COMPANIES.length.toLocaleString()} companies.</h1>
+        <p class="landing-sub">${CATEGORY_TREE.length} categories, ${COMPANIES.length.toLocaleString()} companies —
+          search by name, product, or category to get started.</p>
+        <form class="landing-search-form" onsubmit="submitLandingSearch(event)">
+          <input type="text" id="landingSearchBox" class="landing-search-input"
+                 placeholder="Search company, product, or category…" autocomplete="off">
+          <button type="submit" class="landing-search-btn">Search</button>
+        </form>
+      </div>
+
+      <div class="landing-region-row">
+        <a href="#/region/india" class="landing-region-block landing-region-india">
+          <div class="lr-label">INDIA</div>
+          <div class="lr-count">${nIndia.toLocaleString()}</div>
+          <div class="lr-sub">companies — the core of this directory</div>
+        </a>
+        <a href="#/region/international" class="landing-region-block landing-region-other">
+          <div class="lr-label">OTHER COUNTRIES</div>
+          <div class="lr-count">${nOther.toLocaleString()}</div>
+          <div class="lr-sub">companies, worldwide</div>
+        </a>
+      </div>
+
+      <div class="landing-cats-head">
+        <div class="em-mark">BROWSE BY CATEGORY</div>
+        <h2>${CATEGORY_TREE.length} sections</h2>
+      </div>
+      <div class="landing-cat-grid">
+        ${sectionTiles.map(({ l1, n }) => `
+          <a href="#/section/${l1.slug}" class="landing-cat-tile" ${n === 0 ? 'style="opacity:.4;pointer-events:none;"' : ''}>
+            <div class="lct-code">${l1.code}</div>
+            <div class="lct-name">${l1.name}</div>
+            <div class="lct-count">${n.toLocaleString()} ${n === 1 ? 'company' : 'companies'}</div>
+          </a>`).join('')}
+      </div>
+    </div>`;
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// SECTION PAGE — reached from a landing-page category tile.
+// Infographics (sub-category breakdown as the dominant element, plus a
+// compact India/International split and delivery-model mix within this
+// section specifically) + a sub-category tile grid. No company list here —
+// clicking a sub-category tile is the deliberate second action that leads
+// to one, on a separate page (renderSubCategoryResults below).
+// ══════════════════════════════════════════════════════════════════════
+
+// Palette-derived chart colors (option A): tints/shades of the app's own
+// blue / rust / green, plus neutrals — noticeable and multi-colour, but
+// still visibly "part of" this app rather than a separate visual language.
+const CHART_COLORS = ['#1B4B7A', '#C0602A', '#3E7A4F', '#4A82B0', '#D98A4E', '#6BA17A', '#8B93A0'];
+const CHART_EMPTY_COLOR = '#D8CFB8'; // --line, for the "untagged/other" slice
+
+/** Pure-SVG donut. segments: [{label, n, color}]. Renders a legend beside it.
+ *  emptyNote, when the data is too sparse to be meaningful, replaces the ring
+ *  with an honest message instead of a misleading near-empty circle. */
+function donutChart(title, segments, total, emptyNote, centerLabel = 'total') {
+  if (emptyNote) {
+    return `
+      <div class="donut-card">
+        <div class="donut-title">${title}</div>
+        <div class="donut-empty">${emptyNote}</div>
+      </div>`;
+  }
+  const R = 52, C = 2 * Math.PI * R, cx = 60, cy = 60, sw = 16;
+  let offset = 0;
+  const arcs = segments.map(s => {
+    const frac = total > 0 ? s.n / total : 0;
+    const len = frac * C;
+    const dash = `${len} ${C - len}`;
+    const arc = `<circle cx="${cx}" cy="${cy}" r="${R}" fill="none"
+      stroke="${s.color}" stroke-width="${sw}"
+      stroke-dasharray="${dash}" stroke-dashoffset="${-offset}"
+      transform="rotate(-90 ${cx} ${cy})"><title>${s.label}: ${s.n}</title></circle>`;
+    offset += len;
+    return arc;
+  }).join('');
+  return `
+    <div class="donut-card">
+      <div class="donut-title">${title}</div>
+      <div class="donut-body">
+        <svg viewBox="0 0 120 120" class="donut-svg" role="img" aria-label="${title}">
+          <circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="var(--line)" stroke-width="${sw}" opacity="0.35"/>
+          ${arcs}
+          <text x="${cx}" y="${cy - 4}" text-anchor="middle" class="donut-center-num">${total.toLocaleString()}</text>
+          <text x="${cx}" y="${cy + 12}" text-anchor="middle" class="donut-center-lbl">${centerLabel}</text>
+        </svg>
+        <div class="donut-legend">
+          ${segments.map(s => `
+            <div class="donut-leg-row">
+              <span class="donut-swatch" style="background:${s.color};"></span>
+              <span class="donut-leg-label">${s.label}</span>
+              <span class="donut-leg-n">${s.n.toLocaleString()}</span>
+            </div>`).join('')}
+        </div>
+      </div>
+    </div>`;
+}
+
+function renderSectionPage(sectionSlug) {
+  const l1 = CATEGORY_TREE.find(s => s.slug === sectionSlug);
+  const el = document.getElementById('section-view');
+  if (!l1) {
+    el.innerHTML = `<div class="landing-wrap"><a href="#/" class="back-link">← Back to dashboard</a>
+      <div class="empty-state"><div class="em-mark">Section Not Found</div><h3>No such category</h3></div></div>`;
+    return;
+  }
+
+  const sectionSlugs = new Set(categoryWithDescendants(sectionSlug));
+  const inSection = COMPANIES.filter(c => c.cats.some(s => sectionSlugs.has(s)));
+  const total = inSection.length;
+  const nIndia = inSection.filter(isIndian).length;
+  const nOther = total - nIndia;
+
+  // Delivery mix
+  const deliveryCounts = {};
+  inSection.forEach(c => (c.delivery || []).forEach(d => { deliveryCounts[d] = (deliveryCounts[d] || 0) + 1; }));
+  const deliveryTop = DELIVERY_MODELS
+    .map(([k, label]) => ({ label, n: deliveryCounts[k] || 0 }))
+    .filter(d => d.n > 0)
+    .sort((a, b) => b.n - a.n)
+    .slice(0, 6)
+    .map((d, i) => ({ ...d, color: CHART_COLORS[i % CHART_COLORS.length] }));
+
+  // Sector served — honest sparse handling: this axis is thinly tagged
+  // across the whole roster, so below a coverage threshold we show a note
+  // rather than a donut that's almost entirely one "untagged" slice. As
+  // tagging fills in over time, the same code starts drawing the real ring
+  // automatically once coverage crosses the threshold.
+  const sectorCounts = {};
+  inSection.forEach(c => (c.sectors || []).forEach(s => { sectorCounts[s] = (sectorCounts[s] || 0) + 1; }));
+  const sectorTagged = inSection.filter(c => (c.sectors || []).length > 0).length;
+  const sectorSegs = Object.entries(sectorCounts)
+    .sort((a, b) => b[1] - a[1])
+    .map(([k, n], i) => ({ label: (SECTOR_LABEL[k] || k), n, color: CHART_COLORS[i % CHART_COLORS.length] }));
+  // sectorTagged (unique companies) is right for the coverage-ratio check
+  // just below, but NOT for the donut's own arc math — a company tagged
+  // with two sectors correctly adds to both segments, so the segments can
+  // legitimately sum past sectorTagged. Use that sum, not sectorTagged,
+  // for the ring itself (see the Companies-by-Category fix, same reasoning).
+  const sectorSegsSum = sectorSegs.reduce((a, s) => a + s.n, 0);
+  const sectorCoverage = total > 0 ? sectorTagged / total : 0;
+  const sectorEmptyNote = sectorCoverage < 0.15
+    ? `Sector tagging in progress — ${sectorTagged.toLocaleString()} of ${total.toLocaleString()} companies tagged so far. This chart fills in as coverage grows.`
+    : null;
+
+  // Sub-category distribution — top 6 + "others" rolled into one slice, so
+  // the ring shows concentration at a glance without fragmenting into 20
+  // slivers.
+  const subCounts = l1.items.map(it => {
+    const slugs = new Set(categoryWithDescendants(it.slug));
+    const n = COMPANIES.reduce((acc, c) => acc + (c.cats.some(s => slugs.has(s)) ? 1 : 0), 0);
+    return { it, n };
+  }).sort((a, b) => b.n - a.n);
+  const subTop = subCounts.slice(0, 6);
+  const subRest = subCounts.slice(6);
+  const subRestTotal = subRest.reduce((acc, s) => acc + s.n, 0);
+  const subDistSegs = subTop.map((s, i) => ({ label: s.it.name, n: s.n, color: CHART_COLORS[i % CHART_COLORS.length] }));
+  if (subRestTotal > 0) subDistSegs.push({ label: `Other ${subRest.length} sub-categories`, n: subRestTotal, color: CHART_EMPTY_COLOR });
+  // NB the distribution donut uses sum-of-sub-counts as its total, not the
+  // section total, since a company tagged in two sub-categories legitimately
+  // counts toward both slices here (this ring is "how the tags distribute",
+  // not "how many unique companies").
+  const subDistTotal = subDistSegs.reduce((acc, s) => acc + s.n, 0);
+
+  const subTiles = subCounts; // tiles reuse the same computed counts
+
+  el.innerHTML = `
+    <div class="landing-wrap">
+      <a href="#/" class="sticky-back-btn">← Back to dashboard</a>
+
+      <div class="section-hero">
+        <div class="lct-code" style="font-size:13px;">${l1.code}</div>
+        <h1>${l1.name}</h1>
+        <p class="landing-sub">${total.toLocaleString()} companies across ${l1.items.length}
+          sub-categor${l1.items.length === 1 ? 'y' : 'ies'}.</p>
+      </div>
+
+      <div class="donut-grid">
+        ${donutChart('India / International', [
+          { label: 'India', n: nIndia, color: '#1B4B7A' },
+          { label: 'Other countries', n: nOther, color: '#C0602A' },
+        ], total, total === 0 ? 'No companies in this section yet.' : null)}
+        ${donutChart('Delivery Model Mix', deliveryTop, deliveryTop.reduce((a, d) => a + d.n, 0),
+          deliveryTop.length === 0 ? 'No delivery models tagged for this section yet.' : null, 'delivery tags')}
+        ${donutChart('Sector Served', sectorSegs, sectorSegsSum, sectorEmptyNote, 'sector tags')}
+        ${donutChart('Sub-category Distribution', subDistSegs, subDistTotal,
+          subDistTotal === 0 ? 'No sub-category data yet.' : null, 'category tags')}
+      </div>
+
+      <div class="landing-cats-head">
+        <div class="em-mark">SUB-CATEGORIES — SELECT ONE TO SEE COMPANIES</div>
+        <h2>${l1.items.length} in ${l1.name}</h2>
+      </div>
+      <div class="landing-cat-grid">
+        ${subTiles.map(({ it, n }) => `
+          <a href="#/section/${l1.slug}/${it.slug}" class="landing-cat-tile" ${n === 0 ? 'style="opacity:.4;pointer-events:none;"' : ''}>
+            <div class="lct-code">${it.code}</div>
+            <div class="lct-name">${it.name}</div>
+            <div class="lct-count">${n.toLocaleString()} ${n === 1 ? 'company' : 'companies'}</div>
+          </a>`).join('')}
+      </div>
+    </div>`;
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// REGION PAGE — India (#/region/india) and Rest of World
+// (#/region/international). Curated landing pages, structurally parallel
+// to the section pages: 4 region-scoped graphics on top, then a tiered
+// Champions/Featured spotlight strip. The full roster is NOT dumped here —
+// non-featured companies are reachable only via the search sidebar, same
+// principle as the section pages.
+// ══════════════════════════════════════════════════════════════════════
+function renderRegionPage(region) {
+  const el = document.getElementById('section-view');
+  const isIndiaPage = region === 'india';
+  const pool = COMPANIES.filter(c => isIndiaPage ? isIndian(c) : !isIndian(c));
+  const total = pool.length;
+  const title = isIndiaPage ? 'India' : 'Rest of the World';
+
+  // ── Shared graphic: Companies by Category (donut) ──
+  const catCounts = CATEGORY_TREE.map(l1 => {
+    const slugs = new Set(categoryWithDescendants(l1.slug));
+    return { l1, n: pool.reduce((a, c) => a + (c.cats.some(s => slugs.has(s)) ? 1 : 0), 0) };
+  }).sort((a, b) => b.n - a.n);
+  const catTop = catCounts.slice(0, 7);
+  const catRest = catCounts.slice(7).reduce((a, x) => a + x.n, 0);
+  const catSegs = catTop.map((x, i) => ({ label: x.l1.name, n: x.n, color: CHART_COLORS[i % CHART_COLORS.length] }));
+  if (catRest > 0) catSegs.push({ label: 'Other sections', n: catRest, color: CHART_EMPTY_COLOR });
+  const catTotal = catSegs.reduce((a, s) => a + s.n, 0);
+
+  // ── Shared graphic: Delivery Model Mix (donut) ──
+  const delCounts = {};
+  pool.forEach(c => (c.delivery || []).forEach(d => { delCounts[d] = (delCounts[d] || 0) + 1; }));
+  const delSegs = DELIVERY_MODELS
+    .map(([k, label]) => ({ label, n: delCounts[k] || 0 })).filter(d => d.n > 0)
+    .sort((a, b) => b.n - a.n).slice(0, 6)
+    .map((d, i) => ({ ...d, color: CHART_COLORS[i % CHART_COLORS.length] }));
+  const delTagged = delSegs.reduce((a, d) => a + d.n, 0);
+
+  let graphics;
+  if (isIndiaPage) {
+    // ── India-specific: by City (bar) + Sector Served (donut, sparse-honest) ──
+    const cityCounts = {};
+    pool.forEach(c => {
+      const city = ((c.locations && c.locations[0] && c.locations[0].city) || '').trim();
+      if (city) cityCounts[city] = (cityCounts[city] || 0) + 1;
+    });
+    const cityTop = Object.entries(cityCounts).sort((a, b) => b[1] - a[1]).slice(0, 12)
+      .map(([city, n]) => ({ label: city, n }));
+    const withCity = Object.values(cityCounts).reduce((a, n) => a + n, 0);
+
+    const secCounts = {};
+    pool.forEach(c => (c.sectors || []).forEach(s => { secCounts[s] = (secCounts[s] || 0) + 1; }));
+    const secTagged = pool.filter(c => (c.sectors || []).length > 0).length;
+    const secSegs = Object.entries(secCounts).sort((a, b) => b[1] - a[1])
+      .map(([k, n], i) => ({ label: SECTOR_LABEL[k] || k, n, color: CHART_COLORS[i % CHART_COLORS.length] }));
+    // secTagged (unique companies) is right for the "X of Y tagged" note
+    // below, but not for the donut's own arc math — see the same fix in
+    // the section-page version above.
+    const secSegsSum = secSegs.reduce((a, s) => a + s.n, 0);
+    const secNote = (total > 0 && secTagged / total < 0.15)
+      ? `Sector tagging in progress — ${secTagged} of ${total} tagged so far.` : null;
+
+    graphics = [
+      donutChart('Companies by Category', catSegs, catTotal, catTotal === 0 ? 'No data yet.' : null, 'category tags'),
+      donutChart('Delivery Model Mix', delSegs, delTagged, delSegs.length === 0 ? 'No delivery data yet.' : null, 'delivery tags'),
+      barChart('Companies by City', cityTop, `of ${withCity.toLocaleString()} companies with a city on file`),
+      donutChart('Sector Served', secSegs, secSegsSum, secNote, 'sector tags'),
+    ];
+  } else {
+    // ── ROW-specific: by Country (bar) + by Region (donut) ──
+    const countryCounts = {};
+    const regionCounts = {};
+    pool.forEach(c => {
+      const canon = canonCountry(c.country);
+      if (!canon) return;
+      countryCounts[canon] = (countryCounts[canon] || 0) + 1;
+      const reg = COUNTRY_META[canon] ? COUNTRY_META[canon][1] : 'Other';
+      regionCounts[reg] = (regionCounts[reg] || 0) + 1;
+    });
+    const countryTop = Object.entries(countryCounts).sort((a, b) => b[1] - a[1]).slice(0, 15)
+      .map(([canon, n]) => {
+        const meta = COUNTRY_META[canon];
+        return { label: (meta ? flagImgHtml(meta[0]) + ' ' : '') + canon, n };
+      });
+    const countryResolved = Object.values(countryCounts).reduce((a, n) => a + n, 0);
+    const regionSegs = Object.entries(regionCounts).sort((a, b) => b[1] - a[1])
+      .map(([reg, n], i) => ({ label: reg, n, color: CHART_COLORS[i % CHART_COLORS.length] }));
+    const regionTotal = regionSegs.reduce((a, s) => a + s.n, 0);
+
+    graphics = [
+      barChart('Company Count by Country', countryTop, `top 15 of ${countryResolved.toLocaleString()} companies with a resolved country`),
+      donutChart('Companies by Category', catSegs, catTotal, catTotal === 0 ? 'No data yet.' : null, 'category tags'),
+      donutChart('Companies by Region', regionSegs, regionTotal, regionTotal === 0 ? 'No region data yet.' : null),
+      donutChart('Delivery Model Mix', delSegs, delTagged, delSegs.length === 0 ? 'No delivery data yet.' : null, 'delivery tags'),
+    ];
+  }
+
+  // ── Spotlight strip: Champions then Featured ──
+  const champions = pool.filter(c => c.spotlight === 'champion');
+  const featured = pool.filter(c => c.spotlight === 'featured');
+  const spotlightHtml = (champions.length || featured.length) ? `
+    ${champions.length ? `
+      <div class="landing-cats-head"><div class="em-mark">CHAMPIONS</div><h2>${champions.length} in ${title}</h2></div>
+      <div class="spotlight-grid champions">${champions.map(spotlightTile).join('')}</div>` : ''}
+    ${featured.length ? `
+      <div class="landing-cats-head" style="margin-top:${champions.length ? '32px' : '0'};"><div class="em-mark">FEATURED</div><h2>${featured.length} in ${title}</h2></div>
+      <div class="spotlight-grid">${featured.map(spotlightTile).join('')}</div>` : ''}
+  ` : `
+    <div class="landing-cats-head"><div class="em-mark">FEATURED COMPANIES</div><h2>Coming soon</h2></div>
+    <div class="spotlight-empty">Curated Champions and Featured companies will appear here.
+      Use the search on the dashboard to browse all ${total.toLocaleString()} ${title} companies in the meantime.</div>`;
+
+  el.innerHTML = `
+    <div class="landing-wrap">
+      <a href="#/" class="sticky-back-btn">← Back to dashboard</a>
+      <div class="section-hero">
+        <h1>${title}</h1>
+        <p class="landing-sub">${total.toLocaleString()} companies.
+          ${isIndiaPage ? 'The core of this directory.' : 'Worldwide coverage across ' +
+            new Set(pool.map(c => canonCountry(c.country)).filter(Boolean)).size + ' countries.'}</p>
+      </div>
+      <div class="donut-grid">${graphics.join('')}</div>
+      ${spotlightHtml}
+    </div>`;
+}
+
+/** A single spotlight company tile, with country flag. Links to the company page. */
+function spotlightTile(c) {
+  const flag = companyFlag(c);
+  const loc = (c.locations && c.locations[0]) || {};
+  const place = [loc.city, canonCountry(c.country)].filter(Boolean).join(', ');
+  return `
+    <a href="#/company/${c.slug}" class="spotlight-tile">
+      <div class="st-top">
+        ${c.logo ? `<img src="${c.logo}" class="st-logo" alt="" onerror="this.style.display='none'">`
+                 : `<div class="st-logo st-logo-fallback">${(c.name || '?').slice(0, 2).toUpperCase()}</div>`}
+        ${flag ? `<span class="st-flag" title="${canonCountry(c.country) || ''}">${flag}</span>` : ''}
+      </div>
+      <div class="st-name">${c.name}</div>
+      ${place ? `<div class="st-place">${place}</div>` : ''}
+    </a>`;
+}
+
+/** Simple horizontal bar chart (pure CSS flex bars). rows: [{label, n}]. */
+function barChart(title, rows, footnote) {
+  if (!rows.length) {
+    return `<div class="donut-card"><div class="donut-title">${title}</div>
+      <div class="donut-empty">No data yet.</div></div>`;
+  }
+  const max = Math.max(...rows.map(r => r.n));
+  return `
+    <div class="donut-card">
+      <div class="donut-title">${title}</div>
+      <div class="bar-list">
+        ${rows.map(r => `
+          <div class="bar-row">
+            <span class="bar-label">${r.label}</span>
+            <span class="bar-track"><span class="bar-fill" style="width:${max > 0 ? (r.n / max * 100) : 0}%"></span></span>
+            <span class="bar-n">${r.n.toLocaleString()}</span>
+          </div>`).join('')}
+      </div>
+      ${footnote ? `<div class="bar-foot">${footnote}</div>` : ''}
+    </div>`;
+}
+
+function renderSubCategoryResults(sectionSlug, subSlug) {
+  const l1 = CATEGORY_TREE.find(s => s.slug === sectionSlug);
+  const backBar = document.getElementById('backBar');
+  backBar.innerHTML = `
+    <div class="back-bar">
+      <a href="#/" class="sticky-back-btn">← Back to dashboard</a>
+      ${l1 ? `<a href="#/section/${l1.slug}" class="back-link-secondary">← Back to ${l1.name}</a>` : ''}
+    </div>`;
+  buildSidebar(sectionSlug);
+  activeCategory = subSlug;
+  activeRegion = 'all';
+  activeDelivery = null;
+  activeSector = null;
+  document.getElementById('searchBox').value = '';
+  document.querySelectorAll('.sheet-item').forEach(elm => {
+    elm.classList.toggle('active', elm.dataset.slug === activeCategory);
+  });
+  renderRegionFilter();
+  renderDeliveryFilter();
+  renderSectorFilter();
+  renderAll();
+}
+
+function renderAll() {
+  renderCards();
+}
+
+// ── ROUTING ──
+// Hash-based so each company gets a real, addressable, bookmarkable URL —
+// e.g. tankworldindia.html#/company/larsen-and-toubro-limited — ready for
+// Tankonomics to link to directly once the two apps are wired together.
+// ── Corporate relationships ──────────────────────────────────────────
+// A subsidiary is a SEPARATE LEGAL ENTITY, not a location of its parent:
+// Protego India Private Limited has its own CIN, accounts and contracts;
+// it is not a site belonging to the German GmbH. So each entity keeps its
+// own card and the relationship is expressed here instead.
+//
+// Ownership is likewise not identity — Rosneft's stake in Nayara doesn't
+// make Nayara a Rosneft location.
+//
+// company.parent = { name, slug, relationship } — slug may be "" when the
+// parent isn't itself listed. relationship: subsidiary | division |
+// joint-venture | affiliate | associate.
+const REL_LABEL = {
+  'subsidiary':    'Subsidiary of',
+  'division':      'Division of',
+  'joint-venture': 'Joint venture of',
+  'affiliate':     'Affiliate of',
+  'associate':     'Associate of',
+  'owned-by':      'Owned by',
+};
+
+// Starter set only — same philosophy as the category tree: add a real slug
+// when a real company is found holding that certification, don't pre-seed
+// speculatively. Flat slug array on the company, same shape as cats/sectors/
+// delivery, for the same reason: simple, consistent, filterable.
+const CERTIFICATION_LABELS = {
+  'api-6d':                    'API 6D — Pipeline Valves',
+  'api-620-650':                'API 620/650 — Storage Tanks',
+  'api-610':                    'API 610 — Centrifugal Pumps',
+  'api-682':                    'API 682 — Mechanical Seals',
+  'api-598':                    'API 598 — Valve Inspection & Testing',
+  'api-spec-q1':                 'API Spec Q1 — Quality Management',
+  'iso-9001':                    'ISO 9001 — Quality Management',
+  'iso-14001':                   'ISO 14001 — Environmental Management',
+  'iso-45001':                   'ISO 45001 — Occupational Health & Safety',
+  'iso-3834':                    'ISO 3834 — Welding Quality',
+  'asme-u-stamp':                'ASME U-Stamp — Pressure Vessels',
+  'asme-b31-3':                  'ASME B31.3 — Process Piping',
+  'ped-ce-marking':              'PED / CE Marking',
+  'atex':                        'ATEX — Hazardous Area Equipment',
+  'nace-mr0175':                 'NACE MR0175 — Sour Service',
+  'aws-certified':               'AWS — Welding',
+  'dnv-classed':                 'DNV Classed',
+  'lloyds-register-classed':     "Lloyd's Register Classed",
+  'abs-classed':                 'ABS Classed',
+};
+
+const EMPLOYEE_BANDS = ['1-10', '11-50', '51-200', '201-500', '501-1000', '1000+'];
+
+function parentLineHtml(c) {
+  const p = c.parent;
+  if (!p || !p.name) return '';
+  const label = REL_LABEL[p.relationship] || 'Part of';
+  const listed = p.slug && COMPANIES.some(x => x.slug === p.slug);
+  const target = listed
+    ? `<a href="#/company/${p.slug}">${p.name}</a>`
+    : `<span class="rel-unlisted" title="Not listed in this directory">${p.name}</span>`;
+  return `<div class="cp-rel">${label} ${target}</div>`;
+}
+
+// c.msme = { category: "Micro"|"Small"|"Medium"|null, udyamNumber: string|null }.
+// category is null when a company is confirmed MSME-scale but the specific
+// tier hasn't been verified yet (most of the roster, at least for now — see
+// the sourcing notes on why Udyam numbers in particular are hard to verify
+// independently: no public name-based lookup exists the way MCA/CIN has one).
+function msmeBadgeHtml(c, compact) {
+  if (!c.msme) return '';
+  const label = compact ? 'MSME' : (c.msme.category ? `MSME · ${c.msme.category}` : 'MSME');
+  return `<span class="badge-msme" title="Micro, Small &amp; Medium Enterprise">${label}</span>`;
+}
+
+// Pending state is clickable — explains today's real status (claiming isn't
+// built yet) rather than dead-ending on a button that looks actionable but
+// does nothing. Once claiming ships, this onclick becomes the real trigger.
+function udyamCtaHtml(c) {
+  if (!c.msme) return '';
+  const num = c.msme.udyamNumber;
+  if (num) {
+    return `<span class="udyam-cta verified" title="Udyam Registration Number">UDYAM: ${num}</span>`;
+  }
+  return `<span class="udyam-cta pending" onclick="event.preventDefault(); alert('Udyam number not yet added. Once company claiming is live (via TankWorld India or Tankonomics), verified owners will be able to add this directly from their listing.');" title="Click for status">UDYAM:</span>`;
+}
+
+// c.delivery = ["lstk-epc", "fabrication", ...] — the delivery-model axis.
+// Cards cap the list at two badges (a "+N" carries the rest) so a company
+// with four models doesn't push the card's tag row into a third line; the
+// profile page shows all of them. Unknown keys are skipped rather than
+// rendered raw, so a stale tag can't leak an ugly slug into the UI.
+// Sector badges use a distinct tint from delivery badges so a card showing
+// both doesn't read as one undifferentiated run of grey chips.
+function sectorBadgesHtml(c, compact) {
+  const secs = (c.sectors || []).filter(x => SECTOR_LABEL[x]);
+  if (!secs.length) return '';
+  const shown = compact ? secs.slice(0, 2) : secs;
+  const extra = compact && secs.length > 2 ? secs.length - 2 : 0;
+  return shown.map(x =>
+    `<span class="badge-sector" title="Serves: ${SECTOR_LABEL[x]}">${SECTOR_LABEL[x]}</span>`
+  ).join('') + (extra ? `<span class="badge-sector">+${extra}</span>` : '');
+}
+
+function deliveryBadgesHtml(c, compact) {
+  const models = (c.delivery || []).filter(d => DELIVERY_LABEL[d]);
+  if (!models.length) return '';
+  const shown = compact ? models.slice(0, 2) : models;
+  const extra = compact && models.length > 2 ? models.length - 2 : 0;
+  return shown.map(d =>
+    `<span class="badge-delivery" title="How this company engages: ${DELIVERY_LABEL[d]}">${DELIVERY_LABEL[d]}</span>`
+  ).join('') + (extra ? `<span class="badge-delivery">+${extra}</span>` : '');
+}
+
+// Reverse view: entities in the directory that name THIS company as parent.
+function subsidiariesHtml(c) {
+  const kids = COMPANIES.filter(x => x.parent && x.parent.slug === c.slug);
+  if (!kids.length) return '';
+  return `
+    <div class="cp-section-label">Group companies (${kids.length})</div>
+    <div class="cp-subs">
+      ${kids.map(k => `
+        <a class="sub-card" href="#/company/${k.slug}">
+          <span class="sub-name">${k.name}</span>
+          <span class="sub-meta">${k.country || ''} · ${REL_LABEL[k.parent.relationship] || 'Part of'} this company</span>
+        </a>`).join('')}
+    </div>`;
+}
+
+function renderCompanyPage(slug) {
+  const c = COMPANIES.find(x => x.slug === slug);
+  const wrap = document.getElementById('company-view');
+  if (!c) {
+    wrap.innerHTML = `<a class="back-link" href="#/">← Back to directory</a><div class="empty-state"><div class="em-mark">Sheet Not Found</div><h3>No company at this URL</h3></div>`;
+    return;
+  }
+  document.title = c.name + ' — TankWorld India';
+
+  const locationsHtml = c.locations.map(l => `
+    <div class="location-card">
+      <div>
+        <span class="loc-type">${locTypeLabel(l.type)}</span>
+        <div class="loc-name">${l.name}</div>
+        <div class="loc-city">📍 ${l.address || l.city}</div>
+      </div>
+      ${l.placeId
+        ? `<a class="loc-map-link" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(c.name + ' ' + l.name)}&query_place_id=${l.placeId}" target="_blank" rel="noopener">View on Google Maps ↗</a>`
+        : `<span class="loc-map-pending">Place ID not yet added</span>`}
+    </div>`).join('');
+
+  const tilesHtml = c.cats.map(s => {
+    const l = categoryLabel(s);
+    if (!l) return '';
+    const l1 = CATEGORY_TREE.find(l1 => (l1.items || []).some(it =>
+      it.slug === s || (it.items || []).some(sub => sub.slug === s)));
+    return `
+      <div class="product-tile">
+        <div class="tile-code-row">
+          <span class="tile-code">${l.code}</span>
+        </div>
+        <div class="tile-name">${l.name}</div>
+        <div class="tile-sheet">${l1 ? l1.name : ''}</div>
+        <div class="tile-links">
+          <a class="xlink xlink-hub" href="${tankonomicsUrl(s)}" target="_blank" rel="noopener">Companies on Tankonomics ↗</a>
+        </div>
+      </div>`;
+  }).join('');
+
+  wrap.innerHTML = `
+    <a class="back-link" href="#/">← Back to directory</a>
+    <div class="cp-header">
+      <div class="cp-logo">${logoHtml(c)}</div>
+      <div class="cp-title-block">
+        <div class="cp-name">${c.name}</div>
+        <div class="cp-slug">/company/${c.slug}</div>
+        ${parentLineHtml(c)}
+      </div>
+    </div>
+    ${c.msme ? `<div class="cp-msme-row">${msmeBadgeHtml(c, false)}${udyamCtaHtml(c)}</div>` : ''}
+    ${((c.delivery || []).length || (c.sectors || []).length) ? `<div class="cp-delivery-row">${deliveryBadgesHtml(c, false)}${sectorBadgesHtml(c, false)}</div>` : ''}
+    <div class="cp-desc">${c.desc}</div>
+    <div class="cp-links-row">
+      ${c.site ? `<a class="cp-site" href="${c.site}" target="_blank" rel="noopener">Visit Website ↗</a>` : ''}
+      ${c.email ? `<a class="cp-contact-email" href="mailto:${c.email}">✉ ${c.email}</a>` : ''}
+      ${c.phone ? `<a class="cp-contact-phone" href="tel:${c.phone.replace(/\s+/g, '')}">☎ ${c.phone}</a>` : ''}
+    </div>
+    <div class="cp-section-label">Locations (${c.locations.length})</div>
+    <div class="cp-locations">${locationsHtml}</div>
+    <div class="cp-section-label">Products &amp; Services</div>
+    <div class="cp-tiles">${tilesHtml}</div>
+    ${subsidiariesHtml(c)}
+  `;
+}
+
+function handleRoute() {
+  const hash = location.hash || '#/';
+  const m = hash.match(/^#\/company\/([a-z0-9-]+)$/);
+  const mSubCat = hash.match(/^#\/section\/([a-z0-9-]+)\/([a-z0-9-]+)$/);
+  const mSection = hash.match(/^#\/section\/([a-z0-9-]+)$/);
+  const mRegion = hash.match(/^#\/region\/(india|international)$/);
+  const listPanel = document.getElementById('list-view');
+  const companyPanel = document.getElementById('company-view');
+  const profilePanel = document.getElementById('profile-view');
+  const adminPanel = document.getElementById('admin-view');
+  const sectionPanel = document.getElementById('section-view');
+  const sidebar = document.querySelector('.sidebar');
+
+  // Reset the two account panels on every route change; whichever branch
+  // below matches turns its own panel back on.
+  profilePanel.classList.remove('active');
+  adminPanel.classList.remove('active');
+
+  if (hash === '#/profile' || hash === '#/admin') {
+    const isAdminRoute = hash === '#/admin';
+    if (isAdminRoute) { renderAdminPage(); adminPanel.classList.add('active'); }
+    else { renderProfilePage(); profilePanel.classList.add('active'); }
+    document.title = (isAdminRoute ? 'Admin' : 'Profile') + ' — TankWorld India';
+    document.getElementById('landing-view').style.display = 'none';
+    listPanel.style.display = 'none';
+    companyPanel.classList.remove('active');
+    sectionPanel.style.display = 'none';
+    sidebar.style.display = 'none';
+    return;
+  }
+
+  if (m) {
+    renderCompanyPage(m[1]);
+    listPanel.style.display = 'none';
+    companyPanel.classList.add('active');
+    sectionPanel.style.display = 'none';
+    sidebar.style.display = 'none';
+    document.getElementById('landing-view').style.display = 'none';
+  } else if (mSubCat) {
+    // Sub-category results — the deliberate "second action." Scoped
+    // sidebar, two-level back bar, otherwise the exact same card-rendering
+    // pipeline as the general results view.
+    document.title = 'TankWorld India — Engineering & Equipment Directory';
+    companyPanel.classList.remove('active');
+    document.getElementById('landing-view').style.display = 'none';
+    sectionPanel.style.display = 'none';
+    sidebar.style.display = '';
+    listPanel.style.display = 'block';
+    renderSubCategoryResults(mSubCat[1], mSubCat[2]);
+  } else if (mSection) {
+    document.title = 'TankWorld India — Engineering & Equipment Directory';
+    companyPanel.classList.remove('active');
+    document.getElementById('landing-view').style.display = 'none';
+    sidebar.style.display = 'none';
+    listPanel.style.display = 'none';
+    document.getElementById('backBar').innerHTML = ''; // no stale back bar from a prior sub-category visit
+    sectionPanel.style.display = 'block';
+    renderSectionPage(mSection[1]);
+  } else if (mRegion) {
+    document.title = 'TankWorld India — Engineering & Equipment Directory';
+    companyPanel.classList.remove('active');
+    document.getElementById('landing-view').style.display = 'none';
+    sidebar.style.display = 'none';
+    listPanel.style.display = 'none';
+    document.getElementById('backBar').innerHTML = '';
+    sectionPanel.style.display = 'block';
+    renderRegionPage(mRegion[1]);
+  } else if (hash === '#/') {
+    // Bare "#/" with no query string at all is the landing page -- the flat
+    // "every company, unfiltered" grid was the thing this redesign removed.
+    // Any query string at all (even just "?q=" from an empty landing search)
+    // routes to the existing results view instead.
+    document.title = 'TankWorld India — Engineering & Equipment Directory';
+    companyPanel.classList.remove('active');
+    sectionPanel.style.display = 'none';
+    sidebar.style.display = 'none';
+    listPanel.style.display = 'none';
+    document.getElementById('landing-view').style.display = 'block';
+    renderLandingPage();
+  } else {
+    document.title = 'TankWorld India — Engineering & Equipment Directory';
+    companyPanel.classList.remove('active');
+    sectionPanel.style.display = 'none';
+    sidebar.style.display = '';
+    listPanel.style.display = 'block';
+    document.getElementById('landing-view').style.display = 'none';
+    document.getElementById('backBar').innerHTML = ''; // ditto -- clear any leftover sub-category back bar
+    // Search/general filtering has no single section context, so this is
+    // also where the sidebar gets explicitly restored to the full tree --
+    // otherwise a visit to a scoped sub-category page earlier in the
+    // session would leave it stuck narrow.
+    buildSidebar();
+
+    // Single source of truth for filter state: whatever's in the hash
+    // wins, whether we just navigated there or the user hit back/forward.
+    const parsed = parseFilterHash(hash);
+    activeCategory = parsed.cat;
+    activeRegion = parsed.region;
+    activeDelivery = parsed.delivery;
+    activeSector = parsed.sector;
+    // Search term arriving via the hash (from the landing page's search bar)
+    // -- filteredCompanies() reads this box's live DOM value, so setting it
+    // here is what actually makes a landing-page search show results.
+    document.getElementById('searchBox').value = parsed.q || '';
+
+    document.querySelectorAll('.sheet-item').forEach(el => {
+      el.classList.toggle('active', el.dataset.slug === activeCategory);
+    });
+    // Landing on a filtered state via back/forward can put the active
+    // category inside a sheet group that's currently collapsed — open it so
+    // the highlighted item is actually visible rather than hidden.
+    if (activeCategory) {
+      const activeEl = document.querySelector('.sheet-item[data-slug="' + activeCategory + '"]');
+      const group = activeEl && activeEl.closest('.sheet-group');
+      if (group) group.classList.add('open');
+    }
+
+    renderRegionFilter();
+    renderDeliveryFilter();
+    renderSectorFilter();
+    renderAll();
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// AUTH · PROFILE · ADMIN
+// ══════════════════════════════════════════════════════════════════════
+let currentUser = null;
+
+function openAuthModal() {
+  document.getElementById('authError').textContent = '';
+  document.getElementById('authModal').classList.add('open');
+}
+function closeAuthModal() {
+  document.getElementById('authModal').classList.remove('open');
+}
+
+function signInWithGoogle() {
+  if (!firebaseReady) {
+    document.getElementById('authError').textContent = 'Sign-in unavailable — Firebase failed to load.';
+    return;
+  }
+  const p = new firebase.auth.GoogleAuthProvider();
+  // Popup first (better desktop UX); fall back to full-page redirect when it's
+  // blocked — popup blockers, COOP policies and mobile browsers all trip this.
+  fbAuth.signInWithPopup(p).catch(err => {
+    const code = err.code || '';
+    if (['auth/popup-blocked','auth/popup-closed-by-user','auth/cancelled-popup-request',
+         'auth/operation-not-supported-in-this-environment','auth/web-storage-unsupported'].includes(code)) {
+      fbAuth.signInWithRedirect(p);
+    } else if (code === 'auth/unauthorized-domain') {
+      document.getElementById('authError').textContent =
+        'This domain is not authorised in Firebase Auth. Add it under Authentication → Settings → Authorized domains.';
+    } else {
+      document.getElementById('authError').textContent = err.message;
+      console.error(err);
+    }
+  });
+}
+
+function signOutUser() {
+  if (fbAuth) fbAuth.signOut();
+  location.hash = '#/';
+}
+
+function initials(nameOrEmail) {
+  const s = (nameOrEmail || '?').trim();
+  const parts = s.split(/[\s@.]+/).filter(Boolean);
+  return ((parts[0] || '?')[0] + (parts[1] ? parts[1][0] : '')).toUpperCase();
+}
+
+function avatarHtml(u, cls) {
+  return u.photoURL
+    ? `<img src="${u.photoURL}" alt="" referrerpolicy="no-referrer">`
+    : `<div class="avatar-fallback ${cls || ''}">${initials(u.displayName || u.email)}</div>`;
+}
+
+// ── Access gate rendering ────────────────────────────────────────────
+// Renders one of three full-page states into #accessGateView and toggles
+// it against .app-body. Only called while REQUIRE_APPROVAL_TO_VIEW is on;
+// see checkAccessAndRender() for where that decision is made.
+function renderAccessGate(state) {
+  const gateEl = document.getElementById('accessGateView');
+  const appBody = document.querySelector('.app-body');
+  if (!gateEl) return;
+
+  if (state === 'signin') {
+    gateEl.innerHTML = `
+      <div class="full-gate">
+        <div class="fg-card">
+          <div class="g-mark">ACCESS · GATE-01</div>
+          <h2>Sign in to continue</h2>
+          <p>TankWorld India is in a private build phase ahead of launch.
+             Sign in with Google — new accounts are reviewed by an admin
+             before the directory becomes visible.</p>
+          <button class="btn-google" onclick="signInWithGoogle()" style="margin:0 auto;">
+            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.65l-3.57-2.77c-.99.66-2.26 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.84 14.11a6.6 6.6 0 0 1 0-4.22V7.05H2.18a11 11 0 0 0 0 9.9l3.66-2.84z"/><path fill="#EA4335" d="M12 4.75c1.61 0 3.06.55 4.2 1.64l3.15-3.15C17.45 1.46 14.97.5 12 .5A11 11 0 0 0 2.18 7.05l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+            Continue with Google
+          </button>
+          <div id="authError" class="auth-error"></div>
+        </div>
+      </div>`;
+  } else if (state === 'pending') {
+    gateEl.innerHTML = `
+      <div class="full-gate">
+        <div class="fg-card">
+          <div class="g-mark">ACCESS · GATE-02</div>
+          <h2>Awaiting approval</h2>
+          <p>You're signed in, but this account hasn't been approved yet.
+             An admin needs to review it before you can see the directory.</p>
+          <div class="fg-email">${currentUser ? currentUser.email : ''}</div>
+          <p style="margin-bottom:14px;">Already been approved? Check again below.</p>
+          <button class="btn-action" onclick="checkAccessAndRender()">Check again</button>
+          <button class="btn-action ghost" onclick="fbAuth.signOut()">Sign out</button>
+        </div>
+      </div>`;
+  } else if (state === 'rejected') {
+    gateEl.innerHTML = `
+      <div class="full-gate">
+        <div class="fg-card">
+          <div class="g-mark">ACCESS · GATE-03</div>
+          <h2>Access denied</h2>
+          <p>This account's access request was not approved. If you think
+             that's a mistake, contact the team directly.</p>
+          <div class="fg-email">${currentUser ? currentUser.email : ''}</div>
+          <button class="btn-action ghost" onclick="fbAuth.signOut()">Sign out</button>
+        </div>
+      </div>`;
+  }
+
+  const showGate = state !== null;
+  gateEl.style.display = showGate ? '' : 'none';
+  if (appBody) appBody.style.display = showGate ? 'none' : '';
+}
+
+// Single entry point that decides whether to show the gate or the real
+// app, re-runnable from the "Check again" button on the pending screen
+// without a full page reload. Safe to call repeatedly — it's just a
+// status check plus a render, no side effects beyond the first-visit
+// user-doc creation already guarded inside checkUserApproval().
+async function checkAccessAndRender() {
+  if (!REQUIRE_APPROVAL_TO_VIEW) {
+    renderAccessGate(null);
+    return;
+  }
+  if (!currentUser) {
+    renderAccessGate('signin');
+    return;
+  }
+  currentUserStatus = await checkUserApproval(currentUser);
+  if (currentUserStatus === 'approved') {
+    renderAccessGate(null);
+    // Fast path: if a cached roster exists, render with it immediately —
+    // then refresh from Firestore in the background and silently re-render
+    // once that completes. This is what actually fixes the dashboard's
+    // slow first paint: the ~34 sequential round-trips a full live load
+    // needs at current company count no longer block anything the visitor
+    // can see. A cache miss (first-ever visit, or a cleared cache) falls
+    // straight through to the original behavior below, unchanged.
+    const hadCache = await CompanyStore.loadFromCache();
+    if (hadCache) {
+      buildSidebar();
+      renderRegionFilter();
+      renderDeliveryFilter();
+      renderSectorFilter();
+      document.getElementById('statCompanies').textContent = COMPANIES.length;
+      document.getElementById('statCategories').textContent = allL2Count();
+      document.getElementById('statSheets').textContent = CATEGORY_TREE.length;
+      renderAll();
+      handleRoute();
+      // Background refresh — not awaited, and errors here are already
+      // handled inside CompanyStore.load() itself (falls back to whatever
+      // COMPANIES already holds), so nothing further to catch here.
+      CompanyStore.load().then(() => {
+        buildSidebar();
+        renderRegionFilter();
+        renderDeliveryFilter();
+        renderSectorFilter();
+        document.getElementById('statCompanies').textContent = COMPANIES.length;
+        document.getElementById('statCategories').textContent = allL2Count();
+        renderAll();
+      });
+      return;
+    }
+    // The directory data + sidebar are only loaded once we know the
+    // visitor is allowed to see them.
+    await CompanyStore.load();
+    buildSidebar();
+    renderRegionFilter();
+    renderDeliveryFilter();
+    renderSectorFilter();
+    document.getElementById('statCompanies').textContent = COMPANIES.length;
+    document.getElementById('statCategories').textContent = allL2Count();
+    document.getElementById('statSheets').textContent = CATEGORY_TREE.length;
+    renderAll();
+    handleRoute();
+  } else if (currentUserStatus === 'rejected') {
+    renderAccessGate('rejected');
+  } else {
+    renderAccessGate('pending');
+  }
+}
+
+function renderAuthArea() {
+  const el = document.getElementById('authArea');
+  if (!el) return;
+  if (!currentUser) {
+    el.innerHTML = `<button class="btn-auth" onclick="openAuthModal()">Sign in</button>`;
+    return;
+  }
+  el.innerHTML = `
+    <div class="user-chip" onclick="location.hash='#/profile'" title="Your profile">
+      ${avatarHtml(currentUser)}
+      <span class="u-name">${currentUser.displayName || currentUser.email}</span>
+      ${isAdminUser(currentUser) ? '<span class="badge-admin">ADMIN</span>' : ''}
+    </div>`;
+}
+
+function renderProfilePage() {
+  const el = document.getElementById('profile-view');
+  if (!currentUser) {
+    el.innerHTML = `
+      <div class="gate">
+        <div class="g-mark">NOT SIGNED IN</div>
+        <h3>Sign in to view your profile</h3>
+        <p>Browsing the directory doesn't need an account — managing a listing does.</p>
+        <button class="btn-action" onclick="openAuthModal()">Sign in</button>
+      </div>`;
+    return;
+  }
+  const admin = isAdminUser(currentUser);
+  el.innerHTML = `
+    <div class="panel-head">
+      <div class="p-code">PROFILE · USR-01</div>
+      <h2>Your account</h2>
+    </div>
+    <div class="profile-card">
+      ${avatarHtml(currentUser)}
+      <div>
+        <h3>${currentUser.displayName || 'Unnamed user'}</h3>
+        <div class="p-mail">${currentUser.email}</div>
+        ${admin ? '<span class="badge-admin" style="margin-top:6px;display:inline-block;">ADMINISTRATOR</span>' : ''}
+      </div>
+    </div>
+    ${admin ? `<div class="admin-note"><b>Administrator access.</b> You can seed and manage
+      the company roster from the admin panel.</div>` : `<div class="admin-note">Company
+      claiming isn't built yet — once it is, you'll be able to request control of your
+      company's listing from its page.</div>`}
+    <div class="admin-actions">
+      ${admin ? `<button class="btn-action" onclick="location.hash='#/admin'">Open admin panel</button>` : ''}
+      <button class="btn-action ghost" onclick="location.hash='#/'">Back to directory</button>
+      <button class="btn-action rust" onclick="signOutUser()">Sign out</button>
+    </div>`;
+}
+
+function adminLog(msg) {
+  const el = document.getElementById('adminLog');
+  if (el) { el.textContent += msg + '\n'; el.scrollTop = el.scrollHeight; }
+}
+
+// Writes the in-page COMPANIES roster into Firestore, doc id = slug.
+// Idempotent: setMerge only touches the listed fields, so re-running updates
+// records in place rather than duplicating them. Slug-as-doc-id is what keeps
+// this safe to re-run and what ties a company to the same identity across apps.
+async function seedCompanies() {
+  if (!isAdminUser(currentUser)) { alert('Admin only.'); return; }
+  if (!confirm(`Write ${SEED_COMPANIES.length} companies to Firestore?\n\n` +
+               `Document id = slug. Safe to re-run: existing records are updated ` +
+               `in place, not duplicated. Records already in Firestore but not in ` +
+               `the built-in roster are left untouched.`)) return;
+  const btn = document.getElementById('btnSeed');
+  btn.disabled = true;
+  const log = document.getElementById('adminLog');
+  log.textContent = '';
+  let ok = 0; const failures = [];
+  // try/finally so the button is always re-enabled and the panel always
+  // refreshes, even if something throws outside the per-company catch.
+  try {
+    for (let i = 0; i < SEED_COMPANIES.length; i++) {
+      const c = SEED_COMPANIES[i];
+      // Guard against an empty slug up front -- Firestore's own error for this
+      // ("Document name ... lacks '/'") is a cryptic REST error, not obviously
+      // a data problem. Caught live: two Thai-named companies (non-ASCII names
+      // with no Latin fallback in the slug generator) shipped with slug:"" and
+      // silently failed every seed attempt until traced back here.
+      if (!c.slug) {
+        failures.push({ slug: '(empty)', msg: `${c.name || '(no name)'} has no slug — fix the record, don't re-seed` });
+        adminLog(`✗ ${i + 1}/${SEED_COMPANIES.length} ${c.name || '(no name)'} — empty slug, skipped`);
+        continue;
+      }
+      try {
+        await FS_REST.setMerge('companies', c.slug, {
+          id: c.id, slug: c.slug, name: c.name, desc: c.desc || '',
+          site: c.site || '', country: c.country || '',
+          // logo and address-bearing locations are set INDEPENDENTLY via the
+          // admin editor / batch uploader, and Firestore is their source of
+          // truth — not the in-page array. Omitting logo entirely when the
+          // array has none means the update mask never touches that field,
+          // so a real uploaded logo survives every re-seed instead of being
+          // silently overwritten back to null.
+          ...(c.logo ? { logo: c.logo } : {}),
+          cats: c.cats || [], locations: c.locations || [],
+          parent: (c.parent && c.parent.name) ? c.parent : null,
+          // msme has no independent Firestore-only source yet (no admin
+          // editor for it exists) — unlike logo, there's nothing to
+          // accidentally clobber, so it's always written straight from the
+          // in-page array, same as cats/locations/desc. BUG FIX: this field
+          // was missing entirely from the original seed payload, so every
+          // company seeded before this fix has no msme data in Firestore
+          // regardless of what the in-page array says — re-run Seed
+          // Companies after deploying this fix to backfill all 538 records.
+          msme: c.msme || null,
+          // Same reasoning as msme above: no admin editor writes delivery
+          // independently yet, so there is nothing in Firestore to clobber
+          // and it is safe to write straight from the in-page array.
+          // Including it HERE at the same time the field was introduced is
+          // deliberate — msme shipped without this line and the field
+          // silently never reached Firestore, so every company rendered
+          // without its badge until the seed payload was fixed and re-run.
+          delivery: c.delivery || [],
+          sectors: c.sectors || [],
+          // BUG FIX: email and phone were missing entirely from the seed
+          // payload, same class of bug as msme and delivery above — a field
+          // gets added to the in-page company data but this hardcoded write
+          // list isn't updated to match, so it silently never reaches
+          // Firestore no matter what the in-page array says. Every company
+          // seeded before this fix has no email/phone in Firestore even
+          // though the data is right there in SEED_COMPANIES — re-run Seed
+          // Companies after deploying this fix to backfill all records.
+          email: c.email || '', phone: c.phone || '',
+          // certifications/capacity, unlike msme and delivery above, DO have
+          // an independent Firestore-only source now — the per-company
+          // editor added alongside this field. SEED_COMPANIES has no real
+          // data for either yet, so writing them unconditionally here would
+          // silently wipe out anything an admin enters through the editor
+          // on every future re-seed — the exact bug logo was fixed for.
+          // Same conditional-spread pattern as logo: omit entirely when the
+          // in-page array has nothing, so the update mask never touches the
+          // field and a real edited value survives a re-seed.
+          ...(c.certifications && c.certifications.length ? { certifications: c.certifications } : {}),
+          ...(c.capacity && (c.capacity.employeeCountRange || c.capacity.foundedYear || c.capacity.capacityNote)
+              ? { capacity: c.capacity } : {}),
+          // spotlight ("champion" | "featured" | null) is curated in the
+          // editor and has no value in SEED_COMPANIES, so — same conditional
+          // pattern as certifications/capacity — only write it when the
+          // in-page array actually carries one, or a re-seed would wipe an
+          // admin's manual featuring on every run.
+          ...(c.spotlight ? { spotlight: c.spotlight } : {}),
+          updatedAt: new Date(),
+        });
+        ok++;
+        adminLog(`✓ ${i + 1}/${SEED_COMPANIES.length} ${c.slug}`);
+      } catch (err) {
+        // Record and CONTINUE. An earlier version stopped after 3 failures,
+        // which silently truncated the run and hid which records were missing.
+        failures.push({ slug: c.slug, msg: err.message });
+        adminLog(`✗ ${i + 1}/${SEED_COMPANIES.length} ${c.slug} — ${err.message}`);
+      }
+    }
+  } finally {
+    adminLog(`\nDone — ${ok} written, ${failures.length} failed.`);
+    if (failures.length) {
+      adminLog(`\nFailed records:`);
+      failures.forEach(f => adminLog(`   ${f.slug}: ${f.msg}`));
+    }
+    btn.disabled = false;
+    await CompanyStore.load();
+    renderAll();
+    renderAdminPage();   // refresh the counts so "Data source" isn't stale
+  }
+}
+
+// ── Orphaned records ─────────────────────────────────────────────────
+// seedCompanies() only upserts — by design (see its confirm() text) it never
+// deletes a Firestore document whose slug fell out of SEED_COMPANIES, so a
+// company removed from the build (e.g. an operator pulled for crossing the
+// TWI/TankBazaar boundary) stays live in Firestore indefinitely unless
+// pruned on purpose. This is a separate, explicit, review-before-delete
+// flow rather than folding a silent delete into the Seed button itself —
+// same reasoning as the rest of this admin panel: never trust a bulk
+// operation's own success report, always show what will change first.
+let _lastOrphanScan = null; // slugs found by the most recent scan, so Delete can't run stale
+
+async function findOrphanedCompanies() {
+  const wrap = document.getElementById('orphanWrap');
+  wrap.innerHTML = `<div class="admin-log">Scanning Firestore…</div>`;
+  try {
+    const liveDocs = await FS_REST.listAuth('companies');
+    const buildSlugs = new Set(SEED_COMPANIES.map(c => c.slug));
+    const orphans = liveDocs.filter(d => d.slug && !buildSlugs.has(d.slug));
+    _lastOrphanScan = orphans.map(o => o.slug);
+    if (!orphans.length) {
+      wrap.innerHTML = `<div class="admin-note">No orphaned records — every company live in Firestore is also in this build.</div>`;
+      return;
+    }
+    wrap.innerHTML = `
+      <div class="admin-note" style="border-color:var(--rust);">
+        <b>${orphans.length} record${orphans.length === 1 ? '' : 's'} live in Firestore but not in this build:</b>
+        <ul style="margin:10px 0 0 20px;">
+          ${orphans.map(o => `<li>${o.name || '(no name)'} — <code>${o.slug}</code></li>`).join('')}
+        </ul>
+      </div>
+      <button class="btn-action" style="background:var(--rust);" onclick="deleteOrphanedCompanies()">
+        Delete these ${orphans.length} record${orphans.length === 1 ? '' : 's'} from Firestore
+      </button>`;
+  } catch (err) {
+    wrap.innerHTML = `<div class="admin-note" style="border-color:var(--rust);">Scan failed: ${err.message}</div>`;
+  }
+}
+
+// ── Missing records (the mirror of orphaned records) ────────────────────
+// Answers "which N companies from this build never actually made it into
+// Firestore" without re-running the full seed -- one read of the live
+// collection, diffed against SEED_COMPANIES locally. seedCompanies()'s own
+// per-record error log already reports failures live during a seed run,
+// but that's only useful if you're watching the log at the time; this is
+// the after-the-fact equivalent, safe to run any time.
+let _lastMissingScan = null; // slugs found missing by the most recent scan
+
+async function findMissingCompanies() {
+  const wrap = document.getElementById('missingWrap');
+  wrap.innerHTML = `<div class="admin-log">Scanning Firestore…</div>`;
+  try {
+    const liveDocs = await FS_REST.listAuth('companies');
+    const liveSlugs = new Set(liveDocs.map(d => d.slug).filter(Boolean));
+    const missing = SEED_COMPANIES.filter(c => !liveSlugs.has(c.slug));
+    _lastMissingScan = missing.map(c => c.slug);
+    if (!missing.length) {
+      wrap.innerHTML = `<div class="admin-note">No missing records — every company in this build is also live in Firestore.</div>`;
+      return;
+    }
+    wrap.innerHTML = `
+      <div class="admin-note" style="border-color:var(--rust);">
+        <b>${missing.length} compan${missing.length === 1 ? 'y is' : 'ies are'} in this build but never made it into Firestore:</b>
+        <ul style="margin:10px 0 0 20px;">
+          ${missing.map(c => `<li>${c.name || '(no name)'} — <code>${c.slug}</code></li>`).join('')}
+        </ul>
+      </div>
+      <button class="btn-action" onclick="seedMissingCompanies()">
+        Seed just these ${missing.length} record${missing.length === 1 ? '' : 's'}
+      </button>`;
+  } catch (err) {
+    wrap.innerHTML = `<div class="admin-note" style="border-color:var(--rust);">Scan failed: ${err.message}</div>`;
+  }
+}
+
+async function seedMissingCompanies() {
+  if (!_lastMissingScan || !_lastMissingScan.length) return;
+  const slugs = new Set(_lastMissingScan);
+  const targets = SEED_COMPANIES.filter(c => slugs.has(c.slug));
+  const wrap = document.getElementById('missingWrap');
+  let ok = 0; const failures = [];
+  for (const c of targets) {
+    if (!c.slug) {
+      failures.push({ slug: '(empty)', msg: `${c.name || '(no name)'} has no slug — fix the record, don't re-seed` });
+      continue;
+    }
+    try {
+      await FS_REST.setMerge('companies', c.slug, {
+        id: c.id, slug: c.slug, name: c.name,
+        desc: c.desc || '', site: c.site || '',
+        country: c.country || '', ...(c.logo ? { logo: c.logo } : {}),
+        cats: c.cats || [], locations: c.locations || [],
+        parent: (c.parent && c.parent.name) ? c.parent : null,
+        msme: c.msme || null,
+        delivery: c.delivery || [],
+        sectors: c.sectors || [],
+        email: c.email || '', phone: c.phone || '',
+        ...(c.certifications && c.certifications.length ? { certifications: c.certifications } : {}),
+        ...(c.capacity && (c.capacity.employeeCountRange || c.capacity.foundedYear || c.capacity.capacityNote)
+            ? { capacity: c.capacity } : {}),
+        ...(c.spotlight ? { spotlight: c.spotlight } : {}),
+        updatedAt: new Date(),
+      });
+      ok++;
+    } catch (err) { failures.push({ slug: c.slug, msg: err.message }); }
+  }
+  _lastMissingScan = null;
+  const summary = `Seeded ${ok} record${ok === 1 ? '' : 's'}.` +
+    (failures.length ? ` ${failures.length} failed: ` + failures.map(f => `${f.slug} (${f.msg})`).join(', ') : '');
+  wrap.innerHTML = `<div class="admin-note">${summary}</div>`;
+  alert(summary); // guaranteed-visible, same reasoning as deleteOrphanedCompanies -- the
+                   // renderAdminPage() refresh below would otherwise wipe this message unread
+  await CompanyStore.load();
+  renderAll();
+  renderAdminPage();
+}
+
+async function deleteOrphanedCompanies() {
+  if (!_lastOrphanScan || !_lastOrphanScan.length) return;
+  const slugs = _lastOrphanScan;
+  if (!confirm(`Permanently delete ${slugs.length} record${slugs.length === 1 ? '' : 's'} from Firestore?\n\n` +
+               `This only removes documents already listed above from the most recent scan — ` +
+               `re-run "Find orphaned records" first if the build or Firestore may have changed ` +
+               `since. This cannot be undone.`)) return;
+  const wrap = document.getElementById('orphanWrap');
+  let ok = 0; const failures = [];
+  for (const slug of slugs) {
+    try { await FS_REST.deleteDoc('companies', slug); ok++; }
+    catch (err) { failures.push({ slug, msg: err.message }); }
+  }
+  _lastOrphanScan = null;
+  const summary = `Deleted ${ok} record${ok === 1 ? '' : 's'}.` +
+    (failures.length ? ` ${failures.length} failed: ` + failures.map(f => `${f.slug} (${f.msg})`).join(', ') : '');
+  wrap.innerHTML = `<div class="admin-note">${summary}</div>`;
+  // alert() blocks until dismissed, guaranteeing the result is actually seen —
+  // renderAdminPage() below rebuilds the whole panel (including a fresh, empty
+  // orphanWrap), which would otherwise silently wipe the message above before
+  // anyone reads it. Same risk exists in seedCompanies()'s adminLog output,
+  // not something introduced here — worth fixing there too at some point.
+  alert(summary);
+  await CompanyStore.load();
+  renderAll();
+  renderAdminPage();
+}
+
+function renderAdminPage() {
+  const el = document.getElementById('admin-view');
+  if (!currentUser) {
+    el.innerHTML = `
+      <div class="gate">
+        <div class="g-mark">RESTRICTED · ADM-00</div>
+        <h3>Admin panel</h3>
+        <p>Sign in with an administrator account to continue.</p>
+        <button class="btn-action" onclick="openAuthModal()">Sign in</button>
+      </div>`;
+    return;
+  }
+  if (!isAdminUser(currentUser)) {
+    el.innerHTML = `
+      <div class="gate">
+        <div class="g-mark">RESTRICTED · ADM-00</div>
+        <h3>Not an administrator</h3>
+        <p>${currentUser.email} doesn't have admin access.</p>
+        <button class="btn-action ghost" onclick="location.hash='#/'">Back to directory</button>
+      </div>`;
+    return;
+  }
+  el.innerHTML = `
+    <div class="panel-head">
+      <div class="p-code">ADMIN · ADM-01</div>
+      <h2>Admin panel</h2>
+      <p>Roster management for the TankWorld India directory.</p>
+    </div>
+    <div class="admin-note">
+      <b>Data source:</b> ${CompanyStore.isLive
+        ? `Firestore — ${COMPANIES.length} companies loaded live.`
+        : `built-in seed roster (${COMPANIES.length} companies). Firestore is empty
+           or unreachable, so the directory is running on the in-page array.`}
+      <br><b>Built-in roster:</b> ${SEED_COMPANIES.length} companies in this build.
+      ${CompanyStore.isLive && SEED_COMPANIES.length > COMPANIES.length
+        ? `<br><span style="color:var(--rust);"><b>${SEED_COMPANIES.length - COMPANIES.length}
+           compan${SEED_COMPANIES.length - COMPANIES.length === 1 ? 'y is' : 'ies are'} in this
+           build but not yet in Firestore.</b> Run the seed below to write them.</span>`
+        : ``}
+      ${CompanyStore.isLive && COMPANIES.length > SEED_COMPANIES.length
+        ? `<br><span style="color:var(--rust);"><b>${COMPANIES.length - SEED_COMPANIES.length}
+           more compan${COMPANIES.length - SEED_COMPANIES.length === 1 ? 'y is' : 'ies are'} live
+           in Firestore than in this build.</b> Seeding never deletes — a company removed from
+           the build stays in Firestore until pruned on purpose. Use "Find orphaned records"
+           below to review and remove them.</span>`
+        : ``}
+    </div>
+    <div class="admin-actions">
+      <button class="btn-action" id="btnSeed" onclick="seedCompanies()">
+        Seed ${SEED_COMPANIES.length} companies → Firestore
+      </button>
+      <button class="btn-action ghost" onclick="reloadFromFirestore()">Reload from Firestore</button>
+      <button class="btn-action ghost" onclick="findOrphanedCompanies()" title="Lists companies live in Firestore but no longer in this build — nothing is deleted until you review the list and confirm">Find orphaned records</button>
+      <button class="btn-action ghost" onclick="findMissingCompanies()" title="Lists companies in this build that never made it into Firestore — e.g. after a seed run reports some failures — without re-running the full seed">Find missing records</button>
+      <button class="btn-action ghost" onclick="openBatchLogoModal()">Batch upload logos</button>
+      <button class="btn-action ghost" onclick="relinkLogosFromStorage()" title="Repairs logos wiped by a re-seed — no re-upload needed">Relink logos from Storage</button>
+      <button class="btn-action ghost" onclick="location.hash='#/'">Back to directory</button>
+    </div>
+    <div class="admin-log" id="adminLog"></div>
+    <div id="orphanWrap"></div>
+    <div id="missingWrap"></div>
+    <div class="admin-note">
+      Writes go through the Firestore REST API with your ID token. If a write is
+      rejected, check that your email is in the <code>isAdmin()</code> list in
+      <code>firestore.rules</code> — the rules are what actually enforce this,
+      not this page.
+    </div>
+
+    <div class="panel-head" style="margin-top:26px;">
+      <div class="p-code">ACCESS · ADM-00b</div>
+      <h2 style="font-size:20px;">Pending sign-ups</h2>
+      <p>${REQUIRE_APPROVAL_TO_VIEW
+          ? 'The directory is currently gated — new sign-ins land here until approved or rejected.'
+          : 'The gate is currently off (REQUIRE_APPROVAL_TO_VIEW = false) — this list still tracks requests, but everyone can already see the directory regardless of status.'}</p>
+    </div>
+    <div id="pendingSignupsWrap"><div class="admin-log">Loading…</div></div>
+
+    <div class="panel-head" style="margin-top:26px;">
+      <div class="p-code">ROSTER · ADM-02</div>
+      <h2 style="font-size:20px;">Companies</h2>
+      <p>Edit details, upload logos, and add Google Place IDs per location.</p>
+    </div>
+    <input type="text" class="search-box" id="adminSearch" placeholder="Filter by name or slug…"
+           oninput="renderAdminList()" style="margin-bottom:12px;">
+    <div class="bulk-select-row">
+      <button class="btn-mini" onclick="bulkSelectVisible(true)">Select all shown</button>
+      <button class="btn-mini" onclick="bulkSelectVisible(false)">Deselect all shown</button>
+      <span class="ed-hint">Tick companies to tag several at once.</span>
+    </div>
+    <div class="bulk-bar" id="bulkBar"></div>
+    <div class="admin-table-wrap">
+      <table class="admin-table">
+        <tbody id="adminList">${adminCompanyRows()}</tbody>
+      </table>
+    </div>`;
+  loadPendingSignups();
+}
+
+// ── Pending sign-ups ─────────────────────────────────────────────────
+// Lists everyone in the `users` collection with status 'pending', with
+// Approve/Reject actions. Only reachable from within renderAdminPage(),
+// which has already gated on isAdminUser() above — but the real
+// enforcement is the Firestore rule requiring isAdmin() to list or write
+// the `users` collection at all (see firestore.rules); this function
+// would simply fail to fetch anything for a non-admin caller regardless.
+async function loadPendingSignups() {
+  const wrap = document.getElementById('pendingSignupsWrap');
+  if (!wrap) return;
+  try {
+    const users = await FS_REST.listAuth('users');
+    const pending = users.filter(u => (u.status || 'pending') === 'pending');
+    if (!pending.length) {
+      wrap.innerHTML = `<div class="admin-note">No pending sign-ups right now.</div>`;
+      return;
+    }
+    wrap.innerHTML = `
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <tbody>
+            ${pending.map(u => `
+              <tr>
+                <td>
+                  <div style="font-weight:600;">${escapeHtmlAdmin(u.displayName || '(no name)')}</div>
+                  <div class="ed-hint" style="margin:0;">${escapeHtmlAdmin(u.email || '')}</div>
+                </td>
+                <td class="ed-hint">${u.requestedAt ? new Date(u.requestedAt).toLocaleString() : ''}</td>
+                <td style="text-align:right; white-space:nowrap;">
+                  <button class="btn-mini" onclick="approveSignup('${u.id}')">Approve</button>
+                  <button class="btn-mini rust" onclick="rejectSignup('${u.id}')">Reject</button>
+                </td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>`;
+  } catch (err) {
+    wrap.innerHTML = `<div class="admin-note" style="color:var(--rust);">
+      Couldn't load pending sign-ups: ${err.message}</div>`;
+  }
+}
+
+function escapeHtmlAdmin(s) {
+  const d = document.createElement('div');
+  d.textContent = s || '';
+  return d.innerHTML;
+}
+
+async function approveSignup(uid) {
+  try {
+    await FS_REST.setMerge('users', uid, {
+      status: 'approved', respondedAt: new Date(), respondedBy: currentUser.email,
+    });
+    loadPendingSignups();
+  } catch (err) {
+    alert('Could not approve: ' + err.message);
+  }
+}
+
+async function rejectSignup(uid) {
+  if (!confirm('Reject this sign-up? They will not be able to view the directory.')) return;
+  try {
+    await FS_REST.setMerge('users', uid, {
+      status: 'rejected', respondedAt: new Date(), respondedBy: currentUser.email,
+    });
+    loadPendingSignups();
+  } catch (err) {
+    alert('Could not reject: ' + err.message);
+  }
+}
+
+// ── Batch logo upload ────────────────────────────────────────────────
+// Filename -> slug, mirroring the Python slug() rule used everywhere else in
+// this project (lowercase, & -> and, strip accents/punctuation, collapse to
+// hyphens) so a file named after a company's slug or its full name both have
+// a real chance of auto-matching.
+function filenameSlug(filename) {
+  let s = filename.replace(/\.[a-zA-Z0-9]+$/, '');
+  s = s.replace(/&/g, 'and').replace(/\+/g, '-');
+  s = s.normalize('NFKD').replace(/[\u0300-\u036f]/g, '');
+  s = s.toLowerCase();
+  s = s.replace(/[().,\/']/g, '');
+  s = s.replace(/[^a-z0-9]+/g, '-');
+  s = s.replace(/^-+|-+$/g, '').replace(/-+/g, '-');
+  return s;
+}
+
+let batchLogoRows = []; // [{ file, objectUrl, matchedSlug, status }]
+
+function openBatchLogoModal() {
+  batchLogoRows = [];
+  document.getElementById('batchLogoBody').innerHTML =
+    `<p class="ed-hint">Choose several logo files at once. Each is matched to a company by
+     filename — name files after the company's slug or its full name for the best match rate
+     (e.g. <code>larsen-and-toubro-limited.png</code> or <code>Larsen and Toubro Limited.png</code>).
+     Anything that doesn't auto-match gets a dropdown to assign by hand — nothing uploads to
+     the wrong company silently.</p>
+     <input type="file" id="batchLogoFiles" accept="image/*" multiple onchange="handleBatchLogoFiles()">`;
+  document.getElementById('batchLogoModal').classList.add('open');
+  // Same fix as the company editor: the modal persists in the DOM between
+  // opens, so without this its scroll position carries over from the last
+  // time it was open — which, after reviewing a long file list, could mean
+  // it reopens scrolled past the file picker entirely and looks empty.
+  document.getElementById('batchLogoBody').scrollTop = 0;
+}
+function closeBatchLogoModal() {
+  document.getElementById('batchLogoModal').classList.remove('open');
+  batchLogoRows.forEach(r => r.objectUrl && URL.revokeObjectURL(r.objectUrl));
+  batchLogoRows = [];
+}
+
+function matchCompanyForFile(filename) {
+  const fSlug = filenameSlug(filename);
+  let hit = COMPANIES.find(c => c.slug === fSlug);
+  if (hit) return hit.slug;
+  hit = COMPANIES.find(c => filenameSlug(c.name) === fSlug);
+  return hit ? hit.slug : '';
+}
+
+function handleBatchLogoFiles() {
+  const input = document.getElementById('batchLogoFiles');
+  const files = Array.from(input.files || []);
+  batchLogoRows = files.map(file => {
+    const matchedSlug = matchCompanyForFile(file.name);
+    const matchedCompany = matchedSlug ? COMPANIES.find(c => c.slug === matchedSlug) : null;
+    return {
+      file,
+      objectUrl: URL.createObjectURL(file),
+      matchedSlug,
+      alreadyHasLogo: !!(matchedCompany && matchedCompany.logo),
+      status: 'pending', // pending | done | failed | skipped
+    };
+  });
+  renderBatchLogoRows();
+}
+
+// The per-row assignment dropdown lists every company — with 2,000+
+// companies, rebuilding that <option> list (sorted, mapped, joined) for
+// EVERY row on EVERY render was the real cost here, not the upload network
+// calls. Built once and reused as a DOM template cloned per row instead of
+// re-stringified per row; invalidated only when COMPANIES itself changes.
+let _companyOptionsHtmlCache = null;
+let _companyOptionsHtmlCacheLen = -1;
+function sharedCompanyOptionsHtml() {
+  if (_companyOptionsHtmlCache && _companyOptionsHtmlCacheLen === COMPANIES.length) {
+    return _companyOptionsHtmlCache;
+  }
+  _companyOptionsHtmlCache = COMPANIES.slice().sort((a, b) => a.name.localeCompare(b.name))
+    .map(c => `<option value="${c.slug}">${c.name}</option>`).join('');
+  _companyOptionsHtmlCacheLen = COMPANIES.length;
+  return _companyOptionsHtmlCache;
+}
+
+function renderBatchLogoRows() {
+  const matched = batchLogoRows.filter(r => r.matchedSlug && r.status === 'pending').length;
+  const unmatched = batchLogoRows.filter(r => !r.matchedSlug && r.status === 'pending').length;
+  const optionsHtml = sharedCompanyOptionsHtml();
+
+  // NOTE: no per-row string mutation of optionsHtml (previously a
+  // .replace() call per row — on a ~2,000-option string that's real cost
+  // multiplied by row count). The "selected" value is set as a DOM property
+  // after insertion instead, which is O(1) per row regardless of dropdown size.
+  //
+  // SCALE FIX: the above optimization was reasoned about at "up to 246 rows"
+  // and still eagerly embedded a ~2,000-option <select> for every pending
+  // row, matched or not. At real batch sizes (thousands of slug-named files,
+  // nearly all auto-matched) that's millions of <option> tags in one
+  // innerHTML write — the tab hangs well before any upload logic runs.
+  // Confirmed live: froze past ~70 files. Fix: a correctly-matched row has
+  // nothing to decide, so it renders as plain text with a lazy "change"
+  // link; the dropdown for that one row is only built the moment someone
+  // clicks it. Only genuinely UNMATCHED rows — normally a small fraction of
+  // a large batch — get an eager dropdown, since those need a decision
+  // before upload can proceed anyway.
+  const rowsHtml = batchLogoRows.map((r, i) => {
+    const c = r.matchedSlug ? COMPANIES.find(x => x.slug === r.matchedSlug) : null;
+    const needsDropdown = r.status === 'pending' && !r.matchedSlug;
+    return `
+      <div class="bl-row ${r.status}" data-row-index="${i}">
+        <img src="${r.objectUrl}" class="bl-thumb" alt="">
+        <div class="bl-file">
+          <div class="bl-filename">${r.file.name}</div>
+          <div class="bl-status-line">${r.status === 'done' ? `<span class="bl-status ok">Uploaded to ${c ? c.name : r.matchedSlug}</span>`
+            : r.status === 'failed' ? `<span class="bl-status err">Failed — see log below</span>`
+            : r.status === 'skipped' ? `<span class="bl-status">Skipped — already has a logo</span>`
+            : c ? `<span class="bl-status ok">Matched: ${c.name}${r.alreadyHasLogo ? ' <em>(already has a logo)</em>' : ''}</span>`
+            : `<span class="bl-status warn">No automatic match</span>`}</div>
+        </div>
+        ${r.status === 'pending' && !needsDropdown ? `
+          <button class="btn-mini" onclick="lazyOpenBatchRowSelect(${i})">Change</button>
+          <button class="btn-mini rust" onclick="removeBatchLogoRow(${i})">Remove</button>
+        ` : ''}
+        ${needsDropdown ? `
+          <select class="bl-select" onchange="reassignBatchRow(${i}, this.value)">
+            <option value="">— assign a company —</option>
+            ${optionsHtml}
+          </select>
+          <button class="btn-mini rust" onclick="removeBatchLogoRow(${i})">Remove</button>
+        ` : ''}
+      </div>`;
+  }).join('');
+
+  const alreadyHasCount = batchLogoRows.filter(r => r.status === 'pending' && r.alreadyHasLogo).length;
+
+  document.getElementById('batchLogoBody').innerHTML = `
+    <p class="ed-hint">Choose several logo files at once. Each is matched to a company by
+     filename — name files after the company's slug or its full name for the best match rate.
+     Anything that doesn't auto-match gets a dropdown to assign by hand.</p>
+    <input type="file" id="batchLogoFiles" accept="image/*" multiple onchange="handleBatchLogoFiles()">
+    ${batchLogoRows.length > 0 ? `
+      <div class="bl-summary">${matched} matched · ${unmatched} need assignment · ${batchLogoRows.length} total</div>
+      <label class="ed-hint" style="display:block;margin:6px 0;">
+        <input type="checkbox" id="blSkipExisting" ${alreadyHasCount > 0 ? 'checked' : ''}>
+        Skip companies that already have a logo${alreadyHasCount > 0 ? ` (${alreadyHasCount} of these do — safe to re-run this same folder any time; already-uploaded ones won't be touched)` : ''}
+      </label>
+      <div class="bl-rows">${rowsHtml}</div>
+      <div class="admin-log" id="batchLogoLog"></div>
+    ` : ''}`;
+
+  // Set each unmatched row's selected option via the DOM (not string
+  // replacement) — matches the cached-HTML approach above. Matched rows
+  // don't have a <select> at all until "Change" is clicked (see
+  // lazyOpenBatchRowSelect), so there's nothing to set here for those.
+  batchLogoRows.forEach((r, i) => {
+    if (r.status !== 'pending' || r.matchedSlug) return;
+    const sel = document.querySelector(`.bl-row[data-row-index="${i}"] .bl-select`);
+    if (sel && r.matchedSlug) sel.value = r.matchedSlug;
+  });
+}
+
+// Builds the (expensive, ~2,000-option) dropdown for exactly one row, only
+// when the person clicks "Change" on it — this is what keeps a batch of
+// thousands of already-matched rows cheap to render up front.
+function lazyOpenBatchRowSelect(i) {
+  const r = batchLogoRows[i];
+  const rowEl = document.querySelector(`.bl-row[data-row-index="${i}"]`);
+  if (!r || !rowEl) return;
+  const actionsHtml = `
+    <select class="bl-select" onchange="reassignBatchRow(${i}, this.value)">
+      <option value="">— assign a company —</option>
+      ${sharedCompanyOptionsHtml()}
+    </select>
+    <button class="btn-mini rust" onclick="removeBatchLogoRow(${i})">Remove</button>`;
+  // Replace just the trailing action buttons (Change/Remove) with the
+  // dropdown — everything else in the row (thumbnail, filename, status
+  // line) stays untouched.
+  const btns = rowEl.querySelectorAll('.btn-mini');
+  if (btns.length) {
+    const holder = document.createElement('div');
+    holder.innerHTML = actionsHtml;
+    btns.forEach(b => b.remove());
+    while (holder.firstChild) rowEl.appendChild(holder.firstChild);
+  }
+  const sel = rowEl.querySelector('.bl-select');
+  if (sel && r.matchedSlug) sel.value = r.matchedSlug;
+}
+
+// Lightweight per-row status update used during the upload loop — touches
+// only the one row that just finished, not the other 245 rows and not their
+// dropdowns. This is what actually fixes the freeze: the loop no longer
+// rebuilds ~2,000 options × up to 246 rows on every iteration.
+function updateBatchLogoRowStatus(i, r) {
+  const rowEl = document.querySelector(`.bl-row[data-row-index="${i}"]`);
+  if (!rowEl) return;
+  rowEl.className = `bl-row ${r.status}`;
+  const c = r.matchedSlug ? COMPANIES.find(x => x.slug === r.matchedSlug) : null;
+  const statusLine = rowEl.querySelector('.bl-status-line');
+  if (statusLine) {
+    statusLine.innerHTML = r.status === 'done' ? `<span class="bl-status ok">Uploaded to ${c ? c.name : r.matchedSlug}</span>`
+      : r.status === 'failed' ? `<span class="bl-status err">Failed — see log below</span>`
+      : r.status === 'skipped' ? `<span class="bl-status">Skipped — already has a logo</span>`
+      : `<span class="bl-status">${r.status}</span>`;
+  }
+  // Completed/failed rows no longer need their dropdown, "Change" button,
+  // or "Remove" button — clear all three rather than leave stale controls
+  // (including a still-clickable "Change" that would try to open a
+  // dropdown on a row that's already been uploaded) sitting in the DOM.
+  const sel = rowEl.querySelector('.bl-select');
+  if (sel && r.status !== 'pending') sel.remove();
+  if (r.status !== 'pending') {
+    rowEl.querySelectorAll('.btn-mini').forEach(b => b.remove());
+  }
+  // Summary line at the top (matched/unmatched/total counts) — cheap to
+  // recompute and update in place, no full re-render needed.
+  const summaryEl = document.querySelector('.bl-summary');
+  if (summaryEl) {
+    const matched = batchLogoRows.filter(x => x.matchedSlug && x.status === 'pending').length;
+    const unmatched = batchLogoRows.filter(x => !x.matchedSlug && x.status === 'pending').length;
+    summaryEl.textContent = `${matched} matched · ${unmatched} need assignment · ${batchLogoRows.length} total`;
+  }
+}
+
+function reassignBatchRow(i, slug) {
+  batchLogoRows[i].matchedSlug = slug;
+  renderBatchLogoRows();
+}
+function removeBatchLogoRow(i) {
+  if (batchLogoRows[i].objectUrl) URL.revokeObjectURL(batchLogoRows[i].objectUrl);
+  batchLogoRows.splice(i, 1);
+  renderBatchLogoRows();
+}
+function batchLogoLog(msg) {
+  const el = document.getElementById('batchLogoLog');
+  if (el) { el.textContent += msg + '\n'; el.scrollTop = el.scrollHeight; }
+}
+
+async function runBatchLogoUpload() {
+  if (!isAdminUser(currentUser)) { alert('Admin only.'); return; }
+  const skipExisting = document.getElementById('blSkipExisting')?.checked ?? true;
+  let assignable = batchLogoRows.filter(r => r.status === 'pending' && r.matchedSlug);
+  if (assignable.length === 0) { alert('Nothing assigned to upload yet.'); return; }
+
+  // Mark (and visually update) already-logo'd rows as skipped up front when
+  // the checkbox is on — this is what makes re-running the exact same
+  // folder safe and fast after an interrupted run: whatever succeeded last
+  // time gets skipped near-instantly instead of re-uploaded and overwritten.
+  if (skipExisting) {
+    for (const r of assignable) {
+      if (r.alreadyHasLogo) {
+        r.status = 'skipped';
+        updateBatchLogoRowStatus(batchLogoRows.indexOf(r), r);
+      }
+    }
+    assignable = assignable.filter(r => r.status === 'pending');
+    if (assignable.length === 0) {
+      alert('Nothing to upload — every matched company already has a logo. ' +
+            'Uncheck "Skip companies that already have a logo" to force a re-upload.');
+      return;
+    }
+  }
+
+  if (!confirm(`Upload ${assignable.length} logo${assignable.length === 1 ? '' : 's'}? ` +
+               (skipExisting ? `Companies that already have a logo are being skipped. `
+                              : `Each replaces that company's current logo, if any. `))) return;
+  if (!fbStorage) { alert('Storage SDK not loaded.'); return; }
+
+  let ok = 0, failed = 0;
+  for (const r of assignable) {
+    const label = COMPANIES.find(c => c.slug === r.matchedSlug)?.name || r.matchedSlug;
+    // Index in the FULL batchLogoRows array (not `assignable`, which is a
+    // filtered subset) — the DOM rows are keyed by that original index.
+    const rowIdx = batchLogoRows.indexOf(r);
+    if (r.file.size > 2 * 1024 * 1024) {
+      r.status = 'failed'; failed++;
+      batchLogoLog(`✗ ${r.file.name} → ${label} — too large (2 MB max)`);
+      updateBatchLogoRowStatus(rowIdx, r);
+      continue;
+    }
+    if (!r.file.type.startsWith('image/')) {
+      r.status = 'failed'; failed++;
+      batchLogoLog(`✗ ${r.file.name} → ${label} — not an image`);
+      updateBatchLogoRowStatus(rowIdx, r);
+      continue;
+    }
+    try {
+      const ext = (r.file.name.split('.').pop() || 'png').toLowerCase();
+      const ref = fbStorage.ref().child(`logos/${r.matchedSlug}.${ext}`);
+      const snap = await ref.put(r.file, { contentType: r.file.type });
+      const url = await snap.ref.getDownloadURL();
+      await FS_REST.setMerge('companies', r.matchedSlug, { logo: url, updatedAt: new Date() });
+      const c = COMPANIES.find(x => x.slug === r.matchedSlug);
+      if (c) c.logo = url;
+      r.status = 'done'; ok++;
+      batchLogoLog(`✓ ${r.file.name} → ${label}`);
+    } catch (err) {
+      r.status = 'failed'; failed++;
+      batchLogoLog(`✗ ${r.file.name} → ${label} — ${err.message}`);
+    }
+    // Targeted update of just this one row — see updateBatchLogoRowStatus
+    // comment above for why the full renderBatchLogoRows() was the actual
+    // cause of the page freezing on large batches.
+    updateBatchLogoRowStatus(rowIdx, r);
+  }
+  const skippedCount = batchLogoRows.filter(r => r.status === 'skipped').length;
+  batchLogoLog(`\nDone — ${ok} uploaded, ${failed} failed${skippedCount ? `, ${skippedCount} skipped (already had a logo)` : ''}.`);
+  renderAll();
+  renderAdminList();
+}
+
+// ── Company editor ───────────────────────────────────────────────────
+let editingSlug = null;
+let editDraft = null;
+
+function openCompanyEditor(slug) {
+  const c = COMPANIES.find(x => x.slug === slug);
+  if (!c) return;
+  editingSlug = slug;
+  // Deep copy so Cancel genuinely discards — editing the live object would
+  // leave half-applied changes in the directory even on cancel.
+  editDraft = JSON.parse(JSON.stringify(c));
+  editDraft.locations = editDraft.locations || [];
+  editDraft.certifications = editDraft.certifications || [];
+  editDraft.capacity = editDraft.capacity || { employeeCountRange: null, foundedYear: null, capacityNote: null };
+  editDraft.spotlight = editDraft.spotlight || null;
+  renderCompanyEditor();
+  // The modal is hidden/shown via a CSS class, not recreated, so its inner
+  // scroll position otherwise carries over from whichever company was
+  // viewed last — reopening on a new company could land scrolled straight
+  // past Logo/Name/Slug to whatever was on screen when you closed it.
+  document.getElementById('editBody').scrollTop = 0;
+  document.getElementById('editModal').classList.add('open');
+}
+
+function closeCompanyEditor() {
+  document.getElementById('editModal').classList.remove('open');
+  editingSlug = null; editDraft = null;
+}
+
+function editField(field, value) { editDraft[field] = value; }
+function editLocField(i, field, value) {
+  if (field === 'lat' || field === 'lng') {
+    const n = parseFloat(value);
+    editDraft.locations[i][field] = isNaN(n) ? null : n;
+  } else {
+    editDraft.locations[i][field] = value === '' ? null : value;
+  }
+}
+function addEditLocation() {
+  editDraft.locations.push({ type:'registered-office', name:'', address:'', city:'', lat:null, lng:null, placeId:null });
+  renderCompanyEditor();
+}
+function removeEditLocation(i) {
+  editDraft.locations.splice(i, 1);
+  renderCompanyEditor();
+}
+
+function renderCompanyEditor() {
+  const c = editDraft;
+  const catOptions = CATEGORY_TREE.map(l1 =>
+    `<optgroup label="${l1.code} · ${l1.name}">` +
+    // L3 entries are indented with a non-breaking space so the hierarchy is
+    // visible in a flat <select>, which can't nest optgroups.
+    l1.items.map(it =>
+      `<option value="${it.slug}">${it.code} — ${it.name}</option>` +
+      (it.items || []).map(sub => `<option value="${sub.slug}">&nbsp;&nbsp;&nbsp;${sub.code} — ${sub.name}</option>`).join('')
+    ).join('') +
+    `</optgroup>`).join('');
+
+  document.getElementById('editBody').innerHTML = `
+    <div class="ed-row">
+      <label>Logo</label>
+      <div class="ed-logo">
+        <div class="ed-logo-preview" id="logoPreview">
+          ${c.logo ? `<img src="${c.logo}" alt="">` : `<span>${initials(c.name)}</span>`}
+        </div>
+        <div>
+          <input type="file" id="logoFile" accept="image/*" onchange="uploadLogo()">
+          <div class="ed-hint">Square PNG/SVG works best · max 2 MB · stored in
+            <code>logos/${c.slug}</code></div>
+          <div class="ed-hint" id="logoStatus"></div>
+          ${c.logo ? `<button class="btn-mini rust" onclick="clearLogo()">Remove logo</button>` : ''}
+        </div>
+      </div>
+    </div>
+
+    <div class="ed-row"><label>Name</label>
+      <input type="text" value="${(c.name||'').replace(/"/g,'&quot;')}" oninput="editField('name', this.value)"></div>
+
+    <div class="ed-row"><label>Slug</label>
+      <input type="text" value="${c.slug}" disabled>
+      <div class="ed-hint">Immutable — it's the shared identity key across Tankonomics and
+        TankBazaar. Changing it would break those joins.</div></div>
+
+    <div class="ed-row"><label>Description</label>
+      <textarea rows="3" oninput="editField('desc', this.value)">${c.desc||''}</textarea></div>
+
+    <div class="ed-row-2">
+      <div><label>Website</label>
+        <input type="text" value="${(c.site||'').replace(/"/g,'&quot;')}" oninput="editField('site', this.value)"></div>
+      <div><label>Country</label>
+        <input type="text" value="${(c.country||'').replace(/"/g,'&quot;')}" oninput="editField('country', this.value)"></div>
+    </div>
+
+    <div class="ed-row">
+      <label>Categories <span class="ed-count">${(c.cats||[]).length}</span></label>
+      <div class="ed-chips" id="catChips">
+        ${(c.cats||[]).map(s => {
+          const l = categoryLabel(s);
+          return `<span class="ed-chip">${l ? l.code + ' ' + l.name : s}
+            <button onclick="removeCat('${s}')">&times;</button></span>`;
+        }).join('') || '<span class="ed-hint">None yet</span>'}
+      </div>
+      <select onchange="addCat(this.value); this.value='';">
+        <option value="">+ Add category…</option>${catOptions}
+      </select>
+    </div>
+
+    <div class="ed-row">
+      <label>Certifications <span class="ed-count">${(c.certifications||[]).length}</span></label>
+      <div class="ed-chips" id="certChips">
+        ${(c.certifications||[]).map(s => {
+          const label = CERTIFICATION_LABELS[s] || s;
+          return `<span class="ed-chip">${label}
+            <button onclick="removeCert('${s}')">&times;</button></span>`;
+        }).join('') || '<span class="ed-hint">None yet</span>'}
+      </div>
+      <select onchange="addCert(this.value); this.value='';">
+        <option value="">+ Add certification…</option>
+        ${Object.entries(CERTIFICATION_LABELS).map(([slug, label]) =>
+          `<option value="${slug}">${label}</option>`).join('')}
+      </select>
+      <div class="ed-hint">Starter list only — if a company holds a real certification not listed here,
+        say so in Description for now rather than force a slug that doesn't exist yet.</div>
+    </div>
+
+    <div class="ed-row">
+      <label>Capacity</label>
+      <div class="ed-row-3">
+        <div>
+          <select onchange="editCapacityField('employeeCountRange', this.value)">
+            <option value="">Employee count…</option>
+            ${EMPLOYEE_BANDS.map(b =>
+              `<option value="${b}" ${c.capacity && c.capacity.employeeCountRange === b ? 'selected' : ''}>${b}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <input type="text" placeholder="Founded year"
+                 value="${c.capacity && c.capacity.foundedYear != null ? c.capacity.foundedYear : ''}"
+                 oninput="editCapacityField('foundedYear', this.value)">
+        </div>
+        <div>
+          <input type="text" placeholder="Capacity note (e.g. 1.5M tons/year)"
+                 value="${(c.capacity && c.capacity.capacityNote || '').replace(/\"/g,'&quot;')}"
+                 oninput="editCapacityField('capacityNote', this.value)">
+        </div>
+      </div>
+      <div class="ed-hint">Employee count and founded year are standardized so they're comparable across
+        every company; capacity note is deliberately free text since what "capacity" means varies too much
+        by category to force into one structured number.</div>
+    </div>
+
+    <div class="ed-row">
+      <label>Spotlight tier</label>
+      <select onchange="editSpotlight(this.value)">
+        <option value="" ${!c.spotlight ? 'selected' : ''}>— not featured —</option>
+        <option value="featured" ${c.spotlight === 'featured' ? 'selected' : ''}>Featured</option>
+        <option value="champion" ${c.spotlight === 'champion' ? 'selected' : ''}>Champion (top tier)</option>
+      </select>
+      <div class="ed-hint">Champions and Featured companies appear on the India and Rest-of-World landing
+        pages. Everything else is reachable only through search — this is a curated highlight, so keep it
+        to genuine standouts.</div>
+    </div>
+
+    <div class="ed-row">
+      <label>Corporate relationship</label>
+      <div class="ed-rel">
+        <select onchange="editParentRel(this.value)">
+          <option value="">— independent / no parent —</option>
+          ${Object.entries(REL_LABEL).map(([k, v]) =>
+            `<option value="${k}" ${c.parent && c.parent.relationship === k ? 'selected' : ''}>${v}…</option>`).join('')}
+        </select>
+        <select onchange="editParentSlug(this.value)" ${c.parent && c.parent.relationship ? '' : 'disabled'}>
+          <option value="">— pick a listed company —</option>
+          ${COMPANIES.filter(x => x.slug !== c.slug).sort((a,b)=>a.name.localeCompare(b.name))
+            .map(x => `<option value="${x.slug}" ${c.parent && c.parent.slug === x.slug ? 'selected' : ''}>${x.name}</option>`).join('')}
+        </select>
+        <input type="text" placeholder="…or type a parent not in the directory"
+               value="${c.parent && !c.parent.slug ? (c.parent.name || '').replace(/"/g,'&quot;') : ''}"
+               oninput="editParentName(this.value)"
+               ${c.parent && c.parent.relationship ? '' : 'disabled'}>
+      </div>
+      <div class="ed-hint">A subsidiary is a <b>separate legal entity</b>, not a location — it keeps its own
+        card and links here. Leave blank for independent companies. Use <i>Division of</i> only for a business
+        unit that is <b>not</b> separately incorporated (e.g. Emerson Automation Solutions), and in that case
+        don't give it a card at all.</div>
+    </div>
+
+    <div class="ed-row">
+      <label>Locations <span class="ed-count">${c.locations.length}</span></label>
+      ${c.locations.map((l, i) => `
+        <div class="ed-loc">
+          <div class="ed-loc-head">
+            <select onchange="editLocField(${i},'type',this.value)">
+              ${['registered-office','plant','facility','branch'].map(t =>
+                `<option value="${t}" ${l.type===t?'selected':''}>${t}</option>`).join('')}
+            </select>
+            <button class="btn-mini rust" onclick="removeEditLocation(${i})">Remove</button>
+          </div>
+          <input type="text" placeholder="Location name" value="${(l.name||'').replace(/"/g,'&quot;')}"
+                 oninput="editLocField(${i},'name',this.value)">
+          <input type="text" placeholder="Full address (street, city, state, postal code)" value="${(l.address||'').replace(/"/g,'&quot;')}"
+                 oninput="editLocField(${i},'address',this.value)">
+          <input type="text" placeholder="City, State" value="${(l.city||'').replace(/"/g,'&quot;')}"
+                 oninput="editLocField(${i},'city',this.value)">
+          <div class="ed-row-3">
+            <input type="text" placeholder="lat" value="${l.lat ?? ''}" oninput="editLocField(${i},'lat',this.value)">
+            <input type="text" placeholder="lng" value="${l.lng ?? ''}" oninput="editLocField(${i},'lng',this.value)">
+            <input type="text" placeholder="Google Place ID (ChIJ…)" value="${l.placeId ?? ''}"
+                   oninput="editLocField(${i},'placeId',this.value)">
+          </div>
+          ${l.placeId ? `<a class="ed-hint-link" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(c.name + ' ' + (l.name||''))}&query_place_id=${l.placeId}"
+                target="_blank" rel="noopener">Test this Place ID on Google Maps ↗</a>`
+              : `<div class="ed-hint">No Place ID — the public page falls back to a maps search by name + city.</div>`}
+        </div>`).join('')}
+      <button class="btn-mini" onclick="addEditLocation()">+ Add location</button>
+    </div>
+
+    <div class="ed-hint" id="saveStatus"></div>`;
+}
+
+function editParentRel(rel) {
+  if (!rel) { editDraft.parent = null; }
+  else {
+    editDraft.parent = editDraft.parent || { name: '', slug: '', relationship: '' };
+    editDraft.parent.relationship = rel;
+  }
+  renderCompanyEditor();
+}
+function editParentSlug(slug) {
+  if (!editDraft.parent) return;
+  if (slug) {
+    const p = COMPANIES.find(x => x.slug === slug);
+    editDraft.parent.slug = slug;
+    editDraft.parent.name = p ? p.name : slug;
+  } else {
+    editDraft.parent.slug = '';
+  }
+  renderCompanyEditor();
+}
+function editParentName(name) {
+  if (!editDraft.parent) return;
+  // A free-typed parent isn't in the directory, so it has no slug to link to.
+  editDraft.parent.name = name;
+  editDraft.parent.slug = '';
+}
+
+function addCat(slug) {
+  if (!slug) return;
+  editDraft.cats = editDraft.cats || [];
+  if (!editDraft.cats.includes(slug)) editDraft.cats.push(slug);
+  renderCompanyEditor();
+}
+function removeCat(slug) {
+  editDraft.cats = (editDraft.cats || []).filter(s => s !== slug);
+  renderCompanyEditor();
+}
+function addCert(slug) {
+  if (!slug) return;
+  editDraft.certifications = editDraft.certifications || [];
+  if (!editDraft.certifications.includes(slug)) editDraft.certifications.push(slug);
+  renderCompanyEditor();
+}
+function removeCert(slug) {
+  editDraft.certifications = (editDraft.certifications || []).filter(s => s !== slug);
+  renderCompanyEditor();
+}
+function editCapacityField(field, value) {
+  editDraft.capacity = editDraft.capacity || { employeeCountRange: null, foundedYear: null, capacityNote: null };
+  if (field === 'foundedYear') {
+    const n = parseInt(value, 10);
+    editDraft.capacity.foundedYear = isNaN(n) ? null : n;
+  } else {
+    editDraft.capacity[field] = value === '' ? null : value;
+  }
+}
+function editSpotlight(value) { editDraft.spotlight = value || null; }
+function clearLogo() { editDraft.logo = null; renderCompanyEditor(); }
+
+// Upload to Storage under logos/<slug>, then keep the download URL on the
+// company. Path and constraints match storage.rules (admin-only, image/*, 2 MB).
+async function uploadLogo() {
+  const input = document.getElementById('logoFile');
+  const status = document.getElementById('logoStatus');
+  const file = input.files && input.files[0];
+  if (!file) return;
+  if (!fbStorage) { status.textContent = 'Storage SDK not loaded.'; return; }
+  if (file.size > 2 * 1024 * 1024) { status.textContent = 'Too large — 2 MB maximum.'; return; }
+  if (!file.type.startsWith('image/')) { status.textContent = 'Images only.'; return; }
+  try {
+    status.textContent = 'Uploading…';
+    const ext = (file.name.split('.').pop() || 'png').toLowerCase();
+    const ref = fbStorage.ref().child(`logos/${editDraft.slug}.${ext}`);
+    const snap = await ref.put(file, { contentType: file.type });
+    editDraft.logo = await snap.ref.getDownloadURL();
+    renderCompanyEditor();
+    document.getElementById('logoStatus').textContent = 'Uploaded — remember to Save.';
+  } catch (err) {
+    status.textContent = 'Upload failed: ' + err.message;
+    console.error(err);
+  }
+}
+
+// Removing a company has two parts, and doing only the first is a trap this
+// project has hit before: editing the in-page COMPANIES array alone changes
+// nothing a visitor sees, because Seed only ever merges/adds — it never
+// deletes stale Firestore records. This actually removes the live document,
+// not just the source-file entry.
+async function deleteCompany(slug) {
+  if (!isAdminUser(currentUser)) { alert('Admin only.'); return; }
+  const c = COMPANIES.find(x => x.slug === slug);
+  if (!c) return;
+  const typed = prompt(
+    `This permanently deletes "${c.name}" from Firestore — not just this page.\n\n` +
+    `Type the company's name exactly to confirm:`
+  );
+  if (typed !== c.name) {
+    if (typed !== null) alert('Name did not match — nothing was deleted.');
+    return;
+  }
+  try {
+    await FS_REST.deleteDoc('companies', slug);
+    const idx = COMPANIES.findIndex(x => x.slug === slug);
+    if (idx >= 0) COMPANIES.splice(idx, 1);
+    renderAll();
+    renderAdminList();
+  } catch (err) {
+    alert('Delete failed: ' + err.message);
+    console.error(err);
+  }
+}
+
+async function saveCompany() {
+  if (!isAdminUser(currentUser)) { alert('Admin only.'); return; }
+  const status = document.getElementById('saveStatus');
+  status.textContent = 'Saving…';
+  try {
+    await FS_REST.setMerge('companies', editDraft.slug, {
+      id: editDraft.id, slug: editDraft.slug, name: editDraft.name,
+      desc: editDraft.desc || '', site: editDraft.site || '',
+      country: editDraft.country || '', logo: editDraft.logo || null,
+      cats: editDraft.cats || [], locations: editDraft.locations || [],
+      parent: (editDraft.parent && editDraft.parent.name) ? editDraft.parent : null,
+      certifications: editDraft.certifications || [],
+      capacity: editDraft.capacity || { employeeCountRange: null, foundedYear: null, capacityNote: null },
+      spotlight: editDraft.spotlight || null,
+      updatedAt: new Date(),
+    });
+    // Reflect immediately in the in-memory roster so the directory updates
+    // without a full refetch.
+    const idx = COMPANIES.findIndex(x => x.slug === editDraft.slug);
+    if (idx >= 0) COMPANIES[idx] = JSON.parse(JSON.stringify(editDraft));
+    closeCompanyEditor();
+    renderAll();
+    renderAdminPage();
+  } catch (err) {
+    status.textContent = 'Save failed: ' + err.message;
+    console.error(err);
+  }
+}
+
+// ── Bulk category tagging ────────────────────────────────────────────
+// Adding one category to many companies one-at-a-time through the editor is
+// the tedious case; this applies a single category across a selection in one
+// pass. Writes only the `cats` field, so nothing else on those documents is
+// touched.
+const bulkSelected = new Set();
+
+function adminCompanyRows() {
+  const q = (document.getElementById('adminSearch')?.value || '').toLowerCase();
+  return COMPANIES
+    .filter(c => !q || c.name.toLowerCase().includes(q) || c.slug.includes(q))
+    .map(c => {
+      const noLogo = !c.logo;
+      const locs = (c.locations || []).length;
+      const noPid = (c.locations || []).filter(l => !l.placeId).length;
+      return `
+      <tr>
+        <td><input type="checkbox" class="ac-check" ${bulkSelected.has(c.slug) ? 'checked' : ''}
+                   onchange="toggleBulk('${c.slug}', this.checked)"></td>
+        <td>
+          <div class="ac-logo">${c.logo ? `<img src="${c.logo}" alt="">` : `<span>${initials(c.name)}</span>`}</div>
+        </td>
+        <td>
+          <div class="ac-name">${c.name}</div>
+          <div class="ac-slug">${c.slug}</div>
+        </td>
+        <td class="ac-flags">
+          ${noLogo ? '<span class="flag warn">no logo</span>' : '<span class="flag ok">logo</span>'}
+          <span class="flag">${locs} loc</span>
+          ${noPid ? `<span class="flag warn">${noPid} no place ID</span>` : '<span class="flag ok">place IDs</span>'}
+          <span class="flag">${(c.cats || []).length} cat</span>
+          ${c.parent && c.parent.name ? `<span class="flag rel">${REL_LABEL[c.parent.relationship] || 'part of'} ${c.parent.name}</span>` : ''}
+        </td>
+        <td>
+          <button class="btn-mini" onclick="openCompanyEditor('${c.slug}')">Edit</button>
+          <button class="btn-mini rust" onclick="deleteCompany('${c.slug}')">Delete</button>
+        </td>
+      </tr>`;
+    }).join('');
+}
+
+function toggleBulk(slug, on) {
+  if (on) bulkSelected.add(slug); else bulkSelected.delete(slug);
+  renderBulkBar();
+}
+
+function bulkSelectVisible(on) {
+  const q = (document.getElementById('adminSearch')?.value || '').toLowerCase();
+  COMPANIES
+    .filter(c => !q || c.name.toLowerCase().includes(q) || c.slug.includes(q))
+    .forEach(c => { if (on) bulkSelected.add(c.slug); else bulkSelected.delete(c.slug); });
+  renderAdminList();
+  renderBulkBar();
+}
+
+function bulkClear() {
+  bulkSelected.clear();
+  renderAdminList();
+  renderBulkBar();
+}
+
+function renderBulkBar() {
+  const el = document.getElementById('bulkBar');
+  if (!el) return;
+  const n = bulkSelected.size;
+  if (n === 0) { el.innerHTML = ''; el.classList.remove('active'); return; }
+  el.classList.add('active');
+  const catOptions = CATEGORY_TREE.map(l1 =>
+    `<optgroup label="${l1.code} · ${l1.name}">` +
+    // L3 entries are indented with a non-breaking space so the hierarchy is
+    // visible in a flat <select>, which can't nest optgroups.
+    l1.items.map(it =>
+      `<option value="${it.slug}">${it.code} — ${it.name}</option>` +
+      (it.items || []).map(sub => `<option value="${sub.slug}">&nbsp;&nbsp;&nbsp;${sub.code} — ${sub.name}</option>`).join('')
+    ).join('') +
+    `</optgroup>`).join('');
+  el.innerHTML = `
+    <div class="bulk-count">${n} selected</div>
+    <select id="bulkCat"><option value="">Choose a category…</option>${catOptions}</select>
+    <button class="btn-mini" onclick="bulkApply('add')">Add to selected</button>
+    <button class="btn-mini rust" onclick="bulkApply('remove')">Remove from selected</button>
+    <button class="btn-mini" onclick="bulkClear()">Clear selection</button>
+    <span class="ed-hint" id="bulkStatus"></span>`;
+}
+
+async function bulkApply(mode) {
+  if (!isAdminUser(currentUser)) { alert('Admin only.'); return; }
+  const slug = document.getElementById('bulkCat').value;
+  const status = document.getElementById('bulkStatus');
+  if (!slug) { status.textContent = 'Pick a category first.'; return; }
+  const label = categoryLabel(slug);
+  const verb = mode === 'add' ? 'Add' : 'Remove';
+  if (!confirm(`${verb} "${label ? label.name : slug}" ${mode === 'add' ? 'to' : 'from'} ` +
+               `${bulkSelected.size} compan${bulkSelected.size === 1 ? 'y' : 'ies'}?`)) return;
+
+  let changed = 0, skipped = 0;
+  const failures = [];
+  for (const s of Array.from(bulkSelected)) {
+    const c = COMPANIES.find(x => x.slug === s);
+    if (!c) continue;
+    const cats = Array.isArray(c.cats) ? [...c.cats] : [];
+    const has = cats.includes(slug);
+    if (mode === 'add' && has) { skipped++; continue; }
+    if (mode === 'remove' && !has) { skipped++; continue; }
+    const next = mode === 'add' ? [...cats, slug] : cats.filter(x => x !== slug);
+    try {
+      await FS_REST.setMerge('companies', s, { cats: next, updatedAt: new Date() });
+      c.cats = next;
+      changed++;
+      status.textContent = `${changed} updated…`;
+    } catch (err) {
+      failures.push(s);
+      if (failures.length >= 3) break;
+    }
+  }
+  status.textContent = `${changed} updated, ${skipped} already ${mode === 'add' ? 'had it' : 'without it'}` +
+                       (failures.length ? `, ${failures.length} failed (${failures[0]})` : '');
+  renderAdminList();
+  renderAll();
+}
+
+function renderAdminList() {
+  const el = document.getElementById('adminList');
+  if (el) el.innerHTML = adminCompanyRows();
+}
+
+// Recovery for the logo-wipe bug: re-seeding Firestore previously overwrote
+// every company's logo field with null, because the seed payload always
+// included `logo: c.logo || null` and the in-page array never carried real
+// logo URLs (those only ever lived in Firestore, written by the uploader).
+// The actual files were never touched — only the Firestore pointer to them.
+// This lists every file under logos/ in Storage and re-links each one back
+// to its company by filename (logos/<slug>.<ext>), with no re-upload needed.
+async function relinkLogosFromStorage() {
+  if (!isAdminUser(currentUser)) { alert('Admin only.'); return; }
+  if (!fbStorage) { alert('Storage SDK not loaded.'); return; }
+  if (!confirm('Scan Storage for existing logo files and re-link them to their companies in ' +
+               'Firestore? This does not upload anything new — it only repairs the logo field ' +
+               'for companies whose file already exists in Storage.')) return;
+
+  const log = document.getElementById('adminLog') || { textContent: '' };
+  const write = (msg) => { if (log.textContent !== undefined) { log.textContent += msg + '\n'; log.scrollTop = log.scrollHeight; } };
+  write('Scanning logos/ in Storage…');
+
+  let items;
+  try {
+    const listing = await fbStorage.ref('logos').listAll();
+    items = listing.items;
+  } catch (err) {
+    write('✗ Could not list Storage folder — ' + err.message);
+    return;
+  }
+  write(`Found ${items.length} file(s) in Storage.\n`);
+
+  let relinked = 0, noCompany = 0, failed = 0;
+  for (const item of items) {
+    const filename = item.name; // e.g. "larsen-and-toubro-limited.png"
+    const slug = filename.replace(/\.[a-zA-Z0-9]+$/, '');
+    const c = COMPANIES.find(x => x.slug === slug);
+    if (!c) { write(`⚠ ${filename} — no company matches slug "${slug}"`); noCompany++; continue; }
+    try {
+      const url = await item.getDownloadURL();
+      await FS_REST.setMerge('companies', slug, { logo: url, updatedAt: new Date() });
+      c.logo = url;
+      relinked++;
+      write(`✓ ${c.name}`);
+    } catch (err) {
+      failed++;
+      write(`✗ ${filename} — ${err.message}`);
+    }
+  }
+  write(`\nDone — ${relinked} re-linked, ${noCompany} had no matching company, ${failed} failed.`);
+  renderAll();
+  renderAdminList();
+}
+
+async function reloadFromFirestore() {
+  await CompanyStore.load();
+  renderAll();
+  renderAdminPage();
+}
+
+async function startApp() {
+  window.addEventListener('hashchange', handleRoute);
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeAuthModal();
+  });
+
+  if (!REQUIRE_APPROVAL_TO_VIEW) {
+    // Original open-access behaviour, unchanged: load and render
+    // immediately, no gate. This is the path a launch flips back to.
+    await CompanyStore.load();
+    buildSidebar();
+    renderRegionFilter();
+    renderDeliveryFilter();
+    renderSectorFilter();
+    document.getElementById('statCompanies').textContent = COMPANIES.length;
+    document.getElementById('statCategories').textContent = allL2Count();
+    document.getElementById('statSheets').textContent = CATEGORY_TREE.length;
+    renderAll();
+    handleRoute();
+  }
+
+  // onAuthStateChanged is the single source of truth for who's signed in — it
+  // fires on load, after popup sign-in, and after a redirect returns, so all
+  // three paths converge here rather than each updating the UI themselves.
+  // While the gate is on, it's also what decides whether the directory ever
+  // loads at all, via checkAccessAndRender().
+  renderAuthArea();
+  if (firebaseReady) {
+    fbAuth.onAuthStateChanged(async user => {
+      currentUser = user;
+      renderAuthArea();
+      closeAuthModal();
+      if (REQUIRE_APPROVAL_TO_VIEW) {
+        await checkAccessAndRender();
+      }
+      const h = location.hash;
+      if (h === '#/profile') renderProfilePage();
+      if (h === '#/admin') renderAdminPage();
+    });
+  } else if (REQUIRE_APPROVAL_TO_VIEW) {
+    // Can't verify anyone without Firebase — fail closed rather than show
+    // the directory to an unverifiable visitor.
+    renderAccessGate('signin');
+  }
+}
+document.addEventListener('DOMContentLoaded', startApp);
+</script>
+</body>
+</html>
