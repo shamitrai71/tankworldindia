@@ -153,6 +153,14 @@ main{ flex:1; min-width:0; padding:20px 24px 60px; }
   padding:16px; cursor:pointer; transition:transform 0.12s, box-shadow 0.12s; position:relative;
 }
 .company-card:hover{ transform:translate(-2px,-2px); box-shadow:4px 4px 0 var(--line-blue); }
+.card-links{ display:flex; gap:6px; flex-wrap:wrap; margin-top:10px; }
+.card-link{ display:inline-flex; align-items:center; gap:4px; font-family:var(--font-mono); font-size:11px; padding:3px 8px;
+  border:1px solid var(--line); border-radius:3px; background:#fff; color:var(--ink); cursor:pointer; text-decoration:none; }
+.card-link:hover, .card-link:focus{ border-color:var(--line-blue); color:var(--line-blue); outline:none; }
+.card-link-li{ color:#0A66C2; border-color:#BFD5EE; }
+.card-link-li:hover, .card-link-li:focus{ background:#0A66C2; color:#fff; border-color:#0A66C2; }
+.cp-linkedin{ background:#0A66C2 !important; border-color:#0A66C2 !important; color:#fff !important; }
+.li-ico{ vertical-align:-2px; }
 .company-card::before{
   content:""; position:absolute; top:10px; right:10px; width:8px; height:8px;
   border-radius:50%; background:var(--ok);
@@ -65665,6 +65673,26 @@ function renderActiveFilters() {
   wrap.innerHTML = `<span class="filter-chip">${lbl.code} · ${lbl.name} <button onclick="selectCategory('${activeCategory}')">×</button></span>`;
 }
 
+const LINKEDIN_SVG = '<svg class="li-ico" viewBox="0 0 24 24" width="13" height="13" aria-hidden="true"><path fill="currentColor" d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM3 9h4v12H3zM9 9h3.8v1.7h.05c.53-1 1.83-2.05 3.77-2.05 4.03 0 4.78 2.65 4.78 6.1V21h-4v-5.5c0-1.31-.02-3-1.83-3-1.83 0-2.11 1.43-2.11 2.9V21H9z"/></svg>';
+function openExternal(ev, url) {
+  ev.preventDefault(); ev.stopPropagation();
+  if (url) window.open(url, '_blank', 'noopener');
+}
+// Website and LinkedIn buttons on a tile. The tile itself is a link to the
+// company page, so these open in a new tab without also opening that page.
+function cardLinksHtml(c) {
+  const k = effectiveContact(c);
+  if (!k.site && !k.linkedin) return '';
+  const btn = (url, cls, label, title) => {
+    const u = psEsc(url).replace(/'/g, '%27');
+    return `<span class="card-link ${cls}" role="link" tabindex="0" title="${psEsc(title)}"
+      onclick="openExternal(event, '${u}')" onkeydown="if (event.key === 'Enter') openExternal(event, '${u}')">${label}</span>`;
+  };
+  return `<div class="card-links">
+      ${k.site ? btn(k.site, 'card-link-web', '🌐 Website', 'Open the company website') : ''}
+      ${k.linkedin ? btn(k.linkedin, 'card-link-li', LINKEDIN_SVG + ' LinkedIn', 'Open the company LinkedIn page') : ''}
+    </div>`;
+}
 function renderCards() {
   const list = sortByTier(filteredCompanies());
   const grid = document.getElementById('companyGrid');
@@ -65700,6 +65728,7 @@ function renderCards() {
         <div class="card-tags">${tags}${more}</div>
         ${msmeRow}
         ${deliveryRow}
+        ${cardLinksHtml(c)}
       </a>`;
   }).join('');
 }
@@ -66128,6 +66157,7 @@ function spotlightTile(c) {
       </div>
       <div class="st-name">${c.name}</div>
       ${place ? `<div class="st-place">${place}</div>` : ''}
+      ${cardLinksHtml(c)}
     </a>`;
 }
 
@@ -66990,6 +67020,7 @@ async function seedCompanies() {
           ...(c.profileSections && Object.keys(c.profileSections).length ? { profileSections: c.profileSections } : {}),
           // Registered legal entity (from the legal-name validation), kept separate from the display name.
           ...(c.legalName ? { legalName: c.legalName, registrationId: c.registrationId || '', legalNameSource: c.legalNameSource || '' } : {}),
+          ...(c.linkedin ? { linkedin: c.linkedin } : {}),
           ...(c.capacity && (c.capacity.employeeCountRange || c.capacity.foundedYear || c.capacity.capacityNote)
               ? { capacity: c.capacity } : {}),
           // spotlight ("champion" | "featured" | "sponsored" | null) is curated in the
@@ -67125,6 +67156,7 @@ async function seedMissingCompanies() {
         ...(c.profileSections && Object.keys(c.profileSections).length ? { profileSections: c.profileSections } : {}),
         // Registered legal entity (from the legal-name validation), kept separate from the display name.
         ...(c.legalName ? { legalName: c.legalName, registrationId: c.registrationId || '', legalNameSource: c.legalNameSource || '' } : {}),
+          ...(c.linkedin ? { linkedin: c.linkedin } : {}),
         ...(c.capacity && (c.capacity.employeeCountRange || c.capacity.foundedYear || c.capacity.capacityNote)
             ? { capacity: c.capacity } : {}),
         ...(c.spotlight ? { spotlight: c.spotlight } : {}),
@@ -67775,6 +67807,8 @@ function renderCompanyEditor() {
         <input type="text" value="${(c.country||'').replace(/"/g,'&quot;')}" oninput="editField('country', this.value)"></div>
     </div>
 
+    <div class="ed-row"><label>LinkedIn page</label>
+      <input type="text" value="${psEsc(c.linkedin || '')}" placeholder="https://www.linkedin.com/company/…" oninput="editField('linkedin', this.value)"></div>
     <div class="ed-row"><label>Registered legal name</label>
       <input type="text" value="${psEsc(c.legalName || '')}" placeholder="As on the company register — the display name above stays as it is" oninput="editField('legalName', this.value)"></div>
     <div class="ed-row-2">
@@ -68145,6 +68179,14 @@ function safeSiteUrl(u) {
   if (/^[a-z0-9][a-z0-9.-]*\.[a-z]{2,}(\/[^\s"'<>]*)?$/i.test(s)) return 'https://' + s;
   return '';
 }
+// LinkedIn pages only: company, showcase, school or personal (in) pages on
+// linkedin.com. Bare "linkedin.com/company/x" gets https:// added.
+function safeLinkedinUrl(u) {
+  let s = String(u || '').trim();
+  if (!s) return '';
+  if (!/^https?:\/\//i.test(s)) s = 'https://' + s;
+  return /^https:\/\/([a-z]{2,3}\.)?(www\.)?linkedin\.com\/(company|showcase|school|in)\/[^\s"'<>]+$/i.test(s) ? s : '';
+}
 function safeEmail(e) {
   const m = String(e || '').trim().match(/[^\s@<>"'(),;:]+@[^\s@<>"'(),;:]+\.[^\s@<>"'(),;:]+/);
   return m ? m[0] : '';
@@ -68159,6 +68201,7 @@ function effectiveContact(c) {
   const ownSite = safeSiteUrl(c.companySite), ownMail = safeEmail(c.companyEmail), ownPhone = String(c.companyPhone || '').trim();
   return {
     site:  ownSite || safeSiteUrl(c.site),
+    linkedin: safeLinkedinUrl(c.companyLinkedin) || safeLinkedinUrl(c.linkedin),
     email: ownMail ? ownMail : String(c.email || '').trim(),
     phone: ownPhone ? ownPhone : String(c.phone || '').trim(),
   };
@@ -68169,6 +68212,7 @@ function contactLinksHtml(c) {
   const tel = k.phone.replace(/[^0-9+]/g, '');
   return `
       ${k.site ? `<a class="cp-site" href="${psEsc(k.site)}" target="_blank" rel="noopener nofollow">Visit Website ↗</a>` : ''}
+      ${k.linkedin ? `<a class="cp-site cp-linkedin" href="${psEsc(k.linkedin)}" target="_blank" rel="noopener nofollow">${LINKEDIN_SVG} LinkedIn ↗</a>` : ''}
       ${k.email ? (mailto ? `<a class="cp-contact-email" href="mailto:${psEsc(mailto)}">✉ ${psEsc(k.email)}</a>`
                           : `<span class="cp-contact-email">✉ ${psEsc(k.email)}</span>`) : ''}
       ${k.phone ? (tel ? `<a class="cp-contact-phone" href="tel:${psEsc(tel)}">☎ ${psEsc(k.phone)}</a>`
@@ -68325,7 +68369,7 @@ async function submitClaim() {
 // OWNER'S LISTING EDITOR
 // ══════════════════════════════════════════════════════════════════════
 // Writes ONLY the fields the Firestore rules allow an owner to touch:
-// companySections, companySite/Email/Phone, companyUpdatedAt/By.
+// companySections, companySite/Email/Phone/Linkedin, companyUpdatedAt/By.
 let ownerDraft = null;
 function openOwnerEditor(slug) {
   const c = COMPANIES.find(x => x.slug === slug);
@@ -68334,7 +68378,8 @@ function openOwnerEditor(slug) {
     slug, name: c.name,
     companySections: JSON.parse(JSON.stringify(c.companySections || {})),
     companySite: c.companySite || '', companyEmail: c.companyEmail || '', companyPhone: c.companyPhone || '',
-    twiSite: c.site || '', twiEmail: c.email || '', twiPhone: c.phone || '',
+    companyLinkedin: c.companyLinkedin || '',
+    twiSite: c.site || '', twiEmail: c.email || '', twiPhone: c.phone || '', twiLinkedin: c.linkedin || '',
   };
   renderOwnerEditor();
   document.getElementById('ownerModal').classList.add('open');
@@ -68355,6 +68400,7 @@ function renderOwnerEditor() {
       labelled as stated by your company. The company name, country, categories and locations are maintained by
       TankWorld India — contact us if any of those need correcting.</div>
     ${contactRow('companySite', 'Website', d.twiSite, 'https://www.example.com')}
+    ${contactRow('companyLinkedin', 'LinkedIn page', d.twiLinkedin, 'https://www.linkedin.com/company/your-company')}
     ${contactRow('companyEmail', 'Contact email', d.twiEmail, 'sales@example.com')}
     ${contactRow('companyPhone', 'Contact phone', d.twiPhone, '+91 …')}
     ${psEditorHtml(d, PS_EDITOR_OWNER)}
@@ -68401,6 +68447,8 @@ async function saveOwnerListing() {
   if (!d || !currentUser) return;
   const problems = [];
   if (d.companySite && !safeSiteUrl(d.companySite)) problems.push('Website should be a web address, e.g. https://www.example.com.');
+  if (d.companyLinkedin && !safeLinkedinUrl(d.companyLinkedin)) problems.push('LinkedIn should be a LinkedIn page, e.g. https://www.linkedin.com/company/your-company.');
+  if ((d.companyLinkedin || '').length > 300) problems.push('The LinkedIn address is too long.');
   if (d.companyEmail && safeEmail(d.companyEmail) !== d.companyEmail) problems.push("Contact email doesn't look like a single valid email address.");
   if (d.companyPhone && !safePhone(d.companyPhone)) problems.push('Contact phone may only contain digits, spaces and + - ( ) . /');
   if ((d.companySite || '').length > 300 || (d.companyEmail || '').length > 200 || (d.companyPhone || '').length > 60) problems.push('One of the contact fields is too long.');
@@ -68418,6 +68466,7 @@ async function saveOwnerListing() {
   const payload = {
     companySections: ps.out,
     companySite: d.companySite ? safeSiteUrl(d.companySite) : '',
+    companyLinkedin: d.companyLinkedin ? safeLinkedinUrl(d.companyLinkedin) : '',
     companyEmail: d.companyEmail || '',
     companyPhone: d.companyPhone || '',
     companyUpdatedAt: new Date(),
@@ -68641,6 +68690,7 @@ async function saveCompany() {
       spotlight: editDraft.spotlight || null,
       legalName: editDraft.legalName || '', registrationId: editDraft.registrationId || '',
       legalNameSource: editDraft.legalNameSource || '',
+      linkedin: safeLinkedinUrl(editDraft.linkedin) || '',
       updatedAt: new Date(),
     });
     // Reflect immediately in the in-memory roster so the directory updates
@@ -68940,6 +68990,7 @@ const AN_FIXED_COLS = [
   ['legalName', 'Registered legal name', c => c.legalName || ''],
   ['registrationId', 'Registration ID', c => c.registrationId || ''],
   ['legalNameSource', 'Legal name source', c => c.legalNameSource || ''],
+  ['linkedin', 'LinkedIn', c => c.linkedin || ''],
   ['certifications', 'Certifications', c => (c.certifications || []).map(s => CERTIFICATION_LABELS[s] || s).join('; ')],
   ['ownerUid', 'Managed by owner', c => c.ownerUid ? 'Yes' : ''],
 ];

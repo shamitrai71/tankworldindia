@@ -46,14 +46,74 @@ service cloud.firestore {
     // market. To reopen public browsing at launch, change this one line
     // back to `allow read: if true;` and flip REQUIRE_APPROVAL_TO_VIEW to
     // false in index.html — the two are meant to be toggled together.
-    // Only admin writes. Once claims exist, a listing's owner may update
-    // their own record.
+    //
+    // WRITES — two kinds of writer, deliberately kept apart:
+    //  • Admins (TWI) may write anything. `profileSections` is admin-only,
+    //    and it is the ONLY place an entry can be marked "verified".
+    //  • A listing owner (the approved claimant, via ownerUid) may update
+    //    their OWN company doc, and only the fields in ownerEditableFields().
+    //    Their profile entries go in `companySections`, which every reader
+    //    treats as company-stated no matter what an entry says about itself.
+    //
+    // Why split storage instead of checking each entry's "prov" flag:
+    // Firestore rules cannot loop through a list, so no rule can inspect
+    // every entry for prov == "verified". Trust therefore comes from WHERE
+    // the data lives (admin-only field vs owner field), not from a field the
+    // writer controls. The same logic keeps name, country, categories, Place
+    // ID, certifications and ownerUid itself out of an owner's reach —
+    // those are TWI's validated data.
+    // Owner contact details live in their OWN fields (companySite etc.),
+    // never in TWI's site/email/phone: the seed functions rewrite those from
+    // the static roster, so an owner edit stored there would be silently
+    // wiped by the next reseed. Readers show the owner's value first and
+    // fall back to TWI's.
+    function ownerEditableFields() {
+      return ['companySections', 'companySite', 'companyEmail', 'companyPhone', 'companyLinkedin',
+              'companyUpdatedAt', 'companyUpdatedBy'];
+    }
+    function isListingOwner() {
+      return isApprovedUser()
+          && 'ownerUid' in resource.data
+          && resource.data.ownerUid == request.auth.uid;
+    }
+    // Rules can't iterate lists, but they can check each known section key
+    // explicitly: it must be a list, capped in length. Entry contents are
+    // treated as untrusted and escaped/sanitised by every reader instead.
+    function validSectionList(cs, key) {
+      return !(key in cs) || (cs[key] is list && cs[key].size() <= 100);
+    }
+    function validCompanySections(cs) {
+      return cs is map
+          && cs.keys().hasOnly(['certifications', 'accreditations', 'affiliations',
+                                'clients', 'projects', 'patents', 'highlights'])
+          && validSectionList(cs, 'certifications')
+          && validSectionList(cs, 'accreditations')
+          && validSectionList(cs, 'affiliations')
+          && validSectionList(cs, 'clients')
+          && validSectionList(cs, 'projects')
+          && validSectionList(cs, 'patents')
+          && validSectionList(cs, 'highlights');
+    }
+    function validShortString(data, field, maxLen) {
+      return !(field in data) || (data[field] is string && data[field].size() <= maxLen);
+    }
+    function isValidOwnerUpdate() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(ownerEditableFields())
+          // Every owner write is stamped with who made it.
+          && request.resource.data.companyUpdatedBy == request.auth.uid
+          && request.resource.data.companyUpdatedAt is timestamp
+          && (!('companySections' in request.resource.data)
+              || validCompanySections(request.resource.data.companySections))
+          && validShortString(request.resource.data, 'companySite', 300)
+          && validShortString(request.resource.data, 'companyEmail', 200)
+          && validShortString(request.resource.data, 'companyPhone', 60)
+          && validShortString(request.resource.data, 'companyLinkedin', 300);
+    }
     match /companies/{doc} {
       allow read:   if isApprovedUser();
       allow create: if isAdmin();
       allow delete: if isAdmin();
-      allow update: if isAdmin()
-                    || (isSignedIn() && resource.data.ownerUid == request.auth.uid);
+      allow update: if isAdmin() || (isListingOwner() && isValidOwnerUpdate());
     }
 
     // ── Categories ─────────────────────────────────────────────────────
@@ -95,11 +155,27 @@ service cloud.firestore {
     }
 
     // ── Company ownership claims ───────────────────────────────────────
-    // A signed-in user files a claim on a listing and can read their own;
-    // admin reads all and approves/rejects.
-    match /companyClaims/{doc} {
-      allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;
-      allow read:   if isAdmin() || (isSignedIn() && resource.data.uid == request.auth.uid);
+    // A signed-in, approved user files a claim on a listing and can read
+    // their own; admin reads all and approves/rejects. Approving a claim
+    // means an admin sets companies/{slug}.ownerUid — that field is the
+    // ONLY thing that grants edit rights, and owners can never set it
+    // themselves (it isn't in ownerEditableFields()).
+    // Doc id must be "{companySlug}_{uid}", so each person can hold at most
+    // one claim per company; a claim can only be created as "pending", so
+    // nobody can file a pre-approved claim.
+    match /companyClaims/{claimId} {
+      allow create: if isApprovedUser()
+                    && request.resource.data.uid == request.auth.uid
+                    && request.resource.data.status == 'pending'
+                    && request.resource.data.companySlug is string
+                    && claimId == request.resource.data.companySlug + '_' + request.auth.uid;
+      // get: a claimant may check their own claim by its known id. When no
+      // claim exists yet, resource is null — allowed, so "no claim" reads as
+      // a clean 404 instead of a permission error (nothing leaks: the doc
+      // doesn't exist). list: admin only — the claims queue.
+      allow get:    if isAdmin()
+                    || (isSignedIn() && (resource == null || resource.data.uid == request.auth.uid));
+      allow list:   if isAdmin();
       allow update, delete: if isAdmin();
     }
 
