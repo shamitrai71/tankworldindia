@@ -404,6 +404,18 @@ main{ flex:1; min-width:0; padding:20px 24px 60px; }
 }
 .cp-title-block{ flex:1; min-width:0; }
 .cp-name{ font-family:var(--font-display); font-weight:700; font-size:26px; line-height:1.2; margin-bottom:6px; }
+/* Trust signals: small lettered squares after a company name. Driven by the
+   SIGNALS list in the script, so new squares (a future rating system) are
+   one entry each. R = registry-matched, V = verified (claimed and managed). */
+.sig-row{ display:inline-flex; gap:3px; margin-left:7px; vertical-align:2px; white-space:nowrap; }
+.sig{ display:inline-flex; align-items:center; justify-content:center; width:15px; height:15px;
+      font-family:var(--font-mono); font-size:9.5px; font-weight:700; line-height:1; color:#fff;
+      border-radius:2px; cursor:help; }
+.sig-R{ background:var(--blue); }
+.sig-V{ background:var(--ok); }
+.sig.off{ background:transparent; color:var(--ink-faint); box-shadow:inset 0 0 0 1px var(--line); }
+.cp-name .sig-row{ gap:4px; margin-left:10px; vertical-align:5px; }
+.cp-name .sig{ width:20px; height:20px; font-size:12px; }
 .cp-slug{ font-family:var(--font-mono); font-size:10.5px; color:var(--ink-faint); word-break:break-all; }
 .cp-desc{ font-size:14px; line-height:1.65; color:var(--ink); margin:20px 0; max-width:640px; }
 .cp-links-row{ display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-bottom:28px; }
@@ -1728,7 +1740,7 @@ const SEED_COMPANIES = [];
 // instead of being embedded here. COMPANIES and SEED_COMPANIES are filled from it before
 // the app starts (startApp awaits COMPANIES_READY), so seeding behaves exactly as in the full build.
 const COMPANIES_READY = (async () => {
-  const r = await fetch('companies.json?v=6b9cadf33a');
+  const r = await fetch('companies.json?v=8a5ca75420');
   if (!r.ok) throw new Error('companies.json HTTP ' + r.status);
   const d = (await r.json()).filter(Boolean);
   COMPANIES.push(...d);
@@ -2470,10 +2482,19 @@ function clearFilters() {
 
 // Registered office is always locations[0] by construction — used anywhere
 // a single "the company's location" is needed (search, card, map pin).
-function primaryLocation(c) { return c.locations[0]; }
+// Some records have no locations yet; an empty object keeps .city / .address reads safe.
+function primaryLocation(c) { return (c.locations && c.locations[0]) || {}; }
 
+const LOC_TYPES = [
+  ['head-office','Head Office'], ['registered-office','Registered Office'], ['plant','Plant'],
+  ['regional-office','Regional Office'], ['branch-office','Branch Office'], ['service-centre','Service Centre'],
+  ['r&d-centre','R&D Centre'], ['warehouse','Warehouse'],
+  // older values kept so existing records still show and edit correctly
+  ['headquarters','Main Address'], ['office','Office'], ['branch','Branch Office'], ['facility','Facility']
+];
 function locTypeLabel(t) {
-  return { 'registered-office': 'Registered Office', 'plant': 'Plant', 'facility': 'Facility', 'branch': 'Branch Office' }[t] || t;
+  const hit = LOC_TYPES.find(x => x[0] === t);
+  return hit ? hit[1] : String(t || '').replace(/-/g, ' ').replace(/\b\w/g, m => m.toUpperCase());
 }
 
 function logoHtml(c) {
@@ -2561,7 +2582,7 @@ function renderCards() {
         <div class="card-header">
           <div class="card-logo">${logoHtml(c)}</div>
           <div class="card-title-block">
-            <div class="card-name">${c.name}</div>
+            <div class="card-name">${c.name}${signalsHtml(c)}</div>
             <div class="card-loc">${champCrownHtml(c, 'tier-crown-sm')}${flag ? flag + ' ' : ''}📍 ${locText}</div>
           </div>
         </div>
@@ -2966,6 +2987,30 @@ const TIERS = {
 };
 // "Registered as …" under the company name -- only when the registered
 // legal name says something the display name doesn't (not just capitals).
+// ── Trust signals ─────────────────────────────────────────────────────
+// One entry per square, shown after the company name on tiles and on the
+// company page. To add a square later, add an entry here and a .sig-<key>
+// colour in the CSS. Set SIGNALS_SHOW_UNEARNED = true to show every square,
+// with unearned ones outlined, once this grows into a rating scale.
+const SIGNALS = [
+  { key: 'R', label: 'Registered',
+    test: c => !!String(c.registrationId || '').trim(),
+    tip:  c => 'Registered: matched to a public company register (' + String(c.registrationId).trim() + ')' },
+  { key: 'V', label: 'Verified',
+    test: c => !!c.ownerUid,
+    tip:  c => 'Verified: this listing is claimed and managed by the company' },
+];
+const SIGNALS_SHOW_UNEARNED = false;
+function signalsHtml(c) {
+  const sq = SIGNALS.map(s => {
+    const on = s.test(c);
+    if (!on && !SIGNALS_SHOW_UNEARNED) return '';
+    const t = on ? s.tip(c) : s.label + ': not yet';
+    return `<span class="sig sig-${s.key}${on ? '' : ' off'}" title="${psEsc(t)}" aria-label="${psEsc(t)}">${s.key}</span>`;
+  }).join('');
+  return sq ? `<span class="sig-row">${sq}</span>` : '';
+}
+
 function legalLineHtml(c) {
   const ln = String(c.legalName || '').trim();
   if (!ln) return '';
@@ -2997,7 +3042,7 @@ function spotlightTile(c) {
                  : `<div class="st-logo st-logo-fallback">${(c.name || '?').slice(0, 2).toUpperCase()}</div>`}
         <span class="st-marks">${champCrownHtml(c, 'tier-crown-lg')}${flag ? `<span class="st-flag" title="${canonCountry(c.country) || ''}">${flag}</span>` : ''}</span>
       </div>
-      <div class="st-name">${c.name}</div>
+      <div class="st-name">${c.name}${signalsHtml(c)}</div>
       ${place ? `<div class="st-place">${place}</div>` : ''}
       ${cardLinksHtml(c)}
     </a>`;
@@ -3585,6 +3630,7 @@ function renderCompanyPage(slug) {
         <span class="loc-type">${locTypeLabel(l.type)}</span>
         <div class="loc-name">${l.name}</div>
         <div class="loc-city">📍 ${l.address || l.city}</div>
+        ${l.sourceUrl ? `<div class="loc-city"><a href="${l.sourceUrl}" target="_blank" rel="noopener" style="color:inherit">Source ↗</a>${l.sourceDate ? ' · ' + l.sourceDate : ''}</div>` : ''}
       </div>
       ${l.placeId
         ? `<a class="loc-map-link" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(c.name + ' ' + l.name)}&query_place_id=${l.placeId}" target="_blank" rel="noopener">View on Google Maps ↗</a>`
@@ -3615,7 +3661,7 @@ function renderCompanyPage(slug) {
     <div class="cp-header">
       <div class="cp-logo">${logoHtml(c)}</div>
       <div class="cp-title-block">
-        <div class="cp-name">${c.name}</div>
+        <div class="cp-name">${c.name}${signalsHtml(c)}</div>
         <div class="cp-slug">/company/${c.slug}</div>
         ${legalLineHtml(c)}
         ${parentLineHtml(c)}
@@ -4828,7 +4874,7 @@ function editLocField(i, field, value) {
   }
 }
 function addEditLocation() {
-  editDraft.locations.push({ type:'registered-office', name:'', address:'', city:'', lat:null, lng:null, placeId:null });
+  editDraft.locations.push({ type:'registered-office', name:'', address:'', city:'', state:'', country:'', lat:null, lng:null, placeId:null, sourceUrl:'', sourceDate:'' });
   renderCompanyEditor();
 }
 function removeEditLocation(i) {
@@ -5011,8 +5057,8 @@ function renderCompanyEditor() {
         <div class="ed-loc">
           <div class="ed-loc-head">
             <select onchange="editLocField(${i},'type',this.value)">
-              ${['registered-office','plant','facility','branch'].map(t =>
-                `<option value="${t}" ${l.type===t?'selected':''}>${t}</option>`).join('')}
+              ${LOC_TYPES.map(([t, lab]) =>
+                `<option value="${t}" ${l.type===t?'selected':''}>${lab}</option>`).join('')}
             </select>
             <button class="btn-mini rust" onclick="removeEditLocation(${i})">Remove</button>
           </div>
@@ -5022,6 +5068,13 @@ function renderCompanyEditor() {
                  oninput="editLocField(${i},'address',this.value)">
           <input type="text" placeholder="City, State" value="${(l.city||'').replace(/"/g,'&quot;')}"
                  oninput="editLocField(${i},'city',this.value)">
+          <div class="ed-row-3">
+            <input type="text" placeholder="State / region" value="${(l.state||'').replace(/"/g,'&quot;')}" oninput="editLocField(${i},'state',this.value)">
+            <input type="text" placeholder="Country" value="${(l.country||'').replace(/"/g,'&quot;')}" oninput="editLocField(${i},'country',this.value)">
+            <input type="text" placeholder="Source date (YYYY-MM-DD)" value="${(l.sourceDate||'').replace(/"/g,'&quot;')}" oninput="editLocField(${i},'sourceDate',this.value)">
+          </div>
+          <input type="text" placeholder="Source URL (official page this location came from)" value="${(l.sourceUrl||'').replace(/"/g,'&quot;')}"
+                 oninput="editLocField(${i},'sourceUrl',this.value)">
           <div class="ed-row-3">
             <input type="text" placeholder="lat" value="${l.lat ?? ''}" oninput="editLocField(${i},'lat',this.value)">
             <input type="text" placeholder="lng" value="${l.lng ?? ''}" oninput="editLocField(${i},'lng',this.value)">
@@ -6287,7 +6340,7 @@ async function anExportXlsx() {
   const locs = [];
   list.forEach(c => (c.locations || []).forEach(l => locs.push({
     'Company ID': c.id, Company: c.name, Country: c.country, Type: l.type || '', 'Location name': l.name || '',
-    Address: l.address || '', City: l.city || '', 'Place ID': l.placeId || '', Lat: l.lat ?? '', Lng: l.lng ?? '' })));
+    Address: l.address || '', City: l.city || '', State: l.state || '', 'Location country': l.country || '', 'Source URL': l.sourceUrl || '', 'Source date': l.sourceDate || '', 'Place ID': l.placeId || '', Lat: l.lat ?? '', Lng: l.lng ?? '' })));
   const summary = [['TWI data analysis'], ['Generated', new Date().toLocaleString()], ['Filters', anFilterSummary()], ['Companies', list.length], []];
   anChartData(list).forEach(ch => { summary.push([ch.title]); ch.rows.forEach(r => summary.push([r[1], r[3] || r[2]])); summary.push([]); });
   const wb = XLSX.utils.book_new();
