@@ -2,6 +2,9 @@
 
 *Internal working document — captures the discussion following TWI reaching ~5,000 companies and the SAMREF AML data-quality pass.*
 
+> **Update 17 Oct 2026:** cross-app decisions now live in `T3_DECISIONS.md` at the repo root (same file in all three T3 repos). Where this doc disagrees with it, `T3_DECISIONS.md` wins.
+> Section 12 below records what changed on 17 Oct 2026.
+
 ---
 
 ## 1. The Three Apps, As They Stand Today
@@ -217,3 +220,68 @@ A TankBazaar search index's schema — what's indexed, what's facetable, whether
 - One shared Typesense instance for Tankonomics + TankBazaar, or two separate ones (see Open Question #6 above).
 - Firebase's official Algolia/Typesense sync Extensions exist and would handle the Firestore→search-index sync automatically — worth using instead of hand-building that pipeline, but not yet evaluated in detail against this project's specific needs.
 - Whether TWI's search need ever outgrows client-side (e.g., if it eventually gains TankBazaar-style schema heterogeneity) — no evidence of that today, flagged only as a "revisit if" rather than a current concern.
+
+---
+
+## 12. Update — 17 Oct 2026
+
+Reviewed with the Tankonomics and TankWorldIndia repos and the current
+TankBazaar build. Full record in `T3_DECISIONS.md`.
+
+**What is now decided:**
+
+- **TankBazaar data.** It will also be copied into the `tankonomics` project,
+  one way, and stays in TankBazaar as the master copy. TankBazaar keeps its
+  named `tankbazaar` database.
+- **One sign-in.** Tankonomics is the single sign-in for TankBazaar and
+  TankWorldIndia, through a bridge endpoint on Tankonomics' Cloud Run.
+- **Access to TankBazaar.** It is a per-user permission in Tankonomics, granted
+  by the super admin, approved admins or payment. It also requires a company
+  link (owner or owner-approved). Location owners become the approved
+  claimants of the matching TankBazaar facilities.
+- **TankWorldIndia hosting** moves to Cloud Run; its Firestore database stays.
+- **Database.** Firestore stays for all three apps; Cloud Spanner is not
+  adopted.
+
+**Effect on the open questions in §10:**
+
+1. *TankBazaar access* — resolved. The repos and data were reviewed together on
+   17 Oct.
+2. *TankBazaar internal structure* — resolved for now:
+   - Terminals and plants are one `terminals` collection with
+     `facilityClass[]`, `processType[]` and `type` as the discriminators.
+   - Pipelines, rigs, fields and basins are separate datasets, served as
+     versioned bundles.
+   - So the §8 recommendation (a type field from day one) is met. Search
+     schema design can proceed against this shape.
+3. *500-member list* — unchanged, still open.
+4. *Pagination* — already resolved in §11.
+5. *Supplier Profile extension* — unchanged, still open.
+6. *Shared or separate search instance* — proposed: one shared index with a
+   section per app, with search keys limited to what the user's tier may see
+   (`T3_DECISIONS.md` §8).
+
+**§3's hold on merging company data** still stands for seeding company records
+into Tankonomics. The sign-in and the facility links do not move company data;
+they only connect the apps.
+
+**New exposure found:** `companies.json` (about 9,450 companies on 18 Oct) is
+served publicly from hosting and committed to the repo, so the Firestore access
+gate does not protect it. The single-file build, which embeds the same list, must
+not be committed or hosted either. Close this as part of the Cloud Run move
+(`T3_DECISIONS.md` §9).
+
+**TankWorldIndia preparation for the merge (added 18 Oct).** §3's first reason,
+"data needs revalidation first", is being worked through:
+
+- The identity, location and status rules are recorded in `T3_DECISIONS.md`
+  §10.
+- About 3,850 of about 9,450 companies carry a verified legal name and
+  registration ID; about 5,600 in 90 countries are being verified country by
+  country.
+- Retired slugs (merged duplicates and deleted inactive companies) are listed
+  in `TWI_RETIRED_SLUGS.csv`, so cross-app links can resolve them.
+- Matching against TankBazaar and Tankonomics should use the registration IDs
+  first (`T3_DECISIONS.md` §5).
+- The TankWorldIndia build items from the 17 Oct plan are in
+  `T3_TWI_WORKPLAN.md`.

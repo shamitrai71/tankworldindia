@@ -1740,7 +1740,7 @@ const SEED_COMPANIES = [];
 // instead of being embedded here. COMPANIES and SEED_COMPANIES are filled from it before
 // the app starts (startApp awaits COMPANIES_READY), so seeding behaves exactly as in the full build.
 const COMPANIES_READY = (async () => {
-  const r = await fetch('companies.json?v=8a5ca75420');
+  const r = await fetch('companies.json?v=f4b455599e');
   if (!r.ok) throw new Error('companies.json HTTP ' + r.status);
   const d = (await r.json()).filter(Boolean);
   COMPANIES.push(...d);
