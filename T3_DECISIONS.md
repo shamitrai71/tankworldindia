@@ -3,7 +3,7 @@
 The single record of cross-app decisions for the three T3 apps. The same file
 sits at the root of all three repos; when it changes, copy it to all three.
 
-- **Last updated:** 18 Oct 2026.
+- **Last updated:** 25 Oct 2026.
 - **Status words:**
   - **Decided** means Shamit decided it.
   - **Proposed** means a design waiting for review.
@@ -243,8 +243,8 @@ in the code at `4a13ce9`:
 
 | App | Exposure | Fix |
 |---|---|---|
-| TankWorldIndia | `companies.json` (about 9,450 companies on 18 Oct) is served from hosting and committed to the repo, so anyone can download it | Serve it from Cloud Run only to approved, signed-in users, or load from Firestore; remove it from the repo |
-| TankWorldIndia | The single-file build (`index.html` with the company list embedded) exposes the same data | Never commit or host the single-file build; deploy only the split build (`index.html` + `companies.json`) until the Cloud Run move |
+| TankWorldIndia | `companies.json` was served from hosting and committed to the repo, so anyone could download it | **Fixed 25 Oct (roster v2):** the roster is published into Firestore (`meta/roster`, `rosterParts`) behind the approved-user rule; hosting serves `index.html` only; `companies.json` removed from the repo (and from git history if the repo is public) |
+| TankWorldIndia | The single-file build (`index.html` with the company list embedded) exposes the same data | Never commit or host the single-file build; deploy only the roster v2 `index.html` |
 | TankBazaar | Pipelines, rigs, fields and basins are still embedded in `index.html` | Phases 2 to 4 of the data move |
 | TankBazaar | `liveDataCache` rule is `allow read, write: if true` | Give the vessels function its own service account, then close the rule |
 | Tankonomics | `users` readable by any signed-in user; open notification creation; browser-written counters | §7 items 3 and 5 |
@@ -319,3 +319,11 @@ until this preparation is done.
   from the plan in §4, the single-file build exposure in §9, and the database
   location note in §7. The plan now lives in the TankBazaar repo at
   `docs/TB_DATA_MOVE_PLAN.md`.
+- **25 Oct 2026:** TankWorldIndia roster v2 (`docs/TWI_COST_REDESIGN.md` in
+  the TankWorldIndia repo). Visitors no longer list the `companies`
+  collection (about 9,500 reads per visit) and hosting no longer serves the
+  roster (49.65 GB of hosting downloads in 1–25 Oct). The roster is published
+  from the admin panel into `meta/roster` + `rosterParts` (gzipped, about
+  0.9 MB per doc, same pattern as TankBazaar's bundles in §2); in-app edits
+  go to `companyEdits`. Seeding is retired; a data update needs no deploy.
+  §9 TankWorldIndia exposure closed.

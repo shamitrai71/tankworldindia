@@ -1735,18 +1735,77 @@ const COMPANIES = [];
 // .filter(Boolean) guards against array elisions — a stray double comma in
 // the literal above creates a hole, which JSON.stringify turns into null,
 // and any consumer reading .slug then throws mid-run. Cheap insurance.
-const SEED_COMPANIES = [];
-// DEPLOY BUILD: the roster lives in companies.json (versioned URL, cached by the browser)
-// instead of being embedded here. COMPANIES and SEED_COMPANIES are filled from it before
-// the app starts (startApp awaits COMPANIES_READY), so seeding behaves exactly as in the full build.
-const COMPANIES_READY = (async () => {
-  const r = await fetch('companies.json?v=d71f516f6a');
-  if (!r.ok) throw new Error('companies.json HTTP ' + r.status);
-  const d = (await r.json()).filter(Boolean);
-  COMPANIES.push(...d);
-  SEED_COMPANIES.push(...JSON.parse(JSON.stringify(d)));
-})();
-COMPANIES_READY.catch(e => console.warn('[TANKWORLDINDIA] companies.json failed:', e.message));
+// ══════════════════════════════════════════════════════════════════════
+// ROSTER v2 — cost redesign (Oct 2026). See TWI_COST_REDESIGN.md.
+//
+// Before: every page load listed the whole `companies` collection
+// (~9,500 billed Firestore reads per visit), every data change needed a
+// hosting deploy of a 7.7 MB companies.json (publicly downloadable), and
+// every deploy was followed by a full re-seed (~9,500 writes).
+//
+// Now:
+//   meta/roster                 one small doc: current version, part count, checksum
+//   rosterParts/{version}_{i}   the whole roster, gzipped + base64, ~0.9 MB per doc
+//   companyEdits/{slug}         only the fields changed in the app (editor, claims, logos)
+//
+// A visit costs 1 read (meta) + 1 read (edits query) when the browser
+// already has the current version cached, or a handful more (the parts)
+// the first time it sees a new version. Data updates are published from
+// the admin panel with a companies.json file — no hosting deploy needed.
+// The `companies/{slug}` docs stay (claims/ownership rules use them) but
+// are no longer read by visitors.
+// ══════════════════════════════════════════════════════════════════════
+const SEED_COMPANIES = [];   // retired: seeding replaced by Publish roster; kept so old references don't break
+const ROSTER = {
+  META_COL: 'meta', META_DOC: 'roster', PARTS: 'rosterParts', EDITS: 'companyEdits',
+  PART_CHARS: 900000,      // Firestore doc limit is 1 MiB; leave headroom
+  // Fields that exist only in Firestore (added in the app, not in the offline
+  // master roster). Carried forward from the live data on every publish.
+  // Logos are managed in the app (Storage uploads), so the live logo wins.
+  PRESERVE_ALWAYS: ['logo', 'profileSections', 'companySections', 'ownerUid', 'ownerSince',
+                    'companyUpdatedAt', 'companyUpdatedBy'],
+  // Carried forward only when the new roster has no value of its own.
+  PRESERVE_IF_EMPTY: ['certifications', 'capacity', 'spotlight'],
+};
+function rosterEmpty(v) {
+  return v === null || v === undefined || v === '' ||
+         (Array.isArray(v) && !v.length) ||
+         (typeof v === 'object' && !Array.isArray(v) && !Object.values(v).some(x => !rosterEmpty(x)));
+}
+async function rosterGzipB64(str) {
+  const stream = new Blob([str]).stream().pipeThrough(new CompressionStream('gzip'));
+  const buf = new Uint8Array(await new Response(stream).arrayBuffer());
+  let s = '';
+  for (let i = 0; i < buf.length; i += 0x8000) s += String.fromCharCode.apply(null, buf.subarray(i, i + 0x8000));
+  return btoa(s);
+}
+async function rosterGunzipB64(b64) {
+  const bin = atob(b64);
+  const u = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
+  const stream = new Blob([u]).stream().pipeThrough(new DecompressionStream('gzip'));
+  return await new Response(stream).text();
+}
+async function rosterSha256(str) {
+  const d = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return [...new Uint8Array(d)].map(b => b.toString(16).padStart(2, '0')).join('');
+}
+// Apply one companyEdits doc (only the fields edited in the app) to a roster list.
+function rosterApplyEdit(list, bySlug, slug, edit) {
+  const fields = {};
+  for (const [k, v] of Object.entries(edit)) if (k[0] !== '_') fields[k] = v;
+  const cur = bySlug.get(slug);
+  if (edit._deleted) {
+    if (cur) { list.splice(list.indexOf(cur), 1); bySlug.delete(slug); }
+    return;
+  }
+  if (cur) Object.assign(cur, fields);
+  else if (fields.name) {               // company created in the app
+    const c = { slug, cats: [], locations: [], ...fields };
+    list.push(c); bySlug.set(slug, c);
+  }
+}
+
 </script>
 
 <script>
@@ -1844,7 +1903,16 @@ const FS_REST = {
   },
   // PATCH with an updateMask = merge semantics: only the listed fields are
   // written, anything else on the document is preserved.
+  // Every write to companies/{slug} is mirrored into companyEdits/{slug}
+  // (only the changed fields), which is what visitors read on top of the
+  // published roster. See ROSTER v2.
   async setMerge(collection, docId, data) {
+    const res = await FS_REST._rawSetMerge(collection, docId, data);
+    if (collection === 'companies')
+      await FS_REST._rawSetMerge(ROSTER.EDITS, docId, { ...data, _deleted: false, _editedAt: new Date() });
+    return res;
+  },
+  async _rawSetMerge(collection, docId, data) {
     const token = await FS_REST.token();
     const mask = Object.keys(data).map(k => `updateMask.fieldPaths=${encodeURIComponent(k)}`).join('&');
     const res = await fetch(`${FS_REST.base()}/${collection}/${docId}?${mask}`, {
@@ -1856,6 +1924,30 @@ const FS_REST = {
     return res.json();
   },
   async deleteDoc(collection, docId) {
+    await FS_REST._rawDelete(collection, docId);
+    if (collection === 'companies')
+      await FS_REST._rawSetMerge(ROSTER.EDITS, docId, { _deleted: true, _editedAt: new Date() });
+  },
+  // Documents in `collection` whose timestamp `field` is after `iso`.
+  // An empty result is billed as one read.
+  async queryAfter(collection, field, iso) {
+    const token = await FS_REST.token();
+    const body = { structuredQuery: { from: [{ collectionId: collection }],
+      where: { fieldFilter: { field: { fieldPath: field }, op: 'GREATER_THAN', value: { timestampValue: iso } } } } };
+    const res = await fetch(`${FS_REST.base()}:runQuery`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...(token ? { 'Authorization': 'Bearer ' + token } : {}) },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) throw new Error('REST ' + res.status + ': ' + (await res.text()).slice(0, 160));
+    const rows = await res.json();
+    return (rows || []).filter(r => r.document).map(r => {
+      const o = FS_REST.fromFields(r.document.fields);
+      o._docId = r.document.name.split('/').pop();
+      return o;
+    });
+  },
+  async _rawDelete(collection, docId) {
     const token = await FS_REST.token();
     const res = await fetch(`${FS_REST.base()}/${collection}/${docId}`, {
       method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token },
@@ -2047,62 +2139,215 @@ const CompanyCache = {
 
 const CompanyStore = {
   isLive: false,
-  async load() {
+  meta: null,        // meta/roster doc of the version on screen
+  noRoster: false,   // true when nothing has been published yet
+  editCount: 0,      // companies carrying in-app edits on top of the published roster
+  _loading: null,
+  CACHE_KEY: 'rosterV2',
+
+  async _cacheRead() {
     try {
-      // FIX: this used to call FS_REST.listPublic('companies') — a genuinely
-      // unauthenticated request with no ID token attached. That was correct
-      // when companies were publicly readable (`allow read: if true`), but
-      // once the access gate changed the rule to require isApprovedUser()
-      // (see firestore.rules), an unauthenticated read is rejected with
-      // 403 PERMISSION_DENIED every time, regardless of whether the current
-      // browser session is actually signed in and approved — listPublic
-      // never sends the credentials that would prove that. listAuth sends
-      // the caller's ID token, which is what isApprovedUser() actually
-      // needs to evaluate. Safe for the eventual public-launch flip too:
-      // once REQUIRE_APPROVAL_TO_VIEW is set back to false and the rule
-      // reverts to `allow read: if true`, an anonymous visitor's missing
-      // token just evaluates as request.auth == null, which that rule
-      // doesn't require anyway.
-      const docs = await FS_REST.listAuth('companies');
-      if (docs && docs.length) {
-        COMPANIES.length = 0;
-        COMPANIES.push(...docs.filter(Boolean));
-        this.isLive = true;
-        console.log('%c[TANKWORLDINDIA] Firestore · ' + docs.length + ' companies · project=' +
-                    firebaseConfig.projectId + ' · db=' + FIRESTORE_DB_ID,
-                    'color:#1B4B7A;font-weight:bold');
-        // Fire-and-forget — never block the live load waiting on a cache
-        // write, and never let a cache failure surface as if the real load
-        // failed.
-        CompanyCache.write(docs.filter(Boolean));
-      } else {
-        console.log('%c[TANKWORLDINDIA] Firestore reachable but empty — using seed roster (' +
-                    COMPANIES.length + ')', 'color:#C0602A');
-      }
+      const db = await CompanyCache._openDb();
+      return await new Promise((resolve, reject) => {
+        const req = db.transaction(CompanyCache.STORE, 'readonly').objectStore(CompanyCache.STORE).get(this.CACHE_KEY);
+        req.onsuccess = () => resolve(req.result || null);
+        req.onerror = () => reject(req.error);
+      });
+    } catch (err) { return null; }
+  },
+  async _cacheWrite(rec) {
+    try {
+      const db = await CompanyCache._openDb();
+      await new Promise((resolve, reject) => {
+        const tx = db.transaction(CompanyCache.STORE, 'readwrite');
+        const st = tx.objectStore(CompanyCache.STORE);
+        st.put(rec, this.CACHE_KEY);
+        st.delete(CompanyCache.KEY);          // drop the old v1 full-collection cache
+        tx.oncomplete = resolve;
+        tx.onerror = () => reject(tx.error);
+      });
     } catch (err) {
-      console.warn('[TANKWORLDINDIA] Firestore unavailable, using seed roster:', err.message);
+      console.warn('[TANKWORLDINDIA] Cache write failed (non-fatal):', err.message);
     }
-    return COMPANIES;
+  },
+  _build(rec) {
+    const list = JSON.parse(JSON.stringify(rec.base));
+    const bySlug = new Map(list.map(c => [c.slug, c]));
+    for (const [slug, e] of Object.entries(rec.overlay || {})) rosterApplyEdit(list, bySlug, slug, e);
+    COMPANIES.length = 0;
+    COMPANIES.push(...list);
+    this.isLive = true;
+    this.meta = rec.meta || this.meta;
+    this.editCount = Object.keys(rec.overlay || {}).length;
   },
 
-  // Fast path for first paint: populate COMPANIES from the IndexedDB cache
-  // synchronously-fast (no network) if one exists. Returns true on a cache
-  // hit, false otherwise — the caller still runs a real load() afterward
-  // regardless, this just avoids the visitor staring at a blank/loading
-  // dashboard while that real load's ~34 sequential round-trips complete.
+  // Fast first paint from the browser cache (no network at all).
   async loadFromCache() {
-    const cached = await CompanyCache.read();
-    if (!cached || !cached.companies || !cached.companies.length) return false;
-    COMPANIES.length = 0;
-    COMPANIES.push(...cached.companies);
-    this.isLive = true;
-    const ageMin = Math.round((Date.now() - cached.savedAt) / 60000);
-    console.log('%c[TANKWORLDINDIA] Loaded ' + cached.companies.length +
-                ' companies from cache (' + ageMin + ' min old) — refreshing in background',
-                'color:#8A8A8A');
+    const rec = await this._cacheRead();
+    if (!rec || !rec.base || !rec.base.length) return false;
+    this._build(rec);
+    console.log('%c[TANKWORLDINDIA] Roster ' + rec.version + ' from cache (' + COMPANIES.length +
+                ' companies) — checking for updates', 'color:#8A8A8A');
     return true;
   },
+
+  // 1 read (meta) + 1 read (edits since last check) when the cached version
+  // is current; plus the part docs only when a new version was published.
+  async load() {
+    if (this._loading) return this._loading;
+    this._loading = (async () => {
+      try {
+        const meta = await FS_REST.getDoc(ROSTER.META_COL, ROSTER.META_DOC);
+        if (!meta || !meta.version) {
+          this.noRoster = true;
+          console.warn('[TANKWORLDINDIA] No roster published yet — admin: Publish roster in the admin panel.');
+          return COMPANIES;
+        }
+        this.noRoster = false;
+        let rec = await this._cacheRead();
+        if (!rec || rec.version !== meta.version || !rec.base) {
+          const ids = Array.from({ length: meta.parts }, (_, i) => meta.version + '_' + i);
+          const parts = await Promise.all(ids.map(id => FS_REST.getDoc(ROSTER.PARTS, id)));
+          if (parts.some(p => !p || typeof p.data !== 'string')) throw new Error('roster part missing');
+          const txt = await rosterGunzipB64(parts.map(p => p.data).join(''));
+          if (meta.sha256 && (await rosterSha256(txt)) !== meta.sha256) throw new Error('roster checksum mismatch');
+          // Edits written up to the publish moment are already baked into the
+          // parts; look back 10 min to allow for clock differences.
+          const since = new Date(new Date(meta.publishedAt).getTime() - 10 * 60000).toISOString();
+          rec = { version: meta.version, base: JSON.parse(txt).filter(Boolean), overlay: {}, sync: since };
+          console.log('%c[TANKWORLDINDIA] Roster ' + meta.version + ' downloaded · ' + rec.base.length +
+                      ' companies · ' + meta.parts + ' part(s)', 'color:#1B4B7A;font-weight:bold');
+        }
+        rec.meta = meta;
+        const edits = await FS_REST.queryAfter(ROSTER.EDITS, '_editedAt', rec.sync);
+        for (const e of edits) {
+          rec.overlay[e._docId] = e;
+          if (String(e._editedAt) > String(rec.sync)) rec.sync = String(e._editedAt);
+        }
+        this._build(rec);
+        this._cacheWrite(rec);
+      } catch (err) {
+        console.warn('[TANKWORLDINDIA] Roster load failed, keeping what is on screen:', err.message);
+      } finally {
+        this._loading = null;
+      }
+      return COMPANIES;
+    })();
+    return this._loading;
+  },
 };
+
+// ── Publishing (admin) ──────────────────────────────────────────────────
+// Takes the offline master roster (companies.json), carries forward the
+// fields that only exist in Firestore (owner, profile sections, logos …),
+// bakes in every in-app edit, and writes it as a new version. Costs a few
+// writes per publish instead of one per company. The very first publish
+// also reads the existing companies collection once so nothing added in
+// the app so far is lost.
+async function publishRoster(roster, sourceName, opts = {}) {
+  if (!isAdminUser(currentUser) && !opts.test) throw new Error('Admin only.');
+  const say = opts.log || adminLog;
+  roster = (roster || []).filter(Boolean);
+  const slugs = new Set();
+  for (const c of roster) {
+    if (!c.slug || !c.name) throw new Error('A record has no slug or name (id ' + c.id + ')');
+    if (slugs.has(c.slug)) throw new Error('Duplicate slug in file: ' + c.slug);
+    slugs.add(c.slug);
+  }
+  // 1. what is live now
+  let prev;
+  if (CompanyStore.noRoster || !CompanyStore.meta) {
+    say('First publish: reading the existing companies collection once to keep app-only fields…');
+    prev = await FS_REST.listAuth('companies');
+    prev.forEach(d => { d.slug = d.slug || d.id; });
+  } else {
+    prev = COMPANIES;
+  }
+  const prevBy = new Map(prev.map(c => [c.slug, c]));
+  // 2. carry forward app-only fields
+  const out = JSON.parse(JSON.stringify(roster));
+  let carried = 0;
+  for (const c of out) {
+    const p = prevBy.get(c.slug);
+    if (!p) continue;
+    let hit = false;
+    for (const f of ROSTER.PRESERVE_ALWAYS) if (!rosterEmpty(p[f])) { c[f] = p[f]; hit = true; }
+    for (const f of ROSTER.PRESERVE_IF_EMPTY) if (rosterEmpty(c[f]) && !rosterEmpty(p[f])) { c[f] = p[f]; hit = true; }
+    if (hit) carried++;
+  }
+  const lost = prev.filter(p => !slugs.has(p.slug) && ROSTER.PRESERVE_ALWAYS.some(f => !rosterEmpty(p[f])));
+  // 3. bake in every in-app edit
+  const edits = await FS_REST.queryAfter(ROSTER.EDITS, '_editedAt', '2000-01-01T00:00:00Z');
+  const bySlug = new Map(out.map(c => [c.slug, c]));
+  for (const e of edits) rosterApplyEdit(out, bySlug, e._docId, e);
+  // 4. encode and write
+  const txt = JSON.stringify(out);
+  const sha = await rosterSha256(txt);
+  const b64 = await rosterGzipB64(txt);
+  const nParts = Math.ceil(b64.length / ROSTER.PART_CHARS);
+  const now = new Date();
+  const version = 'v' + now.toISOString().replace(/[-:]/g, '').slice(0, 15);
+  if (!opts.skipConfirm && !confirm(
+      `Publish ${out.length} companies as roster ${version}?\n\n` +
+      `${carried} keep app-only fields (owner, profile sections, logos …); ` +
+      `${edits.length} in-app edit(s) baked in; ${lost.length} live compan${lost.length === 1 ? 'y' : 'ies'} with an owner or profile sections ` +
+      `are not in the new file.\n\nWrites ${nParts + 1} documents.`)) return null;
+  for (let i = 0; i < nParts; i++) {
+    await FS_REST.setMerge(ROSTER.PARTS, version + '_' + i,
+      { version, i, data: b64.slice(i * ROSTER.PART_CHARS, (i + 1) * ROSTER.PART_CHARS) });
+    say(`✓ part ${i + 1}/${nParts}`);
+  }
+  const old = CompanyStore.meta;
+  await FS_REST.setMerge(ROSTER.META_COL, ROSTER.META_DOC, {
+    version, parts: nParts, count: out.length, sha256: sha, bytes: txt.length, gzBytes: Math.round(b64.length * 3 / 4),
+    publishedAt: now, publishedBy: (currentUser && currentUser.email) || '', source: sourceName || '',
+    previous: old ? old.version : null, previousParts: old ? old.parts : 0,
+  });
+  say(`✓ roster ${version} is live: ${out.length} companies, ${nParts} part(s), ${Math.round(b64.length / 1024)} KB.`);
+  // keep the previous version for rollback; remove the one before it
+  if (old && old.previous && old.previousParts) {
+    for (let i = 0; i < old.previousParts; i++) {
+      try { await FS_REST.deleteDoc(ROSTER.PARTS, old.previous + '_' + i); } catch (e) { /* already gone */ }
+    }
+  }
+  if (lost.length) say(`⚠ Not in the new file but had owner/profile data: ${lost.map(p => p.slug).join(', ')}`);
+  await CompanyStore.load();
+  return { version, count: out.length, parts: nParts, carried, edits: edits.length, lost: lost.map(p => p.slug) };
+}
+
+async function publishRosterFromFile(file) {
+  if (!file) return;
+  const log = document.getElementById('adminLog');
+  if (log) log.textContent = '';
+  try {
+    const data = JSON.parse(await file.text());
+    if (!Array.isArray(data)) throw new Error('File is not a list of companies');
+    adminLog(`Read ${file.name}: ${data.length} records.`);
+    const r = await publishRoster(data, file.name);
+    if (r) { alert(`Published ${r.version}: ${r.count} companies.`); renderAll(); renderAdminPage(); }
+  } catch (err) {
+    adminLog('✗ Publish failed: ' + err.message);
+    alert('Publish failed: ' + err.message);
+  }
+}
+
+function downloadJson(name, obj) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(obj, null, 1)], { type: 'application/json' }));
+  a.download = name;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+}
+function downloadLiveRoster() {
+  downloadJson(`TWI_live_roster_${new Date().toISOString().slice(0, 10)}.json`, COMPANIES);
+}
+async function downloadInAppEdits() {
+  try {
+    const edits = await FS_REST.queryAfter(ROSTER.EDITS, '_editedAt', '2000-01-01T00:00:00Z');
+    downloadJson(`TWI_in_app_edits_${new Date().toISOString().slice(0, 10)}.json`, edits);
+  } catch (err) { alert('Could not read edits: ' + err.message); }
+}
+
 </script>
 <script>
 // ══════════════════════════════════════════════════════════════════════
@@ -4054,6 +4299,7 @@ function adminLog(msg) {
 // records in place rather than duplicating them. Slug-as-doc-id is what keeps
 // this safe to re-run and what ties a company to the same identity across apps.
 async function seedCompanies() {
+  alert('Seeding is retired — use "Publish roster" in the admin panel.'); return;
   if (!isAdminUser(currentUser)) { alert('Admin only.'); return; }
   if (!confirm(`Write ${SEED_COMPANIES.length} companies to Firestore?\n\n` +
                `Document id = slug. Safe to re-run: existing records are updated ` +
@@ -4187,11 +4433,12 @@ async function findOrphanedCompanies() {
   wrap.innerHTML = `<div class="admin-log">Scanning Firestore…</div>`;
   try {
     const liveDocs = await FS_REST.listAuth('companies');
-    const buildSlugs = new Set(SEED_COMPANIES.map(c => c.slug));
+    if (!confirm('This reads the whole companies collection once (about 9,500 billed reads). Continue?')) { wrap.innerHTML = ''; return; }
+    const buildSlugs = new Set(COMPANIES.map(c => c.slug));
     const orphans = liveDocs.filter(d => d.slug && !buildSlugs.has(d.slug));
     _lastOrphanScan = orphans.map(o => o.slug);
     if (!orphans.length) {
-      wrap.innerHTML = `<div class="admin-note">No orphaned records — every company live in Firestore is also in this build.</div>`;
+      wrap.innerHTML = `<div class="admin-note">No orphaned records — every companies doc is also in the published roster.</div>`;
       return;
     }
     wrap.innerHTML = `
@@ -4246,6 +4493,7 @@ async function findMissingCompanies() {
 }
 
 async function seedMissingCompanies() {
+  alert('Seeding is retired — use "Publish roster" in the admin panel.'); return;
   if (!_lastMissingScan || !_lastMissingScan.length) return;
   const slugs = new Set(_lastMissingScan);
   const targets = SEED_COMPANIES.filter(c => slugs.has(c.slug));
@@ -4354,31 +4602,25 @@ function renderAdminPage() {
       <p>Roster management for the TankWorld India directory.</p>
     </div>
     <div class="admin-note">
-      <b>Data source:</b> ${CompanyStore.isLive
-        ? `Firestore — ${COMPANIES.length} companies loaded live.`
-        : `built-in seed roster (${COMPANIES.length} companies). Firestore is empty
-           or unreachable, so the directory is running on the in-page array.`}
-      <br><b>Built-in roster:</b> ${SEED_COMPANIES.length} companies in this build.
-      ${CompanyStore.isLive && SEED_COMPANIES.length > COMPANIES.length
-        ? `<br><span style="color:var(--rust);"><b>${SEED_COMPANIES.length - COMPANIES.length}
-           compan${SEED_COMPANIES.length - COMPANIES.length === 1 ? 'y is' : 'ies are'} in this
-           build but not yet in Firestore.</b> Run the seed below to write them.</span>`
-        : ``}
-      ${CompanyStore.isLive && COMPANIES.length > SEED_COMPANIES.length
-        ? `<br><span style="color:var(--rust);"><b>${COMPANIES.length - SEED_COMPANIES.length}
-           more compan${COMPANIES.length - SEED_COMPANIES.length === 1 ? 'y is' : 'ies are'} live
-           in Firestore than in this build.</b> Seeding never deletes — a company removed from
-           the build stays in Firestore until pruned on purpose. Use "Find orphaned records"
-           below to review and remove them.</span>`
-        : ``}
+      <b>Data source:</b> ${CompanyStore.noRoster
+        ? `<span style="color:var(--rust);"><b>No roster published yet.</b> Choose a companies.json file below and publish it.</span>`
+        : CompanyStore.isLive && CompanyStore.meta
+          ? `published roster <code>${CompanyStore.meta.version}</code> — ${COMPANIES.length} companies on screen
+             (${CompanyStore.meta.count} published ${CompanyStore.meta.publishedAt ? new Date(CompanyStore.meta.publishedAt).toLocaleString() : ''}
+             from ${CompanyStore.meta.source || 'file'}; ${CompanyStore.editCount} with in-app edits since).`
+          : `not loaded yet.`}
+      <br>Visitors read 1–2 documents per visit (a few more the first time they see a new version) instead of the whole collection.
+      Publishing a new roster does not need a hosting deploy.
     </div>
     <div class="admin-actions">
-      <button class="btn-action" id="btnSeed" onclick="seedCompanies()">
-        Seed ${SEED_COMPANIES.length} companies → Firestore
-      </button>
-      <button class="btn-action ghost" onclick="reloadFromFirestore()">Reload from Firestore</button>
-      <button class="btn-action ghost" onclick="findOrphanedCompanies()" title="Lists companies live in Firestore but no longer in this build — nothing is deleted until you review the list and confirm">Find orphaned records</button>
-      <button class="btn-action ghost" onclick="findMissingCompanies()" title="Lists companies in this build that never made it into Firestore — e.g. after a seed run reports some failures — without re-running the full seed">Find missing records</button>
+      <label class="btn-action" style="cursor:pointer;">
+        Publish roster from companies.json…
+        <input type="file" accept=".json,application/json" style="display:none" onchange="publishRosterFromFile(this.files[0]); this.value='';">
+      </label>
+      <button class="btn-action ghost" onclick="reloadFromFirestore()">Check for updates</button>
+      <button class="btn-action ghost" onclick="downloadLiveRoster()" title="The roster exactly as shown, with in-app edits applied">Download live roster</button>
+      <button class="btn-action ghost" onclick="downloadInAppEdits()" title="Only the fields changed in the app (editor, claims, logos) — send this before a new roster is prepared">Download in-app edits</button>
+      <button class="btn-action ghost" onclick="findOrphanedCompanies()" title="Lists companies docs no longer in the published roster. Reads the whole companies collection once (~9,500 reads) — use sparingly">Find orphaned records</button>
       <button class="btn-action ghost" onclick="openBatchLogoModal()">Batch upload logos</button>
       <button class="btn-action ghost" onclick="relinkLogosFromStorage()" title="Repairs logos wiped by a re-seed — no re-upload needed">Relink logos from Storage</button>
       <button class="btn-action ghost" onclick="location.hash='#/'">Back to directory</button>
@@ -6519,7 +6761,6 @@ async function reloadFromFirestore() {
 }
 
 async function startApp() {
-  try { await COMPANIES_READY; } catch (e) { /* falls back to Firestore */ }
   window.addEventListener('hashchange', handleRoute);
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') closeAuthModal();

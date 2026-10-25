@@ -34,18 +34,14 @@ The Firestore database stays where it is.
 
 ## B. Data exposure and hosting
 
-5. **Public roster.** `companies.json` (about 9,450 companies on 18 Oct,
-   about 7.3 MB) is served from hosting and committed to the repo, so anyone
-   can download it, whatever the database rules say.
-   - Serve it from Cloud Run only to approved, signed-in users (the server
-     checks the ID token before sending it), or load from Firestore only.
-   - Remove it from the public repo either way (and from the git history if
-     the repo is public).
-   - Never commit or host the single-file build (`index.html` with the list
-     embedded). Deploy only the split build.
+5. **Public roster — done 25 Oct (roster v2).** Hosting serves only
+   `index.html`; the roster is published from the admin panel into Firestore
+   (`meta/roster`, `rosterParts`, readable by approved users only) and in-app
+   edits go to `companyEdits`. `companies.json` is removed from the repo
+   (also remove it from the git history if the repo is public). Never commit
+   or host the single-file build. Details: `docs/TWI_COST_REDESIGN.md`.
 6. **Cloud Run hosting.** Carry over the security headers from
-   `firebase.json` (X-Frame-Options, nosniff, Referrer-Policy) and the `?v=`
-   long-cache rule. One Cloud Run service can serve both Tankonomics and
+   `firebase.json` (X-Frame-Options, nosniff, Referrer-Policy) and the cache rules. One Cloud Run service can serve both Tankonomics and
    TankWorldIndia domains, or TankWorldIndia can run as its own service;
    either works with the bridge.
 
@@ -56,8 +52,8 @@ The Firestore database stays where it is.
    already mirrors the Tankonomics master taxonomy.
 8. **Retired slugs.** Merged duplicates and deleted inactive companies are
    listed in `TWI_RETIRED_SLUGS.csv` (slug, old id, status, survivor). After
-   each reseed, run "Find orphaned records" in the admin to delete their
-   Firestore documents. The Tankonomics mapping must resolve slugs through this
+   a publish, run "Find orphaned records" in the admin (one full read of the
+   companies collection) to delete their leftover `companies` documents. The Tankonomics mapping must resolve slugs through this
    file.
 9. **Registry IDs for matching.** Records carry `legalName`, `registrationId`
    and `legalNameSource`. Matching against TankBazaar and Tankonomics uses the

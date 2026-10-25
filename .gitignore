@@ -17,3 +17,8 @@ desktop.ini
 
 # Node
 node_modules/
+
+# TWI roster files - published to Firestore from the admin panel, never committed
+companies*.json
+TWI_companies_*.json
+NOT_FOR_REPO/

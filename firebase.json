@@ -1,18 +1,13 @@
 {
+  "firestore": {
+    "rules": "firestore.rules"
+  },
   "hosting": {
     "public": ".",
     "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**",
-      "*.rules",
-      "README.md"
-    ],
-    "rewrites": [
-      {
-        "source": "**",
-        "destination": "/index.html"
-      }
+      "firebase.json", "**/.*", "**/node_modules/**", "docs/**",
+      "**/companies*.json", "**/TWI_companies_*.json",
+      "**/*.md", "**/*.csv", "**/*.xlsx", "**/*.pkl", "**/*.py", "**/*.zip", "**/*.pdf", "**/*.docx", "**/*.rules"
     ],
     "headers": [
       {
@@ -22,13 +17,9 @@
           { "key": "X-Content-Type-Options", "value": "nosniff" },
           { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
         ]
-      }
+      },
+      { "source": "/index.html", "headers": [ { "key": "Cache-Control", "value": "public, max-age=300" } ] },
+      { "source": "/",           "headers": [ { "key": "Cache-Control", "value": "public, max-age=300" } ] }
     ]
-  },
-  "firestore": {
-    "rules": "firestore.rules"
-  },
-  "storage": {
-    "rules": "storage.rules"
   }
 }
