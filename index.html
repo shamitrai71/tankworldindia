@@ -1767,6 +1767,30 @@ const ROSTER = {
   // Carried forward only when the new roster has no value of its own.
   PRESERVE_IF_EMPTY: ['certifications', 'capacity', 'spotlight'],
 };
+// Registration details (legal name, registry ID, source), the location
+// source links and research-only strings (vendor-list aliases, vendor-list
+// item lines used as descriptions) must never reach anything a visitor can
+// read. rosterScrub() is applied to the published roster, to every in-app
+// edit before it is shown or baked in, and to every write mirrored into
+// companyEdits. It mutates and returns its argument.
+const ROSTER_PRIVATE_KEYS = ['legalName', 'registrationId', 'legalNameSource'];
+function rosterVendorish(t) {
+  t = String(t || '').trim();
+  return /[();\/]/.test(t) || (t === t.toUpperCase() && t.replace(/[^A-Za-z]/g, '').length > 12);
+}
+function rosterScrub(c) {
+  if (!c || typeof c !== 'object') return c;
+  for (const k of ROSTER_PRIVATE_KEYS) delete c[k];
+  if (Array.isArray(c.locations))
+    c.locations = c.locations.map(l => {
+      if (!l || typeof l !== 'object' || !('sourceUrl' in l)) return l;
+      const o = { ...l }; delete o.sourceUrl; return o;
+    });
+  if (Array.isArray(c.aliases)) c.aliases = c.aliases.filter(a => !rosterVendorish(a));
+  if (typeof c.desc === 'string' && c.desc === c.desc.toUpperCase() &&
+      c.desc.replace(/[^A-Za-z]/g, '').length > 8) c.desc = '';
+  return c;
+}
 function rosterEmpty(v) {
   return v === null || v === undefined || v === '' ||
          (Array.isArray(v) && !v.length) ||
@@ -1794,6 +1818,7 @@ async function rosterSha256(str) {
 function rosterApplyEdit(list, bySlug, slug, edit) {
   const fields = {};
   for (const [k, v] of Object.entries(edit)) if (k[0] !== '_') fields[k] = v;
+  rosterScrub(fields);
   const cur = bySlug.get(slug);
   if (edit._deleted) {
     if (cur) { list.splice(list.indexOf(cur), 1); bySlug.delete(slug); }
@@ -1907,10 +1932,40 @@ const FS_REST = {
   // (only the changed fields), which is what visitors read on top of the
   // published roster. See ROSTER v2.
   async setMerge(collection, docId, data) {
+    if (collection === 'companies') data = rosterScrub({ ...data });
     const res = await FS_REST._rawSetMerge(collection, docId, data);
     if (collection === 'companies')
       await FS_REST._rawSetMerge(ROSTER.EDITS, docId, { ...data, _deleted: false, _editedAt: new Date() });
     return res;
+  },
+  // Set some fields and delete others in one write, leaving the rest of the
+  // document (and its field types) untouched. Not mirrored into companyEdits.
+  async _rawPatch(collection, docId, set, del) {
+    const token = await FS_REST.token();
+    const keys = [...Object.keys(set || {}), ...(del || [])];
+    const mask = keys.map(k => `updateMask.fieldPaths=${encodeURIComponent(k)}`).join('&');
+    const res = await fetch(`${FS_REST.base()}/${collection}/${docId}?${mask}&currentDocument.exists=true`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ fields: FS_REST.toFields(set || {}) }),
+    });
+    if (!res.ok) throw new Error('REST ' + res.status + ': ' + (await res.text()).slice(0, 200));
+  },
+  // Authenticated list that keeps each document's id (_docId); `fields`
+  // limits what is downloaded (e.g. skip the roster part payloads).
+  async listDocs(collection, fields) {
+    const token = await FS_REST.token();
+    const out = []; let pageToken = '';
+    const mask = (fields || []).map(f => `&mask.fieldPaths=${encodeURIComponent(f)}`).join('');
+    do {
+      const res = await fetch(`${FS_REST.base()}/${collection}?pageSize=1000${mask}` +
+        (pageToken ? `&pageToken=${encodeURIComponent(pageToken)}` : ''), { headers: { 'Authorization': 'Bearer ' + token } });
+      if (!res.ok) throw new Error('REST ' + res.status + ': ' + (await res.text()).slice(0, 160));
+      const data = await res.json();
+      (data.documents || []).forEach(d => { const o = FS_REST.fromFields(d.fields); o._docId = d.name.split('/').pop(); out.push(o); });
+      pageToken = data.nextPageToken || '';
+    } while (pageToken);
+    return out;
   },
   async _rawSetMerge(collection, docId, data) {
     const token = await FS_REST.token();
@@ -2281,6 +2336,7 @@ async function publishRoster(roster, sourceName, opts = {}) {
   const bySlug = new Map(out.map(c => [c.slug, c]));
   for (const e of edits) rosterApplyEdit(out, bySlug, e._docId, e);
   // 4. encode and write
+  out.forEach(rosterScrub);
   const txt = JSON.stringify(out);
   const sha = await rosterSha256(txt);
   const b64 = await rosterGzipB64(txt);
@@ -2313,6 +2369,61 @@ async function publishRoster(roster, sourceName, opts = {}) {
   if (lost.length) say(`⚠ Not in the new file but had owner/profile data: ${lost.map(p => p.slug).join(', ')}`);
   await CompanyStore.load();
   return { version, count: out.length, parts: nParts, carried, edits: edits.length, lost: lost.map(p => p.slug) };
+}
+
+// ── Private-data clean-up ─────────────────────────────────────────────
+// Documents written before registration details and research strings were
+// made private still hold them: companyEdits (read by visitors),
+// companies/{slug} (old seeds) and older roster versions kept for rollback.
+// Scan first, show what would change, then write. Safe to re-run.
+let _leakScan = null;
+function rosterScrubPatch(d) {
+  const clean = rosterScrub(JSON.parse(JSON.stringify(d)));
+  const del = ROSTER_PRIVATE_KEYS.filter(k => k in d);
+  const set = {};
+  for (const k of ['locations', 'aliases', 'desc'])
+    if (k in d && JSON.stringify(d[k]) !== JSON.stringify(clean[k])) set[k] = clean[k];
+  return (del.length || Object.keys(set).length) ? { set, del } : null;
+}
+async function scanPrivateLeaks() {
+  const wrap = document.getElementById('leakWrap');
+  if (!confirm('This reads every companyEdits and companies document once (about 9,500+ billed reads) and lists the stored roster parts. Nothing is written yet. Continue?')) return;
+  wrap.innerHTML = `<div class="admin-log">Scanning…</div>`;
+  try {
+    const cur = CompanyStore.meta ? CompanyStore.meta.version : null;
+    if (!cur) throw new Error('No published roster loaded — publish the clean roster first.');
+    const edits = (await FS_REST.listDocs(ROSTER.EDITS)).map(d => ({ col: ROSTER.EDITS, id: d._docId, patch: rosterScrubPatch(d) })).filter(x => x.patch);
+    const comps = (await FS_REST.listDocs('companies')).map(d => ({ col: 'companies', id: d._docId, patch: rosterScrubPatch(d) })).filter(x => x.patch);
+    const parts = (await FS_REST.listDocs(ROSTER.PARTS, ['version'])).map(d => d._docId).filter(id => !id.startsWith(cur + '_'));
+    _leakScan = { edits, comps, parts, cur };
+    const n = edits.length + comps.length + parts.length;
+    wrap.innerHTML = n ? `
+      <div class="admin-note" style="border-color:var(--rust);">
+        <b>Found:</b> ${edits.length} in-app edit doc(s) and ${comps.length} companies doc(s) holding registration details,
+        location source links or vendor-list strings; ${parts.length} roster part(s) from older versions
+        (only <code>${cur}</code> is kept).<br>Cleaning writes ${edits.length + comps.length} doc(s) and deletes ${parts.length}.
+      </div>
+      <button class="btn-action" style="background:var(--rust);" onclick="cleanPrivateLeaks()">Clean these now</button>`
+      : `<div class="admin-note">Nothing to clean — no private details or old roster parts found.</div>`;
+  } catch (err) {
+    wrap.innerHTML = `<div class="admin-note" style="border-color:var(--rust);">Scan failed: ${err.message}</div>`;
+  }
+}
+async function cleanPrivateLeaks() {
+  const s = _leakScan; if (!s) return;
+  if (!CompanyStore.meta || CompanyStore.meta.version !== s.cur) { alert('The roster changed since the scan — scan again.'); return; }
+  const wrap = document.getElementById('leakWrap');
+  let ok = 0, fail = 0;
+  const all = [...s.edits, ...s.comps];
+  for (let i = 0; i < all.length; i++) {
+    const x = all[i];
+    try { await FS_REST._rawPatch(x.col, x.id, x.patch.set, x.patch.del); ok++; } catch (e) { fail++; adminLog(`✗ ${x.col}/${x.id}: ${e.message}`); }
+    if (i % 100 === 0) wrap.innerHTML = `<div class="admin-log">Cleaning… ${i + 1}/${all.length}</div>`;
+  }
+  let del = 0;
+  for (const id of s.parts) { try { await FS_REST._rawDelete(ROSTER.PARTS, id); del++; } catch (e) { fail++; } }
+  _leakScan = null;
+  wrap.innerHTML = `<div class="admin-note">Cleaned ${ok} doc(s), deleted ${del} old roster part(s)${fail ? `, <b>${fail} failed</b> (see log) — scan again` : ''}.</div>`;
 }
 
 async function publishRosterFromFile(file) {
@@ -3220,11 +3331,11 @@ const CROWN_SVG = crownSvg('');
 // Flag-sized crown shown on Champion tiles and cards, just left of the flag.
 function champCrownHtml(c, sizeClass) {
   return tierOf(c) === 'champion'
-    ? `<span class="champ-crown" title="TankWorld India Champion">${crownSvg(sizeClass)}</span>` : '';
+    ? `<span class="champ-crown" title="TWI Champion">${crownSvg(sizeClass)}</span>` : '';
 }
 const TIERS = {
   champion:  { rank: 1, label: CROWN_SVG + 'Champion', heading: 'CHAMPIONS',
-               note: 'TankWorld India Champion — among the standout companies in its field.' },
+               note: 'TWI Champion — among the standout companies in its field.' },
   featured:  { rank: 2, label: '◆ Featured', heading: 'FEATURED',
                note: 'Featured on TankWorld India.' },
   sponsored: { rank: 3, label: '✦ Sponsored', heading: 'SPONSORED',
@@ -3551,7 +3662,17 @@ function brandHitHtml(c) {
 }
 function brandsHtml(c) {
   const chips = (c.brands || []).map(b => `<span class="brand-chip">${psEsc(b)}</span>`).join('');
-  const former = (c.formerNames || []).map(psEsc).join(' · '), aka = (c.aliases || []).map(psEsc).join(' · ');
+  // Aliases stay searchable, but the hero shows only real other names:
+  // not spelling/legal-form variants of the name, not upper-case vendor-list
+  // strings, and not entries carrying notes in brackets.
+  const FORMS = /\b(private|pvt|limited|ltd|llp|inc|llc|gmbh|co|company|corp|corporation|sa|srl|spa|plc|bv|nv|ag|pte|sdn|bhd|pty|the|india|p|i)\b/g;
+  const core = x => String(x || '').toLowerCase().replace(/&/g, ' and ').replace(/[^a-z0-9 ]/g, ' ').replace(FORMS, '').replace(/\s+/g, '');
+  const showAlias = t => { t = String(t || '').trim();
+    if (!t || core(t) === core(c.name)) return false;
+    if (/[();\/]|https?:|www\./i.test(t)) return false;
+    if (t === t.toUpperCase() && t.replace(/[^A-Za-z]/g, '').length > 12) return false;
+    return true; };
+  const former = (c.formerNames || []).map(psEsc).join(' · '), aka = (c.aliases || []).filter(showAlias).map(psEsc).join(' · ');
   if (!chips && !former && !aka) return '';
   return `<div class="cp-brands">${chips ? `<div class="cp-brand-row"><span class="cp-brand-label">Brands</span>${chips}</div>` : ''}` +
     `${former ? `<div class="cp-names">Formerly ${former}</div>` : ''}${aka ? `<div class="cp-names">Also known as ${aka}</div>` : ''}</div>`;
@@ -3576,7 +3697,6 @@ function renderOrgPage(slug) {
     <a class="back-link" href="#/">← Back to directory</a>
     <div class="cp-header"><div class="cp-title-block">
       <div class="cp-name">${psEsc(o.name)}</div>
-      <div class="cp-slug">/group/${o.slug}</div>
       <div class="cp-rel">${ORG_KIND_LABEL[o.kind] || 'Organization'}${o.country ? ' · ' + psEsc(o.country) : ''}</div>
     </div></div>
     <div class="cp-desc">${o.kind === 'group' ? 'A corporate group' : 'A company'} that is not listed as a company in this directory. The companies below belong to it.</div>
@@ -3907,7 +4027,6 @@ function renderCompanyPage(slug) {
       <div class="cp-logo">${logoHtml(c)}</div>
       <div class="cp-title-block">
         <div class="cp-name">${c.name}${signalsHtml(c)}</div>
-        <div class="cp-slug">/company/${c.slug}</div>
         ${legalLineHtml(c)}
         ${parentLineHtml(c)}
         ${corpGroupLineHtml(c)}
@@ -4620,12 +4739,14 @@ function renderAdminPage() {
       <button class="btn-action ghost" onclick="reloadFromFirestore()">Check for updates</button>
       <button class="btn-action ghost" onclick="downloadLiveRoster()" title="The roster exactly as shown, with in-app edits applied">Download live roster</button>
       <button class="btn-action ghost" onclick="downloadInAppEdits()" title="Only the fields changed in the app (editor, claims, logos) — send this before a new roster is prepared">Download in-app edits</button>
+      <button class="btn-action ghost" onclick="scanPrivateLeaks()" title="Finds registration details, location source links and vendor-list strings still stored in Firestore, and old roster versions; shows them before cleaning">Find private data in Firestore</button>
       <button class="btn-action ghost" onclick="findOrphanedCompanies()" title="Lists companies docs no longer in the published roster. Reads the whole companies collection once (~9,500 reads) — use sparingly">Find orphaned records</button>
       <button class="btn-action ghost" onclick="openBatchLogoModal()">Batch upload logos</button>
       <button class="btn-action ghost" onclick="relinkLogosFromStorage()" title="Repairs logos wiped by a re-seed — no re-upload needed">Relink logos from Storage</button>
       <button class="btn-action ghost" onclick="location.hash='#/'">Back to directory</button>
     </div>
     <div class="admin-log" id="adminLog"></div>
+    <div id="leakWrap"></div>
     <div id="orphanWrap"></div>
     <div id="missingWrap"></div>
     <div class="admin-note">

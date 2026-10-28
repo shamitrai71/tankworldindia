@@ -41,15 +41,15 @@ service cloud.firestore {
     }
 
     // ── Companies ──────────────────────────────────────────────────────
-    // Pre-launch: gated to approved sign-ins only (see isApprovedUser()
-    // above) while there's still considerable work left before going to
-    // market. To reopen public browsing at launch, change this one line
-    // back to `allow read: if true;` and flip REQUIRE_APPROVAL_TO_VIEW to
-    // false in index.html — the two are meant to be toggled together.
     // Only admin writes. Once claims exist, a listing's owner may update
     // their own record.
+    // Visitors no longer read this collection (they read the published
+    // roster below), and older docs here may still hold internal fields,
+    // so reads are limited to the admin and a listing's own owner. This
+    // stays closed at launch: only the roster/edits rules open up then.
     match /companies/{doc} {
-      allow read:   if isApprovedUser();
+      allow read:   if isAdmin()
+                    || (isSignedIn() && resource.data.ownerUid == request.auth.uid);
       allow create: if isAdmin();
       allow delete: if isAdmin();
       allow update: if isAdmin()
@@ -60,7 +60,10 @@ service cloud.firestore {
     // meta/roster points at the current version; rosterParts holds the
     // gzipped roster in ~0.9 MB pieces; companyEdits holds only the fields
     // changed in the app. Visitors read these instead of listing the whole
-    // companies collection. Same gate as companies.
+    // companies collection. Pre-launch: approved sign-ins only. To open
+    // public browsing at launch, change these three reads to `if true` and
+    // flip REQUIRE_APPROVAL_TO_VIEW to false in index.html. Registration
+    // details never go into these docs (the page scrubs every write).
     match /meta/{doc} {
       allow read:  if isApprovedUser();
       allow write: if isAdmin();
