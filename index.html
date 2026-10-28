@@ -6270,6 +6270,9 @@ function anFacts(c) {
     hasPid: locs.some(l => l && l.placeId),
     hasLogo: !!c.logo,
     hasCity: cities.length > 0,
+    hasLinkedin: !!String(c.linkedin || '').trim(),
+    hasEmail: !!String(c.email || '').trim() || locs.some(l => l && String(l.email || '').trim()),
+    hasPhone: !!String(c.phone || '').trim() || locs.some(l => l && String(l.phone || '').trim()),
     twoCats: (c.cats || []).length >= 2,
     tier: TIERS[c.spotlight] ? c.spotlight : 'none',
     delivery: Array.isArray(c.delivery) && c.delivery.length ? c.delivery : ['(not set)'],
@@ -6283,6 +6286,9 @@ const AN_GAPS = {
   pid:      ['Missing Place ID',         f => !f.hasPid],
   logo:     ['Missing logo',             f => !f.hasLogo],
   city:     ['Missing city',             f => !f.hasCity],
+  linkedin: ['Missing LinkedIn',         f => !f.hasLinkedin],
+  email:    ['Missing email',            f => !f.hasEmail],
+  phone:    ['Missing contact number',   f => !f.hasPhone],
   cats:     ['Fewer than 2 categories',  f => !f.twoCats],
   complete: ['Complete (website, Place ID, logo and city)', f => f.hasSite && f.hasPid && f.hasLogo && f.hasCity],
 };
@@ -6433,7 +6439,7 @@ function anChartData(list) {
     catTitle = `Subcategories in ${anCode(AN.l1)}`;
   }
   const pct = n => `${Math.round(n / total * 100)}%`;
-  const comp = [['site', 'Website', 'hasSite'], ['pid', 'Place ID', 'hasPid'], ['logo', 'Logo', 'hasLogo'], ['city', 'City', 'hasCity'], ['cats', '2+ categories', 'twoCats']]
+  const comp = [['site', 'Website', 'hasSite'], ['pid', 'Place ID', 'hasPid'], ['logo', 'Logo', 'hasLogo'], ['city', 'City', 'hasCity'], ['linkedin', 'LinkedIn', 'hasLinkedin'], ['email', 'Email', 'hasEmail'], ['phone', 'Contact number', 'hasPhone'], ['cats', '2+ categories', 'twoCats']]
     .map(([gap, label, fk]) => { const n = list.filter(c => anFacts(c)[fk]).length; return [gap, label, n, `${pct(n)} · ${anNum(n)}`]; });
   return [
     { title: 'Companies by country', sub: 'Top 12 · click to filter', key: 'country', rows: anTopRows(anTally(list, f => [f.country]), 12) },
@@ -6456,6 +6462,7 @@ function anRenderSummaryAndCharts() {
     [anNum(list.length), list.length === COMPANIES.length ? 'Companies' : `of ${anNum(COMPANIES.length)} companies`],
     [anNum(countries.size), 'Countries'], [anNum(cities.size), 'Cities'],
     [share('hasSite'), 'With website'], [share('hasPid'), 'With Place ID'], [share('hasLogo'), 'With logo'],
+    [share('hasLinkedin'), 'With LinkedIn'], [share('hasEmail'), 'With email'], [share('hasPhone'), 'With contact number'],
   ].map(([b, s]) => `<div class="an-stat"><b>${b}</b><span>${s}</span></div>`).join('');
   // The completeness chart's bars filter to companies MISSING that field.
   document.getElementById('anCharts').innerHTML = anChartData(list).map(ch => `
