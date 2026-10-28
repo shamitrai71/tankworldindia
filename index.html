@@ -3239,8 +3239,8 @@ const TIERS = {
 // with unearned ones outlined, once this grows into a rating scale.
 const SIGNALS = [
   { key: 'R', label: 'Registered',
-    test: c => !!String(c.registrationId || '').trim(),
-    tip:  c => 'Registered: matched to a public company register (' + String(c.registrationId).trim() + ')' },
+    test: c => !!c.registered,
+    tip:  c => 'Registered: matched to an official company or tax register' },
   { key: 'V', label: 'Verified',
     test: c => !!c.ownerUid,
     tip:  c => 'Verified: this listing is claimed and managed by the company' },
@@ -3261,7 +3261,7 @@ function legalLineHtml(c) {
   if (!ln) return '';
   const norm = x => String(x || '').toLowerCase().replace(/[^a-z0-9]/g, '');
   if (norm(ln) === norm(c.name)) return '';
-  return `<div class="cp-legal">Registered as ${psEsc(ln)}${c.registrationId ? ` · ${psEsc(c.registrationId)}` : ''}</div>`;
+  return '';
 }
 function tierOf(c) { return c && TIERS[c.spotlight] ? c.spotlight : null; }
 function tierStampHtml(t) { return t ? `<span class="tier-stamp">${TIERS[t].label}</span>` : ''; }
@@ -5181,14 +5181,6 @@ function renderCompanyEditor() {
       <div><label>Also known as</label>
         <input type="text" value="${psEsc((c.aliases || []).join(', '))}" placeholder="Trading names, common misspellings" oninput="editListField('aliases', this.value)"></div>
     </div>
-    <div class="ed-row"><label>Registered legal name</label>
-      <input type="text" value="${psEsc(c.legalName || '')}" placeholder="As on the company register — the display name above stays as it is" oninput="editField('legalName', this.value)"></div>
-    <div class="ed-row-2">
-      <div><label>Registration ID</label>
-        <input type="text" value="${psEsc(c.registrationId || '')}" placeholder="CIN, LEI, CNPJ, Companies House…" oninput="editField('registrationId', this.value)"></div>
-      <div><label>Legal name source</label>
-        <input type="text" value="${psEsc(c.legalNameSource || '')}" placeholder="https://… (register entry, gazette, imprint)" oninput="editField('legalNameSource', this.value)"></div>
-    </div>
 
     <div class="ed-row">
       <label>Categories <span class="ed-count">${(c.cats||[]).length}</span></label>
@@ -6073,8 +6065,6 @@ async function saveCompany() {
       certifications: editDraft.certifications || [],
       capacity: editDraft.capacity || { employeeCountRange: null, foundedYear: null, capacityNote: null },
       spotlight: editDraft.spotlight || null,
-      legalName: editDraft.legalName || '', registrationId: editDraft.registrationId || '',
-      legalNameSource: editDraft.legalNameSource || '',
       linkedin: safeLinkedinUrl(editDraft.linkedin) || '',
       brands: editDraft.brands || [], formerNames: editDraft.formerNames || [], aliases: editDraft.aliases || [],
       updatedAt: new Date(),
@@ -6374,9 +6364,6 @@ const AN_FIXED_COLS = [
   ['parent', 'Parent company', c => c.parent && c.parent.name ? `${c.parent.name} (${c.parent.relationship || 'part of'})` : ''],
   ['msme', 'MSME', c => c.msme === undefined ? '' : (c.msme ? 'Yes' : 'No')],
   ['udyamNumber', 'Udyam number', c => c.udyamNumber || ''],
-  ['legalName', 'Registered legal name', c => c.legalName || ''],
-  ['registrationId', 'Registration ID', c => c.registrationId || ''],
-  ['legalNameSource', 'Legal name source', c => c.legalNameSource || ''],
   ['linkedin', 'LinkedIn', c => c.linkedin || ''],
   ['brands', 'Brands', c => (c.brands || []).join('; ')],
   ['formerNames', 'Former names', c => (c.formerNames || []).join('; ')],
