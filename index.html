@@ -71,10 +71,10 @@ header{
   border-bottom:2px solid var(--ink); position:sticky; top:0; z-index:50;
   flex-wrap:wrap; gap:12px;
 }
-.brand{ display:flex; align-items:baseline; gap:10px; }
+.brand{ display:flex; align-items:center; gap:12px; }
 .brand-mark{
-  font-family:var(--font-display); font-weight:700; font-size:22px;
-  letter-spacing:-0.3px; text-transform:uppercase;
+  font-family:var(--font-display); font-weight:800; font-size:40px; line-height:1;
+  letter-spacing:1px; text-transform:uppercase; color:var(--blue);
 }
 .brand-mark span{ color:var(--blue); }
 .brand-sub{
@@ -91,6 +91,7 @@ header{
   width:280px; flex:0 0 280px; padding:20px 16px; position:sticky; top:64px;
   max-height:calc(100vh - 64px); overflow-y:auto;
 }
+.sidebar-toggle{ display:none; }
 .sidebar-title{
   font-family:var(--font-mono); font-size:10px; letter-spacing:1.5px; text-transform:uppercase;
   color:var(--ink-faint); margin-bottom:10px; display:flex; justify-content:space-between;
@@ -920,10 +921,29 @@ footer{
 /* ── MOBILE ── */
 @media (max-width: 860px){
   .app-body{ flex-direction:column; }
-  .sidebar{ width:100%; flex:1 1 auto; position:static; max-height:none; padding:14px 16px; border-bottom:2px solid var(--ink); }
+  .sidebar{ width:100%; flex:1 1 auto; position:static; max-height:none; padding:10px 16px; border-bottom:2px solid var(--ink); }
+  .sidebar-title{ display:none; }
+  .search-box{ margin-bottom:8px; font-size:16px; }
+  /* On a phone the category tree is a collapsed bar, so the companies are
+     the first thing under the search box. Tap the bar to browse. */
+  .sidebar-toggle{
+    display:flex; align-items:center; gap:10px; width:100%; padding:11px 12px; text-align:left;
+    background:var(--paper-raised); border:1.5px solid var(--ink); border-radius:var(--radius);
+    font-family:var(--font-display); font-weight:600; font-size:13px; color:var(--ink);
+  }
+  .st-main{ display:flex; align-items:center; gap:8px; flex:0 0 auto; }
+  .st-now{ flex:1 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+    font-family:var(--font-body); font-weight:400; font-size:12px; color:var(--blue); text-align:right; }
+  .st-caret{ flex:0 0 auto; font-size:12px; color:var(--ink-faint); transition:transform .15s; }
+  .sidebar.open .st-caret{ transform:rotate(180deg); }
+  .sidebar-body{ display:none; margin-top:10px; max-height:65vh; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+  .sidebar.open .sidebar-body{ display:block; }
+  .sheet-item{ padding-top:9px; padding-bottom:9px; }
+  .sheet-head{ padding-top:11px; padding-bottom:11px; }
   .sheet-items{ }
   main{ padding:16px; }
-  header{ padding:12px 16px; }
+  header{ padding:10px 16px; }
+  .brand-mark{ font-size:34px; }
   .header-stats{ display:none; }
   .company-grid{ grid-template-columns:1fr; }
 }
@@ -934,7 +954,7 @@ footer{
 
 <header>
   <div class="brand">
-    <div class="brand-mark">TANKWORLD <span>INDIA</span></div>
+    <div class="brand-mark" aria-label="TankWorld India">TWI</div>
     <div class="brand-sub">Engineering &amp; Equipment Directory</div>
   </div>
   <div class="header-stats">
@@ -1051,11 +1071,18 @@ footer{
       <span id="filterCount"></span>
     </div>
     <input type="text" class="search-box" id="searchBox" placeholder="Search company or category…" oninput="renderAll()">
+    <button type="button" class="sidebar-toggle" id="sidebarToggle" aria-expanded="false" aria-controls="sidebarBody" onclick="toggleSidebar()">
+      <span class="st-main"><span class="st-icon">☰</span><span class="st-text">Browse categories &amp; filters</span></span>
+      <span class="st-now" id="sidebarNow"></span>
+      <span class="st-caret">▾</span>
+    </button>
+    <div class="sidebar-body" id="sidebarBody">
     <div class="region-filter" id="regionFilter"></div>
     <div class="region-filter" id="deliveryFilter"></div>
     <div class="region-filter" id="sectorFilter"></div>
     <div id="sheetList"></div>
     <button class="clear-filters" onclick="clearFilters()">Clear all filters</button>
+    </div>
   </aside>
 
   <main>
@@ -1773,7 +1800,7 @@ const ROSTER = {
 // read. rosterScrub() is applied to the published roster, to every in-app
 // edit before it is shown or baked in, and to every write mirrored into
 // companyEdits. It mutates and returns its argument.
-const ROSTER_PRIVATE_KEYS = ['legalName', 'registrationId', 'legalNameSource'];
+const ROSTER_PRIVATE_KEYS = ['legalName', 'registrationId', 'legalNameSource', 'delivery'];
 function rosterVendorish(t) {
   t = String(t || '').trim();
   return /[();\/]/.test(t) || (t === t.toUpperCase() && t.replace(/[^A-Za-z]/g, '').length > 12);
@@ -3172,8 +3199,6 @@ function renderSectionPage(sectionSlug) {
           { label: 'India', n: nIndia, color: '#1B4B7A' },
           { label: 'Other countries', n: nOther, color: '#C0602A' },
         ], total, total === 0 ? 'No companies in this section yet.' : null)}
-        ${donutChart('Delivery Model Mix', deliveryTop, deliveryTop.reduce((a, d) => a + d.n, 0),
-          deliveryTop.length === 0 ? 'No delivery models tagged for this section yet.' : null, 'delivery tags')}
         ${donutChart('Sector Served', sectorSegs, sectorSegsSum, sectorEmptyNote, 'sector tags')}
         ${donutChart('Sub-category Distribution', subDistSegs, subDistTotal,
           subDistTotal === 0 ? 'No sub-category data yet.' : null, 'category tags')}
@@ -3255,7 +3280,6 @@ function renderRegionPage(region) {
 
     graphics = [
       donutChart('Companies by Category', catSegs, catTotal, catTotal === 0 ? 'No data yet.' : null, 'category tags'),
-      donutChart('Delivery Model Mix', delSegs, delTagged, delSegs.length === 0 ? 'No delivery data yet.' : null, 'delivery tags'),
       barChart('Companies by City', cityTop, `of ${withCity.toLocaleString()} companies with a city on file`),
       donutChart('Sector Served', secSegs, secSegsSum, secNote, 'sector tags'),
     ];
@@ -3284,7 +3308,6 @@ function renderRegionPage(region) {
       barChart('Company Count by Country', countryTop, `top 15 of ${countryResolved.toLocaleString()} companies with a resolved country`),
       donutChart('Companies by Category', catSegs, catTotal, catTotal === 0 ? 'No data yet.' : null, 'category tags'),
       donutChart('Companies by Region', regionSegs, regionTotal, regionTotal === 0 ? 'No region data yet.' : null),
-      donutChart('Delivery Model Mix', delSegs, delTagged, delSegs.length === 0 ? 'No delivery data yet.' : null, 'delivery tags'),
     ];
   }
 
@@ -3451,6 +3474,24 @@ function renderSubCategoryResults(sectionSlug, subSlug) {
 
 function renderAll() {
   renderCards();
+  updateSidebarToggle();
+}
+// Phone layout: the category tree sits behind a bar (CSS shows the bar only
+// under 860px). The bar says what is selected, so a collapsed tree still
+// tells you where you are.
+function toggleSidebar(force) {
+  const sb = document.querySelector('.sidebar'), b = document.getElementById('sidebarToggle');
+  if (!sb) return;
+  const open = typeof force === 'boolean' ? force : !sb.classList.contains('open');
+  sb.classList.toggle('open', open);
+  if (b) b.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+function updateSidebarToggle() {
+  const el = document.getElementById('sidebarNow');
+  if (!el) return;
+  let t = 'All categories';
+  try { if (activeCategory) { const l = categoryLabel(activeCategory); if (l && l.name) t = l.name; } } catch (e) {}
+  el.textContent = t;
 }
 
 // ── ROUTING ──
@@ -4067,6 +4108,9 @@ function handleRoute() {
   const adminPanel = document.getElementById('admin-view');
   const sectionPanel = document.getElementById('section-view');
   const sidebar = document.querySelector('.sidebar');
+  // A route change (picking a category, a filter, a company) closes the
+  // phone category bar and returns to the top so the results are in view.
+  if (sidebar && sidebar.classList.contains('open')) { toggleSidebar(false); window.scrollTo(0, 0); }
 
   // Reset the two account panels on every route change; whichever branch
   // below matches turns its own panel back on.
@@ -6312,7 +6356,6 @@ function anMatch(c, f, skip) {
   if (AN.l2 && skip !== 'l2' && !f.l2.has(AN.l2)) return false;
   if (AN.l3 && skip !== 'l3' && !f.l3.has(AN.l3)) return false;
   if (AN.tier && skip !== 'tier' && f.tier !== AN.tier) return false;
-  if (AN.delivery && skip !== 'delivery' && !f.delivery.includes(AN.delivery)) return false;
   if (AN.gap && skip !== 'gap' && !AN_GAPS[AN.gap][1](f)) return false;
   return true;
 }
@@ -6388,7 +6431,6 @@ function anRenderFilters() {
     <label>Subcategory${sel('l2', AN.l1 ? 'All in ' + AN.l1 : 'All subcategories', opt(new Map(l2opts), byCode, anCode))}</label>
     <label>Sub-sub category${sel('l3', 'All sub-sub categories', opt(new Map(l3opts), byCode, anCode), !l3opts.length)}</label>
     <label>Tier${sel('tier', 'Any tier', opt(anTally(anFiltered('tier'), f => [f.tier]), null, v => AN_TIER_LABEL[v]))}</label>
-    <label>Service type${sel('delivery', 'Any service type', opt(anTally(anFiltered('delivery'), f => f.delivery), null, v => anDeliveryLabel(v)))}</label>
     <label>Data completeness${sel('gap', 'Any', [...gapCounts.entries()].map(([k, n]) => [k, `${AN_GAPS[k][0]} (${anNum(n)})`]))}</label>`;
   if (document.activeElement && document.activeElement.id === 'anQ') { const i = document.getElementById('anQ'); i.setSelectionRange(i.value.length, i.value.length); }
   // Active filters as removable chips
@@ -6398,7 +6440,6 @@ function anRenderFilters() {
   if (AN.city) chips.push(['city', AN.city]);
   if (AN.l3) chips.push(['l3', anCode(AN.l3)]); else if (AN.l2) chips.push(['l2', anCode(AN.l2)]); else if (AN.l1) chips.push(['l1', anCode(AN.l1)]);
   if (AN.tier) chips.push(['tier', AN_TIER_LABEL[AN.tier]]);
-  if (AN.delivery) chips.push(['delivery', anDeliveryLabel(AN.delivery)]);
   if (AN.gap) chips.push(['gap', AN_GAPS[AN.gap][0]]);
   document.getElementById('anChips').innerHTML = chips.length
     ? chips.map(([k, l]) => `<span class="an-chip" title="Remove this filter" onclick="${k === 'q' ? "document.getElementById('anQ').value='';" : ''}anSet('${k}', '')">${psEsc(l)} ✕</span>`).join('')
@@ -6449,8 +6490,6 @@ function anChartData(list) {
     { title: 'Data completeness', sub: 'Share of these companies that have each field · click to list those missing it',
       key: 'gap', rows: comp, max: total },
     { title: 'Tiers', sub: 'Click to filter', key: 'tier', rows: anTopRows(anTally(list, f => [f.tier]), 4, v => AN_TIER_LABEL[v]) },
-    { title: 'Service type', sub: 'Click to filter · a company can have several', key: 'delivery',
-      rows: anTopRows(anTally(list, f => f.delivery), 10, v => anDeliveryLabel(v)) },
   ];
 }
 function anRenderSummaryAndCharts() {
@@ -6485,7 +6524,6 @@ const AN_FIXED_COLS = [
   ['email', 'Email', c => c.email || ''],
   ['phone', 'Phone', c => c.phone || ''],
   ['tier', 'Tier', c => AN_TIER_LABEL[anFacts(c).tier]],
-  ['delivery', 'Service type', c => (c.delivery || []).map(anDeliveryLabel).join('; ')],
   ['sectors', 'Sectors', c => (c.sectors || []).join('; ')],
   ['logo', 'Logo', c => c.logo || ''],
   ['desc', 'Description', c => c.desc || ''],
@@ -6647,7 +6685,6 @@ function anFilterSummary() {
   if (AN.l2) parts.push(`Subcategory: ${anCode(AN.l2)}`);
   if (AN.l3) parts.push(`Sub-sub category: ${anCode(AN.l3)}`);
   if (AN.tier) parts.push(`Tier: ${AN_TIER_LABEL[AN.tier]}`);
-  if (AN.delivery) parts.push(`Service type: ${anDeliveryLabel(AN.delivery)}`);
   if (AN.gap) parts.push(`Completeness: ${AN_GAPS[AN.gap][0]}`);
   return parts.length ? parts.join(' · ') : 'No filters (all companies)';
 }
