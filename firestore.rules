@@ -64,6 +64,11 @@ service cloud.firestore {
     // public browsing at launch, change these three reads to `if true` and
     // flip REQUIRE_APPROVAL_TO_VIEW to false in index.html. Registration
     // details never go into these docs (the page scrubs every write).
+    // Admin-only data: contact email and phone for every company (moved out
+    // of the roster on publish). Nobody but admins can read or write it.
+    match /adminData/{doc} {
+      allow read, write: if isAdmin();
+    }
     match /meta/{doc} {
       allow read:  if isApprovedUser();
       allow write: if isAdmin();

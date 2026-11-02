@@ -1800,7 +1800,46 @@ const ROSTER = {
 // read. rosterScrub() is applied to the published roster, to every in-app
 // edit before it is shown or baked in, and to every write mirrored into
 // companyEdits. It mutates and returns its argument.
-const ROSTER_PRIVATE_KEYS = ['legalName', 'registrationId', 'legalNameSource', 'delivery'];
+const ROSTER_PRIVATE_KEYS = ['legalName', 'registrationId', 'legalNameSource', 'delivery', 'email', 'phone'];
+// ── Admin-only contact details ────────────────────────────────────────
+// Email and phone are visible to admins only. Publish moves them out of the
+// roster into adminData/contacts (rules: admin read/write only) and leaves
+// hasEmail / hasPhone flags behind for the completeness views. An admin's
+// browser reads that one doc once per session.
+const AdminContacts = {
+  map: null, _p: null,
+  async load() {
+    if (!isAdminUser(currentUser)) return null;
+    if (this.map) return this.map;
+    if (!this._p) this._p = (async () => {
+      try {
+        const d = await FS_REST.getDoc('adminData', 'contacts');
+        this.map = (d && d.data) ? JSON.parse(await rosterGunzipB64(d.data)) : {};
+        return this.map;
+      } catch (e) {
+        console.warn('[TANKWORLDINDIA] Admin contacts not loaded:', e.message);
+        this._p = null; return null;
+      }
+    })();
+    return this._p;
+  },
+  get(slug) { const r = (this.map && this.map[slug]) || {}; return { email: r.e || '', phone: r.p || '' }; },
+  fill() {
+    document.querySelectorAll('[data-admin-contact]').forEach(el => {
+      const slug = el.getAttribute('data-admin-contact');
+      const c = (typeof COMPANIES !== 'undefined' && COMPANIES.find(x => x.slug === slug)) || {};
+      const g = this.get(slug);
+      const email = safeEmail(c.companyEmail) || g.email;
+      const phone = String(c.companyPhone || '').trim() || g.phone;
+      const mailto = safeEmail(email), tel = phone.replace(/[^0-9+]/g, '');
+      el.innerHTML =
+        (email ? (mailto ? `<a class="cp-contact-email" href="mailto:${psEsc(mailto)}" title="Visible to admins only">✉ ${psEsc(email)}</a>`
+                         : `<span class="cp-contact-email" title="Visible to admins only">✉ ${psEsc(email)}</span>`) : '') +
+        (phone ? (tel ? `<a class="cp-contact-phone" href="tel:${psEsc(tel)}" title="Visible to admins only">☎ ${psEsc(phone)}</a>`
+                      : `<span class="cp-contact-phone" title="Visible to admins only">☎ ${psEsc(phone)}</span>`) : '');
+    });
+  },
+};
 function rosterVendorish(t) {
   t = String(t || '').trim();
   return /[();\/]/.test(t) || (t === t.toUpperCase() && t.replace(/[^A-Za-z]/g, '').length > 12);
@@ -2363,6 +2402,17 @@ async function publishRoster(roster, sourceName, opts = {}) {
   const bySlug = new Map(out.map(c => [c.slug, c]));
   for (const e of edits) rosterApplyEdit(out, bySlug, e._docId, e);
   // 4. encode and write
+  // Email and phone are admin-only: collect them for adminData/contacts, leave
+  // presence flags in the roster, then scrub strips the values.
+  const contacts = {};
+  for (const c of out) {
+    const e = String(c.email || '').trim(), p = String(c.phone || '').trim();
+    if (e || p) contacts[c.slug] = { e, p };
+    if (e) c.hasEmail = true;
+    if (p) c.hasPhone = true;
+  }
+  const contactsB64 = await rosterGzipB64(JSON.stringify(contacts));
+  if (contactsB64.length > ROSTER.PART_CHARS) throw new Error('Admin contacts doc would exceed the Firestore size limit — split it before publishing.');
   out.forEach(rosterScrub);
   const txt = JSON.stringify(out);
   const sha = await rosterSha256(txt);
@@ -2374,12 +2424,15 @@ async function publishRoster(roster, sourceName, opts = {}) {
       `Publish ${out.length} companies as roster ${version}?\n\n` +
       `${carried} keep app-only fields (owner, profile sections, logos …); ` +
       `${edits.length} in-app edit(s) baked in; ${lost.length} live compan${lost.length === 1 ? 'y' : 'ies'} with an owner or profile sections ` +
-      `are not in the new file.\n\nWrites ${nParts + 1} documents.`)) return null;
+      `are not in the new file.\n\nWrites ${nParts + 2} documents (the roster plus the admin-only contacts).`)) return null;
   for (let i = 0; i < nParts; i++) {
     await FS_REST.setMerge(ROSTER.PARTS, version + '_' + i,
       { version, i, data: b64.slice(i * ROSTER.PART_CHARS, (i + 1) * ROSTER.PART_CHARS) });
     say(`✓ part ${i + 1}/${nParts}`);
   }
+  await FS_REST.setMerge('adminData', 'contacts', { version, count: Object.keys(contacts).length, data: contactsB64, updatedAt: now });
+  say(`✓ admin-only contacts: ${Object.keys(contacts).length} companies`);
+  AdminContacts.map = null; AdminContacts._p = null;
   const old = CompanyStore.meta;
   await FS_REST.setMerge(ROSTER.META_COL, ROSTER.META_DOC, {
     version, parts: nParts, count: out.length, sha256: sha, bytes: txt.length, gzBytes: Math.round(b64.length * 3 / 4),
@@ -4737,6 +4790,7 @@ async function deleteOrphanedCompanies() {
 }
 
 function renderAdminPage() {
+  if (isAdminUser(currentUser)) AdminContacts.load();
   const el = document.getElementById('admin-view');
   if (!currentUser) {
     el.innerHTML = `
@@ -5750,15 +5804,18 @@ function effectiveContact(c) {
 }
 function contactLinksHtml(c) {
   const k = effectiveContact(c);
-  const mailto = safeEmail(k.email);
-  const tel = k.phone.replace(/[^0-9+]/g, '');
+  // Email and phone are admin-only. Admins get a placeholder that
+  // AdminContacts fills from adminData/contacts (one read per session).
+  let priv = '';
+  if (isAdminUser(currentUser)) {
+    priv = `<span class="admin-contact" data-admin-contact="${psEsc(c.slug)}"></span>`;
+    AdminContacts.load().then(() => AdminContacts.fill());
+    setTimeout(() => AdminContacts.fill(), 0);
+  }
   return `
       ${k.site ? `<a class="cp-site" href="${psEsc(k.site)}" target="_blank" rel="noopener nofollow">Visit Website ↗</a>` : ''}
       ${k.linkedin ? `<a class="cp-site cp-linkedin" href="${psEsc(k.linkedin)}" target="_blank" rel="noopener nofollow">${LINKEDIN_SVG} LinkedIn ↗</a>` : ''}
-      ${k.email ? (mailto ? `<a class="cp-contact-email" href="mailto:${psEsc(mailto)}">✉ ${psEsc(k.email)}</a>`
-                          : `<span class="cp-contact-email">✉ ${psEsc(k.email)}</span>`) : ''}
-      ${k.phone ? (tel ? `<a class="cp-contact-phone" href="tel:${psEsc(tel)}">☎ ${psEsc(k.phone)}</a>`
-                       : `<span class="cp-contact-phone">☎ ${psEsc(k.phone)}</span>`) : ''}`;
+      ${priv}`;
 }
 
 // ══════════════════════════════════════════════════════════════════════
@@ -6315,8 +6372,8 @@ function anFacts(c) {
     hasLogo: !!c.logo,
     hasCity: cities.length > 0,
     hasLinkedin: !!String(c.linkedin || '').trim(),
-    hasEmail: !!String(c.email || '').trim() || locs.some(l => l && String(l.email || '').trim()),
-    hasPhone: !!String(c.phone || '').trim() || locs.some(l => l && String(l.phone || '').trim()),
+    hasEmail: !!c.hasEmail || !!String(c.email || '').trim() || locs.some(l => l && String(l.email || '').trim()),
+    hasPhone: !!c.hasPhone || !!String(c.phone || '').trim() || locs.some(l => l && String(l.phone || '').trim()),
     twoCats: (c.cats || []).length >= 2,
     tier: TIERS[c.spotlight] ? c.spotlight : 'none',
     delivery: Array.isArray(c.delivery) && c.delivery.length ? c.delivery : ['(not set)'],
@@ -6521,8 +6578,8 @@ const AN_FIXED_COLS = [
   ['categories', 'Categories', c => { const idx = anCatIndex(); return (c.cats || []).map(sl => { const m = idx.bySlug[sl]; const code = m && (m.l3 || m.l2 || m.l1); return code ? anCode(code) : sl; }).join('; '); }],
   ['l1names', 'Top-level categories', c => [...anFacts(c).l1].map(anCode).join('; ')],
   ['site', 'Website', c => c.site || ''],
-  ['email', 'Email', c => c.email || ''],
-  ['phone', 'Phone', c => c.phone || ''],
+  ['email', 'Email', c => AdminContacts.get(c.slug).email || c.email || ''],
+  ['phone', 'Phone', c => AdminContacts.get(c.slug).phone || c.phone || ''],
   ['tier', 'Tier', c => AN_TIER_LABEL[anFacts(c).tier]],
   ['sectors', 'Sectors', c => (c.sectors || []).join('; ')],
   ['logo', 'Logo', c => c.logo || ''],
