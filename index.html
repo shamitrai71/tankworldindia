@@ -1134,34 +1134,27 @@ function tankonomicsUrl(slug) {
 
 const CATEGORY_TREE = [
   { code:"EC", name:"Engineering & Construction", slug:"engineering-and-construction", items:[
-    { code:"EC-01", name:"EPC Contractors", slug:"epc-contractors" },
-    { code:"EC-22", name:"EPCM Services", slug:"epcm-services" },
-    { code:"EC-02", name:"Tank Construction", slug:"tank-construction" },
+    { code:"EC-01", name:"EPC & EPCM Contractors", slug:"epc-contractors" },
+    { code:"EC-02", name:"Tank Construction", slug:"tank-construction", items:[
+      { code:"EC-02.1", name:"Field-Erected Atmospheric Tanks (API 650)", slug:"field-erected-atmospheric-tanks-api-650" },
+      { code:"EC-02.2", name:"Spheres, Bullets & LPG Storage", slug:"spheres-bullets-and-lpg-storage" },
+      { code:"EC-02.3", name:"Tank Construction Equipment (Jacking & Welding)", slug:"hydraulic-jacking-and-automatic-welding-systems" },
+    ]},
     { code:"EC-03", name:"Tank Engineering", slug:"tank-engineering" },
     { code:"EC-04", name:"Civil & Structural Engineering", slug:"civil-and-structural-engineering", items:[
       { code:"EC-04.1", name:"Foundations & Piling", slug:"foundation-contractors" },
     ]},
-    { code:"EC-07", name:"Mechanical & Piping Contractors", slug:"mechanical-contractors", items:[
-      { code:"EC-07.1", name:"Piping Fabrication & Erection", slug:"piping-contractors" },
-      { code:"EC-07.2", name:"Equipment Erection & Rigging", slug:"equipment-erection-and-rigging" },
-      { code:"EC-07.3", name:"Shutdown & Turnaround", slug:"shutdown-and-turnaround" },
+    { code:"EC-07", name:"Mechanical Contractors", slug:"mechanical-contractors" },
+    { code:"EC-08", name:"Electrical & Instrumentation Contractors", slug:"electrical-contractors", items:[
+      { code:"EC-08.1", name:"Instrumentation Installation & Commissioning", slug:"instrumentation-installation-commissioning-and-testing" },
     ]},
-    { code:"EC-08", name:"Electrical & Instrumentation Contractors", slug:"electrical-contractors" },
     { code:"EC-10", name:"Insulation Contractors", slug:"insulation-contractors" },
-    { code:"EC-11", name:"Painting, Coating & Blasting Contractors", slug:"painting-and-coating-contractors", items:[
-      { code:"EC-11.1", name:"Industrial Flooring", slug:"industrial-flooring" },
-    ]},
+    { code:"EC-11", name:"Painting, Coating & Blasting Contractors", slug:"painting-and-coating-contractors" },
     { code:"EC-12", name:"Scaffolding Services", slug:"scaffolding-services" },
-    { code:"EC-14", name:"Roofing Systems", slug:"roofing-systems" },
+    { code:"EC-14", name:"Waterproofing & Roofing Systems", slug:"roofing-systems" },
     { code:"EC-15", name:"Demolition & Decommissioning", slug:"demolition-and-decommissioning" },
-    { code:"EC-16", name:"Heavy Engineering & Fabrication", slug:"heavy-engineering-and-fabrication" },
+    { code:"EC-16", name:"Heavy Fabrication & Structural Workshops", slug:"heavy-engineering-and-fabrication" },
     { code:"EC-17", name:"Tank Maintenance", slug:"tank-maintenance" },
-    // EC-19 added after reviewing an India research batch's category proposals: real, evidence-
-    // backed distinction between integrated fire-EPC/design capability (this) and individual
-    // fire-system products (FS-01 Fire Protection) — confirmed via 3 real companies (Agnice Fire
-    // Protection, Technofire Protection Systems, New Fire Engineers) already in TWI that needed
-    // re-tagging here rather than staying under the product-level FS-01 alone.
-    { code:"EC-19", name:"Fire Engineering & Systems", slug:"fire-engineering-and-systems" },
     { code:"EC-20", name:"LNG Terminal Engineering (Liquefaction & Export)", slug:"lng-terminal-engineering" },
     { code:"EC-21", name:"Process Technology Licensors", slug:"process-technology-licensors", items:[
       { code:"EC-21.1", name:"Refining Process Technologies", slug:"refining-process-technologies" },
@@ -1200,9 +1193,10 @@ const CATEGORY_TREE = [
       { code:"TS-03.7", name:"Bleeder Vent Gaskets", slug:"bleeder-vent-gaskets" },
       { code:"TS-03.8", name:"Manhole Gaskets", slug:"manhole-gaskets" },
     ]},
-    { code:"TS-04", name:"Floating Roof Systems", slug:"floating-roof-systems", items:[
-      { code:"TS-04.1", name:"Internal Floating Roofs", slug:"internal-floating-roofs" },
-      { code:"TS-04.2", name:"Roof Legs, Ladders & Accessories", slug:"roof-legs-ladders-and-accessories" },
+    { code:"TS-04", name:"Internal Floating Roofs", slug:"floating-roof-systems", items:[
+      { code:"TS-04.1", name:"Aluminium Skin & Pontoon Floating Roofs", slug:"internal-floating-roofs" },
+      { code:"TS-04.2", name:"Honeycomb & Sandwich-Panel Floating Roofs", slug:"honeycomb-and-sandwich-panel-floating-roofs" },
+      { code:"TS-04.3", name:"Composite (FRP/GRP) Internal Floating Roofs", slug:"composite-frp-grp-internal-floating-roofs" },
     ]},
     { code:"TS-06", name:"Aluminium Dome Roofs", slug:"aluminium-dome-roofs" },
     { code:"TS-07", name:"Gauge Hatches", slug:"gauge-hatches" },
@@ -1237,10 +1231,6 @@ const CATEGORY_TREE = [
     { code:"TS-21", name:"Floating Suction Systems", slug:"floating-suction-systems" },
     { code:"TS-22", name:"Water Draw-Off Systems", slug:"water-draw-off-systems" },
     { code:"TS-23", name:"Overfill Protection", slug:"overfill-protection" },
-    { code:"TS-24", name:"Hydraulic Jacking & Automatic Welding Systems", slug:"hydraulic-jacking-and-automatic-welding-systems", items:[
-      { code:"TS-24.1", name:"Hydraulic Jacking Systems", slug:"hydraulic-jacking-systems" },
-      { code:"TS-24.2", name:"Automatic Welding Systems", slug:"automatic-welding-systems" },
-    ]},
     { code:"TS-25", name:"Bolted Steel Tanks", slug:"bolted-steel-tanks", items:[
       { code:"TS-25.1", name:"Glass-Fused-to-Steel Tanks", slug:"glass-fused-to-steel-tanks" },
       { code:"TS-25.2", name:"Epoxy & Galvanised Bolted Tanks", slug:"epoxy-and-galvanised-bolted-tanks" },
@@ -1259,16 +1249,6 @@ const CATEGORY_TREE = [
       { code:"TS-28.2", name:"FRP & Aluminium Platforms", slug:"frp-and-aluminium-platforms" },
       { code:"TS-28.3", name:"Stairs & Handrails", slug:"stairs-and-handrails" },
     ]},
-    { code:"TS-29", name:"Cranes & Lifting Equipment", slug:"cranes-and-lifting-equipment", items:[
-      { code:"TS-29.1", name:"EOT, Gantry & Jib Cranes", slug:"eot-gantry-and-jib-cranes" },
-      { code:"TS-29.2", name:"Mobile & Crawler Cranes", slug:"mobile-and-crawler-cranes" },
-      { code:"TS-29.3", name:"Hoists & Chain Blocks", slug:"hoists-and-chain-blocks" },
-      { code:"TS-29.4", name:"Lifting Tackle & Slings", slug:"lifting-tackle-and-slings" },
-    ]},
-    { code:"TS-30", name:"Blasting & Painting Equipment", slug:"blasting-and-painting-equipment", items:[
-      { code:"TS-30.1", name:"Blasting Equipment", slug:"blasting-equipment" },
-      { code:"TS-30.2", name:"Painting & Spray Equipment", slug:"painting-and-spray-equipment" },
-    ]},
     { code:"TS-31", name:"Sludge Recovery Units", slug:"sludge-recovery-units" },
     { code:"TS-32", name:"Cryogenic & LNG Storage Tanks", slug:"cryogenic-and-lng-storage-tanks" },
   ]},
@@ -1285,12 +1265,16 @@ const CATEGORY_TREE = [
       { code:"FT-01.9", name:"Slurry Pumps", slug:"slurry-pumps" },
       { code:"FT-01.10", name:"Chemical Process Pumps", slug:"chemical-process-pumps" },
       { code:"FT-01.11", name:"Fire Pumps", slug:"fire-pumps" },
-      { code:"FT-01.12", name:"Pipeline Pumps", slug:"pipeline-pumps" },
+      { code:"FT-01.13", name:"Transfer & Loading Pumps", slug:"transfer-pumps" },
+      { code:"FT-01.14", name:"Dosing & Metering Pumps", slug:"metering-pumps" },
+      { code:"FT-01.15", name:"LPG & Cryogenic Pumps", slug:"lpg-pumps-loading-unloading-pumps-and-cryogenic-lpg-transfer-systems" },
     ]},
-    { code:"FT-02", name:"Compressors", slug:"compressors" },
-    { code:"FT-03", name:"Blowers", slug:"blowers" },
-    { code:"FT-05", name:"Transfer & Loading Pumps", slug:"transfer-pumps" },
-    { code:"FT-06", name:"Dosing & Metering Pumps", slug:"metering-pumps" },
+    { code:"FT-02", name:"Compressors", slug:"compressors", items:[
+      { code:"FT-02.1", name:"Reciprocating Compressors", slug:"reciprocating-compressors" },
+      { code:"FT-02.2", name:"Screw & Rotary Compressors", slug:"screw-and-rotary-compressors" },
+      { code:"FT-02.3", name:"Centrifugal & Turbo Compressors", slug:"centrifugal-and-turbo-compressors" },
+      { code:"FT-02.4", name:"Blowers", slug:"blowers" },
+    ]},
     { code:"FT-07", name:"Valves", slug:"valves", items:[
       { code:"FT-07.1", name:"Ball Valves", slug:"ball-valves" },
       { code:"FT-07.2", name:"Gate, Globe & Check Valves", slug:"gate-globe-and-check-valves" },
@@ -1300,92 +1284,64 @@ const CATEGORY_TREE = [
       { code:"FT-07.6", name:"Severe Service Valves", slug:"severe-service-valves" },
       { code:"FT-07.7", name:"Cryogenic Valves", slug:"cryogenic-valves" },
       { code:"FT-07.8", name:"Double Block & Bleed Valves", slug:"double-block-and-bleed-valves" },
-      { code:"FT-07.9", name:"Instrumentation & Manifold Valves", slug:"instrumentation-and-manifold-valves" },
+      { code:"FT-07.9", name:"Instrumentation, Needle & Manifold Valves", slug:"instrumentation-and-manifold-valves" },
+      { code:"FT-07.10", name:"Plug Valves", slug:"plug-valves" },
+      { code:"FT-07.11", name:"Pressure Regulators", slug:"regulators" },
     ]},
-    // FT-08.1-3 added after reviewing dombor.com's category structure: a real, industry-standard
-    // distinction (pneumatic/electric/hydraulic actuation is a genuinely different technology,
-    // and suppliers commonly specialize in just one) that the previously-flat Actuators category
-    // couldn't capture. A company tagged only "actuators" still appears under Actuators, same
-    // pattern as other parent/child categories in this tree.
     { code:"FT-08", name:"Actuators", slug:"actuators", items:[
-      { code:"FT-08.1", name:"Pneumatic Actuators", slug:"pneumatic-actuators" },
+      { code:"FT-08.1", name:"Pneumatic & Hydraulic Actuators", slug:"pneumatic-actuators" },
       { code:"FT-08.2", name:"Electric Actuators", slug:"electric-actuators" },
-      { code:"FT-08.3", name:"Hydraulic Actuators", slug:"hydraulic-actuators" },
     ]},
     { code:"FT-09", name:"Flow Meters", slug:"flow-meters", items:[
       { code:"FT-09.1", name:"Coriolis Meters", slug:"coriolis-meters" },
       { code:"FT-09.2", name:"Turbine Flow Meters", slug:"turbine-flow-meters" },
       { code:"FT-09.3", name:"Ultrasonic Flow Meters", slug:"ultrasonic-flow-meters" },
       { code:"FT-09.4", name:"Positive Displacement Meters", slug:"positive-displacement-meters" },
-      { code:"FT-09.5", name:"Cone & Orifice Meters", slug:"cone-and-orifice-meters" },
+      { code:"FT-09.6", name:"Custody Transfer Metering", slug:"custody-transfer-metering" },
     ]},
-    { code:"FT-10", name:"Custody Transfer Metering", slug:"custody-transfer-metering" },
-    { code:"FT-11", name:"Pigging Systems", slug:"pigging-systems" },
-    { code:"FT-12", name:"Strainers", slug:"strainers" },
-    { code:"FT-14", name:"Flexible Hoses", slug:"flexible-hoses" },
     { code:"FT-15", name:"Loading Arms", slug:"loading-arms", items:[
       { code:"FT-15.1", name:"Marine Loading Arms", slug:"marine-loading-arms" },
     ]},
-    { code:"FT-17", name:"Truck Loading Systems", slug:"truck-loading-systems" },
-    { code:"FT-18", name:"Rail Loading Systems", slug:"rail-loading-systems" },
+    { code:"FT-17", name:"Truck & Rail Loading Systems", slug:"truck-loading-systems" },
     { code:"FT-19", name:"Offshore Loading Systems (SPM/CALM)", slug:"offshore-loading-systems-spm-calm" },
     { code:"FT-20", name:"Cryogenic Loading Systems (LNG)", slug:"cryogenic-loading-systems-lng" },
-    { code:"FT-21", name:"Heat Exchangers", slug:"heat-exchangers", items:[
-      { code:"FT-21.1", name:"Shell & Tube Heat Exchangers", slug:"shell-and-tube-heat-exchangers" },
-      { code:"FT-21.2", name:"Air-Cooled Heat Exchangers", slug:"air-cooled-heat-exchangers" },
-      { code:"FT-21.3", name:"Plate Heat Exchangers", slug:"plate-heat-exchangers" },
-      { code:"FT-21.4", name:"Waste Heat Recovery Units", slug:"waste-heat-recovery-units" },
-    ]},
-    { code:"FT-22", name:"Filtration & Separation Technology", slug:"filtration-and-separation-technology" },
-    { code:"FT-23", name:"Membrane Technologies", slug:"membrane-technologies" },
     { code:"FT-24", name:"Rotating Equipment & Gearboxes", slug:"rotating-equipment-and-gearboxes" },
-    { code:"FT-25", name:"Steam Traps", slug:"steam-traps" },
     { code:"FT-26", name:"Strainers & Line Protection", slug:"strainers-and-line-protection" },
-    { code:"FT-27", name:"Spectacle Blinds & Line Blinds", slug:"spectacle-blinds-and-line-blinds" },
-    { code:"FT-28", name:"Expansion Joints & Bellows", slug:"expansion-joints-and-bellows" },
     { code:"FT-29", name:"Mechanical Seals & Seal Systems", slug:"mechanical-seals-and-seal-systems" },
-    { code:"FT-30", name:"Pump Spares & Wear Parts", slug:"pump-spares-and-wear-parts" },
     { code:"FT-31", name:"Rotating Equipment Repair & Overhaul", slug:"rotating-equipment-repair-and-overhaul" },
   ]},
+  { code:"PP", name:"Piping & Pipeline Systems", slug:"piping-and-pipeline-systems", items:[
+    { code:"PP-01", name:"Pipes & Tubes", slug:"pipes-and-tubes" },
+    { code:"PP-02", name:"Pipe Fittings & Flanges", slug:"pipe-fittings-and-flanges" },
+    { code:"PP-03", name:"Piping Fabrication & Erection", slug:"piping-contractors" },
+    { code:"PP-04", name:"Pipe Supports & Hangers", slug:"pipe-supports-and-hangers" },
+    { code:"PP-05", name:"Expansion Joints & Bellows", slug:"expansion-joints-and-bellows" },
+    { code:"PP-06", name:"Flexible Hoses", slug:"flexible-hoses" },
+    { code:"PP-07", name:"Spectacle Blinds & Line Blinds", slug:"spectacle-blinds-and-line-blinds" },
+    { code:"PP-09", name:"Pigging Systems", slug:"pigging-systems" },
+    { code:"PP-10", name:"Pipeline Coatings, Tapes & Wraps", slug:"pipeline-coatings-tapes-and-wraps" },
+  ]},
   { code:"IA", name:"Instrumentation & Automation", slug:"instrumentation-and-automation", items:[
-    { code:"IA-01", name:"Terminal Automation", slug:"terminal-automation" },
-    { code:"IA-02", name:"SCADA Systems", slug:"scada-systems" },
-    { code:"IA-03", name:"PLC & DCS", slug:"plc-and-dcs" },
-    { code:"IA-04", name:"Tank Inventory Systems", slug:"tank-inventory-systems" },
-    { code:"IA-05", name:"Remote Monitoring", slug:"remote-monitoring" },
-    { code:"IA-06", name:"Industrial Networking", slug:"industrial-networking" },
-    { code:"IA-07", name:"Electrical & Instrumentation", slug:"electrical-and-instrumentation" },
-    { code:"IA-08", name:"Site Communication Systems", slug:"site-communication-systems" },
-    // IA-09 through IA-14 added after a side-by-side review against
-    // controlssupplychain.com (a pure field-instrumentation parts catalog).
-    // The gap: IA-01 through IA-08 above are all systems/software layer
-    // (SCADA, PLC/DCS, networking) — none of them are a home for the
-    // physical field devices that feed data INTO those systems. Before this
-    // addition, TWI had zero categories anywhere containing the words
-    // "transmitter," "indicator," "switch" (as an instrument), "chart
-    // recorder," or "regulator" — confirmed by grepping the full tree.
-    { code:"IA-09", name:"Pressure Transmitters", slug:"pressure-transmitters" },
-    { code:"IA-10", name:"Temperature Transmitters", slug:"temperature-transmitters" },
-    { code:"IA-11", name:"DP Transmitters & Instruments", slug:"dp-transmitters-and-instruments" },
+    { code:"IA-01", name:"Terminal Automation", slug:"terminal-automation", items:[
+      { code:"IA-01.1", name:"Tank Inventory Management", slug:"tank-inventory-systems" },
+    ]},
+    { code:"IA-03", name:"Control Systems (PLC, DCS & SCADA)", slug:"plc-and-dcs" },
+    { code:"IA-05", name:"Remote Monitoring & IoT", slug:"remote-monitoring" },
+    { code:"IA-06", name:"Industrial Networking & Communications", slug:"industrial-networking" },
+    { code:"IA-07", name:"Control Panels & Enclosures", slug:"electrical-and-instrumentation" },
+    { code:"IA-09", name:"Transmitters (Pressure, Temperature & DP)", slug:"pressure-transmitters" },
     { code:"IA-12", name:"Pressure & Temperature Switches", slug:"pressure-and-temperature-switches" },
     { code:"IA-13", name:"Gauges, Indicators & Chart Recorders", slug:"indicators-and-chart-recorders" },
-    { code:"IA-14", name:"Regulators", slug:"regulators" },
-    // IA-15 added from Thailand_TWI_Global_Database_QC_Enrichment_Pass_12.xlsx -- needed by
-    // exactly one company (UniThai Group), whose own listed sub-category was "installation and
-    // testing" for instrumentation/automation systems -- distinct from IA-09..14's specific
-    // instrument-type categories, and from AX-15 (which already exists) for asset-integrity
-    // inspection/testing specifically.
-    { code:"IA-15", name:"Instrumentation Installation, Commissioning & Testing", slug:"instrumentation-installation-commissioning-and-testing" },
-    { code:"IA-16", name:"Level Measurement", slug:"level-measurement" },
+    { code:"IA-16", name:"Process Level Measurement & Switches", slug:"level-measurement" },
     { code:"IA-17", name:"Process Analyzers", slug:"process-analyzers" },
     { code:"IA-19", name:"Weighing Systems & Weighbridges", slug:"weighing-systems-and-weighbridges" },
   ]},
   { code:"DR", name:"Digital, AI & Robotics", slug:"digital-ai-and-robotics", items:[
-    { code:"DR-01", name:"Drone & Robotic Inspection", slug:"drone-and-robotic-inspection" },
-    { code:"DR-02", name:"Autonomous Inspection Robots", slug:"autonomous-inspection-robots" },
-    { code:"DR-03", name:"Laser Scanning & LiDAR", slug:"laser-scanning-and-lidar" },
-    { code:"DR-04", name:"Engineering & Simulation Software", slug:"engineering-and-simulation-software" },
-    { code:"DR-05", name:"Data, Analytics & Enterprise Software", slug:"data-analytics-and-enterprise-software" },
+    { code:"DR-01", name:"Drone & Robotic Inspection Services", slug:"drone-and-robotic-inspection" },
+    { code:"DR-02", name:"Crawlers & Autonomous Inspection Robots", slug:"autonomous-inspection-robots" },
+    { code:"DR-03", name:"3D Laser Scanning, LiDAR & Reality Capture", slug:"laser-scanning-and-lidar" },
+    { code:"DR-04", name:"Plant Design, Simulation & Digital Twin Software", slug:"engineering-and-simulation-software" },
+    { code:"DR-05", name:"Data, Analytics & Asset-Management Software", slug:"data-analytics-and-enterprise-software" },
   ]},
   { code:"AX", name:"Asset Integrity & Inspection", slug:"asset-integrity-and-inspection", items:[
     { code:"AX-01", name:"Tank Inspection", slug:"tank-inspection" },
@@ -1394,58 +1350,54 @@ const CATEGORY_TREE = [
     { code:"AX-04", name:"Corrosion Protection, Coatings & Linings", slug:"corrosion-protection", items:[
       { code:"AX-04.1", name:"Coating Materials & Systems", slug:"coating-materials-and-systems" },
       { code:"AX-04.2", name:"Tank & Vessel Linings", slug:"tank-and-vessel-linings" },
-      { code:"AX-04.3", name:"Pipeline Coatings, Tapes & Wraps", slug:"pipeline-coatings-tapes-and-wraps" },
       { code:"AX-04.4", name:"Corrosion Engineering & Consultancy", slug:"corrosion-engineering-and-consultancy" },
     ]},
     { code:"AX-05", name:"Cathodic Protection", slug:"cathodic-protection" },
     { code:"AX-08", name:"Refractory Services", slug:"refractory-services" },
-    { code:"AX-09", name:"Integrity Management", slug:"integrity-management" },
-    { code:"AX-11", name:"Fitness-for-Service", slug:"fitness-for-service" },
-    { code:"AX-12", name:"Life Extension", slug:"life-extension" },
+    { code:"AX-09", name:"Integrity Management", slug:"integrity-management", items:[
+      { code:"AX-09.1", name:"Risk-Based Inspection", slug:"risk-based-inspection" },
+    ]},
+    { code:"AX-11", name:"Fitness-for-Service & Life Extension", slug:"fitness-for-service" },
     { code:"AX-13", name:"Tank Cleaning", slug:"tank-cleaning", items:[
       { code:"AX-13.1", name:"Robotic & No-Man-Entry Cleaning", slug:"robotic-no-man-entry-cleaning" },
       { code:"AX-13.2", name:"Manual & Confined-Space Cleaning", slug:"manual-confined-space-cleaning" },
       { code:"AX-13.3", name:"Degassing & Vapour Freeing", slug:"degassing-and-vapour-freeing" },
+      { code:"AX-13.4", name:"Sludge Removal & Hydrocarbon Recovery", slug:"sludge-removal" },
     ]},
     { code:"AX-14", name:"Hydrotesting", slug:"hydrotesting" },
     { code:"AX-15", name:"Calibration Services", slug:"calibration-services" },
     { code:"AX-16", name:"Rope Access Services", slug:"rope-access-services" },
     { code:"AX-17", name:"Leak Detection", slug:"leak-detection" },
-    { code:"AX-18", name:"Sludge Removal", slug:"sludge-removal", items:[
-      { code:"AX-18.1", name:"Hydrocarbon Recovery", slug:"hydrocarbon-recovery" },
-    ]},
     { code:"AX-19", name:"Catalyst Handling", slug:"catalyst-handling" },
     { code:"AX-20", name:"Turnaround & Shutdown Services", slug:"turnaround-and-shutdown-services" },
     { code:"AX-21", name:"Chemical Cleaning & Hydrojetting", slug:"chemical-cleaning-and-hydrojetting" },
     { code:"AX-22", name:"On-Site Machining", slug:"on-site-machining" },
     { code:"AX-23", name:"Valve Overhaul & Testing", slug:"valve-overhaul-and-testing" },
-    { code:"AX-24", name:"Risk-Based Inspection (RBI)", slug:"risk-based-inspection" },
-    { code:"AX-25", name:"Fitness-for-Service & Remaining Life", slug:"fitness-for-service-and-remaining-life" },
     { code:"AX-26", name:"Positive Material Identification (PMI)", slug:"positive-material-identification" },
     { code:"AX-27", name:"Failure Analysis & Metallurgical Testing", slug:"failure-analysis-and-metallurgical-testing" },
-    // Online (live-plant) leak repair — genuinely distinct from Leak
-    // Detection (AX-17, which finds leaks) and from Gaskets, where PETROSEAL
-    // was parked for want of anywhere better.
     { code:"AX-28", name:"Online Leak Sealing", slug:"online-leak-sealing" },
     { code:"AX-29", name:"Pipeline Pigging & Intervention", slug:"pipeline-pigging-and-intervention" },
+    { code:"AX-30", name:"Third-Party Inspection & Certification", slug:"inspection-and-certification" },
   ]},
   { code:"FS", name:"Fire, Safety & Environment", slug:"fire-safety-and-environment", items:[
     { code:"FS-01", name:"Fire Protection", slug:"fire-protection", items:[
       { code:"FS-01.1", name:"Foam Systems & Equipment", slug:"foam-systems-and-equipment" },
       { code:"FS-01.2", name:"Fire Water Systems", slug:"fire-water-systems" },
       { code:"FS-01.3", name:"Portable Fire Equipment", slug:"portable-fire-equipment" },
+      { code:"FS-01.4", name:"Passive Fire Protection & Fireproofing", slug:"passive-fire-protection-and-fireproofing" },
     ]},
-    { code:"FS-02", name:"Fire Detection", slug:"fire-detection" },
-    { code:"FS-03", name:"Fire Fighting Foam", slug:"fire-fighting-foam" },
+    { code:"FS-02", name:"Fire & Flame Detection", slug:"fire-detection" },
+    { code:"FS-03", name:"Fire Fighting Foam Concentrates", slug:"fire-fighting-foam" },
     { code:"FS-04", name:"Rim Seal Fire Protection", slug:"rim-seal-fire-protection", items:[
       { code:"FS-04.1", name:"Rim Seal Foam Pourers", slug:"rim-seal-foam-pourers" },
       { code:"FS-04.2", name:"Rim Seal Detection Systems", slug:"rim-seal-detection-systems" },
-      { code:"FS-04.3", name:"Rim Seal Dry Chemical Systems", slug:"rim-seal-dry-chemical-systems" },
     ]},
-    { code:"FS-05", name:"Gas Detection", slug:"gas-detection" },
-    { code:"FS-06", name:"Emergency Shutdown Systems", slug:"emergency-shutdown-systems" },
-    { code:"FS-07", name:"Explosion Protection (ATEX)", slug:"explosion-protection-atex" },
-    { code:"FS-08", name:"Hazardous Area Equipment", slug:"hazardous-area-equipment", items:[
+    { code:"FS-05", name:"Gas Detection & Monitoring", slug:"gas-detection", items:[
+      { code:"FS-05.1", name:"Fixed Gas Detection Systems", slug:"fixed-gas-detection-systems" },
+      { code:"FS-05.2", name:"Portable & Personal Gas Monitors", slug:"portable-and-personal-gas-monitors" },
+    ]},
+    { code:"FS-07", name:"Explosion Protection, Venting & Suppression", slug:"explosion-protection-atex" },
+    { code:"FS-08", name:"Hazardous Area (Ex) Equipment", slug:"hazardous-area-equipment", items:[
       { code:"FS-08.1", name:"Hazardous Area Lighting", slug:"hazardous-area-lighting" },
     ]},
     { code:"FS-09", name:"Lightning Protection", slug:"lightning-protection", items:[
@@ -1456,167 +1408,133 @@ const CATEGORY_TREE = [
       { code:"FS-09.5", name:"Charge Dissipation Systems", slug:"charge-dissipation-systems" },
       { code:"FS-09.6", name:"In-Tank Potential Equalizers", slug:"in-tank-potential-equalizers" },
     ]},
-    { code:"FS-10", name:"Earthing & Bonding", slug:"earthing-and-bonding" },
+    { code:"FS-10", name:"Earthing, Bonding & Static Control", slug:"earthing-and-bonding" },
     { code:"FS-11", name:"Spill Containment", slug:"spill-containment", items:[
       { code:"FS-11.1", name:"Containment Liners & Geomembranes", slug:"containment-liners-and-geomembranes" },
       { code:"FS-11.2", name:"Spill Response Equipment", slug:"spill-response-equipment" },
     ]},
-    { code:"FS-12", name:"Environmental Monitoring", slug:"environmental-monitoring", items:[
-      { code:"FS-12.1", name:"Weather & Metocean Monitoring", slug:"weather-and-metocean-monitoring" },
-    ]},
+    { code:"FS-12", name:"Environmental Monitoring", slug:"environmental-monitoring" },
     { code:"FS-13", name:"Occupational Safety", slug:"occupational-safety" },
     { code:"FS-14", name:"HAZOP & Risk Assessment", slug:"hazop-and-risk-assessment" },
-    { code:"FS-15", name:"Functional Safety", slug:"functional-safety" },
-    { code:"FS-16", name:"Process Safety", slug:"process-safety" },
-    { code:"FS-17", name:"Regulatory Compliance", slug:"regulatory-compliance" },
+    { code:"FS-15", name:"Functional Safety & Emergency Shutdown", slug:"functional-safety" },
+    { code:"FS-16", name:"Process Safety & Regulatory Compliance", slug:"process-safety" },
   ]},
-  { code:"MR", name:"Industrial Supplies (MRO)", slug:"industrial-supplies-mro", items:[
-    { code:"MR-01", name:"Industrial Safety Equipment", slug:"industrial-safety-equipment" },
-    { code:"MR-02", name:"Gaskets", slug:"gaskets" },
+  { code:"MR", name:"Industrial Supplies & MRO", slug:"industrial-supplies-mro", items:[
+    { code:"MR-01", name:"PPE & Industrial Safety Equipment", slug:"industrial-safety-equipment" },
+    { code:"MR-02", name:"Gaskets, Packing & Sealing Products", slug:"gaskets" },
     { code:"MR-03", name:"Welding Equipment & Consumables", slug:"welding-equipment-and-consumables" },
     { code:"MR-04", name:"Fasteners & Bolting", slug:"fasteners-and-bolting" },
-    { code:"MR-05", name:"Pipe Supports & Hangers", slug:"pipe-supports-and-hangers" },
-    { code:"MR-06", name:"Lubricants & Lubrication Services", slug:"lubricants-and-lubrication-services" },
-    { code:"MR-07", name:"Additive Manufacturing (3D-Printed Spares)", slug:"additive-manufacturing-3d-printed-spares" },
+    { code:"MR-07", name:"Spare Parts & 3D-Printed Spares", slug:"additive-manufacturing-3d-printed-spares" },
+    { code:"MR-08", name:"Cranes & Lifting Equipment", slug:"cranes-and-lifting-equipment", items:[
+      { code:"MR-08.1", name:"EOT, Gantry & Jib Cranes", slug:"eot-gantry-and-jib-cranes" },
+      { code:"MR-08.2", name:"Mobile & Crawler Cranes", slug:"mobile-and-crawler-cranes" },
+      { code:"MR-08.3", name:"Hoists & Chain Blocks", slug:"hoists-and-chain-blocks" },
+      { code:"MR-08.4", name:"Lifting Tackle & Slings", slug:"lifting-tackle-and-slings" },
+    ]},
+    { code:"MR-09", name:"Blasting & Painting Equipment", slug:"blasting-and-painting-equipment", items:[
+      { code:"MR-09.1", name:"Blasting Equipment", slug:"blasting-equipment" },
+      { code:"MR-09.2", name:"Painting & Spray Equipment", slug:"painting-and-spray-equipment" },
+    ]},
+    { code:"MR-10", name:"Hand, Power & Torque Tools", slug:"hand-power-and-torque-tools" },
+    { code:"MR-11", name:"MRO Distributors & Stockists", slug:"mro-distributors-and-stockists" },
   ]},
   { code:"LT", name:"Logistics & Transportation", slug:"logistics-and-transportation", items:[
     { code:"LT-01", name:"Marine & Port Equipment", slug:"marine-and-port-equipment" },
-    { code:"LT-02", name:"Trucking & Road Tankers", slug:"trucking-and-road-tankers" },
+    { code:"LT-02", name:"Trucking & Road Tankers", slug:"trucking-and-road-tankers", items:[
+      { code:"LT-02.1", name:"ISO Tank Containers & Intermodal", slug:"iso-tank-containers-and-intermodal" },
+      { code:"LT-02.2", name:"Tank Truck & Trailer Manufacturers", slug:"tank-truck-and-trailer-manufacturers" },
+    ]},
     { code:"LT-03", name:"Port Operators", slug:"port-operators" },
     { code:"LT-04", name:"Pipeline Operators", slug:"pipeline-operators" },
-    { code:"LT-05", name:"Marine Logistics", slug:"marine-logistics" },
-    { code:"LT-06", name:"Shipping Companies", slug:"shipping-companies" },
+    { code:"LT-05", name:"Marine Logistics & Shipping", slug:"marine-logistics", items:[
+      { code:"LT-05.1", name:"Bunkering & Marine Fuel Supply", slug:"bunkering-and-marine-fuel-supply" },
+    ]},
     { code:"LT-07", name:"Inland Waterways", slug:"inland-waterways" },
     { code:"LT-08", name:"Rail Logistics", slug:"rail-logistics" },
-    { code:"LT-09", name:"Freight Forwarding", slug:"freight-forwarding" },
-    { code:"LT-10", name:"Customs & Port Services", slug:"customs-and-port-services" },
-    { code:"LT-11", name:"Warehouse Operators", slug:"warehouse-operators" },
-    { code:"LT-12", name:"Cold Storage", slug:"cold-storage" },
+    { code:"LT-09", name:"Freight Forwarding, Customs & Clearance", slug:"freight-forwarding" },
+    { code:"LT-11", name:"Warehouse & Cold Storage Operators", slug:"warehouse-operators" },
     { code:"LT-13", name:"Heavy Lift & Transport", slug:"heavy-lift-and-transport" },
-  ]},
-  { code:"ES", name:"Sustainability & Energy Transition", slug:"sustainability-and-energy-transition", items:[
-    { code:"ES-01", name:"ESG Consulting", slug:"esg-consulting" },
+    { code:"LT-14", name:"Offshore Support Vessels & Marine Fleet", slug:"offshore-support-vessels" },
+    { code:"LT-15", name:"Naval Architecture & Marine Engineering", slug:"naval-architecture-and-marine-engineering" },
+    { code:"LT-16", name:"Shipbuilding, Repair & Conversion", slug:"shipbuilding" },
   ]},
   { code:"PS", name:"Professional Services", slug:"professional-services", items:[
-    { code:"PS-01", name:"Project Consultants", slug:"project-consultants" },
-    { code:"PS-02", name:"Engineering Consultants", slug:"engineering-consultants" },
-    { code:"PS-03", name:"Consultancy Services", slug:"consultancy-services" },
-    { code:"PS-04", name:"Owner's Engineers", slug:"owner-s-engineers" },
+    { code:"PS-02", name:"Engineering & Technical Consultants", slug:"engineering-consultants" },
+    { code:"PS-04", name:"Project Management & Owner's Engineers", slug:"owner-s-engineers" },
     { code:"PS-05", name:"Environmental Consultants", slug:"environmental-consultants" },
-    { code:"PS-06", name:"Inspection & Certification", slug:"inspection-and-certification" },
+    { code:"PS-07", name:"ESG Consulting", slug:"esg-consulting" },
   ]},
   { code:"MM", name:"Materials & Metallurgy", slug:"materials-and-metallurgy", items:[
     { code:"MM-01", name:"Steel Manufacturers", slug:"steel-manufacturers" },
-    { code:"MM-02", name:"Stainless Steel", slug:"stainless-steel" },
-    { code:"MM-03", name:"Alloy Steel", slug:"alloy-steel" },
+    { code:"MM-02", name:"Stainless & Alloy Steel", slug:"stainless-steel" },
     { code:"MM-04", name:"Aluminium Products", slug:"aluminium-products" },
-    { code:"MM-05", name:"Pipes & Tubes", slug:"pipes-and-tubes" },
-    { code:"MM-06", name:"Plates & Sheets", slug:"plates-and-sheets" },
-    { code:"MM-07", name:"Structural Steel", slug:"structural-steel" },
-    { code:"MM-08", name:"Forgings", slug:"forgings" },
-    { code:"MM-09", name:"Castings", slug:"castings" },
-    { code:"MM-11", name:"Composites & FRP Products", slug:"frp-products" },
-    { code:"MM-12", name:"HDPE Products", slug:"hdpe-products" },
-    { code:"MM-13", name:"Cable Manufacturers", slug:"cable-manufacturers" },
-    { code:"MM-14", name:"Ready Mix Concrete", slug:"ready-mix-concrete" },
-    { code:"MM-15", name:"Cement & Aggregates", slug:"cement-and-aggregates" },
-    { code:"MM-16", name:"Refractory Materials", slug:"refractory-materials" },
-    { code:"MM-17", name:"Insulation Materials", slug:"insulation-materials" },
-    { code:"MM-18", name:"Secondary Metals & Recycling", slug:"secondary-metals-and-recycling" },
-    { code:"MM-19", name:"Catalysts & Adsorbents", slug:"catalysts-and-adsorbents" },
-    { code:"MM-20", name:"Electrical Equipment & Transformers", slug:"electrical-equipment-and-transformers" },
+    { code:"MM-06", name:"Steel Plates, Sheets & Structurals", slug:"plates-and-sheets" },
+    { code:"MM-08", name:"Forgings & Castings", slug:"forgings" },
+    { code:"MM-10", name:"Specialty & Industrial Chemicals", slug:"specialty-and-industrial-chemicals", items:[
+      { code:"MM-10.1", name:"Catalysts & Adsorbents", slug:"catalysts-and-adsorbents" },
+      { code:"MM-10.2", name:"Lubricants & Greases", slug:"lubricants-and-lubrication-services" },
+    ]},
+    { code:"MM-11", name:"Composites, FRP & Plastic Products", slug:"frp-products" },
+    { code:"MM-15", name:"Cement, Concrete & Aggregates", slug:"cement-and-aggregates" },
+    { code:"MM-16", name:"Refractory & Insulation Materials", slug:"refractory-materials" },
+    { code:"MM-21", name:"Rubber, Elastomer & Polymer Products", slug:"rubber-elastomer-and-polymer-products" },
   ]},
   { code:"UE", name:"Utilities & Energy", slug:"utilities-and-energy", items:[
-    { code:"UE-01", name:"Industrial Water Systems", slug:"industrial-water-systems" },
-    { code:"UE-02", name:"Wastewater Treatment", slug:"wastewater-treatment" },
-    { code:"UE-03", name:"Desalination", slug:"desalination" },
-    { code:"UE-04", name:"Steam Systems", slug:"steam-systems" },
+    { code:"UE-01", name:"Industrial Water & Desalination Systems", slug:"industrial-water-systems" },
+    { code:"UE-02", name:"Wastewater Treatment & Contractors", slug:"wastewater-treatment" },
+    { code:"UE-04", name:"Steam Systems", slug:"steam-systems", items:[
+      { code:"UE-04.1", name:"Steam Traps", slug:"steam-traps" },
+      { code:"UE-04.2", name:"Thermal Oil & Hot Oil Systems", slug:"thermal-oil-and-hot-oil-systems" },
+    ]},
     { code:"UE-05", name:"Compressed Air", slug:"compressed-air" },
     { code:"UE-06", name:"Power Generation", slug:"power-generation", items:[
       { code:"UE-06.1", name:"Diesel Generators & Gensets", slug:"diesel-generators" },
-      { code:"UE-06.2", name:"UPS Systems", slug:"ups-systems" },
-      { code:"UE-06.3", name:"Power Distribution Equipment", slug:"power-distribution-equipment" },
+      { code:"UE-06.4", name:"Steam & Gas Turbines", slug:"steam-and-gas-turbines" },
     ]},
-    { code:"UE-09", name:"Hydrogen Infrastructure", slug:"hydrogen-infrastructure", items:[
-      { code:"UE-09.1", name:"Hydrogen Storage & Handling", slug:"hydrogen-storage-and-handling" },
+    { code:"UE-11", name:"Boilers & Industrial Burners", slug:"industrial-burners-and-boilers" },
+    { code:"UE-12", name:"Electrical Equipment & Transformers", slug:"electrical-equipment-and-transformers", items:[
+      { code:"UE-12.1", name:"Cables & Wire", slug:"cable-manufacturers" },
+      { code:"UE-12.2", name:"UPS & Power Conditioning", slug:"ups-systems" },
+      { code:"UE-12.3", name:"Switchgear, Panels & MCC", slug:"switchgear-panels-and-mcc" },
     ]},
-    { code:"UE-10", name:"Utility Contractors", slug:"utility-contractors" },
-    { code:"UE-11", name:"Industrial Burners & Boilers", slug:"industrial-burners-and-boilers" },
+    { code:"UE-13", name:"Industrial Gas Plants (Nitrogen, Oxygen)", slug:"industrial-gas-plants-nitrogen-oxygen" },
   ]},
   { code:"RE", name:"Renewables & Energy Storage", slug:"renewables-and-energy-storage", items:[
     { code:"RE-01", name:"Solar Power Systems", slug:"solar-power-systems" },
     { code:"RE-02", name:"Battery Energy Storage (BESS)", slug:"bess-systems" },
+    { code:"RE-03", name:"Green Hydrogen & Electrolysers", slug:"hydrogen-infrastructure" },
     { code:"RE-04", name:"Ammonia Storage & Handling", slug:"ammonia-storage-and-handling" },
-    { code:"RE-05", name:"Biofuel & Ethanol Storage Systems", slug:"biofuel-and-ethanol-storage-systems" },
+    { code:"RE-05", name:"Biofuels & Bioenergy", slug:"biofuel-and-ethanol-storage-systems" },
     { code:"RE-06", name:"CBG & Biogas Infrastructure", slug:"cbg-and-biogas-infrastructure" },
     { code:"RE-07", name:"Carbon Capture Equipment", slug:"carbon-capture-equipment" },
     { code:"RE-08", name:"Energy Efficiency Systems", slug:"energy-efficiency-systems" },
-    { code:"RE-09", name:"Biofuels & Bioenergy", slug:"biofuels-and-bioenergy" },
   ]},
   { code:"IE", name:"Inspection Equipment", slug:"inspection-equipment", items:[
-    { code:"IE-01", name:"NDT Equipment", slug:"ndt-equipment", items:[
-      { code:"IE-01.1", name:"Ultrasonic Flaw Detectors", slug:"ultrasonic-flaw-detectors" },
-      { code:"IE-01.2", name:"Thickness Gauges", slug:"thickness-gauges" },
-      { code:"IE-01.3", name:"Phased Array & TOFD", slug:"phased-array-and-tofd" },
-    ]},
+    { code:"IE-01", name:"NDT Equipment", slug:"ndt-equipment" },
     { code:"IE-02", name:"Tank Floor Scanners (MFL)", slug:"tank-floor-scanners" },
     { code:"IE-03", name:"Radiographic Equipment", slug:"radiographic-equipment" },
     { code:"IE-04", name:"Weld Inspection Equipment", slug:"weld-inspection-equipment" },
     { code:"IE-05", name:"Acoustic Emission Systems", slug:"acoustic-emission-systems" },
     { code:"IE-06", name:"Borescopes & Visual Inspection", slug:"borescopes-and-visual-inspection" },
-    { code:"IE-07", name:"Inspection Drones & Crawlers", slug:"inspection-drones-and-crawlers" },
   ]},
   { code:"TW", name:"Training & Workforce", slug:"training-and-workforce", items:[
-    // Slugs copied verbatim from Tankonomics' categorySeed.ts (the mothership —
-    // see ENGINEERING_NOTES.md §5.1) rather than re-derived, so this new
-    // section joins cleanly with zero mapping work. Deliberately a subset:
-    // Recruitment & Jobs, Executive Search, Online Learning and Contract
-    // Labour exist in Tankonomics' fuller Training & Workforce section too,
-    // but read as general-workforce rather than industrial/technical — left
-    // out here as a genuine scope call, not an oversight.
     { code:"TW-01", name:"Training & Skilling", slug:"training-and-skilling" },
-    { code:"TW-02", name:"Technical Institutes", slug:"technical-institutes" },
-    { code:"TW-03", name:"Certification Bodies", slug:"certification-bodies" },
-    { code:"TW-04", name:"Competency Assessment", slug:"competency-assessment" },
-    { code:"TW-05", name:"Industrial Staffing", slug:"industrial-staffing" },
-    // Contractor Compliance: distinct from FS's regulatory-compliance —
-    // that's complying with government regulation; this is third-party
-    // verification of OTHER contractors' safety records, insurance and
-    // certifications before site access (the ISNetworld/Avetta/Veriforce
-    // category). Filed alongside Certification Bodies since both are
-    // third-party verification services.
-    { code:"TW-06", name:"Contractor Compliance", slug:"contractor-compliance" },
+    { code:"TW-02", name:"Technical Institutes & Universities", slug:"technical-institutes" },
+    { code:"TW-03", name:"Personnel Certification & Competency Assessment", slug:"certification-bodies" },
+    { code:"TW-05", name:"Industrial Staffing & Contractor Management", slug:"industrial-staffing" },
   ]},
-  // ── Offshore & Subsea ────────────────────────────────────────────────
-  // OS-01 is the former EC-19: migrated here so offshore capability lives in
-  // one section rather than being split between Engineering & Construction
-  // and a scatter of other sheets. Slugs are UNCHANGED, so every company
-  // already tagged offshore-floating-systems / fpso-fso-design-and-conversion
-  // / flng-systems / fsru-and-regasification-systems keeps its tag and its
-  // profile links — this re-parents the display hierarchy only.
   { code:"OS", name:"Offshore & Subsea Systems", slug:"offshore-and-subsea-systems", items:[
     { code:"OS-01", name:"Floating Production Systems (FPSO/FSRU/FLNG)", slug:"offshore-floating-systems", items:[
       { code:"OS-01.1", name:"FPSO/FSO Design & Conversion", slug:"fpso-fso-design-and-conversion" },
-      { code:"OS-01.2", name:"FLNG Systems", slug:"flng-systems" },
-      { code:"OS-01.3", name:"FSRU & Regasification Systems", slug:"fsru-and-regasification-systems" },
-      // OS-01.4 added after reviewing an India research batch's category proposals: a real,
-      // distinct service line (long-term O&M, brownfield support, life-extension) confirmed via
-      // 3 real companies already in TWI (SBM Offshore India, Saipem India, McDermott India).
-      // Scope note: this is for SERVICE PROVIDERS to FPSO assets, not the assets/operators
-      // themselves — FPSO and LNG export terminal OWNERSHIP/OPERATION now lives in TankBazaar,
-      // same boundary already applied to refiners and other producer/asset companies. A company
-      // here does lifecycle work FOR an FPSO owner; it doesn't own or operate the FPSO itself.
-      { code:"OS-01.4", name:"FPSO Lifecycle Management", slug:"fpso-lifecycle-management" },
+      { code:"OS-01.2", name:"FLNG, FSRU & Regasification Systems", slug:"flng-systems" },
     ]},
     { code:"OS-02", name:"Subsea Production Systems", slug:"subsea-production-systems", items:[
-      { code:"OS-02.1", name:"Subsea Trees & Wellheads", slug:"subsea-trees-and-wellheads" },
       { code:"OS-02.2", name:"Subsea Manifolds & PLET/PLEM", slug:"subsea-manifolds-and-plet-plem" },
       { code:"OS-02.3", name:"Subsea Control Systems", slug:"subsea-control-systems" },
     ]},
     { code:"OS-03", name:"SURF (Umbilicals, Risers & Flowlines)", slug:"surf-umbilicals-risers-flowlines", items:[
       { code:"OS-03.1", name:"Umbilicals & Flying Leads", slug:"umbilicals-and-flying-leads" },
-      { code:"OS-03.2", name:"Flexible & Rigid Risers", slug:"flexible-and-rigid-risers" },
-      { code:"OS-03.3", name:"Subsea Flowlines", slug:"subsea-flowlines" },
+      { code:"OS-03.2", name:"Risers & Flowlines", slug:"flexible-and-rigid-risers" },
     ]},
     { code:"OS-04", name:"Mooring Systems", slug:"mooring-systems", items:[
       { code:"OS-04.1", name:"Turret Mooring Systems", slug:"turret-mooring-systems" },
@@ -1624,64 +1542,52 @@ const CATEGORY_TREE = [
       { code:"OS-04.3", name:"Anchors & Mooring Hardware", slug:"anchors-and-mooring-hardware" },
     ]},
     { code:"OS-05", name:"Offshore Structures & Fabrication", slug:"offshore-structures-and-fabrication", items:[
-      { code:"OS-05.1", name:"Jackets & Substructures", slug:"jackets-and-substructures" },
-      { code:"OS-05.2", name:"Topsides & Modules", slug:"topsides-and-modules" },
+      { code:"OS-05.2", name:"Jackets, Topsides & Modules", slug:"topsides-and-modules" },
     ]},
     { code:"OS-06", name:"Offshore Installation & EPCIC", slug:"offshore-installation-and-epcic" },
     { code:"OS-07", name:"Subsea Services & Intervention", slug:"subsea-services-and-intervention", items:[
       { code:"OS-07.1", name:"ROV Services", slug:"rov-services" },
       { code:"OS-07.2", name:"Commercial Diving", slug:"commercial-diving" },
+      { code:"OS-07.3", name:"Subsea Survey & Inspection", slug:"subsea-survey-and-inspection" },
     ]},
-    { code:"OS-08", name:"Offshore Support Vessels", slug:"offshore-support-vessels" },
-    { code:"OS-09", name:"Naval Architecture & Marine Engineering", slug:"naval-architecture-and-marine-engineering" },
-    { code:"OS-10", name:"Shipbuilding", slug:"shipbuilding" },
-    { code:"OS-11", name:"Ship Repair & Conversion", slug:"ship-repair-and-conversion" },
-    // OS-12 added after reviewing an India research batch's category proposals: a genuine gap —
-    // no existing category anywhere in the tree covers ongoing O&M of producing hydrocarbon
-    // facilities (as opposed to construction/EPC, which EC already covers extensively).
-    // Confirmed via 4 real companies already in TWI (Deep Industries, Asian Energy Services,
-    // Dolphin Offshore Enterprises, Greatship India) needing re-tagging here.
-    { code:"OS-12", name:"Offshore/Onshore Facility O&M", slug:"offshore-onshore-facility-om" },
+    { code:"OS-12", name:"Offshore & Onshore Facility Operations & Maintenance", slug:"offshore-onshore-facility-om" },
   ]},
-  // ── Process Plant Equipment ──────────────────────────────────────────
-  // EC-21 covers process TECHNOLOGY LICENSORS (who owns the process); this
-  // section covers the HARDWARE that realises it. Previously there was
-  // nowhere for a reactor, column, fired heater or SRU vendor to sit, which
-  // is why so much of it silently accumulated in Heavy Engineering & Fab.
   { code:"PE", name:"Process Plant Equipment", slug:"process-plant-equipment", items:[
-    { code:"PE-01", name:"Pressure Vessels & Reactors", slug:"pressure-vessels-and-reactors" },
+    { code:"PE-01", name:"Pressure Vessels & Reactors", slug:"pressure-vessels-and-reactors", items:[
+      { code:"PE-01.1", name:"Pressure Vessels", slug:"pressure-vessels" },
+      { code:"PE-01.2", name:"Reactors & Autoclaves", slug:"reactors-and-autoclaves" },
+    ]},
     { code:"PE-02", name:"Distillation Columns & Tower Internals", slug:"distillation-columns-and-tower-internals", items:[
       { code:"PE-02.1", name:"Trays & Packing", slug:"trays-and-packing" },
-      { code:"PE-02.2", name:"Reactor Internals & FCC Cyclones", slug:"reactor-internals-and-fcc-cyclones" },
     ]},
-    { code:"PE-03", name:"Fired Heaters & Process Furnaces", slug:"fired-heaters-and-process-furnaces", items:[
-      { code:"PE-03.1", name:"Burners & Low-NOx Combustion", slug:"burners-and-low-nox-combustion" },
-    ]},
+    { code:"PE-03", name:"Process Furnaces & Fired Heaters", slug:"fired-heaters-and-process-furnaces" },
     { code:"PE-04", name:"Flare Systems", slug:"flare-systems", items:[
       { code:"PE-04.1", name:"Flare Tips & Stacks", slug:"flare-tips-and-stacks" },
-      { code:"PE-04.2", name:"Flare Gas Recovery", slug:"flare-gas-recovery" },
     ]},
-    { code:"PE-05", name:"Sulphur Recovery Units (SRU/TGT)", slug:"sulphur-recovery-units", items:[
-      { code:"PE-05.1", name:"Sulphur Degassing & Handling", slug:"sulphur-degassing-and-handling" },
-    ]},
-    { code:"PE-06", name:"Amine & Gas Treating Systems", slug:"amine-and-gas-treating-systems", items:[
-      { code:"PE-06.1", name:"Sour Water Stripping", slug:"sour-water-stripping" },
-    ]},
+    { code:"PE-06", name:"Gas Treating & Sulphur Recovery (Amine, SRU/TGT)", slug:"amine-and-gas-treating-systems" },
     { code:"PE-07", name:"Hydrogen Generation", slug:"hydrogen-generation", items:[
       { code:"PE-07.1", name:"SMR & Reformer Equipment", slug:"smr-and-reformer-equipment" },
       { code:"PE-07.2", name:"PSA & Gas Purification", slug:"psa-and-gas-purification" },
     ]},
-    { code:"PE-08", name:"Desalters & Electrostatic Separation", slug:"desalters-and-electrostatic-separation" },
-    { code:"PE-09", name:"Separators, Scrubbers & Coalescers", slug:"separators-scrubbers-and-coalescers" },
-    { code:"PE-10", name:"Coke Drums & Delayed Coking Equipment", slug:"coke-drums-and-delayed-coking-equipment" },
+    { code:"PE-09", name:"Separation & Filtration Equipment", slug:"separators-scrubbers-and-coalescers", items:[
+      { code:"PE-09.1", name:"Membrane Technologies", slug:"membrane-technologies" },
+    ]},
     { code:"PE-11", name:"Incinerators & Thermal Oxidizers", slug:"incinerators-and-thermal-oxidizers" },
     { code:"PE-12", name:"Package Units & Process Skids", slug:"package-units-and-process-skids" },
+    { code:"PE-13", name:"Heat Exchangers", slug:"heat-exchangers", items:[
+      { code:"PE-13.1", name:"Shell & Tube Heat Exchangers", slug:"shell-and-tube-heat-exchangers" },
+      { code:"PE-13.2", name:"Air-Cooled Heat Exchangers", slug:"air-cooled-heat-exchangers" },
+      { code:"PE-13.3", name:"Plate Heat Exchangers", slug:"plate-heat-exchangers" },
+      { code:"PE-13.4", name:"Waste Heat Recovery Units", slug:"waste-heat-recovery-units" },
+    ]},
+    { code:"PE-14", name:"Evaporators, Dryers & Crystallizers", slug:"evaporators-dryers-and-crystallizers" },
+    { code:"PE-15", name:"Vacuum Systems & Ejectors", slug:"vacuum-systems-and-ejectors" },
+    { code:"PE-16", name:"Turboexpanders, Cryogenic Gas Processing & NGL Recovery Systems", slug:"turboexpanders-cryogenic-gas-processing-and-ngl-recovery-systems" },
+    { code:"PE-17", name:"LPG Treating & Processing Systems", slug:"lpg-treating-and-processing-systems", items:[
+      { code:"PE-17.1", name:"Dehydration & Drying", slug:"lpg-dehydration-molecular-sieves-and-lpg-drying-systems" },
+      { code:"PE-17.2", name:"Refrigeration & Flash Gas", slug:"lpg-refrigeration-flash-gas-compressors-and-auto-refrigeration-systems" },
+    ]},
   ]},
-  // ── Upstream & Drilling ──────────────────────────────────────────────
-  // Added on an explicit scope decision to extend T3 beyond downstream/
-  // midstream into the full oil & gas chain. Companies previously excluded
-  // as "upstream, out of scope" during research are now in scope and should
-  // be revisited — see the session notes for the ~17 already researched.
   { code:"UP", name:"Upstream & Drilling", slug:"upstream-and-drilling", items:[
     { code:"UP-01", name:"Drilling Contractors", slug:"drilling-contractors", items:[
       { code:"UP-01.1", name:"Onshore Drilling", slug:"onshore-drilling" },
@@ -1698,47 +1604,24 @@ const CATEGORY_TREE = [
     { code:"UP-10", name:"Core Analysis & Reservoir Services", slug:"core-analysis-and-reservoir-services" },
     { code:"UP-11", name:"Workover & Well Servicing", slug:"workover-and-well-servicing" },
     { code:"UP-12", name:"Coiled Tubing & Pressure Pumping", slug:"coiled-tubing-and-pressure-pumping" },
-    { code:"UP-13", name:"Production Chemicals (Upstream)", slug:"production-chemicals-upstream" },
-    // UP-14 through UP-42 (selectively — only codes an actual company in this
-    // batch needed, not the full sequence) added from India_TWI_Master_RT_QC_
-    // Batch136.xlsx. 13 of 14 names came directly from the source's own
-    // per-company "TWI Sub-category" text field (a clean, confirmed match) or
-    // its Summary sheet's batch log. UP-32 is the one exception: the Summary
-    // log itself stops at UP-31 (a gap in the source's own documentation),
-    // and the one row using UP-32 had a messy concatenated text field instead
-    // of a single clean name. Derived from the logical gas-processing
-    // sequence (follows UP-31 dew-point control, precedes UP-33 NGL
-    // fractionation) and partial text evidence — lower confidence than the
-    // other 13, flagged here rather than presented as equally certain.
     { code:"UP-15", name:"Artificial Lift, ESP, Gas Lift & Rod Lift Systems", slug:"artificial-lift-esp-gas-lift-and-rod-lift-systems" },
     { code:"UP-17", name:"Production Chemistry, Flow Assurance & EOR Services", slug:"production-chemistry-flow-assurance-and-eor-services" },
     { code:"UP-18", name:"Produced Water, Water Injection & Water Treatment Systems", slug:"produced-water-water-injection-and-water-treatment-systems" },
-    { code:"UP-32", name:"Turboexpanders, Cryogenic Gas Processing & NGL Recovery Systems", slug:"turboexpanders-cryogenic-gas-processing-and-ngl-recovery-systems" },
-    { code:"UP-40", name:"LPG Treating & Processing Systems", slug:"lpg-treating-and-processing-systems", items:[
-      { code:"UP-40.1", name:"Amine, Merox & Caustic Treating", slug:"lpg-amine-treating-merox-caustic-wash-and-lpg-sweetening-systems" },
-      { code:"UP-40.2", name:"Dehydration & Drying", slug:"lpg-dehydration-molecular-sieves-and-lpg-drying-systems" },
-      { code:"UP-40.3", name:"Filtration & Coalescers", slug:"lpg-filtration-coalescers-fine-filters-and-particulate-removal-systems" },
-      { code:"UP-40.4", name:"Refrigeration & Flash Gas", slug:"lpg-refrigeration-flash-gas-compressors-and-auto-refrigeration-systems" },
-    ]},
-    { code:"UP-42", name:"LPG & Cryogenic Pumps", slug:"lpg-pumps-loading-unloading-pumps-and-cryogenic-lpg-transfer-systems" },
+    { code:"UP-19", name:"Drilling Rig Equipment (Top Drives, Pumps, BOP)", slug:"drilling-rig-equipment-top-drives-pumps-bop" },
   ]},
-  { code:"RT", name:"Rental", slug:"rental", items:[
-    // Equipment rental (scaffolding, generators, cranes, pumps, temporary
-    // storage) is a genuinely distinct business model from equipment
-    // manufacture/sale, which is what the rest of the tree assumes — a
-    // turnaround/maintenance project routinely runs on rented, not owned,
-    // equipment. Slugs match Tankonomics' categorySeed.ts exactly.
+  { code:"RT", name:"Equipment Rental & Leasing", slug:"rental", items:[
     { code:"RT-01", name:"Scaffolding Rental", slug:"scaffolding-rental" },
     { code:"RT-02", name:"Generator & Power Equipment Rental", slug:"generator-and-power-equipment-rental" },
     { code:"RT-03", name:"Crane & Lifting Equipment Rental", slug:"crane-and-lifting-equipment-rental" },
     { code:"RT-04", name:"Pump & Compressor Rental", slug:"pump-and-compressor-rental" },
+    { code:"RT-05", name:"Tanks, Containment & Hose Rental", slug:"tanks-containment-and-hose-rental" },
+    { code:"RT-06", name:"Inspection, Testing & Safety Equipment Rental", slug:"inspection-testing-and-safety-equipment-rental" },
+    { code:"RT-07", name:"Welding, Heating & Site Equipment Rental", slug:"welding-heating-and-site-equipment-rental" },
   ]},
   { code:"NM", name:"News, Media & Associations", slug:"news-media-and-associations", items:[
-    { code:"NM-01", name:"News & Media", slug:"news-and-media" },
+    { code:"NM-01", name:"News, Media & Events", slug:"news-and-media" },
     { code:"NM-02", name:"Industry Associations", slug:"industry-associations" },
-    { code:"NM-03", name:"Standards Bodies", slug:"standards-bodies" },
-    { code:"NM-04", name:"Regulators & Government Bodies", slug:"regulators-and-government-bodies" },
-    { code:"NM-05", name:"Events & Exhibitions", slug:"events-and-exhibitions" },
+    { code:"NM-03", name:"Standards Bodies & Regulators", slug:"standards-bodies" },
   ]}
 ];
 </script>
@@ -3070,7 +2953,7 @@ function renderLandingPage() {
       <div class="landing-hero">
         <div class="em-mark">TANKWORLD INDIA · ENGINEERING &amp; EQUIPMENT DIRECTORY</div>
         <h1>Find the right supplier across ${COMPANIES.length.toLocaleString()} companies.</h1>
-        <p class="landing-sub">${CATEGORY_TREE.length} categories, ${COMPANIES.length.toLocaleString()} companies —
+        <p class="landing-sub">${CATEGORY_TREE.length} sections, ${allL2Count()} categories, ${COMPANIES.length.toLocaleString()} companies —
           search by name, product, or category to get started.</p>
         <form class="landing-search-form" onsubmit="submitLandingSearch(event)">
           <input type="text" id="landingSearchBox" class="landing-search-input"
@@ -4432,7 +4315,9 @@ async function checkAccessAndRender() {
         renderSectorFilter();
         document.getElementById('statCompanies').textContent = COMPANIES.length;
         document.getElementById('statCategories').textContent = allL2Count();
+        document.getElementById('statSheets').textContent = CATEGORY_TREE.length;
         renderAll();
+        handleRoute();   // repaint the landing hero so it shows the refreshed count, same as the header
       });
       return;
     }
