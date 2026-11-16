@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TankWorld India — Engineering &amp; Equipment Directory</title>
 <!-- Firebase compat SDK, classic script tags (not ES modules) so load order is
      predictable in a single-file app. AUTH ONLY — Firestore stays on the REST
@@ -12,7 +12,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* ══════════════════════════════════════════════════════════════════════
    DESIGN TOKENS — "engineering drawing / cyanotype" system.
@@ -22,38 +22,37 @@
    monospace "drawing sheet" numbering for the category taxonomy.
    ══════════════════════════════════════════════════════════════════════ */
 :root{
-  --paper: #F1ECDF;
-  --paper-raised: #FAF7EE;
-  --ink: #1B1F23;
-  --ink-muted: #5B6570;
-  --ink-faint: #8B93A0;
-  --blue: #1B4B7A;
-  --blue-soft: #E4ECF3;
-  --rust: #C0602A;
-  --rust-soft: #F4E3D6;
-  --line: #D8CFB8;
-  --line-blue: #C3D2DE;
-  --ok: #3E7A4F;
-  --ok-soft: #DCEEE1;
-  /* Premium tiers: a pastel fill, a border, a hard-shadow shade and a
-     stamp ink for each. Stamp ink passes WCAG AA (4.5:1) on its fill. */
+  /* Redesign phase 1 (Nov 2026): white, blue and a raspberry accent.
+     The token NAMES are unchanged so every existing rule keeps working;
+     --rust now holds the raspberry accent. */
+  --paper: #F5F7FA;
+  --paper-raised: #FFFFFF;
+  --ink: #111827;
+  --ink-muted: #4B5563;
+  --ink-faint: #6B7480;
+  --navy: #12305A;
+  --blue: #1463D8;
+  --blue-soft: #E8F0FD;
+  --rust: #C8175D;
+  --rust-soft: #FBE4EE;
+  --line: #E3E8EF;
+  --line-blue: #BBD3F7;
+  --ok: #17804A;
+  --ok-soft: #E3F5EB;
   --champ-bg: #F9EBBE; --champ-line: #C49A1C; --champ-shadow: #E3C470; --champ-ink: #6B4E00; --champ-crown: #D4A017;
   --feat-bg:  #E9EFFB; --feat-line:  #6C86C8; --feat-shadow:  #CBD7F1; --feat-ink:  #2F4B92;
   --spon-bg:  #E2F3E8; --spon-line:  #6FAE86; --spon-shadow:  #C2E3CF; --spon-ink:  #23603F;
-  --font-display: 'Space Grotesk', sans-serif;
-  --font-body: 'Inter', sans-serif;
-  --font-mono: 'IBM Plex Mono', monospace;
-  --radius: 3px;
+  --font-display: 'Space Grotesk', 'Segoe UI', system-ui, sans-serif;
+  --font-body: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  /* Labels and codes now use the body face with even-width digits. */
+  --font-mono: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  --radius: 8px;
+  color-scheme: light;
 }
 *{ box-sizing:border-box; margin:0; padding:0; }
 body{
   background:var(--paper); color:var(--ink); font-family:var(--font-body);
   font-size:14px; line-height:1.5;
-  background-image:
-    linear-gradient(var(--line) 1px, transparent 1px),
-    linear-gradient(90deg, var(--line) 1px, transparent 1px);
-  background-size: 28px 28px;
-  background-attachment: fixed;
   min-height:100vh;
 }
 a{ color:var(--blue); }
@@ -68,7 +67,7 @@ button{ font-family:inherit; cursor:pointer; }
 header{
   display:flex; align-items:center; justify-content:space-between;
   padding:14px 24px; background:var(--paper-raised);
-  border-bottom:2px solid var(--ink); position:sticky; top:0; z-index:50;
+  border-bottom:1px solid var(--line); position:sticky; top:0; z-index:50;
   flex-wrap:wrap; gap:12px;
 }
 .brand{ display:flex; align-items:center; gap:12px; }
@@ -97,7 +96,7 @@ header{
   color:var(--ink-faint); margin-bottom:10px; display:flex; justify-content:space-between;
 }
 .search-box{
-  width:100%; padding:9px 10px; border:1.5px solid var(--ink); border-radius:var(--radius);
+  width:100%; padding:9px 10px; border:1px solid var(--line); border-radius:var(--radius);
   background:var(--paper-raised); font-family:var(--font-body); font-size:13px; margin-bottom:18px;
 }
 .sheet-group{ margin-bottom:4px; border:1px solid var(--line); border-radius:var(--radius); background:var(--paper-raised); overflow:hidden; }
@@ -150,10 +149,10 @@ main{ flex:1; min-width:0; padding:20px 24px 60px; }
 .company-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(300px,1fr)); gap:14px; }
 .company-card{
   display:block; text-decoration:none; color:inherit;
-  background:var(--paper-raised); border:1.5px solid var(--ink); border-radius:var(--radius);
+  background:var(--paper-raised); border:1px solid var(--line); border-radius:var(--radius);
   padding:16px; cursor:pointer; transition:transform 0.12s, box-shadow 0.12s; position:relative;
 }
-.company-card:hover{ transform:translate(-2px,-2px); box-shadow:4px 4px 0 var(--line-blue); }
+.company-card:hover{  box-shadow:0 6px 18px rgba(17,24,39,.08); }
 .card-links{ display:flex; gap:6px; flex-wrap:wrap; margin-top:10px; }
 .card-link{ display:inline-flex; align-items:center; gap:4px; font-family:var(--font-mono); font-size:11px; padding:3px 8px;
   border:1px solid var(--line); border-radius:3px; background:#fff; color:var(--ink); cursor:pointer; text-decoration:none; }
@@ -168,7 +167,7 @@ main{ flex:1; min-width:0; padding:20px 24px 60px; }
 }
 .card-header{ display:flex; align-items:flex-start; gap:10px; margin-bottom:10px; padding-right:20px; }
 .card-logo{
-  width:38px; height:38px; flex:0 0 auto; border:1.5px solid var(--ink); border-radius:var(--radius);
+  width:38px; height:38px; flex:0 0 auto; border:1px solid var(--line); border-radius:var(--radius);
   background:var(--paper); display:flex; align-items:center; justify-content:center; overflow:hidden;
 }
 .card-logo img{ width:100%; height:100%; object-fit:contain; }
@@ -199,23 +198,23 @@ main{ flex:1; min-width:0; padding:20px 24px 60px; }
 .landing-search-form{ display:flex; gap:0; max-width:560px; margin:0 auto; }
 .landing-search-input{
   flex:1; padding:15px 18px; font-size:14px; font-family:var(--font-body);
-  border:1.5px solid var(--ink); border-right:none; border-radius:var(--radius) 0 0 var(--radius);
+  border:1px solid var(--line); border-right:none; border-radius:var(--radius) 0 0 var(--radius);
   background:var(--paper-raised); color:var(--ink); outline:none;
 }
 .landing-search-input:focus{ background:#fff; }
 .landing-search-btn{
   padding:15px 28px; font-family:var(--font-display); font-weight:600; font-size:14px;
-  background:var(--ink); color:var(--paper-raised); border:1.5px solid var(--ink);
+  background:var(--ink); color:var(--paper-raised); border:1px solid var(--line);
   border-radius:0 var(--radius) var(--radius) 0; cursor:pointer; transition:background 0.12s;
 }
 .landing-search-btn:hover{ background:var(--blue); border-color:var(--blue); }
 
 .landing-region-row{ display:grid; grid-template-columns:2fr 1fr; gap:16px; margin-bottom:56px; }
 .landing-region-block{
-  display:block; text-decoration:none; border:1.5px solid var(--ink); border-radius:var(--radius);
+  display:block; text-decoration:none; border:1px solid var(--line); border-radius:var(--radius);
   padding:28px 24px; transition:transform 0.12s, box-shadow 0.12s;
 }
-.landing-region-block:hover{ transform:translate(-2px,-2px); box-shadow:4px 4px 0 var(--line-blue); }
+.landing-region-block:hover{  box-shadow:0 6px 18px rgba(17,24,39,.08); }
 .landing-region-india{ background:var(--blue); color:#fff; }
 .landing-region-other{ background:var(--paper-raised); color:var(--ink); }
 .lr-label{ font-family:var(--font-mono); font-size:11px; letter-spacing:2px; margin-bottom:10px; opacity:0.85; }
@@ -230,10 +229,10 @@ main{ flex:1; min-width:0; padding:20px 24px 60px; }
 .landing-cat-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:12px; }
 .landing-cat-tile{
   display:block; text-decoration:none; color:inherit;
-  background:var(--paper-raised); border:1.5px solid var(--ink); border-radius:var(--radius);
+  background:var(--paper-raised); border:1px solid var(--line); border-radius:var(--radius);
   padding:16px; transition:transform 0.12s, box-shadow 0.12s;
 }
-.landing-cat-tile:hover{ transform:translate(-2px,-2px); box-shadow:4px 4px 0 var(--rust-soft); }
+.landing-cat-tile:hover{  box-shadow:4px 4px 0 var(--rust-soft); }
 .lct-code{ font-family:var(--font-mono); font-size:11px; font-weight:700; color:var(--rust); letter-spacing:1px; margin-bottom:8px; }
 .lct-name{ font-family:var(--font-display); font-weight:600; font-size:14.5px; line-height:1.3; margin-bottom:10px; min-height:38px; }
 .lct-count{ font-family:var(--font-mono); font-size:11px; color:var(--ink-faint); }
@@ -243,7 +242,7 @@ main{ flex:1; min-width:0; padding:20px 24px 60px; }
   display:inline-flex; align-items:center; gap:6px; position:sticky; top:12px; z-index:5;
   font-family:var(--font-mono); font-size:12px; font-weight:600; letter-spacing:0.3px;
   color:var(--ink); text-decoration:none; background:var(--paper-raised);
-  border:1.5px solid var(--ink); border-radius:var(--radius); padding:8px 14px;
+  border:1px solid var(--line); border-radius:var(--radius); padding:8px 14px;
   margin-bottom:20px; transition:background 0.12s;
 }
 .sticky-back-btn:hover{ background:var(--blue); color:#fff; border-color:var(--blue); }
@@ -281,10 +280,10 @@ main{ flex:1; min-width:0; padding:20px 24px 60px; }
 .spotlight-grid.champions{ grid-template-columns:repeat(auto-fill, minmax(240px, 1fr)); }
 .spotlight-tile{
   display:block; text-decoration:none; color:inherit;
-  background:var(--paper-raised); border:1.5px solid var(--ink); border-radius:var(--radius);
+  background:var(--paper-raised); border:1px solid var(--line); border-radius:var(--radius);
   padding:16px; transition:transform 0.12s, box-shadow 0.12s;
 }
-.spotlight-tile:hover{ transform:translate(-2px,-2px); box-shadow:4px 4px 0 var(--rust-soft); }
+.spotlight-tile:hover{  box-shadow:4px 4px 0 var(--rust-soft); }
 
 /* ── Premium tiers: Champion / Featured / Sponsored ─────────────────── */
 /* One set of rules drives landing tiles, directory cards and the company
@@ -375,7 +374,7 @@ main{ flex:1; min-width:0; padding:20px 24px 60px; }
 @media (max-width: 640px){
   .landing-region-row{ grid-template-columns:1fr; }
   .landing-search-form{ flex-direction:column; }
-  .landing-search-input{ border-right:1.5px solid var(--ink); border-radius:var(--radius) var(--radius) 0 0; }
+  .landing-search-input{ border-right:1px solid var(--line); border-radius:var(--radius) var(--radius) 0 0; }
   .landing-search-btn{ border-radius:0 0 var(--radius) var(--radius); }
   .section-stats-row{ grid-template-columns:1fr; }
   .donut-grid{ grid-template-columns:1fr; }
@@ -395,7 +394,7 @@ main{ flex:1; min-width:0; padding:20px 24px 60px; }
 .back-link:hover{ color:var(--blue); }
 .cp-header{ display:flex; gap:18px; align-items:flex-start; margin-bottom:6px; }
 .cp-logo{
-  width:72px; height:72px; flex:0 0 auto; border:1.5px solid var(--ink); border-radius:var(--radius);
+  width:72px; height:72px; flex:0 0 auto; border:1px solid var(--line); border-radius:var(--radius);
   background:var(--paper-raised); display:flex; align-items:center; justify-content:center;
   overflow:hidden;
 }
@@ -413,6 +412,7 @@ main{ flex:1; min-width:0; padding:20px 24px 60px; }
       font-family:var(--font-mono); font-size:9.5px; font-weight:700; line-height:1; color:#fff;
       border-radius:2px; cursor:help; }
 .sig-R{ background:var(--blue); }
+.sig-C{ background:var(--navy); }
 .sig-V{ background:var(--ok); }
 .sig.off{ background:transparent; color:var(--ink-faint); box-shadow:inset 0 0 0 1px var(--line); }
 .cp-name .sig-row{ gap:4px; margin-left:10px; vertical-align:5px; }
@@ -438,7 +438,7 @@ main{ flex:1; min-width:0; padding:20px 24px 60px; }
 }
 .cp-locations{ display:grid; gap:10px; }
 .location-card{
-  border:1.5px solid var(--ink); border-radius:var(--radius); background:var(--paper-raised);
+  border:1px solid var(--line); border-radius:var(--radius); background:var(--paper-raised);
   padding:12px 14px; display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;
 }
 .loc-type{
@@ -457,7 +457,7 @@ main{ flex:1; min-width:0; padding:20px 24px 60px; }
 }
 .cp-tiles{ display:grid; grid-template-columns:repeat(auto-fill, minmax(180px,1fr)); gap:10px; }
 .product-tile{
-  border:1.5px solid var(--ink); border-radius:var(--radius); background:var(--paper-raised);
+  border:1px solid var(--line); border-radius:var(--radius); background:var(--paper-raised);
   padding:14px; display:flex; flex-direction:column; gap:6px;
 }
 .product-tile .tile-code{
@@ -921,14 +921,14 @@ footer{
 /* ── MOBILE ── */
 @media (max-width: 860px){
   .app-body{ flex-direction:column; }
-  .sidebar{ width:100%; flex:1 1 auto; position:static; max-height:none; padding:10px 16px; border-bottom:2px solid var(--ink); }
+  .sidebar{ width:100%; flex:1 1 auto; position:static; max-height:none; padding:10px 16px; border-bottom:1px solid var(--line); }
   .sidebar-title{ display:none; }
   .search-box{ margin-bottom:8px; font-size:16px; }
   /* On a phone the category tree is a collapsed bar, so the companies are
      the first thing under the search box. Tap the bar to browse. */
   .sidebar-toggle{
     display:flex; align-items:center; gap:10px; width:100%; padding:11px 12px; text-align:left;
-    background:var(--paper-raised); border:1.5px solid var(--ink); border-radius:var(--radius);
+    background:var(--paper-raised); border:1px solid var(--line); border-radius:var(--radius);
     font-family:var(--font-display); font-weight:600; font-size:13px; color:var(--ink);
   }
   .st-main{ display:flex; align-items:center; gap:8px; flex:0 0 auto; }
@@ -947,6 +947,115 @@ footer{
   .header-stats{ display:none; }
   .company-grid{ grid-template-columns:1fr; }
 }
+
+/* ══════════════════════════════════════════════════════════════════════
+   REDESIGN PHASE 1 — look and tiles (Nov 2026)
+   Later rules win, so this block restyles the header, the company tile
+   and the results bar without touching the rules above.
+   ══════════════════════════════════════════════════════════════════════ */
+:focus-visible{ outline:2px solid var(--blue); outline-offset:2px; }
+h1,h2,h3{ text-wrap:balance; }
+header{ padding:10px 24px; border-bottom:1px solid var(--line); }
+.brand-mark{ font-size:21px; font-weight:700; letter-spacing:0; text-transform:none; color:var(--navy); }
+.brand-mark span{ color:var(--rust); }
+.brand-sub{ font-size:11px; letter-spacing:.06em; border-left:1px solid var(--line); }
+.header-stats{ font-size:12px; font-variant-numeric:tabular-nums; }
+.search-box, .landing-search-input{ border-color:var(--line); }
+.search-box:focus, .landing-search-input:focus{ border-color:var(--blue); outline:none; }
+.landing-search-btn{ background:var(--rust); border-color:var(--rust); color:#fff; }
+.landing-search-btn:hover{ background:var(--rust); border-color:var(--rust); filter:brightness(.94); }
+.sheet-code{ border-radius:4px; }
+.filter-chip{ font-size:12px; }
+
+/* Results bar: count, active filters, grid / list switch */
+.results-bar{ align-items:center; }
+.results-count{ font-size:16px; color:var(--navy); }
+.view-toggle{ display:inline-flex; border:1px solid var(--line); border-radius:8px; overflow:hidden; margin-left:auto; background:var(--paper-raised); }
+.view-toggle button{ border:0; background:none; padding:6px 12px; font-size:13px; color:var(--ink-muted); }
+.view-toggle button[aria-pressed="true"]{ background:var(--blue); color:#fff; }
+
+/* Company tile */
+.company-grid{ grid-template-columns:repeat(auto-fill, minmax(280px,1fr)); }
+.company-card{
+  display:flex; flex-direction:column; gap:8px; min-width:0;
+  border:1px solid var(--line); border-radius:10px; padding:14px;
+  transition:box-shadow .15s, border-color .15s;
+}
+.company-card:hover{ border-color:var(--blue); box-shadow:0 6px 18px rgba(17,24,39,.08); }
+.company-card::before{ content:none; }
+.card-header{ margin-bottom:0; padding-right:0; }
+.card-logo{ width:42px; height:42px; border:1px solid var(--line); border-radius:9px; background:var(--paper-raised); }
+.card-logo.is-mono{ border:0; }
+.card-logo .cp-logo-fallback{ color:#fff; font-size:15px; }
+.card-name{
+  font-family:var(--font-body); font-weight:600; font-size:15px; line-height:1.3; margin-bottom:0; color:var(--ink);
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; overflow-wrap:anywhere;
+}
+.card-name .nm-last{ white-space:nowrap; }
+.card-loc{ font-size:12px; color:var(--ink-muted); gap:6px; margin-top:2px; }
+.card-desc{
+  font-size:13px; color:var(--ink-muted); line-height:1.5; margin-bottom:0; min-height:39px;
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
+}
+.card-tags{ margin-top:auto; }
+.tag{
+  font-size:11px; font-weight:400; letter-spacing:0; padding:2px 6px; border-radius:5px;
+  background:var(--paper); color:var(--ink-muted); border:1px solid var(--line);
+  max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.tag b{ font-weight:600; color:var(--ink-faint); margin-right:4px; font-variant-numeric:tabular-nums; }
+.tag.hit{ background:var(--blue-soft); border-color:var(--line-blue); color:var(--blue); }
+.tag.hit b{ color:var(--blue); }
+.tag.more{ background:var(--paper-raised); border-style:solid; color:var(--ink-faint); }
+.brand-hit{ margin-top:0; font-size:12px; }
+
+/* Tier: a thin coloured top edge and a small label, not a tinted card */
+.company-card.tier-card{
+  background-color:var(--paper-raised); background-image:none; outline:none;
+  border-color:var(--line); border-top:3px solid var(--t-line); box-shadow:none; margin-top:0;
+}
+.company-card.tier-card:hover{ box-shadow:0 6px 18px rgba(17,24,39,.08); border-color:var(--t-line); }
+.company-card .tier-stamp{
+  position:static; align-self:flex-start; font-size:10.5px; letter-spacing:.06em;
+  border:0; background:var(--t-bg); color:var(--t-ink); border-radius:4px; padding:1px 7px;
+}
+
+/* List view: one company per row */
+.company-grid.as-list{ display:block; border:1px solid var(--line); border-radius:10px; overflow:hidden; background:var(--paper-raised); }
+.company-grid.as-list .company-card{
+  flex-direction:row; align-items:center; gap:14px; border:0; border-bottom:1px solid var(--line);
+  border-radius:0; padding:9px 12px; box-shadow:none;
+}
+.company-grid.as-list .company-card:last-child{ border-bottom:0; }
+.company-grid.as-list .company-card:hover{ background:var(--paper); box-shadow:none; }
+.company-grid.as-list .company-card.tier-card{ border-top:0; border-left:3px solid var(--t-line); }
+.company-grid.as-list .tier-stamp{ display:none; }
+.company-grid.as-list .card-header{ flex:1 1 46%; min-width:0; align-items:center; }
+.company-grid.as-list .card-logo{ width:30px; height:30px; border-radius:7px; }
+.company-grid.as-list .card-logo .cp-logo-fallback{ font-size:12px; }
+.company-grid.as-list .card-title-block{ display:flex; align-items:center; gap:12px; min-width:0; }
+.company-grid.as-list .card-name{ -webkit-line-clamp:1; font-size:14px; flex:1 1 60%; }
+.company-grid.as-list .card-loc{ flex:0 1 40%; margin-top:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.company-grid.as-list .card-desc, .company-grid.as-list .brand-hit{ display:none; }
+.company-grid.as-list .card-tags{ flex:1 1 40%; margin-top:0; flex-wrap:nowrap; overflow:hidden; min-width:0; }
+
+/* Owner editor: the "details are correct" confirmation (V mark) */
+.own-confirm{ border:1px solid var(--line); border-left:3px solid var(--ok); border-radius:8px; background:var(--ok-soft); padding:12px 14px; margin:16px 0 10px; }
+.own-confirm-head{ display:flex; align-items:center; gap:8px; font-weight:600; margin-bottom:8px; color:var(--ink); }
+.own-confirm label{ display:flex; gap:10px; align-items:flex-start; font-size:13px; color:var(--ink); text-transform:none; letter-spacing:0; }
+.own-confirm input[type="checkbox"]{ width:auto; margin-top:3px; flex:none; }
+.own-confirm .own-contact-hint{ margin-top:8px; }
+
+/* Load more */
+.cards-more{ display:flex; flex-direction:column; align-items:center; gap:8px; padding:20px 0 4px; }
+.cards-more button{ border:1px solid var(--line); background:var(--paper-raised); border-radius:8px; padding:9px 18px; font-weight:600; color:var(--ink); }
+.cards-more button:hover{ border-color:var(--blue); color:var(--blue); }
+.cards-more span{ font-size:12px; color:var(--ink-muted); font-variant-numeric:tabular-nums; }
+
+@media (max-width: 640px){
+  .company-grid.as-list .card-title-block{ display:block; }
+  .company-grid.as-list .card-tags{ display:none; }
+}
 </style>
 </head>
 <body>
@@ -954,7 +1063,7 @@ footer{
 
 <header>
   <div class="brand">
-    <div class="brand-mark" aria-label="TankWorld India">TWI</div>
+    <div class="brand-mark" aria-label="TankWorld India">TankWorld<span>India</span></div>
     <div class="brand-sub">Engineering &amp; Equipment Directory</div>
   </div>
   <div class="header-stats">
@@ -1091,8 +1200,13 @@ footer{
       <div class="results-bar">
         <div class="results-count"><b id="resultCount">0</b> companies</div>
         <div class="active-filters" id="activeFilters"></div>
+        <div class="view-toggle" role="group" aria-label="How results are shown">
+          <button type="button" id="viewGridBtn" onclick="setCardView('grid')" aria-pressed="true">Grid</button>
+          <button type="button" id="viewListBtn" onclick="setCardView('list')" aria-pressed="false">List</button>
+        </div>
       </div>
       <div class="company-grid" id="companyGrid"></div>
+      <div class="cards-more" id="cardsMore"></div>
       <div class="empty-state" id="emptyState" style="display:none;">
         <div class="em-mark">No Matches — Sheet Blank</div>
         <h3>No companies found</h3>
@@ -1692,7 +1806,7 @@ const ROSTER = {
   // master roster). Carried forward from the live data on every publish.
   // Logos are managed in the app (Storage uploads), so the live logo wins.
   PRESERVE_ALWAYS: ['logo', 'profileSections', 'companySections', 'ownerUid', 'ownerSince',
-                    'companyUpdatedAt', 'companyUpdatedBy'],
+                    'companyUpdatedAt', 'companyUpdatedBy', 'companyVerifiedAt', 'companyVerifiedBy'],
   // Carried forward only when the new roster has no value of its own.
   PRESERVE_IF_EMPTY: ['certifications', 'capacity', 'spotlight'],
 };
@@ -2893,23 +3007,89 @@ function cardLinksHtml(c) {
       ${k.linkedin ? btn(k.linkedin, 'card-link-li', LINKEDIN_SVG + ' LinkedIn', 'Open the company LinkedIn page') : ''}
     </div>`;
 }
+// ── Tiles (redesign phase 1) ────────────────────────────────────────────
+// A tile shows only public directory facts: logo or monogram, name with the
+// R / V squares, flag and place, a two-line description and up to three
+// category chips. Website, LinkedIn, MSME and delivery details are NOT shown
+// on tiles; they stay off until a claimed company chooses to publish them.
+const CARD_PAGE = 48;
+let cardLimit = CARD_PAGE;
+let cardListKey = '';
+let cardView = 'grid';
+try { if (localStorage.getItem('twi-card-view') === 'list') cardView = 'list'; } catch (e) {}
+function setCardView(v) {
+  cardView = v === 'list' ? 'list' : 'grid';
+  try { localStorage.setItem('twi-card-view', cardView); } catch (e) {}
+  renderCards();
+}
+function showMoreCards() { cardLimit += CARD_PAGE; renderCards(); }
+
+// slug → index of its top-level section, for the monogram colour.
+let _sectionIndex = null;
+function sectionIndexOf(slug) {
+  if (!_sectionIndex) {
+    _sectionIndex = {};
+    CATEGORY_TREE.forEach((l1, i) => categoryWithDescendants(l1.slug).forEach(x => { if (!(x in _sectionIndex)) _sectionIndex[x] = i; }));
+  }
+  return _sectionIndex[slug];
+}
+function sectionColor(slug) {
+  const i = sectionIndexOf(slug);
+  if (i == null) return '#6B7480';
+  return `hsl(${Math.round(i * 360 / CATEGORY_TREE.length)} 58% 40%)`;
+}
+function monogramOf(c) {
+  const name = String(c.name || '');
+  return name.split(/\s+/).filter(w => /^[A-Z0-9]/i.test(w) && !/^(and|of|the|for|de|der|van)$/i.test(w)).slice(0, 2).map(w => w[0].toUpperCase()).join('') || (name[0] || '?');
+}
+// A logo that fails to load is swapped for the monogram, never left broken.
+function cardLogoFailed(img) {
+  const box = img.parentNode;
+  if (!box) return;
+  box.classList.add('is-mono');
+  box.style.background = box.dataset.bg || '#6B7480';
+  box.innerHTML = `<span class="cp-logo-fallback">${box.dataset.ini || ''}</span>`;
+}
+function cardLogoHtml(c) {
+  const bg = sectionColor(c.cats[0]), ini = psEsc(monogramOf(c));
+  if (c.logo) return `<div class="card-logo" data-bg="${bg}" data-ini="${ini}"><img src="${c.logo}" alt="" loading="lazy" onerror="cardLogoFailed(this)"></div>`;
+  return `<div class="card-logo is-mono" style="background:${bg}"><span class="cp-logo-fallback">${ini}</span></div>`;
+}
+// Name with the R / V squares kept on the same line as the last word.
+function cardNameHtml(c) {
+  const sig = signalsHtml(c);
+  const name = String(c.name || '');
+  const i = name.lastIndexOf(' ');
+  if (!sig) return name;
+  return i < 0 ? `<span class="nm-last">${name}${sig}</span>`
+               : `${name.slice(0, i)} <span class="nm-last">${name.slice(i + 1)}${sig}</span>`;
+}
 function renderCards() {
   const list = sortByTier(filteredCompanies());
   const grid = document.getElementById('companyGrid');
   const empty = document.getElementById('emptyState');
-  document.getElementById('resultCount').textContent = list.length;
+  const more = document.getElementById('cardsMore');
+  document.getElementById('resultCount').textContent = list.length.toLocaleString('en-IN');
   renderActiveFilters();
-  if (!list.length) { grid.innerHTML = ''; empty.style.display = 'block'; return; }
+  const gridBtn = document.getElementById('viewGridBtn'), listBtn = document.getElementById('viewListBtn');
+  if (gridBtn) gridBtn.setAttribute('aria-pressed', String(cardView === 'grid'));
+  if (listBtn) listBtn.setAttribute('aria-pressed', String(cardView === 'list'));
+  grid.classList.toggle('as-list', cardView === 'list');
+  // A different search or filter starts again from the first page.
+  const key = location.hash + '|' + document.getElementById('searchBox').value;
+  if (key !== cardListKey) { cardListKey = key; cardLimit = CARD_PAGE; }
+  if (!list.length) { grid.innerHTML = ''; if (more) more.innerHTML = ''; empty.style.display = 'block'; return; }
   empty.style.display = 'none';
-  grid.innerHTML = list.map(c => {
-    const tags = c.cats.slice(0, 3).map(s => {
+  const active = activeCategory ? new Set(categoryWithDescendants(activeCategory)) : null;
+  const shown = list.slice(0, cardLimit);
+  grid.innerHTML = shown.map(c => {
+    // The chip for the category being browsed comes first and is highlighted.
+    const cats = active ? c.cats.slice().sort((x, y) => (active.has(y) ? 1 : 0) - (active.has(x) ? 1 : 0)) : c.cats;
+    const tags = cats.slice(0, 3).map(s => {
       const l = categoryLabel(s);
-      return l ? `<span class="tag">${l.code}</span>` : '';
+      return l ? `<span class="tag${active && active.has(s) ? ' hit' : ''}" title="${psEsc(l.code + ' ' + l.name)}"><b>${l.code}</b>${psEsc(l.name)}</span>` : '';
     }).join('');
-    const more = c.cats.length > 3 ? `<span class="tag more">+${c.cats.length - 3}</span>` : '';
-    const msmeRow = c.msme ? `<div class="card-msme-row">${msmeBadgeHtml(c, true)}${udyamCtaHtml(c)}</div>` : '';
-    const deliveryRow = ((c.delivery || []).length || (c.sectors || []).length)
-      ? `<div class="card-delivery-row">${deliveryBadgesHtml(c, true)}${sectorBadgesHtml(c, true)}</div>` : '';
+    const moreTag = c.cats.length > 3 ? `<span class="tag more" title="${c.cats.length - 3} more categories">+${c.cats.length - 3}</span>` : '';
     const loc = primaryLocation(c);
     const flag = companyFlag(c);
     const cleanCountry = canonCountry(c.country) || c.country || '';
@@ -2918,20 +3098,24 @@ function renderCards() {
       <a class="company-card${tierOf(c) ? ' tier-card tier-' + tierOf(c) : ''}" href="#/company/${c.slug}">
         ${tierStampHtml(tierOf(c))}
         <div class="card-header">
-          <div class="card-logo">${logoHtml(c)}</div>
+          ${cardLogoHtml(c)}
           <div class="card-title-block">
-            <div class="card-name">${c.name}${signalsHtml(c)}</div>
-            <div class="card-loc">${champCrownHtml(c, 'tier-crown-sm')}${flag ? flag + ' ' : ''}📍 ${locText}</div>
+            <div class="card-name">${cardNameHtml(c)}</div>
+            <div class="card-loc">${champCrownHtml(c, 'tier-crown-sm')}${flag}<span>${locText}</span></div>
           </div>
         </div>
-        <div class="card-desc">${c.desc}</div>
-        <div class="card-tags">${tags}${more}</div>
-        ${msmeRow}
-        ${deliveryRow}
+        <div class="card-desc">${c.desc || ''}</div>
+        <div class="card-tags">${tags}${moreTag}</div>
         ${brandHitHtml(c)}
-        ${cardLinksHtml(c)}
       </a>`;
   }).join('');
+  if (more) {
+    const left = list.length - shown.length;
+    more.innerHTML = left > 0
+      ? `<button type="button" onclick="showMoreCards()">Show ${Math.min(CARD_PAGE, left)} more</button>
+         <span>Showing ${shown.length.toLocaleString('en-IN')} of ${list.length.toLocaleString('en-IN')} companies</span>`
+      : (list.length > CARD_PAGE ? `<span>All ${list.length.toLocaleString('en-IN')} companies shown</span>` : '');
+  }
 }
 
 // ══════════════════════════════════════════════════════════════════════
@@ -3327,13 +3511,28 @@ const TIERS = {
 // colour in the CSS. Set SIGNALS_SHOW_UNEARNED = true to show every square,
 // with unearned ones outlined, once this grows into a rating scale.
 const SIGNALS = [
-  { key: 'R', label: 'Registered',
+  // R — TankWorld India has checked the company itself (register match).
+  { key: 'R', label: 'Internally verified',
     test: c => !!c.registered,
-    tip:  c => 'Registered: matched to an official company or tax register' },
-  { key: 'V', label: 'Verified',
+    tip:  c => 'R · Internally verified: checked by TankWorld India against an official company or tax register' },
+  // C — an admin has approved a claim; the company owns and manages the listing.
+  { key: 'C', label: 'Claimed',
     test: c => !!c.ownerUid,
-    tip:  c => 'Verified: this listing is claimed and managed by the company' },
+    tip:  c => 'C · Claimed: this listing is owned and managed by the company' },
+  // V — the owner has confirmed, in the claim flow, that all details are correct.
+  { key: 'V', label: 'Verified by the company',
+    test: c => companyHasVerified(c),
+    tip:  c => 'V · Verified by the company: the company confirmed all details on this listing are correct' + (verifiedOnText(c) ? ' (' + verifiedOnText(c) + ')' : '') },
 ];
+/** V needs a current owner AND that owner's confirmation. Losing or changing
+ *  the owner removes it. */
+function companyHasVerified(c) { return !!(c && c.ownerUid && c.companyVerifiedAt); }
+function verifiedOnText(c) {
+  const v = c && c.companyVerifiedAt;
+  if (!v) return '';
+  const d = v instanceof Date ? v : new Date(typeof v === 'object' && v.seconds ? v.seconds * 1000 : v);
+  return isNaN(d) ? '' : 'confirmed ' + d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+}
 const SIGNALS_SHOW_UNEARNED = false;
 function signalsHtml(c) {
   const sq = SIGNALS.map(s => {
@@ -5773,8 +5972,12 @@ function psCleanCompanySections(cs) {
 function claimActionHtml(c) {
   if (!currentUser || isAdminUser(currentUser)) return '';
   if (c.ownerUid && c.ownerUid === currentUser.uid) {
+    const confirmed = companyHasVerified(c);
     return `<div class="cp-owner-row"><span class="own-badge">✓ You manage this listing</span>
-      <button class="btn-action" onclick="openOwnerEditor('${c.slug}')">Edit your listing</button></div>`;
+      <button class="btn-action" onclick="openOwnerEditor('${c.slug}')">Edit your listing</button>
+      ${confirmed
+        ? `<span class="ed-hint" style="margin:0">Details ${verifiedOnText(c) || 'confirmed'}. Your listing shows the V mark.</span>`
+        : `<button class="btn-action ghost" onclick="openOwnerEditor('${c.slug}', true)">Confirm your details are correct</button>`}</div>`;
   }
   if (c.ownerUid) return `<div class="cp-owner-row"><span class="ed-hint" style="margin:0">This listing is managed by the company.</span></div>`;
   if (currentUserStatus !== 'approved') return '';
@@ -5789,7 +5992,7 @@ async function refreshClaimSlot(slug) {
     if (!claim) return; // no claim yet — keep the Claim button
     const msgs = {
       pending:  `<span class="own-badge pending">Your claim is under review</span>`,
-      approved: `<span class="own-badge">Claim approved — reload the page to start editing</span>`,
+      approved: `<span class="own-badge">Claim approved — reload the page to edit your listing and confirm its details</span>`,
       rejected: `<span class="ed-hint" style="margin:0">Your claim on this listing wasn't approved. Contact TankWorld India if you think that's a mistake.</span>`,
       revoked:  `<span class="ed-hint" style="margin:0">Your management of this listing has ended. Contact TankWorld India to restore it.</span>`,
     };
@@ -5820,7 +6023,9 @@ function openClaimModal(slug) {
   document.getElementById('claimBody').innerHTML = `
     <div class="ed-hint">You're asking to manage <b>${psEsc(c.name)}</b> on TankWorld India. Once approved you can
       add your certifications, clients, projects and contact details. TankWorld India reviews every claim —
-      claims from an email address at the company's own web domain are approved fastest.</div>
+      claims from an email address at the company's own web domain are approved fastest.
+      <br><br>Once approved, your listing shows the <b>C</b> mark (claimed). You will then be asked to check the listing
+      and confirm that all details are correct, which adds the <b>V</b> mark.</div>
     <div class="ed-row"><label>Your name *</label>
       <input type="text" id="claimName" value="${psEsc(currentUser.displayName || '')}"></div>
     <div class="ed-row"><label>Your job title *</label>
@@ -5874,11 +6079,12 @@ async function submitClaim() {
 // Writes ONLY the fields the Firestore rules allow an owner to touch:
 // companySections, companySite/Email/Phone/Linkedin, companyUpdatedAt/By.
 let ownerDraft = null;
-function openOwnerEditor(slug) {
+function openOwnerEditor(slug, toConfirm) {
   const c = COMPANIES.find(x => x.slug === slug);
   if (!c || !currentUser || c.ownerUid !== currentUser.uid) return;
   ownerDraft = {
     slug, name: c.name,
+    wasVerified: companyHasVerified(c), verifiedOn: verifiedOnText(c), confirmChecked: companyHasVerified(c),
     companySections: JSON.parse(JSON.stringify(c.companySections || {})),
     companySite: c.companySite || '', companyEmail: c.companyEmail || '', companyPhone: c.companyPhone || '',
     companyLinkedin: c.companyLinkedin || '',
@@ -5886,6 +6092,10 @@ function openOwnerEditor(slug) {
   };
   renderOwnerEditor();
   document.getElementById('ownerModal').classList.add('open');
+  if (toConfirm) setTimeout(() => {
+    const box = document.getElementById('ownConfirmBox');
+    if (box) { box.scrollIntoView({ block: 'center' }); const cb = document.getElementById('ownConfirm'); if (cb) cb.focus(); }
+  }, 60);
 }
 function closeOwnerEditor() {
   document.getElementById('ownerModal').classList.remove('open');
@@ -5907,6 +6117,18 @@ function renderOwnerEditor() {
     ${contactRow('companyEmail', 'Contact email', d.twiEmail, 'sales@example.com')}
     ${contactRow('companyPhone', 'Contact phone', d.twiPhone, '+91 …')}
     ${psEditorHtml(d, PS_EDITOR_OWNER)}
+    <div class="own-confirm" id="ownConfirmBox">
+      <div class="own-confirm-head"><span class="sig sig-V">V</span> Confirm your details</div>
+      <label>
+        <input type="checkbox" id="ownConfirm" ${d.confirmChecked ? 'checked' : ''} onchange="ownerDraft.confirmChecked = this.checked">
+        <span>I have checked this listing — company name, country, locations, categories, description and contact
+          details — and confirm on behalf of <b>${psEsc(d.name)}</b> that all of it is correct.</span>
+      </label>
+      <div class="own-contact-hint">${d.wasVerified
+        ? `Details ${psEsc(d.verifiedOn || 'confirmed')}. Untick and save to withdraw the confirmation and remove the V mark.`
+        : `Ticking this and saving adds the V mark to your listing. If something TankWorld India maintains (name, country,
+           categories, locations) is wrong, contact us to correct it before you confirm.`}</div>
+    </div>
     <div class="ed-hint" id="ownerSaveStatus"></div>`;
 }
 function ownList(key) {
@@ -5975,11 +6197,18 @@ async function saveOwnerListing() {
     companyUpdatedAt: new Date(),
     companyUpdatedBy: currentUser.uid,
   };
+  // V mark: set when the owner newly confirms, cleared when they withdraw,
+  // left untouched (original date kept) when nothing changed.
+  if (d.confirmChecked && !d.wasVerified) { payload.companyVerifiedAt = new Date(); payload.companyVerifiedBy = currentUser.uid; }
+  if (!d.confirmChecked && d.wasVerified) { payload.companyVerifiedAt = null; payload.companyVerifiedBy = null; }
   status.textContent = 'Saving…';
   try {
     await FS_REST.setMerge('companies', d.slug, payload);
     const idx = COMPANIES.findIndex(x => x.slug === d.slug);
-    if (idx >= 0) Object.assign(COMPANIES[idx], payload);
+    if (idx >= 0) {
+      Object.assign(COMPANIES[idx], payload);
+      if (payload.companyVerifiedAt instanceof Date) COMPANIES[idx].companyVerifiedAt = payload.companyVerifiedAt.toISOString();
+    }
     const slug = d.slug;
     closeOwnerEditor();
     renderCompanyPage(slug);
@@ -6053,7 +6282,9 @@ async function approveClaim(claimId) {
   const prevOwner = c && c.ownerUid && c.ownerUid !== cl.uid ? c.ownerUid : null;
   if (prevOwner && !confirm('This listing already has an approved owner. Approving this claim replaces them. Continue?')) return;
   try {
-    await FS_REST.setMerge('companies', cl.companySlug, { ownerUid: cl.uid, ownerSince: new Date() });
+    await FS_REST.setMerge('companies', cl.companySlug,
+      { ownerUid: cl.uid, ownerSince: new Date(), ...(prevOwner ? { companyVerifiedAt: null, companyVerifiedBy: null } : {}) });
+    if (c && prevOwner) { c.companyVerifiedAt = null; c.companyVerifiedBy = null; }
     if (prevOwner) {
       await FS_REST.setMerge('companyClaims', cl.companySlug + '_' + prevOwner,
         { status: 'revoked', decidedAt: new Date(), decidedBy: currentUser.email }).catch(() => {});
@@ -6084,8 +6315,8 @@ async function revokeOwner(claimId) {
     // later approved claim) — never strip a newer owner by revoking an
     // older claim.
     if (!c || !c.ownerUid || c.ownerUid === cl.uid) {
-      await FS_REST.setMerge('companies', cl.companySlug, { ownerUid: null });
-      if (c) c.ownerUid = null;
+      await FS_REST.setMerge('companies', cl.companySlug, { ownerUid: null, companyVerifiedAt: null, companyVerifiedBy: null });
+      if (c) { c.ownerUid = null; c.companyVerifiedAt = null; c.companyVerifiedBy = null; }
     }
     await FS_REST.setMerge('companyClaims', claimId, { status: 'revoked', decidedAt: new Date(), decidedBy: currentUser.email });
     loadCompanyClaims();
@@ -6500,6 +6731,7 @@ const AN_FIXED_COLS = [
   ['corpGroup', 'Corporate group', c => { const r = groupRoot(c); return r ? r.name : ''; }],
   ['certifications', 'Certifications', c => (c.certifications || []).map(s => CERTIFICATION_LABELS[s] || s).join('; ')],
   ['ownerUid', 'Managed by owner', c => c.ownerUid ? 'Yes' : ''],
+  ['companyVerifiedAt', 'Details confirmed by company', c => companyHasVerified(c) ? 'Yes' : ''],
 ];
 const AN_SKIP_KEYS = new Set(['name', 'slug', 'cats', 'spotlight', '_psTouched', '_csTouched']);
 function anColumns() {
