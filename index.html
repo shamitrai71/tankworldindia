@@ -1086,6 +1086,18 @@ header{ padding:10px 24px; border-bottom:1px solid var(--line); }
 .cf-more{ background:none; border:0; color:var(--blue); font-size:12.5px; padding:4px 8px; cursor:pointer; margin-bottom:12px; }
 .active-filters{ flex:1 1 100%; order:3; }
 @media (max-width:860px){ .sort-wrap{ margin-left:0; } }
+
+/* Company page buttons */
+.cp-site{ background:var(--rust); }
+.cp-site:hover{ background:var(--rust); filter:brightness(.92); }
+.cp-linkedin{ display:inline-flex; align-items:center; gap:7px; }
+.location-card{ display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:start; gap:12px 16px; }
+.loc-text{ min-width:0; }
+.loc-map-link{ grid-column:2; justify-self:end; align-self:start; background:var(--blue); color:#fff; border-color:var(--blue); border-radius:6px; padding:7px 12px; }
+.loc-map-link:hover{ filter:brightness(.92); background:var(--blue); color:#fff; }
+.loc-map-link.loc-map-plain{ background:transparent; color:var(--blue); }
+.loc-map-link.loc-map-plain:hover{ background:var(--blue); color:#fff; }
+@media (max-width:560px){ .location-card{ grid-template-columns:1fr; } .loc-map-link{ grid-column:1; justify-self:start; } }
 </style>
 </head>
 <body>
@@ -3089,7 +3101,7 @@ function renderCountryFilter() {
     ${all.length > 8 ? `<button type="button" class="cf-more" onclick="toggleCountryFacet()">${countryFacetAll ? 'Show fewer' : 'Show all ' + all.length + ' countries'}</button>` : ''}`;
 }
 
-const LINKEDIN_SVG = '<svg class="li-ico" viewBox="0 0 24 24" width="13" height="13" aria-hidden="true"><path fill="currentColor" d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM3 9h4v12H3zM9 9h3.8v1.7h.05c.53-1 1.83-2.05 3.77-2.05 4.03 0 4.78 2.65 4.78 6.1V21h-4v-5.5c0-1.31-.02-3-1.83-3-1.83 0-2.11 1.43-2.11 2.9V21H9z"/></svg>';
+const LINKEDIN_SVG = '<svg class="li-ico" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>';
 function openExternal(ev, url) {
   ev.preventDefault(); ev.stopPropagation();
   if (url) window.open(url, '_blank', 'noopener');
@@ -4310,7 +4322,7 @@ function renderCompanyPage(slug) {
 
   const locationsHtml = c.locations.map(l => `
     <div class="location-card">
-      <div>
+      <div class="loc-text">
         <span class="loc-type">${locTypeLabel(l.type)}</span>
         <div class="loc-name">${l.name}</div>
         <div class="loc-city">📍 ${l.address || l.city}</div>
@@ -4318,7 +4330,9 @@ function renderCompanyPage(slug) {
       </div>
       ${l.placeId
         ? `<a class="loc-map-link" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(c.name + ' ' + l.name)}&query_place_id=${l.placeId}" target="_blank" rel="noopener">View on Google Maps ↗</a>`
-        : `<span class="loc-map-pending">Place ID not yet added</span>`}
+        : ((l.address || l.city)
+            ? `<a class="loc-map-link loc-map-plain" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent([c.name, l.address || l.city].join(' '))}" target="_blank" rel="noopener">View on Google Maps ↗</a>`
+            : '')}
     </div>`).join('');
 
   const tilesHtml = c.cats.map(s => {
