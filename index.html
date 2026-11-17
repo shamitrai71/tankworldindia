@@ -1192,6 +1192,33 @@ body:has(#cmpBar[style*="flex"]) footer{ padding-bottom:70px; }
   .ls-country select{ width:100%; max-width:none; border:1px solid var(--line); border-radius:var(--radius) var(--radius) 0 0; }
   .ls-with-country .landing-search-input{ border-right:1px solid var(--line); }
 }
+
+/* ── Phase 6 ── */
+.sec-dot{ display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:6px; vertical-align:1px; flex:0 0 8px; }
+.sheet-head .sec-dot{ margin-right:2px; }
+.hdr-search{ flex:1 1 280px; max-width:440px; margin:0 12px; }
+.hdr-search input{ width:100%; box-sizing:border-box; padding:8px 12px; border:1px solid var(--line); border-radius:8px; font-size:14px; background:#fff; color:var(--ink); }
+.hdr-search input:focus{ border-color:var(--blue); outline:none; }
+body.on-landing .hdr-search{ visibility:hidden; }
+@media (max-width: 1180px){ .header-stats{ display:none; } }
+.sheet-foot{ display:none; }
+@media (max-width: 860px){
+  .hdr-search{ order:3; flex:1 1 100%; max-width:none; margin:0; }
+  body.on-landing .hdr-search{ display:none; }
+  .sidebar.open::before{ content:''; position:fixed; inset:0; background:rgba(17,24,39,.45); z-index:140; }
+  .sidebar.open .sidebar-body{ position:fixed; left:0; right:0; bottom:0; z-index:150; margin:0; max-height:82vh; overflow-y:auto;
+    background:var(--paper-raised, #fff); border-radius:16px 16px 0 0; padding:16px 16px 0; box-shadow:0 -12px 30px rgba(17,24,39,.2); }
+  .sheet-foot{ display:block; position:sticky; bottom:0; margin:12px -16px 0; padding:10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
+    background:var(--paper-raised, #fff); border-top:1px solid var(--line); }
+  .sheet-foot button{ width:100%; padding:12px; border:0; border-radius:10px; background:var(--blue); color:#fff; font-size:15px; font-weight:600; }
+  body.sheet-open{ overflow:hidden; }
+}
+
+/* ── Company type ── */
+.cp-types{ font-size:13px; color:var(--ink-muted); margin-top:4px; }
+.ed-check{ display:flex; gap:8px; align-items:center; font-size:13px; font-weight:400; }
+
+.sv-sync{ font-size:10px; letter-spacing:0; text-transform:none; color:var(--ink-faint); }
 </style>
 </head>
 <body>
@@ -1202,6 +1229,10 @@ body:has(#cmpBar[style*="flex"]) footer{ padding-bottom:70px; }
     <div class="brand-mark" aria-label="TankWorld India">TankWorld<span>India</span></div>
     <div class="brand-sub">Engineering &amp; Equipment Directory</div>
   </div>
+  <form class="hdr-search" role="search" onsubmit="submitHeaderSearch(event)">
+    <input type="search" id="hdrSearchBox" placeholder="Search…" autocomplete="off" aria-label="Search the directory"
+           role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="sugBox">
+  </form>
   <div class="header-stats">
     <div>COMPANIES: <b id="statCompanies">0</b></div>
     <div>CATEGORIES: <b id="statCategories">0</b></div>
@@ -1310,7 +1341,7 @@ body:has(#cmpBar[style*="flex"]) footer{ padding-bottom:70px; }
 <div class="app-body">
   <div id="landing-view" style="display:none;"></div>
   <div id="section-view" style="display:none;"></div>
-  <aside class="sidebar" style="display:none;">
+  <aside class="sidebar" style="display:none;" onclick="if (event.target === this && this.classList.contains('open')) toggleSidebar(false)">
     <div class="sidebar-title">
       <span>Category Index</span>
       <span id="filterCount"></span>
@@ -1325,11 +1356,13 @@ body:has(#cmpBar[style*="flex"]) footer{ padding-bottom:70px; }
     <div class="sidebar-body" id="sidebarBody">
     <div class="region-filter" id="countryFilter"></div>
     <div class="region-filter" id="cityFilter"></div>
+    <div class="region-filter" id="typeFilter"></div>
     <div class="region-filter" id="regionFilter"></div>
     <div class="region-filter" id="deliveryFilter"></div>
     <div class="region-filter" id="sectorFilter"></div>
     <div id="sheetList"></div>
     <button class="clear-filters" onclick="clearFilters()">Clear all filters</button>
+    <div class="sheet-foot"><button type="button" onclick="toggleSidebar(false)">Show <span id="sheetCount">0</span> companies</button></div>
     </div>
   </aside>
 
@@ -1959,7 +1992,7 @@ const ROSTER = {
   PRESERVE_ALWAYS: ['logo', 'profileSections', 'companySections', 'ownerUid', 'ownerSince',
                     'companyUpdatedAt', 'companyUpdatedBy', 'companyVerifiedAt', 'companyVerifiedBy'],
   // Carried forward only when the new roster has no value of its own.
-  PRESERVE_IF_EMPTY: ['certifications', 'capacity', 'spotlight'],
+  PRESERVE_IF_EMPTY: ['certifications', 'capacity', 'spotlight', 'stockist'],
 };
 // Registration details (legal name, registry ID, source), the location
 // source links and research-only strings (vendor-list aliases, vendor-list
@@ -2205,6 +2238,18 @@ const FS_REST = {
     const mask = Object.keys(data).map(k => `updateMask.fieldPaths=${encodeURIComponent(k)}`).join('&');
     const res = await fetch(`${FS_REST.base()}/${collection}/${docId}?${mask}`, {
       method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ fields: FS_REST.toFields(data) }),
+    });
+    if (!res.ok) throw new Error('REST ' + res.status + ': ' + (await res.text()).slice(0, 200));
+    return res.json();
+  },
+  // Create a document with an automatic id (POST). keepalive lets a write
+  // started as the tab closes still reach Firestore.
+  async addDoc(collection, data, keepalive) {
+    const token = await FS_REST.token();
+    const res = await fetch(`${FS_REST.base()}/${collection}`, {
+      method: 'POST', keepalive: !!keepalive,
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
       body: JSON.stringify({ fields: FS_REST.toFields(data) }),
     });
@@ -2715,6 +2760,20 @@ let activeCategory = null;   // first ticked category (breadcrumb, phone bar); t
 let activeCats = [];         // every ticked category slug; OR, each inclusive of its sub-categories
 let activeCountries = [];    // ISO2 codes; OR
 let activeCities = [];       // city names (registered office); offered once a country is picked
+let activeTypes = [];       // company types ticked (any of them matches)
+// Company type, decided 17 Nov 2026: each category has one type; a company has
+// the types of all its categories, plus "Distributor or stockist" when an admin
+// ticks Stockist in the editor. See Category_Work/TWI_Company_Type_Mapping_Final_2026-11-17.xlsx.
+const COMPANY_TYPES = [['mfr', 'Manufacturer'], ['dist', 'Distributor or stockist'], ['contr', 'Contractor'],
+  ['svc', 'Service provider'], ['cons', 'Consultant'], ['rent', 'Rental'], ['oper', 'Operator'], ['nonsup', 'Not a supplier']];
+const COMPANY_TYPE_LABEL = Object.fromEntries(COMPANY_TYPES);
+const CAT_TYPE = {"epc-contractors":"contr","tank-construction":"contr","field-erected-atmospheric-tanks-api-650":"contr","spheres-bullets-and-lpg-storage":"contr","hydraulic-jacking-and-automatic-welding-systems":"mfr","shop-built-steel-tanks":"mfr","tank-engineering":"cons","civil-and-structural-engineering":"contr","foundation-contractors":"contr","mechanical-contractors":"contr","electrical-contractors":"contr","instrumentation-installation-commissioning-and-testing":"contr","insulation-contractors":"contr","painting-and-coating-contractors":"contr","scaffolding-services":"contr","roofing-systems":"contr","demolition-and-decommissioning":"contr","heavy-engineering-and-fabrication":"mfr","tank-maintenance":"contr","lng-terminal-engineering":"contr","process-technology-licensors":"svc","refining-process-technologies":"svc","petrochemical-process-technologies":"svc","gas-processing-and-lng-technologies":"svc","fertilizer-process-technologies":"svc","tank-gauging":"mfr","radar-level-gauges":"mfr","servo-gauges":"mfr","temperature-measurement-mtt":"mfr","water-interface-detection":"mfr","manual-gauging-equipment":"mfr","tank-sampling-systems":"mfr","rim-seals":"mfr","mechanical-shoe-primary-seals-spring-type":"mfr","mechanical-shoe-primary-seals-scissor-type":"mfr","mechanical-shoe-primary-seals-counterweight-type":"mfr","liquid-mounted-foam-seals":"mfr","liquid-filled-foam-seals":"mfr","wiper-seals-primary-and-secondary":"mfr","rim-mounted-secondary-seal":"mfr","low-profile-secondary-seal":"mfr","internal-floating-roof-seals":"mfr","seal-fittings":"mfr","gauge-pole-fittings-cover-type":"mfr","gauge-pole-fittings-sleeve-type":"mfr","roof-leg-fittings-covers":"mfr","roof-leg-fittings-caps":"mfr","roof-leg-fittings-boots":"mfr","pontoon-gaskets":"mfr","bleeder-vent-gaskets":"mfr","manhole-gaskets":"mfr","floating-roof-systems":"mfr","internal-floating-roofs":"mfr","honeycomb-and-sandwich-panel-floating-roofs":"mfr","composite-frp-grp-internal-floating-roofs":"mfr","aluminium-dome-roofs":"mfr","gauge-hatches":"mfr","roof-drains":"mfr","swivel-joint-roof-drains":"mfr","articulated-roof-drains":"mfr","hose-type-roof-drains":"mfr","foam-chambers":"mfr","tank-foam-chambers":"mfr","foam-makers-and-generators":"mfr","foam-dams":"mfr","nozzles-and-manways":"mfr","mixers-and-agitators":"mfr","side-entry-mixers":"mfr","top-entry-mixers-and-agitators":"mfr","heating-systems":"mfr","steam-and-heating-coils":"mfr","electric-heaters-and-heat-tracing":"mfr","thermal-oil-and-suction-heaters":"mfr","tank-blanketing":"mfr","vapour-recovery-units-vru":"mfr","pressure-vacuum-vents":"mfr","emergency-vents":"mfr","flame-arresters":"mfr","end-of-line-flame-arresters":"mfr","in-line-and-detonation-arresters":"mfr","floating-suction-systems":"mfr","water-draw-off-systems":"mfr","overfill-protection":"mfr","bolted-steel-tanks":"mfr","glass-fused-to-steel-tanks":"mfr","epoxy-and-galvanised-bolted-tanks":"mfr","water-and-fire-water-tanks":"mfr","industrial-gratings":"mfr","frp-grp-gratings":"mfr","steel-gratings":"mfr","industrial-ladders":"mfr","steel-ladders-and-cages":"mfr","frp-and-aluminium-ladders":"mfr","industrial-platforms":"mfr","steel-platforms-and-walkways":"mfr","frp-and-aluminium-platforms":"mfr","stairs-and-handrails":"mfr","sludge-recovery-units":"mfr","cryogenic-and-lng-storage-tanks":"contr","pumps":"mfr","centrifugal-pumps":"mfr","api-610-process-pumps":"mfr","vertical-turbine-and-sump-pumps":"mfr","multistage-pumps":"mfr","sealless-and-magnetic-drive-pumps":"mfr","reciprocating-pumps":"mfr","rotary-pd-pumps":"mfr","submersible-pumps":"mfr","slurry-pumps":"mfr","chemical-process-pumps":"mfr","fire-pumps":"mfr","transfer-pumps":"mfr","metering-pumps":"mfr","lpg-pumps-loading-unloading-pumps-and-cryogenic-lpg-transfer-systems":"mfr","compressors":"mfr","reciprocating-compressors":"mfr","screw-and-rotary-compressors":"mfr","centrifugal-and-turbo-compressors":"mfr","blowers":"mfr","valves":"mfr","ball-valves":"mfr","gate-globe-and-check-valves":"mfr","butterfly-valves":"mfr","control-valves":"mfr","safety-and-pressure-relief-valves":"mfr","severe-service-valves":"mfr","cryogenic-valves":"mfr","double-block-and-bleed-valves":"mfr","instrumentation-and-manifold-valves":"mfr","plug-valves":"mfr","regulators":"mfr","actuators":"mfr","pneumatic-actuators":"mfr","electric-actuators":"mfr","flow-meters":"mfr","coriolis-meters":"mfr","turbine-flow-meters":"mfr","ultrasonic-flow-meters":"mfr","positive-displacement-meters":"mfr","custody-transfer-metering":"mfr","loading-arms":"mfr","marine-loading-arms":"mfr","truck-loading-systems":"mfr","offshore-loading-systems-spm-calm":"mfr","cryogenic-loading-systems-lng":"mfr","rotating-equipment-and-gearboxes":"mfr","strainers-and-line-protection":"mfr","mechanical-seals-and-seal-systems":"mfr","rotating-equipment-repair-and-overhaul":"svc","pipes-and-tubes":"mfr","carbon-and-alloy-steel-pipes":"mfr","stainless-duplex-and-nickel-alloy-pipes-and-tubes":"mfr","cast-iron-and-ductile-iron-pipes":"mfr","concrete-and-rcc-pipes":"mfr","clad-and-cra-lined-pipes":"mfr","pipe-and-tube-stockists-and-traders":"dist","pipe-fittings-and-flanges":"mfr","buttweld-fittings-and-bends":"mfr","flanges":"mfr","forged-socket-weld-and-threaded-fittings":"mfr","tube-and-instrument-fittings":"mfr","piping-contractors":"contr","pipe-supports-and-hangers":"mfr","expansion-joints-and-bellows":"mfr","flexible-hoses":"mfr","spectacle-blinds-and-line-blinds":"mfr","pigging-systems":"mfr","pipeline-coatings-tapes-and-wraps":"mfr","terminal-automation":"mfr","tank-inventory-systems":"mfr","plc-and-dcs":"mfr","remote-monitoring":"mfr","industrial-networking":"mfr","cctv-and-video-surveillance":"mfr","electrical-and-instrumentation":"mfr","pressure-transmitters":"mfr","temperature-sensors-and-thermowells":"mfr","pressure-and-temperature-switches":"mfr","indicators-and-chart-recorders":"mfr","level-measurement":"mfr","process-analyzers":"mfr","weighing-systems-and-weighbridges":"mfr","drone-and-robotic-inspection":"svc","autonomous-inspection-robots":"mfr","laser-scanning-and-lidar":"svc","engineering-and-simulation-software":"mfr","data-analytics-and-enterprise-software":"mfr","tank-inspection":"svc","non-destructive-testing-ndt":"svc","corrosion-monitoring":"svc","corrosion-protection":"contr","coating-materials-and-systems":"mfr","tank-and-vessel-linings":"contr","corrosion-engineering-and-consultancy":"cons","cathodic-protection":"contr","refractory-services":"contr","integrity-management":"cons","risk-based-inspection":"cons","fitness-for-service":"cons","tank-cleaning":"svc","robotic-no-man-entry-cleaning":"svc","manual-confined-space-cleaning":"svc","degassing-and-vapour-freeing":"svc","sludge-removal":"svc","hydrotesting":"svc","calibration-services":"svc","rope-access-services":"svc","leak-detection":"svc","catalyst-handling":"svc","turnaround-and-shutdown-services":"contr","chemical-cleaning-and-hydrojetting":"svc","on-site-machining":"svc","valve-overhaul-and-testing":"svc","positive-material-identification":"svc","failure-analysis-and-metallurgical-testing":"svc","online-leak-sealing":"svc","pipeline-pigging-and-intervention":"svc","inspection-and-certification":"svc","fire-protection":"mfr","foam-systems-and-equipment":"mfr","fire-water-systems":"mfr","portable-fire-equipment":"mfr","passive-fire-protection-and-fireproofing":"mfr","fire-detection":"mfr","fire-fighting-foam":"mfr","rim-seal-fire-protection":"mfr","rim-seal-foam-pourers":"mfr","rim-seal-detection-systems":"mfr","gas-detection":"mfr","fixed-gas-detection-systems":"mfr","portable-and-personal-gas-monitors":"mfr","explosion-protection-atex":"mfr","hazardous-area-equipment":"mfr","hazardous-area-lighting":"mfr","lightning-protection":"mfr","bypass-conductors":"mfr","submerged-shunts":"mfr","surge-protection-devices":"mfr","air-terminals-and-strike-termination-devices":"mfr","charge-dissipation-systems":"mfr","in-tank-potential-equalizers":"mfr","earthing-and-bonding":"mfr","spill-containment":"mfr","containment-liners-and-geomembranes":"mfr","spill-response-equipment":"mfr","environmental-monitoring":"mfr","occupational-safety":"mfr","hazop-and-risk-assessment":"cons","functional-safety":"mfr","process-safety":"cons","air-pollution-control":"mfr","industrial-safety-equipment":"mfr","gaskets":"mfr","welding-equipment-and-consumables":"mfr","fasteners-and-bolting":"mfr","additive-manufacturing-3d-printed-spares":"mfr","cranes-and-lifting-equipment":"mfr","eot-gantry-and-jib-cranes":"mfr","mobile-and-crawler-cranes":"mfr","hoists-and-chain-blocks":"mfr","lifting-tackle-and-slings":"mfr","blasting-and-painting-equipment":"mfr","blasting-equipment":"mfr","painting-and-spray-equipment":"mfr","hand-power-and-torque-tools":"mfr","mro-distributors-and-stockists":"dist","marine-and-port-equipment":"mfr","trucking-and-road-tankers":"svc","iso-tank-containers-and-intermodal":"svc","tank-truck-and-trailer-manufacturers":"mfr","port-operators":"oper","pipeline-operators":"oper","marine-logistics":"svc","bunkering-and-marine-fuel-supply":"svc","inland-waterways":"svc","rail-logistics":"svc","freight-forwarding":"svc","warehouse-operators":"oper","heavy-lift-and-transport":"svc","offshore-support-vessels":"svc","naval-architecture-and-marine-engineering":"cons","shipbuilding":"contr","engineering-consultants":"cons","owner-s-engineers":"cons","environmental-consultants":"cons","esg-consulting":"cons","steel-manufacturers":"mfr","stainless-steel":"mfr","aluminium-products":"mfr","plates-and-sheets":"mfr","forgings":"mfr","specialty-and-industrial-chemicals":"mfr","catalysts-and-adsorbents":"mfr","lubricants-and-lubrication-services":"mfr","frp-products":"mfr","cement-and-aggregates":"mfr","refractory-materials":"mfr","rubber-elastomer-and-polymer-products":"mfr","industrial-water-systems":"mfr","wastewater-treatment":"contr","steam-systems":"mfr","steam-traps":"mfr","thermal-oil-and-hot-oil-systems":"mfr","compressed-air":"mfr","power-generation":"mfr","diesel-generators":"mfr","steam-and-gas-turbines":"mfr","industrial-burners-and-boilers":"mfr","electrical-equipment-and-transformers":"mfr","cable-manufacturers":"mfr","ups-systems":"mfr","switchgear-panels-and-mcc":"mfr","industrial-gas-plants-nitrogen-oxygen":"mfr","hvac-ventilation-and-industrial-fans":"mfr","cooling-towers":"mfr","solar-power-systems":"mfr","bess-systems":"mfr","hydrogen-infrastructure":"mfr","ammonia-storage-and-handling":"contr","biofuel-and-ethanol-storage-systems":"mfr","cbg-and-biogas-infrastructure":"contr","carbon-capture-equipment":"mfr","energy-efficiency-systems":"mfr","ndt-equipment":"mfr","tank-floor-scanners":"mfr","radiographic-equipment":"mfr","weld-inspection-equipment":"mfr","acoustic-emission-systems":"mfr","borescopes-and-visual-inspection":"mfr","training-and-skilling":"svc","technical-institutes":"nonsup","certification-bodies":"svc","industrial-staffing":"svc","offshore-floating-systems":"contr","fpso-fso-design-and-conversion":"contr","flng-systems":"mfr","subsea-production-systems":"mfr","subsea-manifolds-and-plet-plem":"mfr","subsea-control-systems":"mfr","surf-umbilicals-risers-flowlines":"mfr","umbilicals-and-flying-leads":"mfr","flexible-and-rigid-risers":"mfr","mooring-systems":"mfr","turret-mooring-systems":"mfr","mooring-chains-and-connectors":"mfr","anchors-and-mooring-hardware":"mfr","offshore-structures-and-fabrication":"contr","topsides-and-modules":"contr","offshore-installation-and-epcic":"contr","subsea-services-and-intervention":"svc","rov-services":"svc","commercial-diving":"svc","subsea-survey-and-inspection":"svc","offshore-onshore-facility-om":"svc","pressure-vessels-and-reactors":"mfr","pressure-vessels":"mfr","reactors-and-autoclaves":"mfr","distillation-columns-and-tower-internals":"mfr","trays-and-packing":"mfr","fired-heaters-and-process-furnaces":"mfr","flare-systems":"mfr","flare-tips-and-stacks":"mfr","amine-and-gas-treating-systems":"mfr","hydrogen-generation":"mfr","smr-and-reformer-equipment":"mfr","psa-and-gas-purification":"mfr","separators-scrubbers-and-coalescers":"mfr","membrane-technologies":"mfr","incinerators-and-thermal-oxidizers":"mfr","package-units-and-process-skids":"mfr","heat-exchangers":"mfr","shell-and-tube-heat-exchangers":"mfr","air-cooled-heat-exchangers":"mfr","plate-heat-exchangers":"mfr","waste-heat-recovery-units":"mfr","evaporators-dryers-and-crystallizers":"mfr","vacuum-systems-and-ejectors":"mfr","turboexpanders-cryogenic-gas-processing-and-ngl-recovery-systems":"mfr","lpg-treating-and-processing-systems":"mfr","lpg-dehydration-molecular-sieves-and-lpg-drying-systems":"mfr","lpg-refrigeration-flash-gas-compressors-and-auto-refrigeration-systems":"mfr","drilling-contractors":"contr","onshore-drilling":"contr","offshore-drilling":"contr","directional-drilling-and-mwd-lwd":"svc","drilling-fluids-and-mud-systems":"mfr","mud-logging-and-wellsite-geology":"svc","well-completion-and-intervention":"svc","cementing-and-stimulation":"svc","wellheads-and-surface-trees":"mfr","drill-bits-and-downhole-tools":"mfr","seismic-and-geophysical-services":"svc","core-analysis-and-reservoir-services":"svc","workover-and-well-servicing":"svc","coiled-tubing-and-pressure-pumping":"svc","artificial-lift-esp-gas-lift-and-rod-lift-systems":"mfr","production-chemistry-flow-assurance-and-eor-services":"svc","produced-water-water-injection-and-water-treatment-systems":"mfr","drilling-rig-equipment-top-drives-pumps-bop":"mfr","scaffolding-rental":"rent","generator-and-power-equipment-rental":"rent","crane-and-lifting-equipment-rental":"rent","pump-and-compressor-rental":"rent","tanks-containment-and-hose-rental":"rent","inspection-testing-and-safety-equipment-rental":"rent","welding-heating-and-site-equipment-rental":"rent","news-and-media":"nonsup","industry-associations":"nonsup","standards-bodies":"nonsup"};
+function companyTypes(c) {
+  const t = new Set();
+  (c.cats || []).forEach(x => { const k = CAT_TYPE[x]; if (k) t.add(k); });
+  if (c.stockist) t.add('dist');
+  return t;
+}
 let withinQ = '';            // "Search within these results"; kept on screen, not in the address
 // Region filter: 'all' | 'india' | 'international'. Derived from each
 // company's country field rather than stored separately, so there's one
@@ -2984,7 +3043,8 @@ function setDelivery(d) {
 // instead of returning to the previous filter/category. Encoding this state
 // into the hash — and driving it exclusively through handleRoute() — means
 // every meaningful navigation is a real, back-button-able history entry.
-function buildFilterHash(cat, region, delivery, sector, q, country, sort, city) {
+function buildFilterHash(cat, region, delivery, sector, q, country, sort, city, type) {
+  if (type === undefined) type = (country === undefined) ? activeTypes : [];
   // country / sort / city left undefined keep what is on screen; pass null to clear.
   // A new country choice clears the cities unless they are passed explicitly.
   if (city === undefined) city = (country === undefined) ? activeCities : [];
@@ -3001,6 +3061,8 @@ function buildFilterHash(cat, region, delivery, sector, q, country, sort, city) 
   if (q) params.push('q=' + encodeURIComponent(q));
   if (ctry.length) params.push('country=' + ctry.join(','));
   if (ctry.length && cities.length) params.push('city=' + cities.map(encodeURIComponent).join('|'));
+  const types = many(type).filter(k => COMPANY_TYPE_LABEL[k]);
+  if (types.length) params.push('type=' + types.join(','));
   if (sort) params.push('sort=' + encodeURIComponent(sort));
   return '#/' + (params.length ? ('?' + params.join('&')) : '');
 }
@@ -3020,6 +3082,7 @@ function parseFilterHash(hash) {
   if (qs.has('q')) out.q = qs.get('q');
   const cs = (qs.get('country') || '').split(',').filter(x => /^[A-Za-z]{2}$/.test(x)).map(x => x.toUpperCase());
   if (cs.length) { out.countries = [cs[0]]; out.country = cs[0]; }
+  out.types = Array.from(new Set((qs.get('type') || '').split(',').filter(k => COMPANY_TYPE_LABEL[k])));
   if (out.countries.length && qs.has('city')) out.cities = qs.get('city').split('|').map(x => x.trim()).filter(Boolean);
   if (['name', 'country', 'locs'].includes(qs.get('sort'))) out.sort = qs.get('sort');
   return out;
@@ -3055,6 +3118,7 @@ function renderRegionFilter() {
 function renderDeliveryFilter() {
   const el = document.getElementById('deliveryFilter');
   if (!el) return;
+  el.innerHTML = ''; return;   // delivery model is being retired from TWI: no public filter
   const counts = {};
   COMPANIES.forEach(c => (c.delivery || []).forEach(d => { counts[d] = (counts[d] || 0) + 1; }));
   const shown = DELIVERY_MODELS.filter(([k]) => counts[k]);
@@ -3104,7 +3168,7 @@ function buildSidebar(scopedSlug) {
   const sections = scopedSlug ? CATEGORY_TREE.filter(l1 => l1.slug === scopedSlug) : CATEGORY_TREE;
   wrap.innerHTML = sections.map((l1, i) => `
     <div class="sheet-group${scopedSlug ? ' open' : ''}" data-l1="${l1.slug}">
-      <div class="sheet-head" onclick="toggleSheet('${l1.slug}')">
+      <div class="sheet-head" onclick="toggleSheet('${l1.slug}')">${secDot(l1)}
         <span class="sheet-code">${l1.code}</span>
         <span>${l1.name}</span>
         <span class="sheet-n"></span>
@@ -3152,7 +3216,7 @@ function selectCategory(slug) {
 function clearFilters() {
   document.getElementById('searchBox').value = '';
   withinQ = ''; const wb = document.getElementById('withinBox'); if (wb) wb.value = '';
-  location.hash = buildFilterHash(null, 'all', null, null, '', activeCountries, null, []);
+  location.hash = buildFilterHash(null, 'all', null, null, '', activeCountries, null, [], []);
 }
 
 // Registered office is always locations[0] by construction — used anywhere
@@ -3187,11 +3251,12 @@ function searchTextCached(c) { let t = _stCache.get(c); if (t === undefined) { t
 // facet's own counts) or with some values swapped (for "widen" suggestions).
 function filterState(skip, over) {
   const st = { cats: activeCats, countries: activeCountries, cities: activeCities, region: activeRegion,
-    delivery: activeDelivery, q: currentQ().toLowerCase(), within: withinQ.trim().toLowerCase() };
+    delivery: null, q: currentQ().toLowerCase(), within: withinQ.trim().toLowerCase() };
   st.region = 'all';
   if (skip === 'cat') st.cats = [];
   if (skip === 'country') { st.countries = []; st.cities = []; }   // only for the per-country counts
   if (skip === 'city') st.cities = [];
+  st.types = skip === 'type' ? [] : activeTypes;
   return Object.assign(st, over || {});
 }
 function filterWith(st) {
@@ -3206,6 +3271,7 @@ function filterWith(st) {
     if (st.region === 'international' && isIndian(c)) return false;
     if (ctry && !ctry.has(countryIso(c))) return false;
     if (cities && !cities.has(companyCity(c).toLowerCase())) return false;
+    if (st.types && st.types.length) { const t = companyTypes(c); if (!st.types.some(k => t.has(k))) return false; }
     // Delivery model: untagged companies drop out of a delivery-filtered view.
     if (st.delivery && !(c.delivery || []).includes(st.delivery)) return false;
     if (st.q && !searchTextCached(c).includes(st.q)) return false;
@@ -3222,6 +3288,7 @@ function renderActiveFilters() {
   activeCats.forEach(x => { const l = categoryLabel(x); if (l) chip('cat:' + x, psEsc(l.code + ' · ' + l.name)); });
   activeCountries.forEach(x => chips.push(`<span class="filter-chip chip-fixed" title="Results are shown one country at a time">${psEsc(countryNameOf(x))}</span>`));
   if (activeCountries.length) activeCities.forEach(x => chip('city:' + x, psEsc(x)));
+  activeTypes.forEach(k => chip('type:' + k, psEsc(COMPANY_TYPE_LABEL[k])));
   if (activeRegion !== 'all') chip('region', activeRegion === 'india' ? 'India' : 'International');
   if (activeDelivery) chip('delivery', psEsc(DELIVERY_LABEL[activeDelivery] || activeDelivery));
   const q = currentQ(); if (q) chip('q', '“' + psEsc(q) + '”');
@@ -3348,6 +3415,22 @@ function updateFacetCounts() {
   });
   _cityCounts = Object.values(cm).sort((a, b) => b.n - a.n || a.name.localeCompare(b.name));
   renderCityFilter();
+  const tm = {};
+  filteredCompanies('type').forEach(c => companyTypes(c).forEach(k => { tm[k] = (tm[k] || 0) + 1; }));
+  renderTypeFilter(tm);
+}
+function setType(k) {
+  const next = activeTypes.includes(k) ? activeTypes.filter(x => x !== k) : activeTypes.concat(k);
+  location.hash = hashWith({ type: next });
+}
+// Several types can be ticked; a company matches if it has any of them.
+function renderTypeFilter(tm) {
+  const el = document.getElementById('typeFilter'); if (!el) return;
+  el.innerHTML = `<div class="rf-label">COMPANY TYPE</div><div class="cf-list">${COMPANY_TYPES.map(([k, label]) => {
+    const on = activeTypes.includes(k), n = tm[k] || 0;
+    return `<button type="button" class="cf-row${on ? ' active' : ''}${!n && !on ? ' zero' : ''}" aria-pressed="${on}" ${!n && !on ? 'disabled' : ''} onclick="setType('${k}')">
+      <span class="cf-box" aria-hidden="true">${on ? '✓' : ''}</span><span class="cf-name">${label}</span><span class="rf-count">${n.toLocaleString('en-IN')}</span></button>`;
+  }).join('')}</div>`;
 }
 // Nothing matched: offer the nearest wider searches that do have companies.
 const _isoRegion = {};
@@ -3368,6 +3451,7 @@ function widerOptions() {
   });
   if (currentQ()) add('without the search “' + currentQ() + '”', { q: '' }, H({ q: '' }));
   if (withinQ.trim()) add('without “' + withinQ.trim() + '” within the results', { within: '' }, 'within');
+  if (activeTypes.length) add('of any company type', { types: [] }, H({ type: [] }));
   const seen = new Set();
   // Inside this country first (nearest first), then at most two other countries (most matches first).
   const inC = out.filter(o => !/ instead$/.test(o.label)).sort((a, b) => a.n - b.n);
@@ -3435,11 +3519,12 @@ function pickSuggest(i) {
   const inp = _sug.input;
   hideSuggest();
   if (inp && inp.id === 'searchBox' && !/^#\/company\//.test(it.href)) inp.value = '';
+  if (inp && inp.id === 'hdrSearchBox') inp.value = '';
   location.hash = it.href;
 }
 document.addEventListener('input', e => {
   const t = e.target;
-  if (t && (t.id === 'landingSearchBox' || t.id === 'searchBox')) showSuggest(t);
+  if (t && (t.id === 'landingSearchBox' || t.id === 'searchBox' || t.id === 'hdrSearchBox')) showSuggest(t);
 });
 document.addEventListener('keydown', e => {
   if (!_sug.input || e.target !== _sug.input) return;
@@ -3512,10 +3597,15 @@ function sectionIndexOf(slug) {
   }
   return _sectionIndex[slug];
 }
+function l1Color(l1) {
+  const i = CATEGORY_TREE.indexOf(l1);
+  return i < 0 ? '#6B7480' : `hsl(${Math.round(((i * 8) % CATEGORY_TREE.length) * 360 / CATEGORY_TREE.length)} 58% 40%)`;
+}
+function secDot(l1) { return `<i class="sec-dot" style="background:${l1Color(l1)}" aria-hidden="true"></i>`; }
 function sectionColor(slug) {
   const i = sectionIndexOf(slug);
   if (i == null) return '#6B7480';
-  return `hsl(${Math.round(i * 360 / CATEGORY_TREE.length)} 58% 40%)`;
+  return `hsl(${Math.round(((i * 8) % CATEGORY_TREE.length) * 360 / CATEGORY_TREE.length)} 58% 40%)`;
 }
 function monogramOf(c) {
   const name = String(c.name || '');
@@ -3553,8 +3643,8 @@ function applySort(list) {
 }
 function currentQ() { const b = document.getElementById('searchBox'); return b ? b.value.trim() : ''; }
 function hashWith(o) {
-  const a = Object.assign({ cat: activeCats, region: activeRegion, delivery: activeDelivery, sector: activeSector, q: currentQ(), country: activeCountries, sort: activeSort, city: activeCities }, o || {});
-  return buildFilterHash(a.cat, a.region, a.delivery, a.sector, a.q, a.country, a.sort, a.city);
+  const a = Object.assign({ cat: activeCats, region: activeRegion, delivery: activeDelivery, sector: activeSector, q: currentQ(), country: activeCountries, sort: activeSort, city: activeCities, type: activeTypes }, o || {});
+  return buildFilterHash(a.cat, a.region, a.delivery, a.sector, a.q, a.country, a.sort, a.city, a.type);
 }
 // Switches the whole results page to another country.
 function setCountry(iso) {
@@ -3569,6 +3659,7 @@ function dropFilter(k) {
   if (kind === 'cat' && val) o = { cat: activeCats.filter(x => x !== val) };
   else if (kind === 'country') return;   // a country is always selected
   else if (kind === 'city' && val) o = { city: activeCities.filter(x => x !== val) };
+  else if (kind === 'type' && val) o = { type: activeTypes.filter(x => x !== val) };
   else o = { cat: { cat: [] }, country: { country: [], city: [] }, region: { region: 'all' }, delivery: { delivery: null }, sector: { sector: null }, q: { q: '' } }[kind];
   if (kind === 'q') { const b = document.getElementById('searchBox'); if (b) b.value = ''; }
   let h = hashWith(o);
@@ -3583,12 +3674,15 @@ function renderCards() {
   const empty = document.getElementById('emptyState');
   const more = document.getElementById('cardsMore');
   document.getElementById('resultCount').textContent = list.length.toLocaleString('en-IN');
+  const shc = document.getElementById('sheetCount'); if (shc) shc.textContent = list.length.toLocaleString('en-IN');
   renderActiveFilters();
   renderSavedSearches();
   renderInsights(list);
   const cName = countryNameOf(activeCountries[0]);
+  if (currentQ() || withinQ.trim()) USAGE.search(currentQ() || withinQ, activeCountries[0], list.length);
   const nn = document.getElementById('resultNoun'); if (nn) nn.textContent = (list.length === 1 ? 'company' : 'companies') + ' in ' + cName;
   const sb = document.getElementById('searchBox'); if (sb) sb.placeholder = 'Search in ' + cName + '…';
+  const hb = document.getElementById('hdrSearchBox'); if (hb) hb.placeholder = 'Search in ' + cName + '…';
   const gridBtn = document.getElementById('viewGridBtn'), listBtn = document.getElementById('viewListBtn');
   if (gridBtn) gridBtn.setAttribute('aria-pressed', String(cardView === 'grid'));
   if (listBtn) listBtn.setAttribute('aria-pressed', String(cardView === 'list'));
@@ -3660,7 +3754,7 @@ function renderInsights(list) {
   const cname = psEsc(countryNameOf(activeCountries[0]));
   const cities = tally(c => [companyCity(c)]).slice(0, 6).map(([k, n]) => ({ label: psEsc(k), n, k }));
   const topCats = tally(c => c.cats).slice(0, 6).map(([k, n]) => { const l = categoryLabel(k); return { label: psEsc(l ? l.name : k), n, k }; });
-  const secs = CATEGORY_TREE.map(l1 => { const set = new Set(categoryWithDescendants(l1.slug)); return { label: psEsc(l1.name), n: list.reduce((a, c) => a + (c.cats.some(x => set.has(x)) ? 1 : 0), 0), k: l1.slug }; })
+  const secs = CATEGORY_TREE.map(l1 => { const set = new Set(categoryWithDescendants(l1.slug)); return { label: secDot(l1) + psEsc(l1.name), n: list.reduce((a, c) => a + (c.cats.some(x => set.has(x)) ? 1 : 0), 0), k: l1.slug }; })
     .filter(x => x.n).sort((a, b) => b.n - a.n).slice(0, 6);
   const sig = SIGNALS.map(g => ({ label: g.key + ' · ' + psEsc(g.label), n: list.filter(g.test).length, k: g.key })).filter(x => x.n);
   const blk = (t, rows, f) => rows.length ? `<div class="ins-card"><div class="ins-t">${t}</div>${barRows(rows, list.length, f)}</div>` : '';
@@ -3668,19 +3762,168 @@ function renderInsights(list) {
     <div class="ins-grid">
       ${blk('Top categories in ' + cname, topCats, r => `selectCategory('${r.k}')`)}
       ${blk('Cities in ' + cname, cities, r => `setCity(${psEsc(JSON.stringify(r.k))})`)}
+      ${blk('Company types', (() => { const m = {}; list.forEach(c => companyTypes(c).forEach(k => { m[k] = (m[k] || 0) + 1; }));
+        return COMPANY_TYPES.filter(([k]) => m[k]).map(([k, l]) => ({ label: l, n: m[k], k })).sort((a, b) => b.n - a.n); })(), r => `setType('${r.k}')`)}
       ${blk('Sections', secs, r => `selectCategory('${r.k}')`)}
       ${blk('Verification', sig, () => `void 0`)}
     </div></div>`;
 }
 
-// ── Saved searches: kept in this browser only.
+
+// ══════════════════════════════════════════════════════════════════════
+// USAGE LOG (decided 15 Nov 2026: a light event log for searches and views)
+// ══════════════════════════════════════════════════════════════════════
+// Events are buffered in the browser and written as ONE document per batch
+// to usageEvents/{auto id}: at most one write a minute, plus one when the
+// tab is hidden or closed, and at most 30 events a document. Admins are not
+// logged. Only admins can read the log (see firestore.rules).
+//   s = search   {t:'s', q, c: country, n: results}
+//   v = view     {t:'v', s: company slug}
+//   f = filter   {t:'f', k: cat|type|city|sort, v: value}
+const USAGE = {
+  buf: [], lastWrite: 0, timer: null, lastSearch: '', lastFilters: '', searchTimer: null,
+  on() { return !!(currentUser && !isAdminUser(currentUser) && typeof firebaseReady !== 'undefined' && firebaseReady); },
+  push(e) {
+    if (!this.on()) return;
+    this.buf.push(e);
+    if (this.buf.length >= 30) this.flush();
+    else if (!this.timer) this.timer = setTimeout(() => { this.timer = null; this.flush(); }, Math.max(5000, 60000 - (Date.now() - this.lastWrite)));
+  },
+  async flush(closing) {
+    if (!this.buf.length || !this.on()) return;
+    if (!closing && Date.now() - this.lastWrite < 60000) return;   // the timer will come back
+    const ev = this.buf.splice(0, 30);
+    this.lastWrite = Date.now();
+    const now = new Date();
+    try {
+      await FS_REST.addDoc('usageEvents', { uid: currentUser.uid, day: now.toISOString().slice(0, 10), ts: now, ev }, closing);
+    } catch (err) { console.warn('[TANKWORLDINDIA] Usage log write skipped:', err.message); }
+    if (this.buf.length && !this.timer) this.timer = setTimeout(() => { this.timer = null; this.flush(); }, 60000);
+  },
+  // A search is logged once it has been stable for 1.5 s (not every keystroke).
+  search(q, iso, n) {
+    clearTimeout(this.searchTimer);
+    q = String(q || '').trim().toLowerCase().slice(0, 80);
+    if (q.length < 2) return;
+    this.searchTimer = setTimeout(() => {
+      const key = q + '|' + iso;
+      if (key === this.lastSearch) return;
+      this.lastSearch = key;
+      this.push({ t: 's', q, c: iso || '', n });
+    }, 1500);
+  },
+  view(slug) { if (slug) this.push({ t: 'v', s: String(slug).slice(0, 120) }); },
+  filters() {
+    const key = JSON.stringify([activeCats, activeTypes, activeCities, activeSort]);
+    if (key === this.lastFilters) return;
+    this.lastFilters = key;
+    activeCats.forEach(v => this.push({ t: 'f', k: 'cat', v }));
+    activeTypes.forEach(v => this.push({ t: 'f', k: 'type', v }));
+    activeCities.forEach(v => this.push({ t: 'f', k: 'city', v: String(v).slice(0, 80) }));
+    if (activeSort) this.push({ t: 'f', k: 'sort', v: activeSort });
+  },
+};
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') USAGE.flush(true); });
+
+// ── Admin: usage report (read on request only, to keep reads low) ──
+async function loadUsageReport() {
+  const wrap = document.getElementById('usageWrap'); if (!wrap) return;
+  const days = +(document.getElementById('usageDays') || {}).value || 30;
+  wrap.innerHTML = '<div class="admin-log">Loading…</div>';
+  try {
+    const since = new Date(Date.now() - days * 86400000).toISOString();
+    const docs = await FS_REST.queryAfter('usageEvents', 'ts', since);
+    const users = new Set(), perDay = {}, searches = {}, zero = {}, views = {}, filters = {};
+    let nEv = 0;
+    docs.forEach(d => {
+      users.add(d.uid);
+      (d.ev || []).forEach(e => {
+        nEv++; perDay[d.day] = (perDay[d.day] || 0) + 1;
+        if (e.t === 's') {
+          const k = e.q + (e.c ? ' · ' + countryNameOf(e.c) : '');
+          searches[k] = (searches[k] || 0) + 1;
+          if (!e.n) zero[k] = (zero[k] || 0) + 1;
+        } else if (e.t === 'v') {
+          views[e.s] = (views[e.s] || 0) + 1;
+        } else if (e.t === 'f') {
+          const lbl = e.k === 'cat' ? 'Category: ' + ((categoryLabel(e.v) || {}).name || e.v)
+            : e.k === 'type' ? 'Company type: ' + (COMPANY_TYPE_LABEL[e.v] || e.v)
+            : e.k === 'city' ? 'City: ' + e.v : 'Sort: ' + e.v;
+          filters[lbl] = (filters[lbl] || 0) + 1;
+        }
+      });
+    });
+    const top = (m, n, lab) => {
+      const rows = Object.entries(m).sort((a, b) => b[1] - a[1]).slice(0, n);
+      return rows.length ? anBarsHtml(rows.map(([k, v]) => [null, lab ? lab(k) : k, v])) : '<div class="an-empty">Nothing yet.</div>';
+    };
+    const coName = s => { const c = COMPANIES.find(x => x.slug === s); return c ? c.name : s; };
+    const dayRows = Object.keys(perDay).sort().map(k => [null, k, perDay[k]]);
+    wrap.innerHTML = `
+      <div class="an-summary">
+        <div class="an-stat"><b>${anNum(users.size)}</b><span>Signed-in visitors</span></div>
+        <div class="an-stat"><b>${anNum(nEv)}</b><span>Events</span></div>
+        <div class="an-stat"><b>${anNum(Object.values(searches).reduce((a, b) => a + b, 0))}</b><span>Searches</span></div>
+        <div class="an-stat"><b>${anNum(Object.values(views).reduce((a, b) => a + b, 0))}</b><span>Company page views</span></div>
+        <div class="an-stat"><b>${anNum(docs.length)}</b><span>Log documents read</span></div>
+      </div>
+      <div class="an-charts">
+        <div class="an-card"><h4>Top searches</h4><div class="an-sub">Search term · country</div>${top(searches, 20)}</div>
+        <div class="an-card"><h4>Searches with no results</h4><div class="an-sub">What visitors looked for and did not find</div>${top(zero, 20)}</div>
+        <div class="an-card"><h4>Most-viewed companies</h4><div class="an-sub">Company page opens</div>${top(views, 20, coName)}</div>
+        <div class="an-card"><h4>Most-used filters</h4><div class="an-sub">Categories, company types, cities and sorts picked</div>${top(filters, 20)}</div>
+        <div class="an-card"><h4>Events per day</h4><div class="an-sub">All logged events</div>${dayRows.length ? anBarsHtml(dayRows) : '<div class="an-empty">Nothing yet.</div>'}</div>
+      </div>`;
+  } catch (err) {
+    wrap.innerHTML = `<div class="admin-log">Could not load the usage log: ${psEsc(err.message)}. Check that the new firestore.rules (usageEvents) are published.</div>`;
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// SAVED SEARCHES, synced to the signed-in account (userSaved/{uid})
+// ══════════════════════════════════════════════════════════════════════
+// The browser copy stays as a cache and for signed-out use. On sign-in the
+// account's list and this browser's list are merged (account first, by
+// name, at most 20) and written back to both. Every save or delete writes
+// the one account document.
+const SAVED_SYNC = {
+  uid: null, timer: null, ok: false,
+  async pull() {
+    if (!currentUser || !firebaseReady) { this.uid = null; this.ok = false; renderSavedSearches(); return; }
+    if (this.uid === currentUser.uid) return;
+    this.uid = currentUser.uid;
+    try {
+      const d = await FS_REST.getDoc('userSaved', currentUser.uid);
+      const remote = (d && Array.isArray(d.items)) ? d.items.filter(x => x && x.name && x.hash) : [];
+      const local = savedList();
+      const seen = new Set(), merged = [];
+      remote.concat(local).forEach(x => { if (!seen.has(x.name) && merged.length < 20) { seen.add(x.name); merged.push({ name: String(x.name).slice(0, 120), hash: String(x.hash).slice(0, 1500) }); } });
+      try { localStorage.setItem('twi-saved-searches', JSON.stringify(merged)); } catch (e) {}
+      this.ok = true;
+      if (JSON.stringify(merged) !== JSON.stringify(remote)) await this.push(true);
+    } catch (err) { console.warn('[TANKWORLDINDIA] Saved searches not synced:', err.message); this.ok = false; }
+    renderSavedSearches();
+  },
+  async push(now) {
+    if (!currentUser || !firebaseReady || !this.ok) return;
+    clearTimeout(this.timer);
+    const go = async () => {
+      try { await FS_REST._rawSetMerge('userSaved', currentUser.uid, { items: savedList().slice(0, 20), updatedAt: new Date() }); }
+      catch (err) { console.warn('[TANKWORLDINDIA] Saved searches not synced:', err.message); }
+    };
+    if (now) await go(); else this.timer = setTimeout(go, 800);
+  },
+};
+
+// ── Saved searches: browser copy (synced to the account when signed in, above).
 function savedList() { try { return JSON.parse(localStorage.getItem('twi-saved-searches') || '[]'); } catch (e) { return []; } }
-function savedWrite(a) { try { localStorage.setItem('twi-saved-searches', JSON.stringify(a.slice(0, 20))); } catch (e) {} }
+function savedWrite(a) { try { localStorage.setItem('twi-saved-searches', JSON.stringify(a.slice(0, 20))); } catch (e) {} SAVED_SYNC.push(); }
 function saveSearch() {
   const bits = [];
   activeCats.forEach(x => { const l = categoryLabel(x); if (l) bits.push(l.name); });
   activeCountries.forEach(x => bits.push(countryNameOf(x)));
   if (activeCountries.length) activeCities.forEach(x => bits.push(x));
+  activeTypes.forEach(k => bits.push(COMPANY_TYPE_LABEL[k]));
   if (currentQ()) bits.push('“' + currentQ() + '”');
   const name = (window.prompt('Name this search', bits.join(' · ') || 'All companies') || '').trim();
   if (!name) return;
@@ -3693,7 +3936,7 @@ function deleteSaved(i) { const a = savedList(); a.splice(i, 1); savedWrite(a); 
 function renderSavedSearches() {
   const el = document.getElementById('savedSearches'); if (!el) return;
   const a = savedList();
-  el.innerHTML = a.length ? `<div class="rf-label">SAVED SEARCHES</div><div class="sv-list">${a.map((x, i) =>
+  el.innerHTML = a.length ? `<div class="rf-label">SAVED SEARCHES${SAVED_SYNC.ok ? ' <span class="sv-sync" title="Saved to your account: they appear on any device you sign in on">· on your account</span>' : ''}</div><div class="sv-list">${a.map((x, i) =>
     `<div class="sv-row"><button type="button" onclick="applySaved(${i})">${psEsc(x.name)}</button><button type="button" class="sv-x" aria-label="Delete saved search" onclick="deleteSaved(${i})">×</button></div>`).join('')}</div>` : '';
 }
 
@@ -3769,6 +4012,22 @@ function sectionCompanyCount(l1) {
   return COMPANIES.reduce((n, c) => n + (c.cats.some(s => slugs.has(s)) ? 1 : 0), 0);
 }
 
+function submitHeaderSearch(event) {
+  if (event) event.preventDefault();
+  hideSuggest();
+  const box = document.getElementById('hdrSearchBox'), term = box.value.trim();
+  if (!term) return;
+  box.value = '';
+  location.hash = buildFilterHash(null, 'all', null, null, term, [activeCountries[0] || defaultCountry()], null, []);
+}
+function syncHeaderSearch() {
+  const h = location.hash;
+  document.body.classList.toggle('on-landing', !h || h === '#' || h === '#/');
+  const box = document.getElementById('hdrSearchBox');
+  if (box && typeof countryNameOf === 'function') box.placeholder = 'Search in ' + countryNameOf(activeCountries[0] || defaultCountry()) + '…';
+}
+window.addEventListener('hashchange', () => setTimeout(syncHeaderSearch, 0));
+window.addEventListener('load', () => setTimeout(syncHeaderSearch, 0));
 function landingIso() { const sel = document.getElementById('landingCountry'); return (sel && sel.value) || activeCountries[0] || defaultCountry(); }
 function submitLandingSearch(event) {
   if (event) event.preventDefault();
@@ -3846,7 +4105,7 @@ function renderLandingPage() {
       <div class="landing-cat-grid">
         ${sectionTiles.map(({ l1, n }) => `
           <a href="${R(l1.slug)}" class="landing-cat-tile" ${n === 0 ? 'style="opacity:.4;pointer-events:none;"' : ''}>
-            <div class="lct-code">${l1.code}</div>
+            <div class="lct-code">${secDot(l1)}${l1.code}</div>
             <div class="lct-name">${l1.name}</div>
             <div class="lct-count">${n.toLocaleString()} ${n === 1 ? 'company' : 'companies'}</div>
           </a>`).join('')}
@@ -4310,6 +4569,8 @@ function toggleSidebar(force) {
   const open = typeof force === 'boolean' ? force : !sb.classList.contains('open');
   sb.classList.toggle('open', open);
   if (b) b.setAttribute('aria-expanded', open ? 'true' : 'false');
+  // On a phone the open panel is a sheet over the page: stop the page scrolling under it.
+  document.body.classList.toggle('sheet-open', open && window.matchMedia('(max-width: 860px)').matches);
 }
 function updateSidebarToggle() {
   const el = document.getElementById('sidebarNow');
@@ -4881,6 +5142,7 @@ const PIN_SVG = '<svg class="pin-ico" viewBox="0 0 24 24" width="13" height="13"
 
 function renderCompanyPage(slug) {
   const c = COMPANIES.find(x => x.slug === slug);
+  if (c) USAGE.view(c.slug);
   const wrap = document.getElementById('company-view');
   if (!c) {
     wrap.innerHTML = `<a class="back-link" href="#/">← Back to directory</a><div class="empty-state"><div class="em-mark">Sheet Not Found</div><h3>No company at this URL</h3></div>`;
@@ -4929,6 +5191,7 @@ function renderCompanyPage(slug) {
       <div class="cp-title-block">
         <div class="cp-name">${c.name}${signalsHtml(c)}</div>
         ${legalLineHtml(c)}
+        ${companyTypes(c).size ? `<div class="cp-types">${COMPANY_TYPES.filter(([k]) => companyTypes(c).has(k)).map(([, l]) => psEsc(l)).join(' · ')}</div>` : ''}
         ${parentLineHtml(c)}
         ${corpGroupLineHtml(c)}
         ${brandsHtml(c)}
@@ -4936,7 +5199,6 @@ function renderCompanyPage(slug) {
     </div>
     ${tierOf(c) ? `<div class="cp-tier-note">${TIERS[tierOf(c)].note}</div></div>` : ''}
     ${c.msme ? `<div class="cp-msme-row">${msmeBadgeHtml(c, false)}${udyamCtaHtml(c)}</div>` : ''}
-    ${(c.delivery || []).length ? `<div class="cp-delivery-row">${deliveryBadgesHtml(c, false)}</div>` : ''}
     ${credentialsStripHtml(c)}
     <div class="cp-desc">${c.desc}</div>
     <div class="cp-links-row">
@@ -5052,6 +5314,7 @@ function handleRoute() {
     const parsed = parseFilterHash(hash);
     activeCategory = parsed.cat;
     activeCats = parsed.cats;
+    activeTypes = parsed.types || [];
     activeCountries = parsed.countries;
     rememberCountry(activeCountries[0]);
     activeCities = parsed.cities;
@@ -5081,6 +5344,7 @@ function handleRoute() {
     renderDeliveryFilter();
     renderSectorFilter();
     renderAll();
+    USAGE.filters();
   }
 }
 
@@ -5683,6 +5947,20 @@ function renderAdminPage() {
     <div id="claimsWrap"><div class="admin-log">Loading…</div></div>
 
     <div class="panel-head" style="margin-top:26px;">
+      <div class="p-code">USAGE · ADM-03</div>
+      <h2 style="font-size:20px;">Usage</h2>
+      <p>What signed-in visitors search for, which searches find nothing, which companies they open and which
+        filters they use. Admins are not counted. Loading reads one document per batch of up to 30 events,
+        so it is loaded only when you ask.</p>
+    </div>
+    <div class="an-toolbar">
+      <label class="ed-hint" style="display:flex;gap:6px;align-items:center;">Period
+        <select id="usageDays"><option value="7">Last 7 days</option><option value="30" selected>Last 30 days</option><option value="90">Last 90 days</option></select></label>
+      <button class="btn-mini" onclick="loadUsageReport()">Load usage</button>
+    </div>
+    <div id="usageWrap"></div>
+
+    <div class="panel-head" style="margin-top:26px;">
       <div class="p-code">ROSTER · ADM-02</div>
       <h2 style="font-size:20px;">Companies &amp; data analysis</h2>
       <p>Filter the directory, see it in charts, download exactly what you've filtered, and edit companies.
@@ -6120,6 +6398,7 @@ function openCompanyEditor(slug) {
   editDraft._csTouched = false;
   editDraft.capacity = editDraft.capacity || { employeeCountRange: null, foundedYear: null, capacityNote: null };
   editDraft.spotlight = editDraft.spotlight || null;
+  editDraft.stockist = !!editDraft.stockist;
   renderCompanyEditor();
   // The modal is hidden/shown via a CSS class, not recreated, so its inner
   // scroll position otherwise carries over from whichever company was
@@ -6282,6 +6561,13 @@ function renderCompanyEditor() {
       <div class="ed-hint">All three tiers appear on the India and Rest-of-World landing pages, in their own
         pastel style, and are listed first in search results. Champion and Featured are curated highlights —
         keep them to genuine standouts. Sponsored is a paid placement and is always labelled "Sponsored".</div>
+    </div>
+
+    <div class="ed-row">
+      <label>Stockist</label>
+      <label class="ed-check"><input type="checkbox" ${c.stockist ? 'checked' : ''} onchange="editDraft.stockist = this.checked">
+        This company stocks or distributes products it does not make</label>
+      <div class="ed-hint">Adds "Distributor or stockist" to its company types, alongside the types that come from its categories.</div>
     </div>
 
     <div class="ed-row">
@@ -7129,6 +7415,7 @@ async function saveCompany() {
       certifications: editDraft.certifications || [],
       capacity: editDraft.capacity || { employeeCountRange: null, foundedYear: null, capacityNote: null },
       spotlight: editDraft.spotlight || null,
+      stockist: !!editDraft.stockist,
       linkedin: safeLinkedinUrl(editDraft.linkedin) || '',
       brands: editDraft.brands || [], formerNames: editDraft.formerNames || [], aliases: editDraft.aliases || [],
       updatedAt: new Date(),
@@ -7164,7 +7451,7 @@ const bulkSelected = new Set();
 // One filter state drives everything. Charts, summary and downloads always
 // cover EVERY matching company; the list shows only as many rows as chosen
 // ("None" by default, so the panel opens instantly).
-const AN = { q: '', country: '', city: '', l1: '', l2: '', l3: '', tier: '', gap: '', delivery: '', show: '0' };
+const AN = { q: '', country: '', city: '', l1: '', l2: '', l3: '', tier: '', gap: '', flag: '', ctype: '', delivery: '', show: '0' };
 const AN_SHOW = [['0', 'None'], ['25', '25'], ['50', '50'], ['100', '100'], ['500', '500'], ['all', 'All']];
 const AN_COLS_KEY = 'twi_admin_columns_v1';
 const anExpanded = new Set();
@@ -7219,11 +7506,16 @@ function anFacts(c) {
     twoCats: (c.cats || []).length >= 2,
     tier: TIERS[c.spotlight] ? c.spotlight : 'none',
     delivery: Array.isArray(c.delivery) && c.delivery.length ? c.delivery : ['(not set)'],
+    hasR: !!c.registered,
+    hasDesc: String(c.desc || '').replace(/<[^>]*>/g, '').trim().length >= 40,
+    hasParent: !!(c.parent && c.parent.name),
+    hasLocType: locs.length > 0 && locs.every(l => l && l.type && !AN_LEGACY_LOC.has(l.type)),
   };
   anFactCache.set(c, f);
   return f;
 }
 
+const AN_LEGACY_LOC = new Set(['headquarters', 'office', 'branch', 'facility']);
 const AN_GAPS = {
   site:     ['Missing website',          f => !f.hasSite],
   pid:      ['Missing Place ID',         f => !f.hasPid],
@@ -7233,6 +7525,10 @@ const AN_GAPS = {
   email:    ['Missing email',            f => !f.hasEmail],
   phone:    ['Missing contact number',   f => !f.hasPhone],
   cats:     ['Fewer than 2 categories',  f => !f.twoCats],
+  r:        ['Without the R mark',       f => !f.hasR],
+  desc:     ['Missing or short description (under 40 characters)', f => !f.hasDesc],
+  parent:   ['No parent link',           f => !f.hasParent],
+  loctype:  ['Legacy or missing location type', f => !f.hasLocType],
   complete: ['Complete (website, Place ID, logo and city)', f => f.hasSite && f.hasPid && f.hasLogo && f.hasCity],
 };
 const AN_TIER_LABEL = { champion: 'Champion', featured: 'Featured', sponsored: 'Sponsored', none: 'No tier' };
@@ -7256,8 +7552,28 @@ function anMatch(c, f, skip) {
   if (AN.l3 && skip !== 'l3' && !f.l3.has(AN.l3)) return false;
   if (AN.tier && skip !== 'tier' && f.tier !== AN.tier) return false;
   if (AN.gap && skip !== 'gap' && !AN_GAPS[AN.gap][1](f)) return false;
+  if (AN.flag && skip !== 'flag' && !AN_FLAGS[AN.flag][1](c, f)) return false;
+  if (AN.ctype && skip !== 'ctype' && !companyTypes(c).has(AN.ctype)) return false;
   return true;
 }
+// Quality flags: records that need a fix, each one click from the list to fix.
+let AN_SITE_HOSTS = null;
+function anSiteHost(c) {
+  const v = String(c.site || '').trim(); if (!v) return '';
+  try { return new URL(/^https?:/i.test(v) ? v : 'https://' + v).hostname.replace(/^www\./, '').toLowerCase(); } catch (e) { return ''; }
+}
+function anSharedSite(c) {
+  if (!AN_SITE_HOSTS) { AN_SITE_HOSTS = new Map(); COMPANIES.forEach(x => { const h = anSiteHost(x); if (h) AN_SITE_HOSTS.set(h, (AN_SITE_HOSTS.get(h) || 0) + 1); }); }
+  const h = anSiteHost(c); return !!h && AN_SITE_HOSTS.get(h) > 1;
+}
+const AN_FLAGS = {
+  nocat:      ['No category',                       c => !(c.cats || []).length],
+  legacyloc:  ['Legacy location type',              c => (c.locations || []).some(l => l && AN_LEGACY_LOC.has(l.type))],
+  textparent: ['Parent named but not linked',       c => !!(c.parent && c.parent.name && !c.parent.slug)],
+  sharedsite: ['Website shared with another record', c => anSharedSite(c)],
+  nocountry:  ['Country not recognised',            c => !countryIso(c)],
+  nodesc:     ['No description',                    c => !String(c.desc || '').trim()],
+};
 function anFiltered(skip) { return COMPANIES.filter(c => anMatch(c, anFacts(c), skip)); }
 function anTally(list, pick) {
   const m = new Map();
@@ -7278,7 +7594,7 @@ function anSet(key, val) {
   anRefresh();
 }
 function anClear() {
-  Object.assign(AN, { q: '', country: '', city: '', l1: '', l2: '', l3: '', tier: '', gap: '', delivery: '' });
+  Object.assign(AN, { q: '', country: '', city: '', l1: '', l2: '', l3: '', tier: '', gap: '', flag: '', ctype: '', delivery: '' });
   const qi = document.getElementById('anQ'); if (qi) qi.value = '';
   anRefresh();
 }
@@ -7286,12 +7602,16 @@ function anSetShow(v) { AN.show = v; anRenderList(); }
 
 function anInit() {
   anFactCache = new WeakMap();
+  AN_SITE_HOSTS = null;
   document.getElementById('anShow').innerHTML =
     AN_SHOW.map(([v, l]) => `<option value="${v}" ${AN.show === v ? 'selected' : ''}>${l}</option>`).join('');
   // Chart bars carry their filter in data attributes; one listener handles all.
   document.getElementById('anCharts').addEventListener('click', e => {
     const b = e.target.closest('.an-bar[data-k]');
-    if (b) anSet(b.dataset.k, b.dataset.v);
+    if (!b) return;
+    // Category-health bars name a category at its own level: clear the others first.
+    if (['l2', 'l3'].includes(b.dataset.k)) { AN.l1 = ''; AN.l2 = ''; AN.l3 = ''; }
+    anSet(b.dataset.k, b.dataset.v);
   });
   anRenderColumnPicker();
   anRefresh();
@@ -7330,7 +7650,9 @@ function anRenderFilters() {
     <label>Subcategory${sel('l2', AN.l1 ? 'All in ' + AN.l1 : 'All subcategories', opt(new Map(l2opts), byCode, anCode))}</label>
     <label>Sub-sub category${sel('l3', 'All sub-sub categories', opt(new Map(l3opts), byCode, anCode), !l3opts.length)}</label>
     <label>Tier${sel('tier', 'Any tier', opt(anTally(anFiltered('tier'), f => [f.tier]), null, v => AN_TIER_LABEL[v]))}</label>
-    <label>Data completeness${sel('gap', 'Any', [...gapCounts.entries()].map(([k, n]) => [k, `${AN_GAPS[k][0]} (${anNum(n)})`]))}</label>`;
+    <label>Data completeness${sel('gap', 'Any', [...gapCounts.entries()].map(([k, n]) => [k, `${AN_GAPS[k][0]} (${anNum(n)})`]))}</label>
+    <label>Quality flag${sel('flag', 'Any', Object.keys(AN_FLAGS).map(k => [k, `${AN_FLAGS[k][0]} (${anNum(anFiltered('flag').filter(c => AN_FLAGS[k][1](c, anFacts(c))).length)})`]))}</label>
+    <label>Company type${sel('ctype', 'Any', COMPANY_TYPES.map(([k, l]) => [k, `${l} (${anNum(anFiltered('ctype').filter(c => companyTypes(c).has(k)).length)})`]))}</label>`;
   if (document.activeElement && document.activeElement.id === 'anQ') { const i = document.getElementById('anQ'); i.setSelectionRange(i.value.length, i.value.length); }
   // Active filters as removable chips
   const chips = [];
@@ -7340,6 +7662,8 @@ function anRenderFilters() {
   if (AN.l3) chips.push(['l3', anCode(AN.l3)]); else if (AN.l2) chips.push(['l2', anCode(AN.l2)]); else if (AN.l1) chips.push(['l1', anCode(AN.l1)]);
   if (AN.tier) chips.push(['tier', AN_TIER_LABEL[AN.tier]]);
   if (AN.gap) chips.push(['gap', AN_GAPS[AN.gap][0]]);
+  if (AN.flag) chips.push(['flag', AN_FLAGS[AN.flag][0]]);
+  if (AN.ctype) chips.push(['ctype', COMPANY_TYPE_LABEL[AN.ctype]]);
   document.getElementById('anChips').innerHTML = chips.length
     ? chips.map(([k, l]) => `<span class="an-chip" title="Remove this filter" onclick="${k === 'q' ? "document.getElementById('anQ').value='';" : ''}anSet('${k}', '')">${psEsc(l)} ✕</span>`).join('')
       + `<span class="an-chip" onclick="anClear()">Clear all</span>`
@@ -7353,8 +7677,8 @@ function anBarsHtml(rows, key, max) {
   // Scale to the largest REAL entry: the "Other" row is often bigger than
   // any single city and would otherwise shrink every other bar to a sliver.
   const top = max || Math.max(...rows.filter(r => r[0] !== null).map(r => r[2]), 1);
-  return rows.map(([v, label, n, suffix]) => `
-    <div class="an-bar" ${key && v !== null ? `data-k="${key}" data-v="${psEsc(v)}" title="Filter by ${psEsc(label)}"` : ''}>
+  return rows.map(([v, label, n, suffix, rk]) => `
+    <div class="an-bar" ${(rk || key) && v !== null ? `data-k="${rk || key}" data-v="${psEsc(v)}" title="Filter by ${psEsc(label)}"` : ''}>
       <span class="an-lbl" title="${psEsc(label)}">${psEsc(label)}</span>
       <span class="an-track"><span class="an-fill" style="width:${Math.min(100, Math.max(1.5, (n / top) * 100)).toFixed(1)}%${v === null ? ';opacity:.35' : ''}"></span></span>
       <span class="an-val">${suffix || anNum(n)}</span>
@@ -7379,7 +7703,7 @@ function anChartData(list) {
     catTitle = `Subcategories in ${anCode(AN.l1)}`;
   }
   const pct = n => `${Math.round(n / total * 100)}%`;
-  const comp = [['site', 'Website', 'hasSite'], ['pid', 'Place ID', 'hasPid'], ['logo', 'Logo', 'hasLogo'], ['city', 'City', 'hasCity'], ['linkedin', 'LinkedIn', 'hasLinkedin'], ['email', 'Email', 'hasEmail'], ['phone', 'Contact number', 'hasPhone'], ['cats', '2+ categories', 'twoCats']]
+  const comp = [['r', 'R mark', 'hasR'], ['desc', 'Description (40+ characters)', 'hasDesc'], ['loctype', 'Location type set', 'hasLocType'], ['parent', 'Parent link', 'hasParent'], ['site', 'Website', 'hasSite'], ['pid', 'Place ID', 'hasPid'], ['logo', 'Logo', 'hasLogo'], ['city', 'City', 'hasCity'], ['linkedin', 'LinkedIn', 'hasLinkedin'], ['email', 'Email', 'hasEmail'], ['phone', 'Contact number', 'hasPhone'], ['cats', '2+ categories', 'twoCats']]
     .map(([gap, label, fk]) => { const n = list.filter(c => anFacts(c)[fk]).length; return [gap, label, n, `${pct(n)} · ${anNum(n)}`]; });
   return [
     { title: 'Companies by country', sub: 'Top 12 · click to filter', key: 'country', rows: anTopRows(anTally(list, f => [f.country]), 12) },
@@ -7388,7 +7712,35 @@ function anChartData(list) {
       rows: anTopRows(catMap, 20, anCode) },
     { title: 'Data completeness', sub: 'Share of these companies that have each field · click to list those missing it',
       key: 'gap', rows: comp, max: total },
+    { title: 'R mark by country', sub: 'Share of each country\u2019s companies with the R mark · top 12 by size · click to filter',
+      key: 'country', max: 100, rows: (() => {
+        const tot = anTally(list, f => [f.country]), withR = anTally(list.filter(c => anFacts(c).hasR), f => [f.country]);
+        return [...tot.entries()].sort((a, b) => b[1] - a[1]).slice(0, 12).map(([k, n]) => {
+          const r = withR.get(k) || 0, p = Math.round(r / n * 100);
+          return [k, k, p, `${p}% · ${anNum(r)} of ${anNum(n)}`];
+        });
+      })() },
+    { title: 'Quality flags', sub: 'Records to fix · click to list them', key: 'flag',
+      rows: Object.keys(AN_FLAGS).map(k => [k, AN_FLAGS[k][0], list.filter(c => AN_FLAGS[k][1](c, anFacts(c))).length]).filter(r => r[2] > 0) },
+    ...anCategoryHealth(),
     { title: 'Tiers', sub: 'Click to filter', key: 'tier', rows: anTopRows(anTally(list, f => [f.tier]), 4, v => AN_TIER_LABEL[v]) },
+  ];
+}
+// Category health covers the whole directory, not the filters: categories that
+// may be worth merging (fewer than 5 companies) or splitting (more than 300).
+function anCategoryHealth() {
+  const idx = anCatIndex(), cnt = {};
+  Object.keys(idx.parent).forEach(code => { cnt[code] = 0; });
+  COMPANIES.forEach(c => { const f = anFacts(c); f.l2.forEach(x => cnt[x]++); f.l3.forEach(x => cnt[x]++); });
+  const lvl = code => idx.parent[idx.parent[code]] ? 'l3' : 'l2';
+  const small = Object.entries(cnt).filter(([, n]) => n < 5).sort((a, b) => a[1] - b[1] || a[0].localeCompare(b[0], undefined, { numeric: true }));
+  const big = Object.entries(cnt).filter(([, n]) => n > 300).sort((a, b) => b[1] - a[1]);
+  const row = ([code, n]) => [code, anCode(code), n, n === 0 ? 'empty' : anNum(n), lvl(code)];
+  return [
+    { title: `Small categories (${small.length})`, sub: 'Fewer than 5 companies in the whole directory · candidates to merge · click to list',
+      key: 'l2', rows: small.slice(0, 25).map(row).concat(small.length > 25 ? [[null, `and ${small.length - 25} more`, 0, ' ']] : []), max: 5 },
+    { title: `Large categories (${big.length})`, sub: 'More than 300 companies in the whole directory · candidates to split · click to list',
+      key: 'l2', rows: big.map(row) },
   ];
 }
 function anRenderSummaryAndCharts() {
@@ -7399,7 +7751,7 @@ function anRenderSummaryAndCharts() {
   document.getElementById('anSummary').innerHTML = [
     [anNum(list.length), list.length === COMPANIES.length ? 'Companies' : `of ${anNum(COMPANIES.length)} companies`],
     [anNum(countries.size), 'Countries'], [anNum(cities.size), 'Cities'],
-    [share('hasSite'), 'With website'], [share('hasPid'), 'With Place ID'], [share('hasLogo'), 'With logo'],
+    [share('hasR'), 'With R mark'], [share('hasSite'), 'With website'], [share('hasPid'), 'With Place ID'], [share('hasLogo'), 'With logo'],
     [share('hasLinkedin'), 'With LinkedIn'], [share('hasEmail'), 'With email'], [share('hasPhone'), 'With contact number'],
   ].map(([b, s]) => `<div class="an-stat"><b>${b}</b><span>${s}</span></div>`).join('');
   // The completeness chart's bars filter to companies MISSING that field.
@@ -7423,6 +7775,8 @@ const AN_FIXED_COLS = [
   ['email', 'Email', c => AdminContacts.get(c.slug).email || c.email || ''],
   ['phone', 'Phone', c => AdminContacts.get(c.slug).phone || c.phone || ''],
   ['tier', 'Tier', c => AN_TIER_LABEL[anFacts(c).tier]],
+  ['ctypes', 'Company types', c => COMPANY_TYPES.filter(([k]) => companyTypes(c).has(k)).map(([, l]) => l).join('; ')],
+  ['stockist', 'Stockist', c => c.stockist ? 'Yes' : ''],
   ['sectors', 'Sectors', c => (c.sectors || []).join('; ')],
   ['logo', 'Logo', c => c.logo || ''],
   ['desc', 'Description', c => c.desc || ''],
@@ -7440,7 +7794,7 @@ const AN_FIXED_COLS = [
   ['ownerUid', 'Managed by owner', c => c.ownerUid ? 'Yes' : ''],
   ['companyVerifiedAt', 'Details confirmed by company', c => companyHasVerified(c) ? 'Yes' : ''],
 ];
-const AN_SKIP_KEYS = new Set(['name', 'slug', 'cats', 'spotlight', '_psTouched', '_csTouched']);
+const AN_SKIP_KEYS = new Set(['name', 'slug', 'cats', 'spotlight', 'stockist', '_psTouched', '_csTouched']);
 function anColumns() {
   const cols = AN_FIXED_COLS.map(([k, label, get]) => ({ k, label, get }));
   const covered = new Set(cols.map(c => c.k).concat(['locations', 'cats']));
@@ -7843,6 +8197,7 @@ async function startApp() {
     fbAuth.onAuthStateChanged(async user => {
       currentUser = user;
       renderAuthArea();
+      SAVED_SYNC.pull();
       closeAuthModal();
       if (REQUIRE_APPROVAL_TO_VIEW) {
         await checkAccessAndRender();

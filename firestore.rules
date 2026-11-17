@@ -175,6 +175,32 @@ service cloud.firestore {
       allow update, delete: if isAdmin();
     }
 
+    // ── Usage log (17 Nov 2026) ─────────────────────────────────────────
+    // A signed-in visitor's browser appends batches of up to 30 events
+    // (searches, company views, filters) as new documents. Nobody but an
+    // admin can read, change or delete them. No update: batches are append-only.
+    match /usageEvents/{doc} {
+      allow create: if isSignedIn()
+                    && request.resource.data.keys().hasOnly(['uid', 'day', 'ts', 'ev'])
+                    && request.resource.data.uid == request.auth.uid
+                    && request.resource.data.day is string && request.resource.data.day.size() == 10
+                    && request.resource.data.ts is timestamp
+                    && request.resource.data.ev is list && request.resource.data.ev.size() <= 30;
+      allow read, delete: if isAdmin();
+    }
+
+    // ── Saved searches on the account (17 Nov 2026) ─────────────────────
+    // One document per user holding at most 20 saved searches. Only that
+    // user can read or write it; it cannot be listed.
+    match /userSaved/{uid} {
+      allow get: if isOwner(uid);
+      allow create, update: if isOwner(uid)
+                    && request.resource.data.keys().hasOnly(['items', 'updatedAt'])
+                    && request.resource.data.items is list
+                    && request.resource.data.items.size() <= 20;
+      allow delete: if isOwner(uid);
+    }
+
     // Anything not matched above is denied by default.
   }
 }
