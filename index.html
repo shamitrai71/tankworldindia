@@ -1137,6 +1137,61 @@ header{ padding:10px 24px; border-bottom:1px solid var(--line); }
 .sim-txt{ display:flex; flex-direction:column; gap:2px; min-width:0; font-size:12.5px; color:var(--ink-muted); }
 .sim-txt b{ color:var(--ink); font-size:14px; font-weight:600; }
 body:has(#cmpBar[style*="flex"]) footer{ padding-bottom:70px; }
+
+/* ── Phase 4: results-page filters ── */
+.sheet-item .si-name{ flex:1; min-width:0; }
+.sheet-item .si-n, .sheet-head .sheet-n{ font-size:10.5px; color:var(--ink-faint); font-variant-numeric:tabular-nums; }
+.sheet-head .sheet-n{ margin-left:auto; }
+.sheet-head .sheet-n + .sheet-caret{ margin-left:6px; }
+.sheet-item.zero{ opacity:.45; pointer-events:none; }
+.sheet-group.zero > .sheet-head{ opacity:.5; }
+.sheet-item.active .si-n{ color:var(--blue); }
+.cf-row.zero{ opacity:.45; cursor:default; }
+.cf-row.zero:hover{ background:none; }
+.cf-box{ flex:0 0 14px; height:14px; border:1px solid var(--line, #CBD3DE); border-radius:3px; font-size:10px; line-height:12px; text-align:center; background:#fff; color:var(--blue); }
+.cf-row.active .cf-box{ border-color:#fff; }
+.cf-find{ width:100%; box-sizing:border-box; margin:0 0 6px; padding:6px 8px; border:1px solid var(--line, #CBD3DE); border-radius:6px; font-size:12.5px; }
+.cf-none{ font-size:12px; color:var(--ink-faint); padding:4px 8px; }
+.within-box{ flex:0 1 220px; min-width:140px; padding:6px 10px; border:1px solid var(--line, #CBD3DE); border-radius:8px; font-size:13px; background:#fff; }
+.chip-clear{ background:none; border:0; color:var(--blue); font-size:12.5px; text-decoration:underline; cursor:pointer; padding:2px 4px; }
+#emptyState h3{ margin:0 0 6px; }
+.wider-list{ display:flex; flex-direction:column; align-items:center; gap:6px; margin:8px 0 14px; }
+.wider-btn{ background:var(--blue-soft); color:var(--blue); border:0; border-radius:8px; padding:8px 12px; font-size:13.5px; font-weight:600; cursor:pointer; text-align:left; }
+.wider-btn:hover{ background:var(--blue); color:#fff; }
+.wider-clear{ background:none; border:1px solid var(--line, #CBD3DE); border-radius:8px; padding:7px 12px; font-size:13px; cursor:pointer; }
+@media (max-width: 860px){ .within-box{ flex:1 1 100%; } }
+
+/* ── Phase 5: one country at a time, suggestions, front page, company page ── */
+.cf-radio{ border-radius:50%; }
+.cf-row.active .cf-radio{ background:#fff; box-shadow:inset 0 0 0 3px var(--blue); border-color:#fff; }
+.filter-chip.chip-fixed{ padding-right:10px; }
+.ls-with-country{ max-width:720px; }
+.ls-country select{ height:100%; min-height:46px; padding:0 10px; border:1px solid var(--line); border-right:0; border-radius:var(--radius) 0 0 var(--radius); background:#fff; font-size:14px; color:var(--ink); max-width:200px; }
+.ls-with-country .landing-search-input{ border-radius:0; }
+.sr-only{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+.glance{ display:flex; flex-wrap:wrap; justify-content:center; gap:6px 22px; margin:18px 0 0; font-size:14px; color:var(--ink-muted); }
+.glance b{ color:var(--ink); font-variant-numeric:tabular-nums; }
+.quick-chips{ display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:8px; margin-top:16px; font-size:13px; color:var(--ink-muted); }
+.quick-chips a{ display:inline-flex; gap:6px; align-items:center; padding:6px 11px; border:1px solid var(--line); border-radius:999px; background:#fff; color:var(--ink); text-decoration:none; }
+.quick-chips a b{ font-size:11px; color:var(--blue); font-weight:600; }
+.quick-chips a:hover{ border-color:var(--blue); color:var(--blue); }
+.ctry-tile.ctry-on{ border-color:var(--blue); box-shadow:0 0 0 2px var(--blue-soft); }
+.sug-box{ position:fixed; z-index:200; display:none; background:#fff; border:1px solid var(--line); border-radius:10px; box-shadow:0 10px 30px rgba(17,24,39,.14); padding:6px 0; max-height:min(420px, 70vh); overflow:auto; text-align:left; }
+.sug-g{ font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-faint); padding:8px 14px 4px; }
+.sug-item{ display:flex; gap:10px; align-items:baseline; padding:7px 14px; cursor:pointer; font-size:13.5px; color:var(--ink); }
+.sug-item .sug-l{ flex:1; min-width:0; }
+.sug-item .sug-m{ font-size:12px; color:var(--ink-faint); white-space:nowrap; }
+.sug-item:hover, .sug-item.on{ background:var(--blue-soft); color:var(--blue); }
+.cp-map{ margin:12px 0 4px; border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; height:240px; }
+.cp-map iframe{ width:100%; height:100%; border:0; display:block; }
+.cp-more{ margin:8px 0 0; font-size:13px; }
+.cp-more a{ color:var(--blue); font-weight:600; }
+.pin-ico{ vertical-align:-2px; color:var(--ink-faint); }
+@media (max-width: 640px){
+  .ls-with-country{ flex-direction:column; }
+  .ls-country select{ width:100%; max-width:none; border:1px solid var(--line); border-radius:var(--radius) var(--radius) 0 0; }
+  .ls-with-country .landing-search-input{ border-right:1px solid var(--line); }
+}
 </style>
 </head>
 <body>
@@ -1269,6 +1324,7 @@ body:has(#cmpBar[style*="flex"]) footer{ padding-bottom:70px; }
     </button>
     <div class="sidebar-body" id="sidebarBody">
     <div class="region-filter" id="countryFilter"></div>
+    <div class="region-filter" id="cityFilter"></div>
     <div class="region-filter" id="regionFilter"></div>
     <div class="region-filter" id="deliveryFilter"></div>
     <div class="region-filter" id="sectorFilter"></div>
@@ -1283,11 +1339,12 @@ body:has(#cmpBar[style*="flex"]) footer{ padding-bottom:70px; }
       <div class="results-bar">
         <div class="results-count"><b id="resultCount">0</b> <span id="resultNoun">companies</span></div>
         <div class="active-filters" id="activeFilters"></div>
+        <input type="search" id="withinBox" class="within-box" placeholder="Search within these results" aria-label="Search within these results" oninput="withinQ = this.value; renderAll()">
         <button type="button" class="rb-btn" id="insightsBtn" aria-pressed="false" onclick="toggleInsights()">Insights</button>
         <button type="button" class="rb-btn" onclick="saveSearch()">☆ Save search</button>
         <label class="sort-wrap">Sort
           <select id="sortSel" onchange="setSort(this.value)">
-            <option value="">Featured first</option><option value="name">Name A–Z</option><option value="country">Country A–Z</option>
+            <option value="">Featured first</option><option value="name">Name A–Z</option><option value="country">Country A–Z</option><option value="locs">Most locations</option>
           </select></label>
         <div class="view-toggle" role="group" aria-label="How results are shown">
           <button type="button" id="viewGridBtn" onclick="setCardView('grid')" aria-pressed="true">Grid</button>
@@ -1297,11 +1354,7 @@ body:has(#cmpBar[style*="flex"]) footer{ padding-bottom:70px; }
       <div id="insightsPanel"></div>
       <div class="company-grid" id="companyGrid"></div>
       <div class="cards-more" id="cardsMore"></div>
-      <div class="empty-state" id="emptyState" style="display:none;">
-        <div class="em-mark">No Matches — Sheet Blank</div>
-        <h3>No companies found</h3>
-        <p>Try clearing a filter or searching a different term.</p>
-      </div>
+      <div class="empty-state" id="emptyState" style="display:none;"></div>
     </div>
     <div id="company-view"></div>
     <div id="profile-view"></div>
@@ -2658,13 +2711,21 @@ async function downloadInAppEdits() {
 // ══════════════════════════════════════════════════════════════════════
 // APP LOGIC
 // ══════════════════════════════════════════════════════════════════════
-let activeCategory = null;   // single L2 slug filter, or null
+let activeCategory = null;   // first ticked category (breadcrumb, phone bar); the full set is activeCats
+let activeCats = [];         // every ticked category slug; OR, each inclusive of its sub-categories
+let activeCountries = [];    // ISO2 codes; OR
+let activeCities = [];       // city names (registered office); offered once a country is picked
+let withinQ = '';            // "Search within these results"; kept on screen, not in the address
 // Region filter: 'all' | 'india' | 'international'. Derived from each
 // company's country field rather than stored separately, so there's one
 // source of truth and no risk of the two drifting apart.
 let activeRegion = 'all';
-let activeCountry = null;   // ISO2 code, e.g. 'IN'
-let activeSort = null;      // null = featured first | 'name' | 'country'
+let activeCountry = null;   // the selected country (one at a time, decided 17 Nov 2026)
+// A country is always selected: the one in the address, else the visitor's
+// last choice on this device, else India.
+function defaultCountry() { let v = null; try { v = localStorage.getItem('twi-country'); } catch (e) {} return (v && /^[A-Z]{2}$/.test(v)) ? v : 'IN'; }
+function rememberCountry(iso) { try { if (iso) localStorage.setItem('twi-country', iso); } catch (e) {} }
+let activeSort = null;      // null = featured first | 'name' | 'country' | 'locs'
 function isIndian(c) { return (c.country || '').trim().toLowerCase() === 'india'; }
 
 // ── Country normalization ─────────────────────────────────────────────
@@ -2677,6 +2738,14 @@ function isIndian(c) { return (c.country || '').trim().toLowerCase() === 'india'
 // companies resolve cleanly; only the ~6 genuinely "Unknown"/"Unconfirmed"
 // rows fall through to null (correctly).
 const COUNTRY_META = {
+  // Added 17 Nov 2026: 25 countries in the roster that had no entry, so their 69 companies were unreachable.
+  'Libya':['LY','Africa'], 'Peru':['PE','Americas'], 'Iran':['IR','Middle East'], 'Guyana':['GY','Americas'],
+  'Algeria':['DZ','Africa'], 'Tanzania':['TZ','Africa'], 'Bangladesh':['BD','South Asia'], 'Hungary':['HU','Europe'],
+  'Namibia':['NA','Africa'], 'Puerto Rico':['PR','Americas'], 'Senegal':['SN','Africa'], 'Curaçao':['CW','Americas'],
+  'Guatemala':['GT','Americas'], 'Democratic Republic of the Congo':['CD','Africa'], 'Philippines':['PH','SE Asia'],
+  'South Sudan':['SS','Africa'], 'Jamaica':['JM','Americas'], 'Ecuador':['EC','Americas'], 'Estonia':['EE','Europe'],
+  'Bolivia':['BO','Americas'], 'Bulgaria':['BG','Europe'], 'Mali':['ML','Africa'], 'Malta':['MT','Europe'],
+  'Trinidad and Tobago':['TT','Americas'], 'Rwanda':['RW','Africa'],
   // canonical name : [ISO2 (for flag), region]
   'India':['IN','South Asia'], 'United States of America':['US','Americas'],
   'United Arab Emirates':['AE','Middle East'], 'Italy':['IT','Europe'], 'Malaysia':['MY','SE Asia'],
@@ -2893,18 +2962,18 @@ function categoryWithDescendants(slug) {
 }
 
 function setRegion(r) {
-  location.hash = buildFilterHash(activeCategory, r, activeDelivery, activeSector);
+  location.hash = hashWith({ region: r });
 }
 
 // Same toggle-off-on-reclick behaviour as setDelivery/selectCategory.
 function setSector(sec) {
-  location.hash = buildFilterHash(activeCategory, activeRegion, activeDelivery, activeSector === sec ? null : sec);
+  location.hash = hashWith({ sector: activeSector === sec ? null : sec });
 }
 
 // Toggles off when the active model is clicked again, matching how
 // selectCategory() behaves — one tap to filter, one to clear.
 function setDelivery(d) {
-  location.hash = buildFilterHash(activeCategory, activeRegion, activeDelivery === d ? null : d, activeSector);
+  location.hash = hashWith({ delivery: activeDelivery === d ? null : d });
 }
 
 // ── Filter/view state ↔ URL hash ────────────────────────────────────────
@@ -2915,40 +2984,51 @@ function setDelivery(d) {
 // instead of returning to the previous filter/category. Encoding this state
 // into the hash — and driving it exclusively through handleRoute() — means
 // every meaningful navigation is a real, back-button-able history entry.
-function buildFilterHash(cat, region, delivery, sector, q, country, sort) {
-  // country / sort left undefined keep what is on screen; pass null to clear.
-  if (country === undefined) country = activeCountry;
+function buildFilterHash(cat, region, delivery, sector, q, country, sort, city) {
+  // country / sort / city left undefined keep what is on screen; pass null to clear.
+  // A new country choice clears the cities unless they are passed explicitly.
+  if (city === undefined) city = (country === undefined) ? activeCities : [];
+  if (country === undefined) country = activeCountries;
+  if (!(Array.isArray(country) ? country.filter(Boolean).length : country)) country = [activeCountries[0] || defaultCountry()];
   if (sort === undefined) sort = activeSort;
+  const many = v => Array.isArray(v) ? v.filter(Boolean) : (v ? [v] : []);
+  const cats = many(cat), ctry = many(country).slice(0, 1), cities = many(city);
   const params = [];
-  if (cat) params.push('cat=' + encodeURIComponent(cat));
+  if (cats.length) params.push('cat=' + cats.map(encodeURIComponent).join(','));
   if (region && region !== 'all') params.push('region=' + encodeURIComponent(region));
   if (delivery) params.push('delivery=' + encodeURIComponent(delivery));
   if (sector) params.push('sector=' + encodeURIComponent(sector));
   if (q) params.push('q=' + encodeURIComponent(q));
-  if (country) params.push('country=' + encodeURIComponent(country));
+  if (ctry.length) params.push('country=' + ctry.join(','));
+  if (ctry.length && cities.length) params.push('city=' + cities.map(encodeURIComponent).join('|'));
   if (sort) params.push('sort=' + encodeURIComponent(sort));
   return '#/' + (params.length ? ('?' + params.join('&')) : '');
 }
 
 function parseFilterHash(hash) {
-  const out = { cat: null, region: 'all', delivery: null, sector: null, q: '', country: null, sort: null };
+  const dc = defaultCountry();
+  const out = { cat: null, cats: [], region: 'all', delivery: null, sector: null, q: '', country: dc, countries: [dc], cities: [], sort: null };
   const qIdx = hash.indexOf('?');
   if (qIdx === -1) return out;
   const qs = new URLSearchParams(hash.slice(qIdx + 1));
-  if (qs.has('cat')) out.cat = qs.get('cat');
-  if (qs.has('region')) out.region = qs.get('region');
+  // Unknown slugs (a stale or hand-edited link) are dropped rather than shown raw.
+  if (qs.has('cat')) { out.cats = Array.from(new Set(qs.get('cat').split(',').map(x => x.trim()).filter(x => x && categoryLabel(x)))); out.cat = out.cats[0] || null; }
+  // region (India / International) is retired: a single country is always selected.
   // Guard against a hand-edited or stale hash naming a model we don't have.
   if (qs.has('delivery') && DELIVERY_LABEL[qs.get('delivery')]) out.delivery = qs.get('delivery');
-  if (qs.has('sector') && SECTOR_LABEL[qs.get('sector')]) out.sector = qs.get('sector');
+  // Sector served is admin-only (decided 15 Nov 2026): a ?sector= in an old link is ignored.
   if (qs.has('q')) out.q = qs.get('q');
-  if (/^[A-Za-z]{2}$/.test(qs.get('country') || '')) out.country = qs.get('country').toUpperCase();
-  if (['name', 'country'].includes(qs.get('sort'))) out.sort = qs.get('sort');
+  const cs = (qs.get('country') || '').split(',').filter(x => /^[A-Za-z]{2}$/.test(x)).map(x => x.toUpperCase());
+  if (cs.length) { out.countries = [cs[0]]; out.country = cs[0]; }
+  if (out.countries.length && qs.has('city')) out.cities = qs.get('city').split('|').map(x => x.trim()).filter(Boolean);
+  if (['name', 'country', 'locs'].includes(qs.get('sort'))) out.sort = qs.get('sort');
   return out;
 }
 
 function renderRegionFilter() {
   const el = document.getElementById('regionFilter');
   if (!el) return;
+  el.innerHTML = ''; return;   // retired: a single country is always selected
   const nIndia = COMPANIES.filter(isIndian).length;
   const nIntl  = COMPANIES.length - nIndia;
   const opts = [
@@ -2995,6 +3075,8 @@ function renderDeliveryFilter() {
 function renderSectorFilter() {
   const el = document.getElementById('sectorFilter');
   if (!el) return;
+  // Sector served is admin-only (decided 15 Nov 2026), so no public filter.
+  el.innerHTML = ''; return;
   const counts = {};
   COMPANIES.forEach(c => (c.sectors || []).forEach(x => { counts[x] = (counts[x] || 0) + 1; }));
   const shown = SECTORS.filter(([k]) => counts[k]);
@@ -3025,18 +3107,19 @@ function buildSidebar(scopedSlug) {
       <div class="sheet-head" onclick="toggleSheet('${l1.slug}')">
         <span class="sheet-code">${l1.code}</span>
         <span>${l1.name}</span>
+        <span class="sheet-n"></span>
         <span class="sheet-caret">▶</span>
       </div>
       <div class="sheet-items">
         ${l1.items.map(it => `
           <div class="sheet-item" data-slug="${it.slug}" onclick="selectCategory('${it.slug}')">
-            <span class="item-code">${it.code}</span><span>${it.name}</span>
+            <span class="item-code">${it.code}</span><span class="si-name">${it.name}</span><span class="si-n"></span>
           </div>
           ${(it.items && it.items.length) ? `
             <div class="sheet-subitems" data-parent="${it.slug}">
               ${it.items.map(sub => `
                 <div class="sheet-item sheet-subitem" data-slug="${sub.slug}" onclick="selectCategory('${sub.slug}')">
-                  <span class="item-code">${sub.code}</span><span>${sub.name}</span>
+                  <span class="item-code">${sub.code}</span><span class="si-name">${sub.name}</span><span class="si-n"></span>
                 </div>
               `).join('')}
             </div>` : ''}
@@ -3051,14 +3134,25 @@ function toggleSheet(slug) {
   if (el) el.classList.toggle('open');
 }
 
+// Ticking a category adds it to the set; ticking it again removes it. A
+// category and its own parent or child are never both ticked: the newer
+// choice replaces the other, so the set always reads as plain "any of".
 function selectCategory(slug) {
-  const newCat = (activeCategory === slug) ? null : slug;
-  location.hash = buildFilterHash(newCat, activeRegion, activeDelivery, activeSector);
+  let next;
+  if (activeCats.includes(slug)) next = activeCats.filter(x => x !== slug);
+  else {
+    const below = new Set(categoryWithDescendants(slug));
+    next = activeCats.filter(x => !below.has(x) && !categoryWithDescendants(x).includes(slug)).concat(slug);
+  }
+  let h = hashWith({ cat: next });
+  if (h === '#/') h = '#/?all=1';
+  location.hash = h;
 }
 
 function clearFilters() {
   document.getElementById('searchBox').value = '';
-  location.hash = buildFilterHash(null, 'all', null, null, '', null, null);
+  withinQ = ''; const wb = document.getElementById('withinBox'); if (wb) wb.value = '';
+  location.hash = buildFilterHash(null, 'all', null, null, '', activeCountries, null, []);
 }
 
 // Registered office is always locations[0] by construction — used anywhere
@@ -3084,72 +3178,292 @@ function logoHtml(c) {
   return `<span class="cp-logo-fallback">${initials}</span>`;
 }
 
-function filteredCompanies() {
-  const q = document.getElementById('searchBox').value.trim().toLowerCase();
+// City used for the city filter: the registered office, as on the tile.
+function companyCity(c) { return String(primaryLocation(c).city || '').trim(); }
+// searchText() is rebuilt once per render, not once per facet.
+let _stCache = new WeakMap();
+function searchTextCached(c) { let t = _stCache.get(c); if (t === undefined) { t = searchText(c); _stCache.set(c, t); } return t; }
+// The current filter state, optionally with one facet left out (for that
+// facet's own counts) or with some values swapped (for "widen" suggestions).
+function filterState(skip, over) {
+  const st = { cats: activeCats, countries: activeCountries, cities: activeCities, region: activeRegion,
+    delivery: activeDelivery, q: currentQ().toLowerCase(), within: withinQ.trim().toLowerCase() };
+  st.region = 'all';
+  if (skip === 'cat') st.cats = [];
+  if (skip === 'country') { st.countries = []; st.cities = []; }   // only for the per-country counts
+  if (skip === 'city') st.cities = [];
+  return Object.assign(st, over || {});
+}
+function filterWith(st) {
+  // Inclusive of descendants: ticking an L2 like "Tank Gauging" still matches
+  // a company tagged only with its L3 child "Radar Level Gauges".
+  const catSets = st.cats.map(x => new Set(categoryWithDescendants(x)));
+  const ctry = st.countries.length ? new Set(st.countries) : null;
+  const cities = (ctry && st.cities.length) ? new Set(st.cities.map(x => x.toLowerCase())) : null;
   return COMPANIES.filter(c => {
-    // Inclusive of descendants: selecting an L2 like "Tank Gauging" must still
-    // match a company tagged only with its L3 child "Radar Level Gauges".
-    // Without this a company tagged at L3 would vanish from its own parent's
-    // filter — the same confusing empty-result class of bug as before.
-    if (activeCategory) {
-      const wanted = categoryWithDescendants(activeCategory);
-      if (!wanted.some(s => c.cats.includes(s))) return false;
-    }
-    if (activeRegion === 'india' && !isIndian(c)) return false;
-    if (activeRegion === 'international' && isIndian(c)) return false;
-    if (activeCountry && countryIso(c) !== activeCountry) return false;
-    // Delivery model is a separate axis from category — a company matches
-    // only if it has been tagged. Untagged companies simply drop out of a
-    // delivery-filtered view rather than being assumed to fit any model.
-    if (activeDelivery && !(c.delivery || []).includes(activeDelivery)) return false;
-    // Sector served — same opt-in semantics as delivery: untagged companies
-    // drop out rather than being assumed to serve every market.
-    if (activeSector && !(c.sectors || []).includes(activeSector)) return false;
-    if (q && !searchText(c).includes(q)) return false;
+    if (catSets.length && !catSets.some(set => c.cats.some(x => set.has(x)))) return false;
+    if (st.region === 'india' && !isIndian(c)) return false;
+    if (st.region === 'international' && isIndian(c)) return false;
+    if (ctry && !ctry.has(countryIso(c))) return false;
+    if (cities && !cities.has(companyCity(c).toLowerCase())) return false;
+    // Delivery model: untagged companies drop out of a delivery-filtered view.
+    if (st.delivery && !(c.delivery || []).includes(st.delivery)) return false;
+    if (st.q && !searchTextCached(c).includes(st.q)) return false;
+    if (st.within && !searchTextCached(c).includes(st.within)) return false;
     return true;
   });
 }
+function filteredCompanies(skip) { return filterWith(filterState(skip)); }
 
 function renderActiveFilters() {
   const wrap = document.getElementById('activeFilters');
   const chips = [];
-  const chip = (k, t) => chips.push(`<span class="filter-chip">${t} <button type="button" aria-label="Remove filter" onclick="dropFilter('${k}')">×</button></span>`);
-  if (activeCategory) { const l = categoryLabel(activeCategory); if (l) chip('cat', psEsc(l.code + ' · ' + l.name)); }
-  if (activeCountry) chip('country', psEsc(countryNameOf(activeCountry)));
+  const chip = (k, t) => chips.push(`<span class="filter-chip">${t} <button type="button" aria-label="Remove filter" data-k="${psEsc(k)}" onclick="dropFilter(this.dataset.k)">×</button></span>`);
+  activeCats.forEach(x => { const l = categoryLabel(x); if (l) chip('cat:' + x, psEsc(l.code + ' · ' + l.name)); });
+  activeCountries.forEach(x => chips.push(`<span class="filter-chip chip-fixed" title="Results are shown one country at a time">${psEsc(countryNameOf(x))}</span>`));
+  if (activeCountries.length) activeCities.forEach(x => chip('city:' + x, psEsc(x)));
   if (activeRegion !== 'all') chip('region', activeRegion === 'india' ? 'India' : 'International');
   if (activeDelivery) chip('delivery', psEsc(DELIVERY_LABEL[activeDelivery] || activeDelivery));
-  if (activeSector) chip('sector', psEsc(SECTOR_LABEL[activeSector] || activeSector));
   const q = currentQ(); if (q) chip('q', '“' + psEsc(q) + '”');
+  if (withinQ.trim()) chip('within', 'Within: “' + psEsc(withinQ.trim()) + '”');
+  if (chips.filter(x => x.indexOf('chip-fixed') < 0).length > 1) chips.push(`<button type="button" class="chip-clear" onclick="clearFilters()">Clear all</button>`);
   wrap.innerHTML = chips.join('');
   const sel = document.getElementById('sortSel'); if (sel) sel.value = activeSort || '';
 }
 function renderBreadcrumb() {
   const el = document.getElementById('backBar'); if (!el) return;
   const parts = ['<a href="#/">Home</a>'];
+  const iso0 = activeCountries[0];
+  if (iso0) parts.push(`<a href="${buildFilterHash(null, 'all', null, null, '', [iso0], activeSort, [])}">${psEsc(countryNameOf(iso0))}</a>`);
   let l1 = null, node = null;
-  if (activeCategory) {
+  if (activeCats.length === 1) {
     l1 = CATEGORY_TREE.find(x => x.slug === activeCategory);
     if (!l1) { const hit = allCategoryNodes().find(n => n.slug === activeCategory); if (hit) { l1 = hit.l1; node = hit; } }
   }
-  if (l1) { parts.push(`<a href="#/section/${l1.slug}">${psEsc(l1.name)}</a>`); if (node) parts.push(`<span>${psEsc(node.name)}</span>`); }
+  if (l1) { parts.push(`<a href="${hashWith({ cat: [l1.slug], city: activeCities })}">${psEsc(l1.name)}</a>`); if (node) parts.push(`<span>${psEsc(node.name)}</span>`); }
+  else if (activeCats.length > 1) parts.push(`<span>${activeCats.length} categories</span>`);
   else parts.push(`<span>${currentQ() ? 'Search results' : 'All companies'}</span>`);
-  if (activeCountry) parts.push(`<span>${psEsc(countryNameOf(activeCountry))}</span>`);
+  if (activeCountries.length && activeCities.length === 1) parts.push(`<span>${psEsc(activeCities[0])}</span>`);
   el.innerHTML = `<nav class="crumbs" aria-label="Breadcrumb">${parts.join('<i>›</i>')}</nav>`;
 }
-let countryFacetAll = false;
-function toggleCountryFacet() { countryFacetAll = !countryFacetAll; renderCountryFilter(); }
+let countryFacetAll = false, countryFind = '';
+function toggleCountryFacet() { countryFacetAll = !countryFacetAll; countryFind = ''; renderCountryFilter(); }
+function findCountry(v) { countryFind = v; renderCountryFilter(); const i = document.getElementById('cfFind'); if (i) { i.focus(); i.setSelectionRange(v.length, v.length); } }
+// Counts are for the companies the other filters leave; a zero is greyed out.
+let _ctryCounts = {};
 function renderCountryFilter() {
   const el = document.getElementById('countryFilter'); if (!el) return;
   const all = countryStats(); if (!all.length) { el.innerHTML = ''; return; }
-  let shown = countryFacetAll ? all : all.slice(0, 8);
-  if (!countryFacetAll && activeCountry && !shown.some(x => x.iso === activeCountry)) shown = shown.concat(all.filter(x => x.iso === activeCountry));
+  const n = iso => _ctryCounts[iso] || 0;
+  const ranked = all.slice().sort((a, b) => n(b.iso) - n(a.iso) || b.n - a.n);
+  let shown;
+  if (countryFacetAll) {
+    const f = countryFind.trim().toLowerCase();
+    shown = f ? ranked.filter(x => x.name.toLowerCase().includes(f)) : ranked;
+  } else {
+    shown = ranked.slice(0, 8);
+    activeCountries.forEach(iso => { if (!shown.some(x => x.iso === iso)) shown = shown.concat(all.filter(x => x.iso === iso)); });
+  }
   el.innerHTML = `<div class="rf-label">COUNTRY</div>
-    <div class="cf-list">${shown.map(x => `
-      <button type="button" class="cf-row${activeCountry === x.iso ? ' active' : ''}" onclick="setCountry('${x.iso}')">
+    ${countryFacetAll ? `<input type="search" id="cfFind" class="cf-find" placeholder="Find a country" value="${psEsc(countryFind)}" oninput="findCountry(this.value)" aria-label="Find a country">` : ''}
+    <div class="cf-list">${shown.map(x => {
+      const on = activeCountries.includes(x.iso), k = n(x.iso);
+      return `<button type="button" class="cf-row${on ? ' active' : ''}${!k && !on ? ' zero' : ''}" aria-pressed="${on}" ${!k && !on ? 'disabled' : ''} onclick="setCountry('${x.iso}')">
+        <span class="cf-box cf-radio" aria-hidden="true"></span>
         <img src="https://flagcdn.com/40x30/${x.iso.toLowerCase()}.png" width="20" height="15" alt="" loading="lazy" onerror="this.remove()">
-        <span class="cf-name">${psEsc(x.name)}</span><span class="rf-count">${x.n.toLocaleString('en-IN')}</span>
-      </button>`).join('')}</div>
+        <span class="cf-name">${psEsc(x.name)}</span><span class="rf-count">${k.toLocaleString('en-IN')}</span>
+      </button>`; }).join('') || '<div class="cf-none">No country by that name.</div>'}</div>
     ${all.length > 8 ? `<button type="button" class="cf-more" onclick="toggleCountryFacet()">${countryFacetAll ? 'Show fewer' : 'Show all ' + all.length + ' countries'}</button>` : ''}`;
+}
+// City: offered once a country is ticked. Registered-office city, as on the tile.
+let cityFacetAll = false, cityFind = '', _cityCounts = [];
+function toggleCityFacet() { cityFacetAll = !cityFacetAll; cityFind = ''; renderCityFilter(); }
+function findCity(v) { cityFind = v; renderCityFilter(); const i = document.getElementById('ctFind'); if (i) { i.focus(); i.setSelectionRange(v.length, v.length); } }
+function setCity(name) {
+  const has = activeCities.some(x => x.toLowerCase() === name.toLowerCase());
+  const next = has ? activeCities.filter(x => x.toLowerCase() !== name.toLowerCase()) : activeCities.concat(name);
+  location.hash = hashWith({ city: next });
+}
+function renderCityFilter() {
+  const el = document.getElementById('cityFilter'); if (!el) return;
+  if (!activeCountries.length || !_cityCounts.length) { el.innerHTML = ''; return; }
+  const on = name => activeCities.some(x => x.toLowerCase() === name.toLowerCase());
+  let shown;
+  if (cityFacetAll) {
+    const f = cityFind.trim().toLowerCase();
+    shown = f ? _cityCounts.filter(x => x.name.toLowerCase().includes(f)) : _cityCounts;
+  } else {
+    shown = _cityCounts.slice(0, 10);
+    _cityCounts.forEach(x => { if (on(x.name) && !shown.includes(x)) shown = shown.concat(x); });
+  }
+  el.innerHTML = `<div class="rf-label">CITY</div>
+    ${cityFacetAll ? `<input type="search" id="ctFind" class="cf-find" placeholder="Find a city" value="${psEsc(cityFind)}" oninput="findCity(this.value)" aria-label="Find a city">` : ''}
+    <div class="cf-list">${shown.map(x => `
+      <button type="button" class="cf-row${on(x.name) ? ' active' : ''}" aria-pressed="${on(x.name)}" data-c="${psEsc(x.name)}" onclick="setCity(this.dataset.c)">
+        <span class="cf-box" aria-hidden="true">${on(x.name) ? '✓' : ''}</span>
+        <span class="cf-name">${psEsc(x.name)}</span><span class="rf-count">${x.n.toLocaleString('en-IN')}</span>
+      </button>`).join('') || '<div class="cf-none">No city by that name.</div>'}</div>
+    ${_cityCounts.length > 10 ? `<button type="button" class="cf-more" onclick="toggleCityFacet()">${cityFacetAll ? 'Show fewer' : 'Show all ' + _cityCounts.length + ' cities'}</button>` : ''}`;
+}
+// slug → [parent slug, section slug], for the category counts.
+let _catUp = null;
+function catAncestors(slug) {
+  if (!_catUp) {
+    _catUp = {};
+    CATEGORY_TREE.forEach(l1 => (l1.items || []).forEach(it => {
+      _catUp[it.slug] = [l1.slug];
+      (it.items || []).forEach(sub => { _catUp[sub.slug] = [it.slug, l1.slug]; });
+    }));
+  }
+  return _catUp[slug] || [];
+}
+// Live counts beside every category and section in the side panel, for the
+// companies the other filters leave. Zero is greyed out and cannot be picked.
+function updateFacetCounts() {
+  const exCat = filteredCompanies('cat');
+  const m = {};
+  exCat.forEach(c => {
+    const seen = new Set();
+    c.cats.forEach(x => { seen.add(x); catAncestors(x).forEach(y => seen.add(y)); });
+    seen.forEach(x => { m[x] = (m[x] || 0) + 1; });
+  });
+  document.querySelectorAll('#sheetList .sheet-item[data-slug]').forEach(el => {
+    const k = m[el.dataset.slug] || 0, on = activeCats.includes(el.dataset.slug);
+    const b = el.querySelector('.si-n'); if (b) b.textContent = k ? k.toLocaleString('en-IN') : '0';
+    el.classList.toggle('zero', !k && !on);
+    el.classList.toggle('active', on);
+  });
+  document.querySelectorAll('#sheetList .sheet-group[data-l1]').forEach(g => {
+    const k = m[g.dataset.l1] || 0, b = g.querySelector('.sheet-n');
+    if (b) b.textContent = k.toLocaleString('en-IN');
+    g.classList.toggle('zero', !k);
+  });
+  _ctryCounts = {};
+  filteredCompanies('country').forEach(c => { const iso = countryIso(c); if (iso) _ctryCounts[iso] = (_ctryCounts[iso] || 0) + 1; });
+  renderCountryFilter();
+  const cm = {};
+  if (activeCountries.length) filteredCompanies('city').forEach(c => {
+    const name = companyCity(c); if (!name) return;
+    const k = name.toLowerCase(); (cm[k] = cm[k] || { name, n: 0 }).n++;
+  });
+  _cityCounts = Object.values(cm).sort((a, b) => b.n - a.n || a.name.localeCompare(b.name));
+  renderCityFilter();
+}
+// Nothing matched: offer the nearest wider searches that do have companies.
+const _isoRegion = {};
+Object.values(COUNTRY_META).forEach(([iso, region]) => { if (iso && !(iso in _isoRegion)) _isoRegion[iso] = region; });
+function widerOptions() {
+  const out = [];
+  const add = (label, over, apply) => { const n = filterWith(filterState(null, over)).length; if (n) out.push({ label, n, apply }); };
+  const H = o => { let h = hashWith(o); if (h === '#/') h = '#/?all=1'; return h; };
+  if (activeCities.length) add('in all of ' + countryNameOf(activeCountries[0]), { cities: [] }, H({ city: [] }));
+  // The same search in the countries that do have matches (one country at a time).
+  const other = {};
+  filterWith(filterState('country')).forEach(c => { const iso = countryIso(c); if (iso && !activeCountries.includes(iso)) other[iso] = 1; });
+  Object.keys(other).forEach(iso => add('in ' + countryNameOf(iso) + ' instead', { countries: [iso], cities: [] }, H({ country: [iso], city: [] })));
+  activeCats.forEach(x => {
+    const up = catAncestors(x)[0];
+    if (up) { const l = categoryLabel(up); const cats = activeCats.map(y => y === x ? up : y); add('in ' + (l ? l.name : up), { cats }, H({ cat: cats })); }
+    else if (activeCats.length > 0) { const cats = activeCats.filter(y => y !== x); const l = categoryLabel(x); add('without ' + (l ? l.name : x), { cats }, H({ cat: cats })); }
+  });
+  if (currentQ()) add('without the search “' + currentQ() + '”', { q: '' }, H({ q: '' }));
+  if (withinQ.trim()) add('without “' + withinQ.trim() + '” within the results', { within: '' }, 'within');
+  const seen = new Set();
+  // Inside this country first (nearest first), then at most two other countries (most matches first).
+  const inC = out.filter(o => !/ instead$/.test(o.label)).sort((a, b) => a.n - b.n);
+  const outC = out.filter(o => / instead$/.test(o.label)).sort((a, b) => b.n - a.n).slice(0, 2);
+  return inC.concat(outC).filter(o => !seen.has(o.label) && seen.add(o.label)).slice(0, 5);
+}
+function applyWider(h) {
+  if (h === 'within') { withinQ = ''; const wb = document.getElementById('withinBox'); if (wb) wb.value = ''; renderAll(); return; }
+  location.hash = h;
+}
+// ── Suggestions as you type, inside the selected country only.
+let _sug = { input: null, items: [], idx: -1 };
+function hideSuggest() {
+  const box = document.getElementById('sugBox'); if (box) box.style.display = 'none';
+  if (_sug.input) _sug.input.setAttribute('aria-expanded', 'false');
+  _sug = { input: null, items: [], idx: -1 };
+}
+function suggestionsFor(q, iso) {
+  q = q.trim().toLowerCase();
+  if (q.length < 2) return [];
+  const pool = COMPANIES.filter(c => countryIso(c) === iso);
+  const out = [];
+  const starts = (t) => String(t).toLowerCase().startsWith(q) ? 0 : 1;
+  pool.filter(c => String(c.name).toLowerCase().includes(q)).sort((a, b) => starts(a.name) - starts(b.name) || String(a.name).localeCompare(String(b.name)))
+    .slice(0, 5).forEach(c => out.push({ g: 'Companies', label: c.name, meta: companyCity(c), href: '#/company/' + c.slug }));
+  const cc = catCountsIn(iso);
+  const nodes = CATEGORY_TREE.map(l1 => ({ slug: l1.slug, code: l1.code, name: l1.name })).concat(allCategoryNodes());
+  nodes.filter(n => cc[n.slug] && (String(n.name).toLowerCase().includes(q) || String(n.code).toLowerCase().startsWith(q)))
+    .sort((a, b) => cc[b.slug] - cc[a.slug]).slice(0, 5)
+    .forEach(n => out.push({ g: 'Categories', label: n.code + ' ' + n.name, meta: cc[n.slug] + '', href: buildFilterHash([n.slug], 'all', null, null, '', [iso], null, []) }));
+  const brands = {};
+  pool.forEach(c => (c.brands || []).concat(c.formerNames || []).forEach(t => { if (String(t).toLowerCase().includes(q)) brands[t] = (brands[t] || 0) + 1; }));
+  Object.entries(brands).sort((a, b) => b[1] - a[1]).slice(0, 3)
+    .forEach(([t, n]) => out.push({ g: 'Brands and former names', label: t, meta: n + '', href: buildFilterHash(null, 'all', null, null, t, [iso], null, []) }));
+  const cities = {};
+  pool.forEach(c => { const t = companyCity(c); if (t && t.toLowerCase().includes(q)) { const k = t.toLowerCase(); (cities[k] = cities[k] || { t, n: 0 }).n++; } });
+  Object.values(cities).sort((a, b) => b.n - a.n).slice(0, 3)
+    .forEach(x => out.push({ g: 'Cities', label: x.t, meta: x.n + '', href: buildFilterHash(null, 'all', null, null, '', [iso], null, [x.t]) }));
+  return out;
+}
+function showSuggest(input) {
+  const iso = input.id === 'landingSearchBox' ? landingIso() : (activeCountries[0] || defaultCountry());
+  const items = suggestionsFor(input.value, iso);
+  let box = document.getElementById('sugBox');
+  if (!box) { box = document.createElement('div'); box.id = 'sugBox'; box.className = 'sug-box'; box.setAttribute('role', 'listbox'); document.body.appendChild(box); }
+  if (!items.length) { hideSuggest(); return; }
+  _sug = { input, items, idx: -1 };
+  let g = '';
+  box.innerHTML = items.map((it, i) => {
+    const head = it.g !== g ? `<div class="sug-g">${psEsc(it.g)}</div>` : '';
+    g = it.g;
+    return head + `<div class="sug-item" role="option" id="sug${i}" data-i="${i}" onmousedown="event.preventDefault();pickSuggest(${i})">
+      <span class="sug-l">${psEsc(it.label)}</span>${it.meta ? `<span class="sug-m">${psEsc(it.meta)}</span>` : ''}</div>`;
+  }).join('');
+  const r = input.getBoundingClientRect();
+  const w = Math.min(Math.max(r.width, 340), window.innerWidth - 16);
+  box.style.width = w + 'px';
+  box.style.left = Math.max(8, Math.min(r.left, window.innerWidth - w - 8)) + 'px';
+  box.style.top = (r.bottom + 4) + 'px';
+  box.style.display = 'block';
+  input.setAttribute('aria-expanded', 'true');
+}
+function pickSuggest(i) {
+  const it = _sug.items[i]; if (!it) return;
+  const inp = _sug.input;
+  hideSuggest();
+  if (inp && inp.id === 'searchBox' && !/^#\/company\//.test(it.href)) inp.value = '';
+  location.hash = it.href;
+}
+document.addEventListener('input', e => {
+  const t = e.target;
+  if (t && (t.id === 'landingSearchBox' || t.id === 'searchBox')) showSuggest(t);
+});
+document.addEventListener('keydown', e => {
+  if (!_sug.input || e.target !== _sug.input) return;
+  const n = _sug.items.length;
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+    e.preventDefault();
+    _sug.idx = (_sug.idx + (e.key === 'ArrowDown' ? 1 : -1) + n) % n;
+    document.querySelectorAll('#sugBox .sug-item').forEach(el => el.classList.toggle('on', +el.dataset.i === _sug.idx));
+    _sug.input.setAttribute('aria-activedescendant', 'sug' + _sug.idx);
+  } else if (e.key === 'Enter' && _sug.idx >= 0) { e.preventDefault(); pickSuggest(_sug.idx); }
+  else if (e.key === 'Escape') hideSuggest();
+});
+document.addEventListener('focusout', e => { if (_sug.input && e.target === _sug.input) setTimeout(hideSuggest, 120); });
+window.addEventListener('hashchange', hideSuggest);
+window.addEventListener('scroll', () => { if (_sug.input) hideSuggest(); }, { passive: true });
+
+function renderEmptyState() {
+  const el = document.getElementById('emptyState'); if (!el) return;
+  const opts = widerOptions();
+  el.innerHTML = `<h3>No companies match these filters</h3>
+    ${opts.length ? `<p>Nearest wider searches:</p><div class="wider-list">${opts.map(o =>
+      `<button type="button" class="wider-btn" data-h="${psEsc(o.apply)}" onclick="applyWider(this.dataset.h)">${o.n.toLocaleString('en-IN')} ${o.n === 1 ? 'company' : 'companies'} ${psEsc(o.label)}</button>`).join('')}</div>`
+      : '<p>Try clearing a filter or searching a different term.</p>'}
+    <button type="button" class="wider-clear" onclick="clearFilters()">Clear all filters</button>`;
 }
 
 const LINKEDIN_SVG = '<svg class="li-ico" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>';
@@ -3231,26 +3545,40 @@ function cardNameHtml(c) {
 }
 function applySort(list) {
   if (activeSort === 'name') return list.slice().sort((a, b) => String(a.name).localeCompare(String(b.name)));
+  if (activeSort === 'locs') return list.slice().sort((a, b) =>
+    (b.locations || []).length - (a.locations || []).length || String(a.name).localeCompare(String(b.name)));
   if (activeSort === 'country') return list.slice().sort((a, b) =>
     String(canonCountry(a.country) || '~').localeCompare(String(canonCountry(b.country) || '~')) || String(a.name).localeCompare(String(b.name)));
   return sortByTier(list);
 }
 function currentQ() { const b = document.getElementById('searchBox'); return b ? b.value.trim() : ''; }
 function hashWith(o) {
-  const a = Object.assign({ cat: activeCategory, region: activeRegion, delivery: activeDelivery, sector: activeSector, q: currentQ(), country: activeCountry, sort: activeSort }, o || {});
-  return buildFilterHash(a.cat, a.region, a.delivery, a.sector, a.q, a.country, a.sort);
+  const a = Object.assign({ cat: activeCats, region: activeRegion, delivery: activeDelivery, sector: activeSector, q: currentQ(), country: activeCountries, sort: activeSort, city: activeCities }, o || {});
+  return buildFilterHash(a.cat, a.region, a.delivery, a.sector, a.q, a.country, a.sort, a.city);
 }
-function setCountry(iso) { location.hash = hashWith({ country: activeCountry === iso ? null : iso }); }
+// Switches the whole results page to another country.
+function setCountry(iso) {
+  if (activeCountries[0] === iso) return;
+  location.hash = hashWith({ country: [iso], city: [] });
+}
 function setSort(v) { location.hash = hashWith({ sort: v || null }); }
 function dropFilter(k) {
-  const o = { cat: { cat: null }, country: { country: null }, region: { region: 'all' }, delivery: { delivery: null }, sector: { sector: null }, q: { q: '' } }[k];
-  if (k === 'q') { const b = document.getElementById('searchBox'); if (b) b.value = ''; }
+  const i = k.indexOf(':'), kind = i < 0 ? k : k.slice(0, i), val = i < 0 ? null : k.slice(i + 1);
+  if (kind === 'within') { withinQ = ''; const wb = document.getElementById('withinBox'); if (wb) wb.value = ''; renderAll(); return; }
+  let o;
+  if (kind === 'cat' && val) o = { cat: activeCats.filter(x => x !== val) };
+  else if (kind === 'country') return;   // a country is always selected
+  else if (kind === 'city' && val) o = { city: activeCities.filter(x => x !== val) };
+  else o = { cat: { cat: [] }, country: { country: [], city: [] }, region: { region: 'all' }, delivery: { delivery: null }, sector: { sector: null }, q: { q: '' } }[kind];
+  if (kind === 'q') { const b = document.getElementById('searchBox'); if (b) b.value = ''; }
   let h = hashWith(o);
   if (h === '#/') h = '#/?all=1';   // stay on the results page, not the front page
   location.hash = h;
 }
 function renderCards() {
+  _stCache = new WeakMap();
   const list = applySort(filteredCompanies());
+  updateFacetCounts();
   const grid = document.getElementById('companyGrid');
   const empty = document.getElementById('emptyState');
   const more = document.getElementById('cardsMore');
@@ -3258,7 +3586,9 @@ function renderCards() {
   renderActiveFilters();
   renderSavedSearches();
   renderInsights(list);
-  const nn = document.getElementById('resultNoun'); if (nn) nn.textContent = list.length === 1 ? 'company' : 'companies';
+  const cName = countryNameOf(activeCountries[0]);
+  const nn = document.getElementById('resultNoun'); if (nn) nn.textContent = (list.length === 1 ? 'company' : 'companies') + ' in ' + cName;
+  const sb = document.getElementById('searchBox'); if (sb) sb.placeholder = 'Search in ' + cName + '…';
   const gridBtn = document.getElementById('viewGridBtn'), listBtn = document.getElementById('viewListBtn');
   if (gridBtn) gridBtn.setAttribute('aria-pressed', String(cardView === 'grid'));
   if (listBtn) listBtn.setAttribute('aria-pressed', String(cardView === 'list'));
@@ -3266,9 +3596,9 @@ function renderCards() {
   // A different search or filter starts again from the first page.
   const key = location.hash + '|' + document.getElementById('searchBox').value;
   if (key !== cardListKey) { cardListKey = key; cardLimit = CARD_PAGE; }
-  if (!list.length) { grid.innerHTML = ''; if (more) more.innerHTML = ''; empty.style.display = 'block'; return; }
+  if (!list.length) { grid.innerHTML = ''; if (more) more.innerHTML = ''; renderEmptyState(); empty.style.display = 'block'; return; }
   empty.style.display = 'none';
-  const active = activeCategory ? new Set(categoryWithDescendants(activeCategory)) : null;
+  const active = activeCats.length ? new Set([].concat(...activeCats.map(categoryWithDescendants))) : null;
   const shown = list.slice(0, cardLimit);
   grid.innerHTML = shown.map(c => {
     // The chip for the category being browsed comes first and is highlighted.
@@ -3327,17 +3657,18 @@ function renderInsights(list) {
   if (!box) return;
   if (!insightsOpen || !list.length) { box.innerHTML = ''; return; }
   const tally = (fn) => { const m = {}; list.forEach(c => (fn(c) || []).forEach(k => { if (k) m[k] = (m[k] || 0) + 1; })); return Object.entries(m).sort((a, b) => b[1] - a[1]); };
-  const ctry = tally(c => [countryIso(c)]).slice(0, 6).map(([k, n]) => ({ label: psEsc(countryNameOf(k)), n, k }));
+  const cname = psEsc(countryNameOf(activeCountries[0]));
+  const cities = tally(c => [companyCity(c)]).slice(0, 6).map(([k, n]) => ({ label: psEsc(k), n, k }));
+  const topCats = tally(c => c.cats).slice(0, 6).map(([k, n]) => { const l = categoryLabel(k); return { label: psEsc(l ? l.name : k), n, k }; });
   const secs = CATEGORY_TREE.map(l1 => { const set = new Set(categoryWithDescendants(l1.slug)); return { label: psEsc(l1.name), n: list.reduce((a, c) => a + (c.cats.some(x => set.has(x)) ? 1 : 0), 0), k: l1.slug }; })
     .filter(x => x.n).sort((a, b) => b.n - a.n).slice(0, 6);
-  const sect = tally(c => c.sectors).slice(0, 5).map(([k, n]) => ({ label: psEsc(SECTOR_LABEL[k] || k), n, k }));
   const sig = SIGNALS.map(g => ({ label: g.key + ' · ' + psEsc(g.label), n: list.filter(g.test).length, k: g.key })).filter(x => x.n);
   const blk = (t, rows, f) => rows.length ? `<div class="ins-card"><div class="ins-t">${t}</div>${barRows(rows, list.length, f)}</div>` : '';
   box.innerHTML = `<div class="ins-wrap"><div class="ins-head">Insights for these ${list.length.toLocaleString('en-IN')} companies <span>Click a bar to filter</span></div>
     <div class="ins-grid">
-      ${blk('Countries', ctry, r => `setCountry('${r.k}')`)}
+      ${blk('Top categories in ' + cname, topCats, r => `selectCategory('${r.k}')`)}
+      ${blk('Cities in ' + cname, cities, r => `setCity(${psEsc(JSON.stringify(r.k))})`)}
       ${blk('Sections', secs, r => `selectCategory('${r.k}')`)}
-      ${blk('Sectors served', sect, r => `setSector('${r.k}')`)}
       ${blk('Verification', sig, () => `void 0`)}
     </div></div>`;
 }
@@ -3347,8 +3678,9 @@ function savedList() { try { return JSON.parse(localStorage.getItem('twi-saved-s
 function savedWrite(a) { try { localStorage.setItem('twi-saved-searches', JSON.stringify(a.slice(0, 20))); } catch (e) {} }
 function saveSearch() {
   const bits = [];
-  if (activeCategory) { const l = categoryLabel(activeCategory); if (l) bits.push(l.name); }
-  if (activeCountry) bits.push(countryNameOf(activeCountry));
+  activeCats.forEach(x => { const l = categoryLabel(x); if (l) bits.push(l.name); });
+  activeCountries.forEach(x => bits.push(countryNameOf(x)));
+  if (activeCountries.length) activeCities.forEach(x => bits.push(x));
   if (currentQ()) bits.push('“' + currentQ() + '”');
   const name = (window.prompt('Name this search', bits.join(' · ') || 'All companies') || '').trim();
   if (!name) return;
@@ -3394,11 +3726,7 @@ function openCompare() {
     ${row('Country', c => psEsc(canonCountry(c.country) || c.country || ''))}
     ${row('City', c => psEsc(primaryLocation(c).city || ''))}
     ${row('Categories', c => c.cats.slice(0, 5).map(x => { const l = categoryLabel(x); return l ? psEsc(l.name) : ''; }).filter(Boolean).join('<br>'))}
-    ${row('Sectors served', c => (c.sectors || []).map(x => psEsc(SECTOR_LABEL[x] || x)).join('<br>'))}
-    ${row('Delivery model', c => (c.delivery || []).map(x => psEsc(DELIVERY_LABEL[x] || x)).join('<br>'))}
     ${row('Verification', c => SIGNALS.filter(g => g.test(c)).map(g => g.key + ' · ' + psEsc(g.label)).join('<br>'))}
-    ${row('Website', c => link(effectiveContact(c).site, 'Website'))}
-    ${row('LinkedIn', c => link(effectiveContact(c).linkedin, 'LinkedIn'))}
   </tbody></table>`;
   document.getElementById('cmpModal').classList.add('open');
 }
@@ -3412,6 +3740,7 @@ function similarCompanies(c, n) {
     if (o === c || o.slug === c.slug) return;
     const shared = o.cats.reduce((a, x) => a + (mine.has(x) ? 1 : 0), 0);
     if (!shared) return;
+    if (iso && countryIso(o) !== iso) return;   // one country at a time
     const sameSec = o.cats.some(x => secs.has(sectionIndexOf(x)));
     out.push([shared * 4 + (countryIso(o) === iso && iso ? 2 : 0) + (sameSec ? 1 : 0) + (o.logo ? 0.5 : 0), o]);
   });
@@ -3440,64 +3769,98 @@ function sectionCompanyCount(l1) {
   return COMPANIES.reduce((n, c) => n + (c.cats.some(s => slugs.has(s)) ? 1 : 0), 0);
 }
 
+function landingIso() { const sel = document.getElementById('landingCountry'); return (sel && sel.value) || activeCountries[0] || defaultCountry(); }
 function submitLandingSearch(event) {
   if (event) event.preventDefault();
+  hideSuggest();
   const term = document.getElementById('landingSearchBox').value.trim();
-  location.hash = buildFilterHash(null, 'all', null, null, term, null, null);
+  location.hash = buildFilterHash(null, 'all', null, null, term, [landingIso()], null, []);
+}
+function setLandingCountry(iso) { rememberCountry(iso); activeCountries = [iso]; renderLandingPage(); }
+
+// slug -> companies in one country, counting each company once per category
+// and once per parent category and section. Cached per country.
+const _catCountCache = {};
+function catCountsIn(iso) {
+  const key = iso + '|' + COMPANIES.length;
+  if (!_catCountCache[key]) {
+    const m = {};
+    COMPANIES.forEach(c => {
+      if (countryIso(c) !== iso) return;
+      const seen = new Set();
+      c.cats.forEach(x => { seen.add(x); catAncestors(x).forEach(y => seen.add(y)); });
+      seen.forEach(x => { m[x] = (m[x] || 0) + 1; });
+    });
+    _catCountCache[key] = m;
+  }
+  return _catCountCache[key];
 }
 
 function renderLandingPage() {
   const el = document.getElementById('landing-view');
-  const nIndia = COMPANIES.filter(isIndian).length;
-  const nOther = COMPANIES.length - nIndia;
-
-  const sectionTiles = CATEGORY_TREE.map(l1 => {
-    const n = sectionCompanyCount(l1);
-    return { l1, n };
-  }).sort((a, b) => b.n - a.n); // busiest sections first -- a rough proxy for
-                                  // "most developed part of the roster" until
-                                  // there's a reason to hand-order this.
-
-  const ctry = countryStats().slice().sort((x, y) => (y.iso === 'IN') - (x.iso === 'IN'));
-  const ctryTile = x => `<a class="ctry-tile${x.iso === 'IN' ? ' ctry-home' : ''}" href="${buildFilterHash(null, 'all', null, null, '', x.iso, null)}">
+  const all = countryStats();
+  const iso = activeCountries[0] || defaultCountry();
+  const here = all.find(x => x.iso === iso) || all[0] || { iso, name: iso, n: 0 };
+  const cc = catCountsIn(here.iso);
+  const pool = COMPANIES.filter(c => countryIso(c) === here.iso);
+  const nCities = new Set(pool.map(c => companyCity(c).toLowerCase()).filter(Boolean)).size;
+  const leafCount = allCategoryNodes().filter(n => cc[n.slug]).length;
+  const R = (cat) => buildFilterHash(cat ? [cat] : null, 'all', null, null, '', [here.iso], null, []);
+  // Quick chips: the busiest categories in this country (not whole sections).
+  const quick = allCategoryNodes().filter(n => !n.parent && cc[n.slug]).sort((a, b) => cc[b.slug] - cc[a.slug]).slice(0, 6);
+  const sectionTiles = CATEGORY_TREE.map(l1 => ({ l1, n: cc[l1.slug] || 0 })).sort((a, b) => b.n - a.n);
+  const ctry = all.slice().sort((x, y) => (y.iso === 'IN') - (x.iso === 'IN'));
+  const opts = all.slice().sort((a, b) => (b.iso === 'IN') - (a.iso === 'IN') || a.name.localeCompare(b.name));
+  const ctryTile = x => `<a class="ctry-tile${x.iso === 'IN' ? ' ctry-home' : ''}${x.iso === here.iso ? ' ctry-on' : ''}" href="${buildFilterHash(null, 'all', null, null, '', [x.iso], null, [])}">
       <img src="https://flagcdn.com/40x30/${x.iso.toLowerCase()}.png" width="32" height="24" alt="" loading="lazy" onerror="this.remove()">
       <span class="ct-name">${psEsc(x.name)}</span><span class="ct-n">${x.n.toLocaleString()}</span></a>`;
   el.innerHTML = `
     <div class="landing-wrap">
       <div class="landing-hero">
         <div class="em-mark">TANKWORLD INDIA · ENGINEERING &amp; EQUIPMENT DIRECTORY</div>
-        <h1>Find the right supplier across ${COMPANIES.length.toLocaleString()} companies.</h1>
-        <p class="landing-sub">${CATEGORY_TREE.length} sections, ${allL2Count()} categories, ${COMPANIES.length.toLocaleString()} companies —
-          search by name, product, or category to get started.</p>
-        <form class="landing-search-form" onsubmit="submitLandingSearch(event)">
+        <h1>Find the right supplier, one country at a time.</h1>
+        <form class="landing-search-form ls-with-country" onsubmit="submitLandingSearch(event)">
+          <label class="ls-country"><span class="sr-only">Country</span>
+            <select id="landingCountry" onchange="setLandingCountry(this.value)">
+              ${opts.map(x => `<option value="${x.iso}"${x.iso === here.iso ? ' selected' : ''}>${psEsc(x.name)}</option>`).join('')}
+            </select></label>
           <input type="text" id="landingSearchBox" class="landing-search-input"
-                 placeholder="Search company, product, or category…" autocomplete="off">
+                 placeholder="Search company, product, brand or city in ${psEsc(here.name)}…" autocomplete="off"
+                 role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="sugBox">
           <button type="submit" class="landing-search-btn">Search</button>
         </form>
+        <div class="glance">
+          <span><b>${here.n.toLocaleString('en-IN')}</b> companies in ${psEsc(here.name)}</span>
+          <span><b>${leafCount.toLocaleString('en-IN')}</b> categories</span>
+          <span><b>${nCities.toLocaleString('en-IN')}</b> cities</span>
+          <span><b>${all.length}</b> countries in the directory</span>
+        </div>
+        ${quick.length ? `<div class="quick-chips"><span>Popular in ${psEsc(here.name)}:</span>${quick.map(n =>
+          `<a href="${R(n.slug)}"><b>${n.code}</b> ${psEsc(n.name)}</a>`).join('')}</div>` : ''}
       </div>
 
       <div class="landing-cats-head">
-        <div class="em-mark">BROWSE BY COUNTRY</div>
-        <h2>${ctry.length} countries</h2>
-      </div>
-      <div class="ctry-grid">${ctry.slice(0, 12).map(ctryTile).join('')}</div>
-      ${ctry.length > 12 ? `<div class="ctry-grid ctry-more" id="ctryMore" style="display:none;">${ctry.slice(12).map(ctryTile).join('')}</div>
-      <button type="button" class="ctry-toggle" id="ctryToggle" onclick="var m=document.getElementById('ctryMore');var o=m.style.display==='none';m.style.display=o?'grid':'none';this.textContent=o?'Show fewer countries':'Show all ${ctry.length} countries';">Show all ${ctry.length} countries</button>` : ''}
-      <div class="ctry-links"><a href="#/?all=1">Browse all ${COMPANIES.length.toLocaleString()} companies</a>
-        <a href="#/region/india">India statistics</a><a href="#/region/international">International statistics</a></div>
-
-      <div class="landing-cats-head">
-        <div class="em-mark">BROWSE BY CATEGORY</div>
+        <div class="em-mark">BROWSE ${psEsc(here.name.toUpperCase())} BY CATEGORY</div>
         <h2>${CATEGORY_TREE.length} sections</h2>
       </div>
       <div class="landing-cat-grid">
         ${sectionTiles.map(({ l1, n }) => `
-          <a href="#/section/${l1.slug}" class="landing-cat-tile" ${n === 0 ? 'style="opacity:.4;pointer-events:none;"' : ''}>
+          <a href="${R(l1.slug)}" class="landing-cat-tile" ${n === 0 ? 'style="opacity:.4;pointer-events:none;"' : ''}>
             <div class="lct-code">${l1.code}</div>
             <div class="lct-name">${l1.name}</div>
             <div class="lct-count">${n.toLocaleString()} ${n === 1 ? 'company' : 'companies'}</div>
           </a>`).join('')}
       </div>
+      <div class="ctry-links"><a href="${R(null)}">Browse all ${here.n.toLocaleString()} companies in ${psEsc(here.name)}</a>
+        <a href="#/region/india">India statistics</a><a href="#/region/international">International statistics</a></div>
+
+      <div class="landing-cats-head">
+        <div class="em-mark">CHOOSE A COUNTRY</div>
+        <h2>${ctry.length} countries</h2>
+      </div>
+      <div class="ctry-grid">${ctry.slice(0, 12).map(ctryTile).join('')}</div>
+      ${ctry.length > 12 ? `<div class="ctry-grid ctry-more" id="ctryMore" style="display:none;">${ctry.slice(12).map(ctryTile).join('')}</div>
+      <button type="button" class="ctry-toggle" id="ctryToggle" onclick="var m=document.getElementById('ctryMore');var o=m.style.display==='none';m.style.display=o?'grid':'none';this.textContent=o?'Show fewer countries':'Show all ${ctry.length} countries';">Show all ${ctry.length} countries</button>` : ''}
     </div>`;
 }
 
@@ -3646,7 +4009,6 @@ function renderSectionPage(sectionSlug) {
           { label: 'India', n: nIndia, color: '#1B4B7A' },
           { label: 'Other countries', n: nOther, color: '#C0602A' },
         ], total, total === 0 ? 'No companies in this section yet.' : null)}
-        ${donutChart('Sector Served', sectorSegs, sectorSegsSum, sectorEmptyNote, 'sector tags')}
         ${donutChart('Sub-category Distribution', subDistSegs, subDistTotal,
           subDistTotal === 0 ? 'No sub-category data yet.' : null, 'category tags')}
       </div>
@@ -3728,7 +4090,6 @@ function renderRegionPage(region) {
     graphics = [
       donutChart('Companies by Category', catSegs, catTotal, catTotal === 0 ? 'No data yet.' : null, 'category tags'),
       barChart('Companies by City', cityTop, `of ${withCity.toLocaleString()} companies with a city on file`),
-      donutChart('Sector Served', secSegs, secSegsSum, secNote, 'sector tags'),
     ];
   } else {
     // ── ROW-specific: by Country (bar) + by Region (donut) ──
@@ -3921,6 +4282,8 @@ function renderSubCategoryResults(sectionSlug, subSlug) {
     </div>`;
   buildSidebar(sectionSlug);
   activeCategory = subSlug;
+  activeCats = [subSlug];
+  activeCountries = []; activeCities = []; activeCountry = null;
   activeRegion = 'all';
   activeDelivery = null;
   activeSector = null;
@@ -3952,7 +4315,11 @@ function updateSidebarToggle() {
   const el = document.getElementById('sidebarNow');
   if (!el) return;
   let t = 'All categories';
-  try { if (activeCategory) { const l = categoryLabel(activeCategory); if (l && l.name) t = l.name; } } catch (e) {}
+  try {
+    if (activeCats.length > 1) t = activeCats.length + ' categories';
+    else if (activeCategory) { const l = categoryLabel(activeCategory); if (l && l.name) t = l.name; }
+    if (activeCountries.length) t += ' · ' + (activeCountries.length === 1 ? countryNameOf(activeCountries[0]) : activeCountries.length + ' countries');
+  } catch (e) {}
   el.textContent = t;
 }
 
@@ -4483,6 +4850,35 @@ function subsidiariesHtml(c) {
     </div>`;
 }
 
+// Sister companies: everything else under the same top company or group.
+function groupSiblingsHtml(c) {
+  if (!c.parent || !c.parent.name) return '';
+  const r = groupRoot(c), rootSlug = (r && r.slug) || c.parent.slug || '';
+  if (!rootSlug) return '';
+  const kids = new Set(COMPANIES.filter(x => x.parent && x.parent.slug === c.slug).map(x => x.slug));
+  const rootCo = COMPANIES.find(x => x.slug === rootSlug);
+  const others = (rootCo ? [rootCo] : []).concat(groupMembers(rootSlug)).filter(x => x.slug !== c.slug && !kids.has(x.slug));
+  if (!others.length) return '';
+  const name = (r && r.name) || c.parent.name;
+  return `<div class="cp-section-label">Other companies in the ${psEsc(name)} group (${others.length})</div>
+    <div class="cp-subs">${others.slice(0, 12).map(k => `
+      <a class="sub-card" href="#/company/${k.slug}">
+        <span class="sub-name">${psEsc(k.name)}</span>
+        <span class="sub-meta">${psEsc([companyCity(k), canonCountry(k.country) || k.country].filter(Boolean).join(', '))}</span>
+      </a>`).join('')}</div>
+    ${others.length > 12 ? `<div class="cp-more"><a href="${(rootCo ? '#/company/' : '#/group/') + rootSlug}">See all ${others.length} companies in the group</a></div>` : ''}`;
+}
+// A small map of the registered office (first location), loaded only when scrolled to.
+function locationMapHtml(c) {
+  const l = primaryLocation(c);
+  if (!(l.address || l.city)) return '';
+  const q = (l.lat != null && l.lng != null) ? (l.lat + ',' + l.lng)
+    : [l.address || l.city, canonCountry(c.country) || c.country].filter(Boolean).join(', ');
+  return `<div class="cp-map"><iframe title="Map: ${psEsc(l.name || 'registered office')}" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+    src="https://maps.google.com/maps?q=${encodeURIComponent(q)}&z=13&output=embed"></iframe></div>`;
+}
+const PIN_SVG = '<svg class="pin-ico" viewBox="0 0 24 24" width="13" height="13" aria-hidden="true"><path fill="currentColor" d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>';
+
 function renderCompanyPage(slug) {
   const c = COMPANIES.find(x => x.slug === slug);
   const wrap = document.getElementById('company-view');
@@ -4497,7 +4893,7 @@ function renderCompanyPage(slug) {
       <div class="loc-text">
         <span class="loc-type">${locTypeLabel(l.type)}</span>
         <div class="loc-name">${l.name}</div>
-        <div class="loc-city">📍 ${l.address || l.city}</div>
+        <div class="loc-city">${PIN_SVG} ${l.address || l.city}</div>
         ${l.sourceUrl ? `<div class="loc-city"><a href="${l.sourceUrl}" target="_blank" rel="noopener" style="color:inherit">Source ↗</a>${l.sourceDate ? ' · ' + l.sourceDate : ''}</div>` : ''}
       </div>
       ${l.placeId
@@ -4540,7 +4936,7 @@ function renderCompanyPage(slug) {
     </div>
     ${tierOf(c) ? `<div class="cp-tier-note">${TIERS[tierOf(c)].note}</div></div>` : ''}
     ${c.msme ? `<div class="cp-msme-row">${msmeBadgeHtml(c, false)}${udyamCtaHtml(c)}</div>` : ''}
-    ${((c.delivery || []).length || (c.sectors || []).length) ? `<div class="cp-delivery-row">${deliveryBadgesHtml(c, false)}${sectorBadgesHtml(c, false)}</div>` : ''}
+    ${(c.delivery || []).length ? `<div class="cp-delivery-row">${deliveryBadgesHtml(c, false)}</div>` : ''}
     ${credentialsStripHtml(c)}
     <div class="cp-desc">${c.desc}</div>
     <div class="cp-links-row">
@@ -4549,10 +4945,12 @@ function renderCompanyPage(slug) {
     ${claimActionHtml(c)}
     <div class="cp-section-label">Locations (${c.locations.length})</div>
     <div class="cp-locations">${locationsHtml}</div>
+    ${locationMapHtml(c)}
     <div class="cp-section-label">Products &amp; Services</div>
     <div class="cp-tiles">${tilesHtml}</div>
     ${profileSectionsHtml(c)}
     ${subsidiariesHtml(c)}
+    ${groupSiblingsHtml(c)}
     ${similarHtml(c)}
   `;
   // Swaps the Claim button for "under review" etc. if this visitor has
@@ -4653,6 +5051,10 @@ function handleRoute() {
     // wins, whether we just navigated there or the user hit back/forward.
     const parsed = parseFilterHash(hash);
     activeCategory = parsed.cat;
+    activeCats = parsed.cats;
+    activeCountries = parsed.countries;
+    rememberCountry(activeCountries[0]);
+    activeCities = parsed.cities;
     activeRegion = parsed.region;
     activeDelivery = parsed.delivery;
     activeSector = parsed.sector;
@@ -4664,16 +5066,14 @@ function handleRoute() {
     document.getElementById('searchBox').value = parsed.q || '';
 
     document.querySelectorAll('.sheet-item').forEach(el => {
-      el.classList.toggle('active', el.dataset.slug === activeCategory);
+      el.classList.toggle('active', activeCats.includes(el.dataset.slug));
     });
-    // Landing on a filtered state via back/forward can put the active
-    // category inside a sheet group that's currently collapsed — open it so
-    // the highlighted item is actually visible rather than hidden.
-    if (activeCategory) {
-      const activeEl = document.querySelector('.sheet-item[data-slug="' + activeCategory + '"]');
+    // Open every sheet group that holds a ticked category, so the ticks show.
+    activeCats.forEach(x => {
+      const activeEl = document.querySelector('.sheet-item[data-slug="' + x + '"]');
       const group = activeEl && activeEl.closest('.sheet-group');
       if (group) group.classList.add('open');
-    }
+    });
 
     renderBreadcrumb();
     renderCountryFilter();
