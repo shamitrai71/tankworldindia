@@ -1098,6 +1098,45 @@ header{ padding:10px 24px; border-bottom:1px solid var(--line); }
 .loc-map-link.loc-map-plain{ background:transparent; color:var(--blue); }
 .loc-map-link.loc-map-plain:hover{ background:var(--blue); color:#fff; }
 @media (max-width:560px){ .location-card{ grid-template-columns:1fr; } .loc-map-link{ grid-column:1; justify-self:start; } }
+
+/* Phase 3 */
+.company-card{ position:relative; }
+.cmp-btn{ position:absolute; top:10px; right:10px; z-index:2; width:26px; height:26px; border-radius:50%; border:1px solid var(--line); background:#fff; color:var(--ink-muted); font-size:15px; line-height:1; cursor:pointer; }
+.cmp-btn:hover{ border-color:var(--blue); color:var(--blue); }
+.cmp-btn.on{ background:var(--blue); border-color:var(--blue); color:#fff; }
+.company-card .card-title-block{ padding-right:28px; }
+.rb-btn{ border:1px solid var(--line); background:var(--paper-raised); border-radius:8px; padding:6px 12px; font-size:13px; color:var(--ink); cursor:pointer; }
+.rb-btn:hover, .rb-btn[aria-pressed="true"]{ border-color:var(--blue); color:var(--blue); }
+.ins-wrap{ background:var(--paper-raised); border:1px solid var(--line); border-radius:10px; padding:14px 16px; margin-bottom:16px; }
+.ins-head{ font-weight:600; margin-bottom:10px; } .ins-head span{ font-weight:400; font-size:12px; color:var(--ink-muted); margin-left:8px; }
+.ins-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:18px; }
+.ins-t{ font-family:var(--font-mono); font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:var(--ink-faint); margin-bottom:6px; }
+.ins-row{ display:grid; grid-template-columns:minmax(0,1fr) 70px auto; align-items:center; gap:8px; width:100%; background:none; border:0; padding:3px 0; font-size:12.5px; text-align:left; cursor:pointer; color:var(--ink); }
+.ins-row:hover .ins-lbl{ color:var(--blue); }
+.ins-lbl{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.ins-bar{ height:6px; background:var(--line); border-radius:3px; overflow:hidden; } .ins-bar i{ display:block; height:100%; background:var(--blue); }
+.ins-n{ font-variant-numeric:tabular-nums; color:var(--ink-muted); }
+.sv-list{ display:flex; flex-direction:column; gap:2px; margin-bottom:14px; }
+.sv-row{ display:flex; align-items:center; }
+.sv-row button{ background:none; border:0; font-size:13px; color:var(--blue); text-align:left; padding:4px 6px; cursor:pointer; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.sv-row .sv-x{ flex:0 0 auto; color:var(--ink-faint); } .sv-row button:hover{ text-decoration:underline; }
+.cmp-bar{ position:fixed; left:0; right:0; bottom:0; z-index:1500; background:var(--navy); color:#fff; padding:10px 16px; align-items:center; gap:12px; }
+.cb-names{ flex:1; display:flex; gap:6px; flex-wrap:wrap; min-width:0; }
+.cb-chip{ background:rgba(255,255,255,.14); border-radius:12px; padding:3px 10px; font-size:12.5px; max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.cb-go{ background:var(--rust); color:#fff; border:0; border-radius:8px; padding:8px 16px; font-weight:600; cursor:pointer; } .cb-go:disabled{ opacity:.5; cursor:default; }
+.cb-clear{ background:none; border:1px solid rgba(255,255,255,.4); color:#fff; border-radius:8px; padding:7px 12px; cursor:pointer; }
+.cmp-modal{ max-width:1000px; }
+.cmp-scroll{ overflow:auto; max-height:75vh; }
+.cmp-table{ border-collapse:collapse; width:100%; min-width:560px; font-size:13px; }
+.cmp-table th, .cmp-table td{ border-top:1px solid var(--line); padding:9px 10px; vertical-align:top; text-align:left; }
+.cmp-table thead th{ border-top:0; font-size:14px; } .cmp-table tbody th{ width:120px; color:var(--ink-muted); font-weight:600; font-size:12px; }
+.cmp-table a{ color:var(--blue); }
+.sim-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:10px; margin-bottom:40px; }
+.sim-card{ display:flex; gap:12px; align-items:center; padding:10px 12px; background:var(--paper-raised); border:1px solid var(--line); border-radius:10px; text-decoration:none; color:var(--ink); min-width:0; }
+.sim-card:hover{ border-color:var(--blue); }
+.sim-txt{ display:flex; flex-direction:column; gap:2px; min-width:0; font-size:12.5px; color:var(--ink-muted); }
+.sim-txt b{ color:var(--ink); font-size:14px; font-weight:600; }
+body:has(#cmpBar[style*="flex"]) footer{ padding-bottom:70px; }
 </style>
 </head>
 <body>
@@ -1222,6 +1261,7 @@ header{ padding:10px 24px; border-bottom:1px solid var(--line); }
       <span id="filterCount"></span>
     </div>
     <input type="text" class="search-box" id="searchBox" placeholder="Search company or category…" oninput="renderAll()">
+    <div id="savedSearches"></div>
     <button type="button" class="sidebar-toggle" id="sidebarToggle" aria-expanded="false" aria-controls="sidebarBody" onclick="toggleSidebar()">
       <span class="st-main"><span class="st-icon">☰</span><span class="st-text">Browse categories &amp; filters</span></span>
       <span class="st-now" id="sidebarNow"></span>
@@ -1243,6 +1283,8 @@ header{ padding:10px 24px; border-bottom:1px solid var(--line); }
       <div class="results-bar">
         <div class="results-count"><b id="resultCount">0</b> <span id="resultNoun">companies</span></div>
         <div class="active-filters" id="activeFilters"></div>
+        <button type="button" class="rb-btn" id="insightsBtn" aria-pressed="false" onclick="toggleInsights()">Insights</button>
+        <button type="button" class="rb-btn" onclick="saveSearch()">☆ Save search</button>
         <label class="sort-wrap">Sort
           <select id="sortSel" onchange="setSort(this.value)">
             <option value="">Featured first</option><option value="name">Name A–Z</option><option value="country">Country A–Z</option>
@@ -1252,6 +1294,7 @@ header{ padding:10px 24px; border-bottom:1px solid var(--line); }
           <button type="button" id="viewListBtn" onclick="setCardView('list')" aria-pressed="false">List</button>
         </div>
       </div>
+      <div id="insightsPanel"></div>
       <div class="company-grid" id="companyGrid"></div>
       <div class="cards-more" id="cardsMore"></div>
       <div class="empty-state" id="emptyState" style="display:none;">
@@ -1266,6 +1309,14 @@ header{ padding:10px 24px; border-bottom:1px solid var(--line); }
   </main>
 </div>
 
+<div id="cmpBar" class="cmp-bar" style="display:none;"></div>
+<div class="modal-backdrop" id="cmpModal" onclick="if(event.target===this) closeCompare()">
+  <div class="modal cmp-modal">
+    <div class="modal-head"><div><div class="modal-code">COMPARE</div><h3>Side by side</h3></div>
+      <button class="modal-x" onclick="closeCompare()">&times;</button></div>
+    <div id="cmpBody" class="cmp-scroll"></div>
+  </div>
+</div>
 <footer>
   TANKWORLD INDIA — A DIRECTORY OF ENGINEERING &amp; EQUIPMENT COMPANIES SERVING THE TANK TERMINAL &amp; PROCESS INDUSTRIES SUPPLY CHAIN · DATA SCOPE: INDIA + INTERNATIONAL
 </footer>
@@ -3205,6 +3256,8 @@ function renderCards() {
   const more = document.getElementById('cardsMore');
   document.getElementById('resultCount').textContent = list.length.toLocaleString('en-IN');
   renderActiveFilters();
+  renderSavedSearches();
+  renderInsights(list);
   const nn = document.getElementById('resultNoun'); if (nn) nn.textContent = list.length === 1 ? 'company' : 'companies';
   const gridBtn = document.getElementById('viewGridBtn'), listBtn = document.getElementById('viewListBtn');
   if (gridBtn) gridBtn.setAttribute('aria-pressed', String(cardView === 'grid'));
@@ -3232,6 +3285,7 @@ function renderCards() {
     return `
       <a class="company-card${tierOf(c) ? ' tier-card tier-' + tierOf(c) : ''}" href="#/company/${c.slug}">
         ${tierStampHtml(tierOf(c))}
+        <button type="button" class="cmp-btn${compareSet.includes(c.slug) ? ' on' : ''}" data-s="${c.slug}" title="Add to compare" aria-label="Add to compare" onclick="toggleCompare(event,'${c.slug}')">${compareSet.includes(c.slug) ? '✓' : '+'}</button>
         <div class="card-header">
           ${cardLogoHtml(c)}
           <div class="card-title-block">
@@ -3251,6 +3305,124 @@ function renderCards() {
          <span>Showing ${shown.length.toLocaleString('en-IN')} of ${list.length.toLocaleString('en-IN')} companies</span>`
       : (list.length > CARD_PAGE ? `<span>All ${list.length.toLocaleString('en-IN')} companies shown</span>` : '');
   }
+}
+
+
+// ══════════════════════════════════════════════════════════════════════
+// PHASE 3 — insights, saved searches, compare, similar companies
+// ══════════════════════════════════════════════════════════════════════
+// ── Insights: a read-only summary of the companies currently listed.
+let insightsOpen = false;
+function toggleInsights() { insightsOpen = !insightsOpen; renderCards(); }
+function barRows(rows, total, onclick) {
+  const max = Math.max(1, ...rows.map(r => r.n));
+  return rows.map(r => `<button type="button" class="ins-row" onclick="${onclick(r)}">
+      <span class="ins-lbl">${r.label}</span>
+      <span class="ins-bar"><i style="width:${Math.max(3, Math.round(r.n / max * 100))}%"></i></span>
+      <span class="ins-n">${r.n.toLocaleString('en-IN')}</span></button>`).join('');
+}
+function renderInsights(list) {
+  const box = document.getElementById('insightsPanel'), btn = document.getElementById('insightsBtn');
+  if (btn) btn.setAttribute('aria-pressed', String(insightsOpen));
+  if (!box) return;
+  if (!insightsOpen || !list.length) { box.innerHTML = ''; return; }
+  const tally = (fn) => { const m = {}; list.forEach(c => (fn(c) || []).forEach(k => { if (k) m[k] = (m[k] || 0) + 1; })); return Object.entries(m).sort((a, b) => b[1] - a[1]); };
+  const ctry = tally(c => [countryIso(c)]).slice(0, 6).map(([k, n]) => ({ label: psEsc(countryNameOf(k)), n, k }));
+  const secs = CATEGORY_TREE.map(l1 => { const set = new Set(categoryWithDescendants(l1.slug)); return { label: psEsc(l1.name), n: list.reduce((a, c) => a + (c.cats.some(x => set.has(x)) ? 1 : 0), 0), k: l1.slug }; })
+    .filter(x => x.n).sort((a, b) => b.n - a.n).slice(0, 6);
+  const sect = tally(c => c.sectors).slice(0, 5).map(([k, n]) => ({ label: psEsc(SECTOR_LABEL[k] || k), n, k }));
+  const sig = SIGNALS.map(g => ({ label: g.key + ' · ' + psEsc(g.label), n: list.filter(g.test).length, k: g.key })).filter(x => x.n);
+  const blk = (t, rows, f) => rows.length ? `<div class="ins-card"><div class="ins-t">${t}</div>${barRows(rows, list.length, f)}</div>` : '';
+  box.innerHTML = `<div class="ins-wrap"><div class="ins-head">Insights for these ${list.length.toLocaleString('en-IN')} companies <span>Click a bar to filter</span></div>
+    <div class="ins-grid">
+      ${blk('Countries', ctry, r => `setCountry('${r.k}')`)}
+      ${blk('Sections', secs, r => `selectCategory('${r.k}')`)}
+      ${blk('Sectors served', sect, r => `setSector('${r.k}')`)}
+      ${blk('Verification', sig, () => `void 0`)}
+    </div></div>`;
+}
+
+// ── Saved searches: kept in this browser only.
+function savedList() { try { return JSON.parse(localStorage.getItem('twi-saved-searches') || '[]'); } catch (e) { return []; } }
+function savedWrite(a) { try { localStorage.setItem('twi-saved-searches', JSON.stringify(a.slice(0, 20))); } catch (e) {} }
+function saveSearch() {
+  const bits = [];
+  if (activeCategory) { const l = categoryLabel(activeCategory); if (l) bits.push(l.name); }
+  if (activeCountry) bits.push(countryNameOf(activeCountry));
+  if (currentQ()) bits.push('“' + currentQ() + '”');
+  const name = (window.prompt('Name this search', bits.join(' · ') || 'All companies') || '').trim();
+  if (!name) return;
+  const a = savedList().filter(x => x.name !== name);
+  a.unshift({ name, hash: hashWith({}) === '#/' ? '#/?all=1' : hashWith({}) });
+  savedWrite(a); renderSavedSearches();
+}
+function applySaved(i) { const x = savedList()[i]; if (x) location.hash = x.hash; }
+function deleteSaved(i) { const a = savedList(); a.splice(i, 1); savedWrite(a); renderSavedSearches(); }
+function renderSavedSearches() {
+  const el = document.getElementById('savedSearches'); if (!el) return;
+  const a = savedList();
+  el.innerHTML = a.length ? `<div class="rf-label">SAVED SEARCHES</div><div class="sv-list">${a.map((x, i) =>
+    `<div class="sv-row"><button type="button" onclick="applySaved(${i})">${psEsc(x.name)}</button><button type="button" class="sv-x" aria-label="Delete saved search" onclick="deleteSaved(${i})">×</button></div>`).join('')}</div>` : '';
+}
+
+// ── Compare: up to four companies side by side.
+let compareSet = [];
+function toggleCompare(ev, slug) {
+  ev.preventDefault(); ev.stopPropagation();
+  const i = compareSet.indexOf(slug);
+  if (i >= 0) compareSet.splice(i, 1);
+  else if (compareSet.length >= 4) { alert('You can compare up to four companies.'); return; }
+  else compareSet.push(slug);
+  document.querySelectorAll('.cmp-btn').forEach(b => { const on = compareSet.includes(b.dataset.s); b.classList.toggle('on', on); b.textContent = on ? '✓' : '+'; });
+  renderCompareBar();
+}
+function renderCompareBar() {
+  const bar = document.getElementById('cmpBar'); if (!bar) return;
+  if (!compareSet.length) { bar.style.display = 'none'; return; }
+  bar.style.display = 'flex';
+  bar.innerHTML = `<span class="cb-names">${compareSet.map(s => { const c = COMPANIES.find(x => x.slug === s); return `<span class="cb-chip">${psEsc(c ? c.name : s)}</span>`; }).join('')}</span>
+    <button type="button" class="cb-go" ${compareSet.length < 2 ? 'disabled' : ''} onclick="openCompare()">Compare (${compareSet.length})</button>
+    <button type="button" class="cb-clear" onclick="compareSet=[];toggleCompareRefresh()">Clear</button>`;
+}
+function toggleCompareRefresh() { document.querySelectorAll('.cmp-btn').forEach(b => { b.classList.remove('on'); b.textContent = '+'; }); renderCompareBar(); }
+function closeCompare() { document.getElementById('cmpModal').classList.remove('open'); }
+function openCompare() {
+  const cs = compareSet.map(s => COMPANIES.find(x => x.slug === s)).filter(Boolean);
+  const link = (u, t) => u ? `<a href="${psEsc(u)}" target="_blank" rel="noopener nofollow">${t} ↗</a>` : '—';
+  const row = (lbl, fn) => `<tr><th>${lbl}</th>${cs.map(c => `<td>${fn(c) || '—'}</td>`).join('')}</tr>`;
+  document.getElementById('cmpBody').innerHTML = `<table class="cmp-table"><thead><tr><th></th>${cs.map(c => `<th><a href="#/company/${c.slug}" onclick="closeCompare()">${psEsc(c.name)}</a></th>`).join('')}</tr></thead><tbody>
+    ${row('Country', c => psEsc(canonCountry(c.country) || c.country || ''))}
+    ${row('City', c => psEsc(primaryLocation(c).city || ''))}
+    ${row('Categories', c => c.cats.slice(0, 5).map(x => { const l = categoryLabel(x); return l ? psEsc(l.name) : ''; }).filter(Boolean).join('<br>'))}
+    ${row('Sectors served', c => (c.sectors || []).map(x => psEsc(SECTOR_LABEL[x] || x)).join('<br>'))}
+    ${row('Delivery model', c => (c.delivery || []).map(x => psEsc(DELIVERY_LABEL[x] || x)).join('<br>'))}
+    ${row('Verification', c => SIGNALS.filter(g => g.test(c)).map(g => g.key + ' · ' + psEsc(g.label)).join('<br>'))}
+    ${row('Website', c => link(effectiveContact(c).site, 'Website'))}
+    ${row('LinkedIn', c => link(effectiveContact(c).linkedin, 'LinkedIn'))}
+  </tbody></table>`;
+  document.getElementById('cmpModal').classList.add('open');
+}
+
+// ── Similar companies, shown at the foot of a company page.
+function similarCompanies(c, n) {
+  const mine = new Set(c.cats), iso = countryIso(c);
+  const secs = new Set(c.cats.map(sectionIndexOf).filter(x => x != null));
+  const out = [];
+  COMPANIES.forEach(o => {
+    if (o === c || o.slug === c.slug) return;
+    const shared = o.cats.reduce((a, x) => a + (mine.has(x) ? 1 : 0), 0);
+    if (!shared) return;
+    const sameSec = o.cats.some(x => secs.has(sectionIndexOf(x)));
+    out.push([shared * 4 + (countryIso(o) === iso && iso ? 2 : 0) + (sameSec ? 1 : 0) + (o.logo ? 0.5 : 0), o]);
+  });
+  return out.sort((a, b) => b[0] - a[0]).slice(0, n).map(x => x[1]);
+}
+function similarHtml(c) {
+  const list = similarCompanies(c, 6);
+  if (!list.length) return '';
+  return `<div class="cp-section-label">Similar companies</div><div class="sim-grid">${list.map(o => `
+    <a class="sim-card" href="#/company/${o.slug}">${cardLogoHtml(o)}
+      <span class="sim-txt"><b>${cardNameHtml(o)}</b><span>${companyFlag(o)} ${psEsc([primaryLocation(o).city, canonCountry(o.country)].filter(Boolean).join(', '))}</span></span></a>`).join('')}</div>`;
 }
 
 // ══════════════════════════════════════════════════════════════════════
@@ -3647,10 +3819,10 @@ const TIERS = {
 // colour in the CSS. Set SIGNALS_SHOW_UNEARNED = true to show every square,
 // with unearned ones outlined, once this grows into a rating scale.
 const SIGNALS = [
-  // R — TankWorld India has checked the company itself (register match).
-  { key: 'R', label: 'Internally verified',
+  // R — TankWorld India's own mark. Deliberately no public explanation; the records behind it are kept in a private registry.
+  { key: 'R', label: 'TankWorld India mark',
     test: c => !!c.registered,
-    tip:  c => 'R · Internally verified: checked by TankWorld India against an official company or tax register' },
+    tip:  c => 'R · TankWorld India mark' },
   // C — an admin has approved a claim; the company owns and manages the listing.
   { key: 'C', label: 'Claimed',
     test: c => !!c.ownerUid,
@@ -4381,6 +4553,7 @@ function renderCompanyPage(slug) {
     <div class="cp-tiles">${tilesHtml}</div>
     ${profileSectionsHtml(c)}
     ${subsidiariesHtml(c)}
+    ${similarHtml(c)}
   `;
   // Swaps the Claim button for "under review" etc. if this visitor has
   // already filed a claim. Async and failure-tolerant by design.

@@ -40,6 +40,27 @@ service cloud.firestore {
       );
     }
 
+    // ── Owner edits: what a listing's owner may write (17 Nov 2026) ─────
+    // Exactly the fields the owner editor saves, plus the two bookkeeping
+    // fields the app adds to every mirrored edit. Everything else, notably
+    // registered (the R mark), ownerUid, ownerSince, name, country, cats,
+    // logo and spotlight, stays admin-only.
+    function ownerFields() {
+      return ['companySections', 'companySite', 'companyLinkedin', 'companyEmail',
+              'companyPhone', 'companyUpdatedAt', 'companyUpdatedBy',
+              'companyVerifiedAt', 'companyVerifiedBy'];
+    }
+    // The company confirms and stamps as itself. Withdrawing the V
+    // confirmation clears companyVerifiedBy, which is allowed.
+    function ownerStampsAreOwn(d) {
+      return 'companyUpdatedBy' in d && d.companyUpdatedBy == request.auth.uid
+        && (!('companyVerifiedBy' in d) || d.companyVerifiedBy == null
+            || d.companyVerifiedBy == request.auth.uid);
+    }
+    function notMarkedDeleted(d) {
+      return !('_deleted' in d) || d._deleted == false;
+    }
+
     // ── Companies ──────────────────────────────────────────────────────
     // Only admin writes. Once claims exist, a listing's owner may update
     // their own record.
@@ -53,7 +74,10 @@ service cloud.firestore {
       allow create: if isAdmin();
       allow delete: if isAdmin();
       allow update: if isAdmin()
-                    || (isSignedIn() && resource.data.ownerUid == request.auth.uid);
+                    || (isSignedIn()
+                        && resource.data.ownerUid == request.auth.uid
+                        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(ownerFields())
+                        && ownerStampsAreOwn(request.resource.data));
     }
 
     // ── Published roster (cost redesign, 25 Oct 2026) ─────────────────
@@ -79,12 +103,27 @@ service cloud.firestore {
     }
     // An approved owner's edit to companies/{slug} is mirrored here by the
     // app, so the owner may write their own listing's edits doc too.
+    // Every visitor's page applies these docs on top of the roster, so an
+    // owner may write ONLY the owner fields here too (otherwise they could
+    // set registered, ownerUid or _deleted for everyone).
     match /companyEdits/{slug} {
-      allow read:  if isApprovedUser();
-      allow write: if isAdmin()
-                   || (isSignedIn()
-                       && exists(/databases/$(database)/documents/companies/$(slug))
-                       && get(/databases/$(database)/documents/companies/$(slug)).data.ownerUid == request.auth.uid);
+      function isListingOwner() {
+        return isSignedIn()
+          && exists(/databases/$(database)/documents/companies/$(slug))
+          && get(/databases/$(database)/documents/companies/$(slug)).data.ownerUid == request.auth.uid;
+      }
+      allow read:   if isApprovedUser();
+      allow create: if isAdmin()
+                    || (isListingOwner()
+                        && request.resource.data.keys().hasOnly(ownerFields().concat(['_deleted', '_editedAt']))
+                        && notMarkedDeleted(request.resource.data)
+                        && ownerStampsAreOwn(request.resource.data));
+      allow update: if isAdmin()
+                    || (isListingOwner()
+                        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(ownerFields().concat(['_deleted', '_editedAt']))
+                        && notMarkedDeleted(request.resource.data)
+                        && ownerStampsAreOwn(request.resource.data));
+      allow delete: if isAdmin();
     }
 
     // ── Categories ─────────────────────────────────────────────────────
@@ -129,7 +168,9 @@ service cloud.firestore {
     // A signed-in user files a claim on a listing and can read their own;
     // admin reads all and approves/rejects.
     match /companyClaims/{doc} {
-      allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;
+      // A claim can only be filed as pending; approval is an admin update.
+      allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid
+                    && request.resource.data.status == 'pending';
       allow read:   if isAdmin() || (isSignedIn() && resource.data.uid == request.auth.uid);
       allow update, delete: if isAdmin();
     }
