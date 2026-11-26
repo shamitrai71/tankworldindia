@@ -3,7 +3,7 @@
 The single record of cross-app decisions for the three T3 apps. The same file
 sits at the root of all three repos; when it changes, copy it to all three.
 
-- **Last updated:** 15 Nov 2026.
+- **Last updated:** 26 Nov 2026.
 - **Status words:**
   - **Decided** means Shamit decided it.
   - **Proposed** means a design waiting for review.
@@ -462,7 +462,44 @@ Tankonomics.
 - **Search:** Typesense for Tankonomics (decided); other options for TWI and
   TankBazaar.
 
-## 15. Change log
+## 15. Tankonomics jobs and salary data — Decided (26 Nov 2026)
+
+- **No levels.fyi.** Levels.fyi is not used for the Tankonomics jobs section.
+  It covers mainly software and big-tech pay, has little data on tank,
+  terminal and process-industry roles in India or the Gulf, sells salary
+  data rather than job postings, and is enterprise-priced with unclear
+  display rights.
+- **Jobs come from verified companies.** Jobs are posted by claimed,
+  verified companies, in line with the claim and verification model; no
+  imported job feeds at launch.
+- **Own salary data later, through Surveys.** Tankonomics builds its own pay
+  data through the Surveys section, for example an annual **"Tank & Terminal
+  Industry Salary Survey"** for members. The data belongs to Tankonomics and
+  is specific to the industry, which levels.fyi cannot offer. It can become a
+  paid report or a lead magnet.
+
+## 16. Tender board — Decided (26 Nov 2026)
+
+- **It lives in Tankonomics, not TWI.** The tender board is part of the
+  interactive Tankonomics app, where it is worth using for members. TWI does
+  not carry it.
+- **A curated board, built by us.** Government and public-sector tenders are
+  public notices. Admins post a short summary of each relevant tender: title,
+  authority, closing date and value, with a link to the official notice. The
+  tender documents themselves are not copied. This fits the verified-data
+  approach used across the T3 apps.
+- **How entries are added.** Admins add entries by hand, or use official
+  feeds where a portal offers one. No automated scraping: most portals have
+  CAPTCHAs and rules against it.
+- **No third-party tender-data feed for now.** TenderKosh (API) was reviewed
+  and not adopted: its terms ban republishing and limit use to internal
+  business use, its operator is not named, and its portal coverage is not
+  listed. Any paid feed would need a written right to display the tenders
+  and a named company behind it.
+- **Replaces the earlier note.** This settles the "tenders via partners or
+  own app" item: the board is our own, inside Tankonomics.
+
+## 17. Change log
 
 - **17 Oct 2026:** first version. Covers the data placement, sign-in bridge,
   company identity, database choice and scale review above.
@@ -479,3 +516,9 @@ Tankonomics.
   new §11 app placement, §12 category trees (Tankonomics now matches TWI and
   TankBazaar), §13 the Big Merge (decided rules and the proposed field
   additions), §14 releases and costs.
+- **26 Nov 2026:** new §15 (Tankonomics jobs and salary data: no levels.fyi,
+  jobs from verified companies, own salary survey through Surveys); change
+  log moved to §16.
+- **26 Nov 2026 (later):** new §16 (tender board: lives in Tankonomics, curated
+  by admins with links to the official notices, no scraping, TenderKosh not
+  adopted); change log moved to §17.
