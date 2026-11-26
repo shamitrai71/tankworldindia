@@ -1159,7 +1159,9 @@ body:has(#cmpBar[style*="flex"]) footer{ padding-bottom:70px; }
 .wider-btn{ background:var(--blue-soft); color:var(--blue); border:0; border-radius:8px; padding:8px 12px; font-size:13.5px; font-weight:600; cursor:pointer; text-align:left; }
 .wider-btn:hover{ background:var(--blue); color:#fff; }
 .wider-clear{ background:none; border:1px solid var(--line, #CBD3DE); border-radius:8px; padding:7px 12px; font-size:13px; cursor:pointer; }
-@media (max-width: 860px){ .within-box{ flex:1 1 100%; } }
+/* Phones: the header search already sits full width above the results, so the
+   second "search within these results" box is hidden to avoid two search boxes. */
+@media (max-width: 860px){ .within-box{ display:none; } }
 
 /* ── Phase 5: one country at a time, suggestions, front page, company page ── */
 .cf-radio{ border-radius:50%; }
@@ -4076,8 +4078,7 @@ function renderLandingPage() {
   el.innerHTML = `
     <div class="landing-wrap">
       <div class="landing-hero">
-        <div class="em-mark">TANKWORLD INDIA · ENGINEERING &amp; EQUIPMENT DIRECTORY</div>
-        <h1>Directory of suppliers, contractors, inspectors and service providers for the process, tank and terminal industry</h1>
+        <h1>Engineering &amp; equipment directory for the process, tank and terminal industry</h1>
         <p class="landing-sub">Find the company you need</p>
         <form class="landing-search-form ls-with-country" onsubmit="submitLandingSearch(event)">
           <label class="ls-country"><span class="sr-only">Country</span>
