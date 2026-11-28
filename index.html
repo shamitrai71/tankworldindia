@@ -2613,29 +2613,70 @@ async function publishRoster(roster, sourceName, opts = {}) {
   // delete the renamed company.
   const REDIR = (typeof TWI_SLUG_REDIRECTS === 'object' && TWI_SLUG_REDIRECTS) || {};
   const follow = (s) => { let t = s, hops = 0; while (!slugs.has(t) && REDIR[t] && hops++ < 10) t = REDIR[t]; return t; };
+  // The version before the one on screen is kept for rollback (this publish
+  // deletes it). After the slug round it may be the only copy of a renamed
+  // company's app-only fields under its old slug, so it is read as a second
+  // source.
+  let prevOld = [];
+  try {
+    const m = CompanyStore.meta;
+    if (m && m.previous && m.previousParts) {
+      const ids = Array.from({ length: m.previousParts }, (_, i) => m.previous + '_' + i);
+      const parts = await Promise.all(ids.map(id => FS_REST.getDoc(ROSTER.PARTS, id)));
+      if (parts.every(x => x && typeof x.data === 'string')) {
+        prevOld = JSON.parse(await rosterGunzipB64(parts.map(x => x.data).join(''))).filter(Boolean);
+        say(`Read the previous roster ${m.previous} (${prevOld.length} companies) for renamed companies' app-only fields.`);
+      }
+    }
+  } catch (e) { say('⚠ Previous roster not read: ' + e.message); }
+  // Old-slug records of renamed companies: same company name, slug now
+  // redirected. (A merged company has a different name and is never used.)
   const renamedFrom = new Map();
-  for (const p of prev) {
-    if (slugs.has(p.slug)) continue;
+  const newByName = new Map(roster.map(c => [c.slug, String(c.name || '').trim()]));
+  for (const p of prev.concat(prevOld)) {
+    if (!p || !p.slug || slugs.has(p.slug)) continue;
     const t = follow(p.slug);
-    if (t !== p.slug && slugs.has(t) && !prevBy.has(t) && !renamedFrom.has(t)) renamedFrom.set(t, p);
+    if (t === p.slug || !slugs.has(t) || renamedFrom.has(t)) continue;
+    if (String(p.name || '').trim() !== newByName.get(t)) continue;
+    renamedFrom.set(t, p);
   }
-  // 2. carry forward app-only fields
+  // 2. carry forward app-only fields (the live record first, then the
+  //    renamed company's old-slug record for anything the live one lacks)
   const out = JSON.parse(JSON.stringify(roster));
   let carried = 0, carriedRenamed = 0;
   for (const c of out) {
-    let p = prevBy.get(c.slug);
-    if (!p && renamedFrom.has(c.slug)) { p = renamedFrom.get(c.slug); carriedRenamed++; }
-    if (!p) continue;
-    let hit = false;
-    for (const f of ROSTER.PRESERVE_ALWAYS) if (!rosterEmpty(p[f])) { c[f] = p[f]; hit = true; }
-    for (const f of ROSTER.PRESERVE_IF_EMPTY) if (rosterEmpty(c[f]) && !rosterEmpty(p[f])) { c[f] = p[f]; hit = true; }
+    const p = prevBy.get(c.slug), r = renamedFrom.get(c.slug);
+    if (!p && !r) continue;
+    let hit = false, fromOld = false;
+    for (const f of ROSTER.PRESERVE_ALWAYS) {
+      if (p && !rosterEmpty(p[f])) { c[f] = p[f]; hit = true; }
+      else if (r && !rosterEmpty(r[f])) { c[f] = r[f]; hit = true; fromOld = true; }
+    }
+    for (const f of ROSTER.PRESERVE_IF_EMPTY) {
+      if (!rosterEmpty(c[f])) continue;
+      if (p && !rosterEmpty(p[f])) { c[f] = p[f]; hit = true; }
+      else if (r && !rosterEmpty(r[f])) { c[f] = r[f]; hit = true; fromOld = true; }
+    }
     if (hit) carried++;
+    if (fromOld) carriedRenamed++;
   }
   const lost = prev.filter(p => !slugs.has(follow(p.slug)) && ROSTER.PRESERVE_ALWAYS.some(f => !rosterEmpty(p[f])));
   // 3. bake in every in-app edit (edits made under an old slug first, so an
   //    edit made under the new slug wins)
   const edits = await FS_REST.queryAfter(ROSTER.EDITS, '_editedAt', '2000-01-01T00:00:00Z');
   const bySlug = new Map(out.map(c => [c.slug, c]));
+  // A company in this file whose slug carries an old in-app deletion (for
+  // example a retired slug taken back by its own company in the slug round):
+  // ask before letting the old deletion remove it.
+  const revived = edits.filter(e => e._deleted && slugs.has(e._docId));
+  let restored = [];
+  if (revived.length) {
+    const names = revived.slice(0, 25).map(e => '• ' + ((bySlug.get(e._docId) || {}).name || e._docId)).join('\n');
+    const restore = opts.skipConfirm ? true : confirm(
+      `${revived.length} compan${revived.length === 1 ? 'y' : 'ies'} in this file ${revived.length === 1 ? 'was' : 'were'} deleted in the app earlier:\n\n${names}` +
+      `${revived.length > 25 ? '\n…' : ''}\n\nOK = restore ${revived.length === 1 ? 'it' : 'them'} (the file wins).\nCancel = keep ${revived.length === 1 ? 'it' : 'them'} deleted.`);
+    if (restore) { revived.forEach(e => { e._skip = true; }); restored = revived.map(e => e._docId); }
+  }
   let editsRenamed = 0;
   for (const e of edits) {
     if (slugs.has(e._docId)) continue;
@@ -2643,7 +2684,7 @@ async function publishRoster(roster, sourceName, opts = {}) {
     if (t !== e._docId && bySlug.has(t)) { if (!e._deleted) { rosterApplyEdit(out, bySlug, t, e); editsRenamed++; } }
     else rosterApplyEdit(out, bySlug, e._docId, e);
   }
-  for (const e of edits) if (slugs.has(e._docId)) rosterApplyEdit(out, bySlug, e._docId, e);
+  for (const e of edits) if (slugs.has(e._docId) && !e._skip) rosterApplyEdit(out, bySlug, e._docId, e);
   // 4. encode and write
   // Email and phone are admin-only: collect them for adminData/contacts, leave
   // presence flags in the roster, then scrub strips the values.
@@ -2689,6 +2730,10 @@ async function publishRoster(roster, sourceName, opts = {}) {
     for (let i = 0; i < old.previousParts; i++) {
       try { await FS_REST.deleteDoc(ROSTER.PARTS, old.previous + '_' + i); } catch (e) { /* already gone */ }
     }
+  }
+  for (const slug of restored) {
+    try { await FS_REST._rawSetMerge(ROSTER.EDITS, slug, { _deleted: false, _editedAt: new Date() }); say(`✓ restored ${slug}`); }
+    catch (e) { say(`⚠ ${slug}: old deletion not cleared (${e.message})`); }
   }
   if (lost.length) say(`⚠ Not in the new file but had owner/profile data: ${lost.map(p => p.slug).join(', ')}`);
   await CompanyStore.load();
